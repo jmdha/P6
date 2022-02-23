@@ -12,14 +12,13 @@ namespace PostgresTestSuite.Connectors
 {
     internal class PostGres : DbConnector
     {
-        string ConnectionString { get; set; }
-        public PostGres(string connectionString) : base("Postgress")
+        public PostGres(string connectionString) : base("Postgress", connectionString)
         {
-            ConnectionString = connectionString;
+
         }
 
 
-        public async Task<DataSet> CallQuery(string query)
+        public override async Task<DataSet> CallQuery(string query)
         {
             await using var conn = new NpgsqlConnection(ConnectionString);
             await conn.OpenAsync();
@@ -35,19 +34,7 @@ namespace PostgresTestSuite.Connectors
             }
         }
 
-        public string GetCardinalityEstimate(string query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<int> GetCardinalityActual(string query)
-        {
-            var result = await CallQuery(query);
-
-            return result.Tables[0].Rows.Count;
-        }
-
-        public async Task<AnalysisResult> GetAnalysis(string query)
+        public async override Task<AnalysisResult> GetAnalysis(string query)
         {
             string analysisQuery = $"EXPLAIN ANALYSE {query}";
             DataSet analysis = await CallQuery(analysisQuery);
@@ -83,7 +70,7 @@ namespace PostgresTestSuite.Connectors
 
                 var nextIndent = nextRow.Item2;
 
-                if(nextIndent > indent)
+                if (nextIndent > indent)
                     analysisRes.SubQueries.Add(RunAnalysis(rows));
                 else
                     isCheckingForSubQueries = false;
@@ -143,10 +130,5 @@ namespace PostgresTestSuite.Connectors
             return Tuple.Create(analysisResult, indentation);
         }
 
-
-        public string GetQueryPlan(string query)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
