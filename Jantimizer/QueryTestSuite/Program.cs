@@ -28,4 +28,6 @@ string joinQuery = $"SELECT * FROM jan_scheme.jan_table JOIN jan_scheme.jano_tab
 
 var analysis = await pgConn.GetAnalysis(joinQuery);
 
+Console.WriteLine(analysis.ToString());
+
 Console.WriteLine(explain);

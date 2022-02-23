@@ -26,5 +26,21 @@ namespace QueryTestSuite.Models
             ActualCardinality = actualCardinality;
             ActualTime = actualTime;
         }
+
+        public override string ToString()
+        {
+            return BuildStringBuilderRec(new StringBuilder(), 0).ToString();
+        }
+
+        private StringBuilder BuildStringBuilderRec(StringBuilder sb, int indentLevel)
+        {
+            sb.Append(new string('\t', indentLevel));
+            sb.AppendLine(Name);
+            foreach(var sub in SubQueries)
+                sub.BuildStringBuilderRec(sb, indentLevel+1);
+
+            return sb;
+        }
+
     }
 }
