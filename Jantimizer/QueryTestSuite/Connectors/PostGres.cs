@@ -39,50 +39,40 @@ namespace PostgresTestSuite.Connectors
             string analysisQuery = $"EXPLAIN ANALYSE {query}";
             DataSet analysis = await CallQuery(analysisQuery);
 
-
-            Queue<Tuple<AnalysisResult, int>> results;
+            Queue<AnalysisResultWithIndent> resultQueue;
 
             try
             {
-                results = new Queue<Tuple<AnalysisResult, int>>(ParseQueryAnalysisRows(analysis.Tables[0].Rows));
+                var resultRows = ParseQueryAnalysisRows(analysis.Tables[0].Rows);
+                resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
             }
             catch (NoNullAllowedException)
             {
                 throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis of {analysisQuery}");
             }
 
-
-            return RunAnalysis(results);
+            return RunAnalysis(resultQueue);
         }
 
-        private AnalysisResult RunAnalysis(Queue<Tuple<AnalysisResult, int>> rows)
+        private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
-            Tuple<AnalysisResult, int>? row = rows.Dequeue();
-            var analysisRes = row.Item1;
-            var indent = row.Item2;
+            AnalysisResultWithIndent? row = rows.Dequeue();
+            var analysisRes = row.AnalysisResult;
 
-            bool isCheckingForSubQueries = true;
-            while (isCheckingForSubQueries)
+            // Recursively add subqueries
+            while (rows.Count > 0)
             {
-                Tuple<AnalysisResult, int>? nextRow;
-                if (!rows.TryPeek(out nextRow))
-                    break;
-
-                var nextIndent = nextRow.Item2;
-
-                if (nextIndent > indent)
+                if (rows.Peek().indentation > row.indentation)
                     analysisRes.SubQueries.Add(RunAnalysis(rows));
                 else
-                    isCheckingForSubQueries = false;
+                    break;
             }
 
             return analysisRes;
         }
 
-        private Queue<Tuple<AnalysisResult, int>> ParseQueryAnalysisRows(DataRowCollection rows)
+        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(DataRowCollection rows)
         {
-            Queue<Tuple<AnalysisResult, int>> outQueue = new Queue<Tuple<AnalysisResult, int>>();
-
             foreach (DataRow row in rows)
             {
                 var rowStr = row["QUERY PLAN"].ToString();
@@ -91,34 +81,36 @@ namespace PostgresTestSuite.Connectors
 
                 var parsed = ParseQueryAnalysisRow(rowStr);
                 if (parsed != null)
-                    outQueue.Enqueue(parsed);
+                    yield return parsed;
             }
-
-            return outQueue;
         }
 
+
+
+        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
 
         /// <summary>
         /// Returns null if the row isn't a new subquery, e.g. if the row is the condition on a join.
         /// </summary>
         /// <param name="rowStr">The content from a single row after running EXPLAIN ANALYZE</param>
         /// <returns>AnalysisResult, IndentationSize</returns>
-        private Tuple<AnalysisResult, int>? ParseQueryAnalysisRow(string rowStr)
+        private AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
         {
-            Regex rowParser = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)");
-
-            var match = rowParser.Match(rowStr);
+            // Regex Matching
+            var match = RowParserRegex.Match(rowStr);
 
             if (!match.Success)
                 return null;
 
-            var rowData = rowParser.Match(rowStr).Groups;
+            var rowData = match.Groups;
 
+            // Data Parsing
             int indentation = rowData["indentation"].ToString().Length;
 
             decimal miliseconds = decimal.Parse(rowData["timeMax"].ToString()); // Decimal, instead of double, because the tiny, somewhat important number, has already been written to ascii as decimal.
             long nanoSeconds = (long)Math.Round(miliseconds * 1000000);
 
+            // Create Result
             var analysisResult = new AnalysisResult(
                 rowData["name"].ToString().Trim(),
                 decimal.Parse(rowData["costMin"].ToString()),
@@ -127,8 +119,21 @@ namespace PostgresTestSuite.Connectors
                 new TimeSpan(nanoSeconds)
             );
 
-            return Tuple.Create(analysisResult, indentation);
+            // Return
+            return new AnalysisResultWithIndent(analysisResult, indentation);
         }
 
+        private class AnalysisResultWithIndent
+        {
+            public AnalysisResult AnalysisResult { get; set; }
+            public int indentation { get; set; }
+
+            public AnalysisResultWithIndent(AnalysisResult analysisResult, int indentation)
+            {
+                AnalysisResult = analysisResult;
+                this.indentation = indentation;
+            }
+        }
     }
+
 }

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.1.7" />
     <PackageReference Include="Npgsql" Version="6.0.3" />
   </ItemGroup>
 
