@@ -12,7 +12,7 @@ namespace PostgresTestSuite.Connectors
 {
     internal class PostGres : DbConnector
     {
-        public PostGres(string connectionString) : base("Postgress", connectionString)
+        public PostGres(string connectionString) : base("Postgres", connectionString)
         {
 
         }
