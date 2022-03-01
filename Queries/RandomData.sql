@@ -25,7 +25,7 @@ explain analyze select * from (((a join b on a."int4" > b."int4") join c on b."i
 explain analyze select * from (((a join b on a."int4" > b."int4") join c on b."int4" > c."int4") join d on c."int4" > d."int4"); -- 927833 | 0
 
 -- Clean up
-drop table A;
-drop table B;
-drop table C;
-drop table D;
+drop table if exists A;
+drop table if exists B;
+drop table if exists C;
+drop table if exists D;
