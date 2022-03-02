@@ -22,10 +22,8 @@ namespace QueryTestSuite.Connectors
 
 
         public Task<DataSet> CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
-        public Task<DataSet> CallQuery(Query query) => CallQuery(query.GetVariation(this));
         public abstract Task<DataSet> CallQuery(string query);
 
-        public Task<AnalysisResult> GetAnalysis(Query query) => GetAnalysis(query.GetVariation(this));
 
         public Task<AnalysisResult> GetAnalysis(FileInfo sqlFile) => GetAnalysis(File.ReadAllText(sqlFile.FullName));
         public abstract Task<AnalysisResult> GetAnalysis(string query);
