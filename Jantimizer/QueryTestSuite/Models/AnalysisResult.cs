@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
-    internal class AnalysisResult
+    public class AnalysisResult
     {
         public string Name { get; set; }
 
         public decimal EstimatedCost { get; set; }
-        public int EstimatedCardinality { get; set; }
+        public ulong EstimatedCardinality { get; set; }
 
-        public int ActualCardinality { get; set; }
+        public ulong ActualCardinality { get; set; }
         public TimeSpan ActualTime { get; set; }
 
         public List<AnalysisResult> SubQueries = new List<AnalysisResult>();
 
-        public AnalysisResult(string name, decimal estimatedCost, int estimatedCardinality, int actualCardinality, TimeSpan actualTime)
+        public AnalysisResult(string name, decimal estimatedCost, ulong estimatedCardinality, ulong actualCardinality, TimeSpan actualTime)
         {
             Name = name;
             EstimatedCost = estimatedCost;

@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PostgresTestSuite.Connectors
+namespace QueryTestSuite.Connectors
 {
-    internal abstract class DbConnector
+    public abstract class DbConnector
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }
@@ -19,10 +20,17 @@ namespace PostgresTestSuite.Connectors
             ConnectionString = connectionString;
         }
 
+
+        public Task<DataSet> CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
+        public Task<DataSet> CallQuery(Query query) => CallQuery(query.GetVariation(this));
         public abstract Task<DataSet> CallQuery(string query);
+
+        public Task<AnalysisResult> GetAnalysis(Query query) => GetAnalysis(query.GetVariation(this));
+
+        public Task<AnalysisResult> GetAnalysis(FileInfo sqlFile) => GetAnalysis(File.ReadAllText(sqlFile.FullName));
         public abstract Task<AnalysisResult> GetAnalysis(string query);
 
-        public async Task<int> GetCardinalityEstimate(string query)
+        public async Task<ulong> GetCardinalityEstimate(string query)
         {
             var analysis = await GetAnalysis(query);
 
@@ -35,6 +43,8 @@ namespace PostgresTestSuite.Connectors
 
             return result.Tables[0].Rows.Count;
         }
+
+        protected static TimeSpan TimeSpanFromMs(decimal ms) => new TimeSpan((long)Math.Round(ms * 10000)); // 1 million ns per ms, but 1 tick is 100 ns, thus there are 1000000/100=10000 ticks per ms
 
     }
 }
