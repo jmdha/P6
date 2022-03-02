@@ -36,8 +36,9 @@ namespace QueryTestSuite.Connectors
             }
 
             await Task.WhenAll(testRuns);
+            Console.WriteLine("Cleaning up");
             foreach (var runner in testRunners)
-                await runner.DisposeAsync();
+                await runner.Cleanup();
         }
 
         private FileInfo GetVariant(DirectoryInfo dir, string name, string type)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
-    internal class TestRunner : IAsyncDisposable, IDisposable
+    internal class TestRunner
     {
         public DbConnector Connector { get; }
         public FileInfo SetupFile { get; set; }
@@ -66,15 +66,10 @@ namespace QueryTestSuite.Models
             return queryAnalysisResults;
         }
 
-        public async ValueTask DisposeAsync()
+
+        public async Task Cleanup()
         {
-            Console.WriteLine($"Disposing async using {CleanupFile}");
             await Connector.CallQuery(CleanupFile);
-        }
-        public void Dispose()
-        {
-            Console.WriteLine($"Disposing using {CleanupFile}");
-            Task.WaitAll(Connector.CallQuery(CleanupFile));
         }
     }
 }
