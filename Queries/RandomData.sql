@@ -13,21 +13,21 @@ create table D as select s, (random() * 10000)::integer from generate_Series(1,5
 analyze;
 
 -- Run queries
-explain analyze select * from (a join b on a."int4" = b."int4");                                                                 -- 12     | 6
-explain analyze select * from (a join b on a."int4" < b."int4");                                                                 -- 167    | 470
-explain analyze select * from (a join b on a."int4" > b."int4");                                                                 -- 167    | 24
-explain analyze select * from (a join b on a."int4" <= b."int4");                                                                -- 167    | 476
-explain analyze select * from (a join b on a."int4" >= b."int4");                                                                -- 167    | 30
-explain analyze select * from ((a join b on a."int4" = b."int4") join c on b."int4" = c."int4");                                 -- 12     | 0
-explain analyze select * from ((a join b on a."int4" < b."int4") join c on b."int4" < c."int4");                                 -- 5567   | 44500
-explain analyze select * from ((a join b on a."int4" < b."int4") join c on b."int4" > c."int4");                                 -- 5567   | 3330
-explain analyze select * from ((a join b on a."int4" > b."int4") join c on b."int4" > c."int4");                                 -- 5567   | 0
-explain analyze select * from (((a join b on a."int4" < b."int4") join c on b."int4" < c."int4") join d on c."int4" < d."int4"); -- 927833 | 20956870  
-explain analyze select * from (((a join b on a."int4" < b."int4") join c on b."int4" < c."int4") join d on c."int4" > d."int4"); -- 927833 | 1235810
-explain analyze select * from (((a join b on a."int4" < b."int4") join c on b."int4" > c."int4") join d on c."int4" < d."int4"); -- 927833 | 1780120
-explain analyze select * from (((a join b on a."int4" < b."int4") join c on b."int4" > c."int4") join d on c."int4" > d."int4"); -- 927833 | 6800
-explain analyze select * from (((a join b on a."int4" > b."int4") join c on b."int4" > c."int4") join d on c."int4" < d."int4"); -- 927833 | 16000
-explain analyze select * from (((a join b on a."int4" > b."int4") join c on b."int4" > c."int4") join d on c."int4" > d."int4"); -- 927833 | 0
+explain analyze select * from (a join b on a."int4" = b."int4");
+explain analyze select * from (a join b on a."int4" < b."int4");
+explain analyze select * from (a join b on a."int4" > b."int4");
+explain analyze select * from (a join b on a."int4" <= b."int4");
+explain analyze select * from (a join b on a."int4" >= b."int4");
+explain analyze select * from ((a join b on a."int4" = b."int4") join c on b."int4" = c."int4");
+explain analyze select * from ((a join b on a."int4" < b."int4") join c on b."int4" < c."int4");
+explain analyze select * from ((a join b on a."int4" > b."int4") join c on b."int4" > c."int4");
+explain analyze select * from ((a join b on a."int4" <= b."int4") join c on b."int4" <= c."int4");
+explain analyze select * from ((a join b on a."int4" >= b."int4") join c on b."int4" >= c."int4");
+explain analyze select * from (((a join b on a."int4" = b."int4") join c on b."int4" = c."int4") join d on c."int4" = d."int4");
+explain analyze select * from (((a join b on a."int4" < b."int4") join c on b."int4" < c."int4") join d on c."int4" < d."int4");
+explain analyze select * from (((a join b on a."int4" > b."int4") join c on b."int4" > c."int4") join d on c."int4" > d."int4");
+explain analyze select * from (((a join b on a."int4" <= b."int4") join c on b."int4" <= c."int4") join d on c."int4" <= d."int4");
+explain analyze select * from (((a join b on a."int4" >= b."int4") join c on b."int4" >= c."int4") join d on c."int4" >= d."int4");
 
 explain analyze select * from a, b where a."int4" = b."int4";
 explain analyze select * from a, b where a."int4" < b."int4";
