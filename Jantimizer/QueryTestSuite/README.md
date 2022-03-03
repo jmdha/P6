@@ -13,8 +13,8 @@ Each test suite is a directory in /Tests, and is run as follows:
 
 ## Test Naming Convention
 	/Tests/{TestName}
+                cleanup.sql or cleanup.[sqlType].sql
 		setup.sql or setup.[sqlType].sql
-		cleanup.sql or cleanup.[sqlType].sql
 		cases/
 			*.sql or *.[sqlType].sql // Whereas '*' is a wildcart, but may not contain a dot '.'.
 
