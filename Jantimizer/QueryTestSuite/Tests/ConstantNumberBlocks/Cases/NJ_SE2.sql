@@ -1,0 +1,1 @@
+﻿SELECT * FROM (a JOIN b ON a."int4" <= b."int4");

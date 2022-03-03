@@ -1,4 +1,6 @@
-﻿create table A as select s, (10)::integer from generate_Series(1,10) s;
-create table B as select s, (100)::integer from generate_Series(1,50) s;
-create table C as select s, (1000)::integer from generate_Series(1,100) s;
-create table D as select s, (10000)::integer from generate_Series(1,500) s;
+﻿CREATE TABLE A AS SELECT s, (10)::integer FROM generate_Series(1,10) s;
+CREATE TABLE B AS SELECT s, (100)::integer FROM generate_Series(1,50) s;
+CREATE TABLE C AS SELECT s, (1000)::integer FROM generate_Series(1,100) s;
+CREATE TABLE D AS SELECT s, (10000)::integer FROM generate_Series(1,500) s;
+
+ANALYZE;
