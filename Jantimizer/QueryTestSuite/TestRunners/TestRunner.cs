@@ -44,7 +44,7 @@ namespace QueryTestSuite.Models
             foreach (var queryFile in CaseFiles)
             {
                 Console.WriteLine($"Spawning Task for: {queryFile}");
-                queryAnalysisTasks.Add(CommunicationModel.Connector.CallQuery(queryFile));
+                queryAnalysisTasks.Add(CommunicationModel.Connector.AnalyseQuery(queryFile));
             }
 
             await Task.WhenAll(queryAnalysisTasks);
@@ -63,7 +63,7 @@ namespace QueryTestSuite.Models
             foreach (FileInfo queryFile in CaseFiles)
             {
                 Console.WriteLine($"Running {queryFile}");
-                queryAnalysisResults.Add(CommunicationModel.Parser.GetAnalysis(await CommunicationModel.Connector.CallQuery(queryFile)));
+                queryAnalysisResults.Add(CommunicationModel.Parser.GetAnalysis(await CommunicationModel.Connector.AnalyseQuery(queryFile)));
             }
             return queryAnalysisResults;
         }
