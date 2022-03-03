@@ -15,11 +15,11 @@ namespace QueryTestSuite
         async static Task AsyncMain(string[] args)
         {
             var postgresModel = new DatabaseCommunicator(
-                "Postgres",
+                "postgre",
                 new PostgreSqlConnector("Host=localhost;Username=postgres;Password=password;Database=postgres"),
                 new PostgreSqlParser());
             var mySqlModel = new DatabaseCommunicator(
-                "MySQL",
+                "mysql",
                 new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234"),
                 new MySQLParser());
 
