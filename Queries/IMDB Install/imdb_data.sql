@@ -1,4 +1,4 @@
-copy imdb.name_basics from E'C:/Users/Public/Data/name.basics.tsv/data.tsv' with (format 'csv', delimiter E'\t', null '\N', header true, quote E'\b');
+copy name_basics from E'C:/Users/Public/Data/name.basics.tsv/data.tsv' with (format 'csv', delimiter E'\t', null '\N', header true, quote E'\b');
 
 copy ratings from E'C:/Users/Public/Data/title.ratings.tsv/data.tsv' with (format 'csv', delimiter E'\t', null '\N', header true, quote E'\b');
 
