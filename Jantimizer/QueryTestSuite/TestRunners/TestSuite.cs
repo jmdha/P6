@@ -9,11 +9,11 @@ namespace QueryTestSuite.Connectors
 {
     internal class TestSuite
     {
-        public IEnumerable<DbConnector> Connectors { get; }
+        public IEnumerable<DbCommunicationModel> DatabaseModels { get; }
 
-        public TestSuite(IEnumerable<DbConnector> connectors)
+        public TestSuite(IEnumerable<DbCommunicationModel> connectors)
         {
-            Connectors = connectors;
+            DatabaseModels = connectors;
         }
 
         public async Task RunTests(DirectoryInfo dir)
@@ -21,15 +21,15 @@ namespace QueryTestSuite.Connectors
             var testRuns = new List<Task<List<AnalysisResult>>>();
             var testRunners = new List<TestRunner>();
 
-            foreach(DbConnector connector in Connectors)
+            foreach(DbCommunicationModel databaseModel in DatabaseModels)
             {
                 var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "cases/"));
 
                 TestRunner runner = new TestRunner(
-                    connector,
-                    GetVariant(dir, "setup", connector.Name),
-                    GetVariant(dir, "cleanup", connector.Name),
-                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, connector.Name))
+                    databaseModel,
+                    GetVariant(dir, "setup", databaseModel.Name),
+                    GetVariant(dir, "cleanup", databaseModel.Name),
+                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name))
                 );
                 testRuns.Add(runner.Run());
                 testRunners.Add(runner);

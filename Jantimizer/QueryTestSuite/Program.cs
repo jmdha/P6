@@ -1,5 +1,6 @@
 ﻿using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
+using QueryTestSuite.Parsers;
 using System.Data;
 
 namespace QueryTestSuite
@@ -13,10 +14,16 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            var pgConn = new PostgreSqlConnector("Host=localhost;Username=postgres;Password=Aber1234;Database=JanBase");
-            var myConn = new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234");
+            var postgresModel = new DbCommunicationModel(
+                "Postgres",
+                new PostgreSqlConnector("Host=localhost;Username=postgres;Password=Aber1234;Database=JanBase"),
+                new PostgreSqlParser());
+            var mySqlModel = new DbCommunicationModel(
+                "MySQL",
+                new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234"),
+                new MySQLParser());
 
-            var connectorSet = new List<DbConnector>() { pgConn };
+            var connectorSet = new List<DbCommunicationModel>() { postgresModel };
 
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
