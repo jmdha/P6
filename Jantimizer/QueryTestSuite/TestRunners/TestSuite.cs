@@ -11,9 +11,9 @@ namespace QueryTestSuite.Connectors
     {
         public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
 
-        public TestSuite(IEnumerable<DatabaseCommunicator> connectors)
+        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels)
         {
-            DatabaseModels = connectors;
+            DatabaseModels = databaseModels;
         }
 
         public async Task RunTests(DirectoryInfo dir)
@@ -36,6 +36,15 @@ namespace QueryTestSuite.Connectors
             }
 
             await Task.WhenAll(testRuns);
+
+            foreach(var runs in testRuns)
+            {
+                foreach (var run in await runs)
+                {
+                    Console.WriteLine($"Database predicted cardinality: [{(run.EstimatedCardinality)}], actual: [{run.ActualCardinality}]");
+                }
+            }
+
             Console.WriteLine("Cleaning up");
             foreach (var runner in testRunners)
                 await runner.Cleanup();

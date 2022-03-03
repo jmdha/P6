@@ -11,7 +11,7 @@ namespace QueryTestSuite.Parsers
 {
     public class PostgreSqlParser : BasePlanParser
     {
-        public override AnalysisResult GetAnalysis(DataSet planData)
+        public override AnalysisResult ParsePlan(DataSet planData)
         {
             Queue<AnalysisResultWithIndent> resultQueue;
 
@@ -25,7 +25,8 @@ namespace QueryTestSuite.Parsers
                 throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis");
             }
 
-            return RunAnalysis(resultQueue);
+            LatestPlan = RunAnalysis(resultQueue);
+            return LatestPlan;
         }
 
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
