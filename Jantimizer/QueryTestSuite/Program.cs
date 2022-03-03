@@ -1,6 +1,7 @@
 ﻿using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;
+using QueryTestSuite.Services;
 using System.Data;
 
 namespace QueryTestSuite
@@ -14,13 +15,15 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
+            SecretsService secrets = new SecretsService();
+
             var postgresModel = new DatabaseCommunicator(
                 "postgre",
-                new PostgreSqlConnector("Host=localhost;Username=postgres;Password=password;Database=postgres"),
+                new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL")),
                 new PostgreSqlParser());
             var mySqlModel = new DatabaseCommunicator(
                 "mysql",
-                new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234"),
+                new Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
                 new MySQLParser());
 
             var connectorSet = new List<DatabaseCommunicator>() { postgresModel };
@@ -35,7 +38,6 @@ namespace QueryTestSuite
                 Console.WriteLine($"Running Collection: {testDir}");
                 await suite.RunTests(testDir);
             }
-
         }
     }
 }

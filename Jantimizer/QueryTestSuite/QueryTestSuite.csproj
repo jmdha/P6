@@ -20,6 +20,7 @@
     <None Remove="Tests\**" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
     <PackageReference Include="MySqlConnector" Version="2.1.7" />
     <PackageReference Include="Npgsql" Version="6.0.3" />
   </ItemGroup>
@@ -30,5 +31,6 @@
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
+    <UserSecretsId>8c0990b3-bd55-4561-95ab-69fec8917b23</UserSecretsId>
   </PropertyGroup>
 </Project>
