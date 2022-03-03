@@ -1,1 +1,1 @@
-explain analyze select * from a, b, c where a."int4" <= b."int4" and b."int4" <= c."int4";
+select * from a, b, c where a."int4" <= b."int4" and b."int4" <= c."int4";

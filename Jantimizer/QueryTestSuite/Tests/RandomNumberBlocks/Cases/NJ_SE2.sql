@@ -1,1 +1,1 @@
-﻿explain analyze select * from (a join b on a."int4" <= b."int4");
+﻿select * from (a join b on a."int4" <= b."int4");
