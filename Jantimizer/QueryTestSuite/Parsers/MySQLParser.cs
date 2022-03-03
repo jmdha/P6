@@ -25,8 +25,7 @@ namespace QueryTestSuite.Parsers
                 throw new NoNullAllowedException($"Unexpected null-value from MySql Analysis");
             }
 
-            LatestPlan = RunAnalysis(resultQueue);
-            return LatestPlan;
+            return RunAnalysis(resultQueue);
         }
 
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)

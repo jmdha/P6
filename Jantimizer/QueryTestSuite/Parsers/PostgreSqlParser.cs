@@ -25,8 +25,7 @@ namespace QueryTestSuite.Parsers
                 throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis");
             }
 
-            LatestPlan = RunAnalysis(resultQueue);
-            return LatestPlan;
+            return RunAnalysis(resultQueue);
         }
 
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
