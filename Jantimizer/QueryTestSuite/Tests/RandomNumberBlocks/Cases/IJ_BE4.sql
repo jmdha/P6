@@ -1,1 +1,1 @@
-select * from a, b, c, d where a."int4" >= b."int4" and b."int4" >= c."int4" and c."int4" >= d."int4";
+SELECT * FROM a, b, c, d WHERE a."int4" >= b."int4" AND b."int4" >= c."int4" AND c."int4" >= d."int4";

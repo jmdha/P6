@@ -1,5 +1,5 @@
 ﻿-- Clean up
-drop table IF EXISTS A;
-drop table IF EXISTS B;
-drop table IF EXISTS C;
-drop table IF EXISTS D;
+DROP TABLE IF EXISTS A;
+DROP TABLE IF EXISTS B;
+DROP TABLE IF EXISTS C;
+DROP TABLE IF EXISTS D;

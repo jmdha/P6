@@ -1,1 +1,1 @@
-select * from a, b where a."int4" > b."int4";
+SELECT * FROM a, b WHERE a."int4" > b."int4";

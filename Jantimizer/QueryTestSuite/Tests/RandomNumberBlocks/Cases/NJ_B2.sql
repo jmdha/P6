@@ -1,1 +1,1 @@
-﻿select * from (a join b on a."int4" > b."int4");
+﻿SELECT * FROM (a JOIN b ON a."int4" > b."int4");
