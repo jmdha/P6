@@ -29,8 +29,8 @@ namespace QueryTestSuite.Connectors
 
         public override async Task<DataSet> AnalyseQuery(string query)
         {
-            if (!query.Contains("EXPLAIN ANALYSE"))
-                return await CallQuery($"EXPLAIN ANALYSE {query}");
+            if (!query.ToUpper().Contains("EXPLAIN ANALYZE"))
+                return await CallQuery($"EXPLAIN ANALYZE {query}");
             return await CallQuery(query);
         }
     }
