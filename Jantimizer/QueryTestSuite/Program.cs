@@ -13,8 +13,8 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            var pgConn = new PostGres("Host=localhost;Username=postgres;Password=Aber1234;Database=JanBase");
-            var myConn = new MySql("Host=localhost;Username=Jantimizer;Password=Aber1234");
+            var pgConn = new PostgreSqlConnector("Host=localhost;Username=postgres;Password=Aber1234;Database=JanBase");
+            var myConn = new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234");
 
             var connectorSet = new List<DbConnector>() { pgConn };
 

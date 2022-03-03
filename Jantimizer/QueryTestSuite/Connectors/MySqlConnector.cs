@@ -1,19 +1,13 @@
 ﻿using MySqlConnector;
-using Npgsql;
 using QueryTestSuite.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace QueryTestSuite.Connectors
 {
-    internal class MySql : DbConnector
+    internal class MySqlConnector : DbConnector
     {
-        public MySql(string connectionString) : base(nameof(MySql), connectionString)
+        public MySqlConnector(string connectionString) : base("mysql", connectionString)
         {
 
         }

@@ -1,19 +1,13 @@
 ﻿using Npgsql;
 using QueryTestSuite.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace QueryTestSuite.Connectors
 {
-    internal class PostGres : DbConnector
+    internal class PostgreSqlConnector : DbConnector
     {
-        public PostGres(string connectionString) : base(nameof(PostGres), connectionString)
+        public PostgreSqlConnector(string connectionString) : base("postgre", connectionString)
         {
 
         }
