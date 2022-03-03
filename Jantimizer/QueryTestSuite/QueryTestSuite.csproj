@@ -24,7 +24,9 @@
     <PackageReference Include="Npgsql" Version="6.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tests\" />
+    <None Include="Tests\ConstantNumberBlocks\Cases\JoinOnLargerThan.sql" />
+    <None Include="Tests\ConstantNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\ConstantNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
