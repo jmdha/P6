@@ -9,9 +9,9 @@ namespace QueryTestSuite.Connectors
 {
     internal class TestSuite
     {
-        public IEnumerable<DbCommunicationModel> DatabaseModels { get; }
+        public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
 
-        public TestSuite(IEnumerable<DbCommunicationModel> connectors)
+        public TestSuite(IEnumerable<DatabaseCommunicator> connectors)
         {
             DatabaseModels = connectors;
         }
@@ -21,7 +21,7 @@ namespace QueryTestSuite.Connectors
             var testRuns = new List<Task<List<AnalysisResult>>>();
             var testRunners = new List<TestRunner>();
 
-            foreach(DbCommunicationModel databaseModel in DatabaseModels)
+            foreach(DatabaseCommunicator databaseModel in DatabaseModels)
             {
                 var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "cases/"));
 

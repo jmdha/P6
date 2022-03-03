@@ -11,12 +11,12 @@ namespace QueryTestSuite.Models
 {
     internal class TestRunner
     {
-        public DbCommunicationModel CommunicationModel { get; }
+        public DatabaseCommunicator CommunicationModel { get; }
         public FileInfo SetupFile { get; set; }
         public FileInfo CleanupFile { get; set; }
         public IEnumerable<FileInfo> CaseFiles { get; set; }
 
-        public TestRunner(DbCommunicationModel databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
             CommunicationModel = databaseModel;
             SetupFile = setupFile;
@@ -24,7 +24,7 @@ namespace QueryTestSuite.Models
             CaseFiles = caseFiles;
         }
 
-        public async Task<List<AnalysisResult>> Run(bool runParallel = true)
+        public async Task<List<AnalysisResult>> Run(bool runParallel = false)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await CommunicationModel.Connector.CallQuery(CleanupFile);

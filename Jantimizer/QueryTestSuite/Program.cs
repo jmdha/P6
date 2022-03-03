@@ -14,16 +14,16 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            var postgresModel = new DbCommunicationModel(
+            var postgresModel = new DatabaseCommunicator(
                 "Postgres",
-                new PostgreSqlConnector("Host=localhost;Username=postgres;Password=Aber1234;Database=JanBase"),
+                new PostgreSqlConnector("Host=localhost;Username=postgres;Password=password;Database=postgres"),
                 new PostgreSqlParser());
-            var mySqlModel = new DbCommunicationModel(
+            var mySqlModel = new DatabaseCommunicator(
                 "MySQL",
                 new Connectors.MySqlConnector("Host=localhost;Username=Jantimizer;Password=Aber1234"),
                 new MySQLParser());
 
-            var connectorSet = new List<DbCommunicationModel>() { postgresModel };
+            var connectorSet = new List<DatabaseCommunicator>() { postgresModel };
 
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");

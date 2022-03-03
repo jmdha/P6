@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
-    public class DbCommunicationModel
+    public class DatabaseCommunicator
     {
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
 
-        public DbCommunicationModel(string name, IDbConnector connector, IPlanParser parser)
+        public DatabaseCommunicator(string name, IDbConnector connector, IPlanParser parser)
         {
             Name = name;
             Connector = connector;
