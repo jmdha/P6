@@ -1,4 +1,5 @@
 ﻿using QueryTestSuite.Models;
+using CsvHelper;
 
 namespace QueryTestSuite.TestRunners
 {

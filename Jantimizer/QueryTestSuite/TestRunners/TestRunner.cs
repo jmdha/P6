@@ -1,5 +1,8 @@
-﻿using QueryTestSuite.TestRunners;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using QueryTestSuite.TestRunners;
 using System.Data;
+using System.Globalization;
 
 namespace QueryTestSuite.Models
 {
@@ -20,7 +23,7 @@ namespace QueryTestSuite.Models
             Results = new List<TestCase>();
         }
 
-        public async Task<List<TestCase>> Run(bool runParallel = false, bool consoleOutput = true)
+        public async Task<List<TestCase>> Run(bool runParallel = false, bool consoleOutput = true, bool saveResult = true)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -38,6 +41,9 @@ namespace QueryTestSuite.Models
 
             if (consoleOutput)
                 WriteResultToConsole();
+            if (saveResult)
+                SaveResult();
+
 
             return Results;
         }
@@ -95,6 +101,36 @@ namespace QueryTestSuite.Models
         {
             foreach(var testCase in Results)
                 Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.AnalysisResult.EstimatedCardinality)}], actual: [{testCase.AnalysisResult.ActualCardinality}]");
+        }
+
+        private void SaveResult()
+        {
+            const string directory = "Results";
+            const string resultFileName = directory + "\\result.csv";
+            Directory.CreateDirectory(directory);
+            FileStream stream;
+            CsvConfiguration config;
+            if (File.Exists(resultFileName))
+            {
+                stream = File.Open(resultFileName, FileMode.Append);
+                config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    // Don't write the header again.
+                    HasHeaderRecord = false,
+                };
+
+            } else
+            {
+                stream = File.Open(resultFileName, FileMode.Create);
+                config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            }
+            using (var writer = new StreamWriter(stream))
+            using (var csv = new CsvWriter(writer, config))
+            {
+                csv.WriteRecords(Results);
+                writer.Flush();
+            }
+
         }
 
     }
