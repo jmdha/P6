@@ -18,5 +18,10 @@ namespace QueryEditorTool.Models.Expersions
             Predicate = predicate;
             Left = left;
         }
+
+        public override string? ToString()
+        {
+            return $"{Left} {PredicateEnumParser.ConvertToString(Predicate)} {Right}";
+        }
     }
 }

@@ -90,6 +90,9 @@
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\QueryEditorTool\QueryEditorTool.csproj" />
+  </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
     <UserSecretsId>8c0990b3-bd55-4561-95ab-69fec8917b23</UserSecretsId>

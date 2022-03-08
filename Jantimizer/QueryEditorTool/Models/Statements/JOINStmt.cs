@@ -8,11 +8,11 @@ namespace QueryEditorTool.Models
 {
     public class JOINStmt : IStmt
     {
-        public IConst RightTable { get; set; }
-        public IConst LeftTable { get; set; }
+        public INode RightTable { get; set; }
+        public INode LeftTable { get; set; }
         public IExp OnExp { get; set; }
 
-        public JOINStmt(IConst rightTable, IConst leftTable, IExp onExp)
+        public JOINStmt(INode rightTable, INode leftTable, IExp onExp)
         {
             RightTable = rightTable;
             LeftTable = leftTable;
