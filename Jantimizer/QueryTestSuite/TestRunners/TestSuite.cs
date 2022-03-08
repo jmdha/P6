@@ -11,10 +11,12 @@ namespace QueryTestSuite.Connectors
     internal class TestSuite
     {
         public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
+        private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels)
+        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels, DateTime timeStamp)
         {
             DatabaseModels = databaseModels;
+            TimeStamp = timeStamp;
         }
 
         public async Task RunTests(DirectoryInfo dir)
@@ -30,7 +32,8 @@ namespace QueryTestSuite.Connectors
                     databaseModel,
                     GetVariant(dir, "setup", databaseModel.Name),
                     GetVariant(dir, "cleanup", databaseModel.Name),
-                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name))
+                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name)),
+                    TimeStamp
                 );
                 testRunners.Add(runner);
                 Console.WriteLine("Running tests");

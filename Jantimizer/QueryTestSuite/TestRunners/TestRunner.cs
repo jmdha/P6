@@ -13,14 +13,16 @@ namespace QueryTestSuite.Models
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
+        private DateTime TimeStamp;
 
-        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
             DatabaseModel = databaseModel;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
+            TimeStamp = timeStamp;
         }
 
         public async Task<List<TestCase>> Run(bool runParallel = false, bool consoleOutput = true, bool saveResult = true)
@@ -105,8 +107,8 @@ namespace QueryTestSuite.Models
 
         private void SaveResult()
         {
-            const string directory = "Results";
-            const string resultFileName = directory + "\\result.csv";
+            string directory = $"Results\\{TimeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}";
+            string resultFileName = directory + "\\result.csv";
             Directory.CreateDirectory(directory);
             FileStream stream;
             CsvConfiguration config;
