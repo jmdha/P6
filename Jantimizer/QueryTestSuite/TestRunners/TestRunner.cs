@@ -1,11 +1,5 @@
-﻿using QueryTestSuite.Connectors;
-using QueryTestSuite.Parsers;
-using System;
-using System.Collections.Generic;
+﻿using QueryTestSuite.TestRunners;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
@@ -15,7 +9,7 @@ namespace QueryTestSuite.Models
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
-        public List<AnalysisResult> Results { get; private set; }
+        public List<TestCase> Results { get; private set; }
 
         public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
@@ -23,10 +17,10 @@ namespace QueryTestSuite.Models
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
-            Results = new List<AnalysisResult>();
+            Results = new List<TestCase>();
         }
 
-        public async Task<List<AnalysisResult>> Run(bool runParallel = false, bool consoleOutput = true)
+        public async Task<List<TestCase>> Run(bool runParallel = false, bool consoleOutput = true)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -48,40 +42,59 @@ namespace QueryTestSuite.Models
             return Results;
         }
 
-        private async Task<List<AnalysisResult>> RunQueriesParallel()
+        private async Task<List<TestCase>> RunQueriesParallel()
         {
-            var queryAnalysisTasks = new List<Task<DataSet>>();
-            foreach (var queryFile in CaseFiles)
+            List<Task<TestCase>> testTasks = new List<Task<TestCase>>();
+            foreach (FileInfo queryFile in CaseFiles)
             {
                 Console.WriteLine($"Spawning Task for: {queryFile}");
-                queryAnalysisTasks.Add(DatabaseModel.Connector.AnalyseQuery(queryFile));
+                Task<TestCase> testTask = GenerateAndRunTestCase(queryFile);
+                testTasks.Add(testTask);
             }
 
-            await Task.WhenAll(queryAnalysisTasks);
+            await Task.WhenAll(testTasks);
 
-            var queryAnalysisResults = new List<AnalysisResult>();
-            foreach (var task in queryAnalysisTasks)
+            var testCases = new List<TestCase>();
+            foreach (var testTask in testTasks)
             {
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await task));
+                testCases.Add(testTask.Result);
             }
-            return queryAnalysisResults;
+            return testCases;
         }
 
-        private async Task<List<AnalysisResult>> RunQueriesSerial()
+        private async Task<List<TestCase>> RunQueriesSerial()
         {
-            var queryAnalysisResults = new List<AnalysisResult>();
+            var testCases = new List<TestCase>();
             foreach (FileInfo queryFile in CaseFiles)
             {
                 Console.WriteLine($"Running {queryFile}");
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile)));
+                TestCase testCase = await GenerateAndRunTestCase(queryFile);
+                testCases.Add(testCase);
             }
-            return queryAnalysisResults;
+            return testCases;
+        }
+
+        private Task<TestCase> GenerateAndRunTestCase(FileInfo queryFile)
+        {
+            string testName = queryFile.Name;
+            string testCategory;
+            try
+            {
+                testCategory = queryFile.Directory.Parent.Name;
+            } catch (Exception ex)
+            {
+                testCategory = "N/A";
+                Console.WriteLine($"Could not get test caregory - {queryFile}");
+            }
+            
+            TestCase testCase = new TestCase(testName, testCategory);
+            return testCase.Run(DatabaseModel.Parser.ParsePlan(DatabaseModel.Connector.AnalyseQuery(queryFile)));
         }
 
         private void WriteResultToConsole()
         {
-            foreach(var analysisResult in Results)
-                Console.WriteLine($"Database predicted cardinality: [{(analysisResult.EstimatedCardinality)}], actual: [{analysisResult.ActualCardinality}]");
+            foreach(var testCase in Results)
+                Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.AnalysisResult.EstimatedCardinality)}], actual: [{testCase.AnalysisResult.ActualCardinality}]");
         }
 
     }

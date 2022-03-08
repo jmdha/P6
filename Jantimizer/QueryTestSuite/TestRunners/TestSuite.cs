@@ -1,4 +1,5 @@
 ﻿using QueryTestSuite.Models;
+using QueryTestSuite.TestRunners;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace QueryTestSuite.Connectors
         public async Task RunTests(DirectoryInfo dir)
         {
             var testRunners = new List<TestRunner>();
-            var testRuns = new List<Task<List<AnalysisResult>>>();
+            var testRuns = new List<Task<List<TestCase>>>();
 
             foreach(DatabaseCommunicator databaseModel in DatabaseModels)
             {

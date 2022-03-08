@@ -11,7 +11,7 @@ namespace QueryTestSuite.Parsers
 {
     public class MySQLParser : BasePlanParser
     {
-        public override AnalysisResult ParsePlan(DataSet planData)
+        public override Task<AnalysisResult> ParsePlan(DataSet planData)
         {
             Queue<AnalysisResultWithIndent> resultQueue;
 
@@ -25,7 +25,13 @@ namespace QueryTestSuite.Parsers
                 throw new NoNullAllowedException($"Unexpected null-value from MySql Analysis");
             }
 
-            return RunAnalysis(resultQueue);
+            return Task.FromResult(RunAnalysis(resultQueue));
+        }
+
+        public override Task<AnalysisResult> ParsePlan(Task<DataSet> planData)
+        {
+            planData.Wait();
+            return ParsePlan(planData.Result);
         }
 
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
