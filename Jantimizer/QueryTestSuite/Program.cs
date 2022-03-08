@@ -40,7 +40,7 @@ namespace QueryTestSuite
                 valuesToIndex.Add((int)valuesToIndexRows[i]["int4"]);
 
             int[] histogramValues = valuesToIndex.ToArray();
-            var histogram = new HistogramEquiWidth(histogramValues, 20);
+            var histogram = new HistogramEquiDepth(histogramValues, 20);
 
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
