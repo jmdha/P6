@@ -12,9 +12,10 @@ namespace QueryTestSuite.Models
     internal class TestRunner
     {
         public DatabaseCommunicator DatabaseModel { get; }
-        public FileInfo SetupFile { get; set; }
-        public FileInfo CleanupFile { get; set; }
-        public IEnumerable<FileInfo> CaseFiles { get; set; }
+        public FileInfo SetupFile { get; private set; }
+        public FileInfo CleanupFile { get; private set; }
+        public IEnumerable<FileInfo> CaseFiles { get; private set; }
+        public List<AnalysisResult> Results { get; private set; }
 
         public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
@@ -22,9 +23,10 @@ namespace QueryTestSuite.Models
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
+            Results = new List<AnalysisResult>();
         }
 
-        public async Task<List<AnalysisResult>> Run(bool runParallel = false)
+        public async Task<List<AnalysisResult>> Run(bool runParallel = false, bool consoleOutput = true)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -33,9 +35,17 @@ namespace QueryTestSuite.Models
             await DatabaseModel.Connector.CallQuery(SetupFile);
 
             if (runParallel)
-                return await RunQueriesParallel();
+                Results = await RunQueriesParallel();
             else
-                return await RunQueriesSerial();
+                Results = await RunQueriesSerial();
+
+            Console.WriteLine($"Running Cleanup: {CleanupFile}");
+            await DatabaseModel.Connector.CallQuery(CleanupFile);
+
+            if (consoleOutput)
+                WriteResultToConsole();
+
+            return Results;
         }
 
         private async Task<List<AnalysisResult>> RunQueriesParallel()
@@ -68,10 +78,11 @@ namespace QueryTestSuite.Models
             return queryAnalysisResults;
         }
 
-
-        public async Task Cleanup()
+        private void WriteResultToConsole()
         {
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            foreach(var analysisResult in Results)
+                Console.WriteLine($"Database predicted cardinality: [{(analysisResult.EstimatedCardinality)}], actual: [{analysisResult.ActualCardinality}]");
         }
+
     }
 }

@@ -18,8 +18,8 @@ namespace QueryTestSuite.Connectors
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            var testRuns = new List<Task<List<AnalysisResult>>>();
             var testRunners = new List<TestRunner>();
+            var testRuns = new List<Task<List<AnalysisResult>>>();
 
             foreach(DatabaseCommunicator databaseModel in DatabaseModels)
             {
@@ -31,23 +31,12 @@ namespace QueryTestSuite.Connectors
                     GetVariant(dir, "cleanup", databaseModel.Name),
                     GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name))
                 );
-                testRuns.Add(runner.Run());
                 testRunners.Add(runner);
+                Console.WriteLine("Running tests");
+                testRuns.Add(runner.Run(true));
             }
 
             await Task.WhenAll(testRuns);
-
-            foreach(var runs in testRuns)
-            {
-                foreach (var run in await runs)
-                {
-                    Console.WriteLine($"Database predicted cardinality: [{(run.EstimatedCardinality)}], actual: [{run.ActualCardinality}]");
-                }
-            }
-
-            Console.WriteLine("Cleaning up");
-            foreach (var runner in testRunners)
-                await runner.Cleanup();
         }
 
         private FileInfo GetVariant(DirectoryInfo dir, string name, string type)
