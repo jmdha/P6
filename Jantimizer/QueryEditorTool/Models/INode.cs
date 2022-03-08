@@ -8,6 +8,6 @@ namespace QueryEditorTool.Models
 {
     public interface INode
     {
-
+        public INode Parent { get; set; }
     }
 }

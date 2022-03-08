@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models
 {
-    public interface IStmt : INode
+    public interface IValue : INode
     {
+        public INode? Value { get; set; }
     }
 }

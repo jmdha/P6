@@ -6,22 +6,24 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models.Expersions
 {
-    public class BinaryExp : IExp
+    public class BinaryExp : IExp, IValue
     {
-        public IConst? Right { get; set; }
-        public PredicateEnums Predicate { get; set; }
-        public IConst? Left { get; set; }
+        public INode? Parent { get; set; }
+        public INode? Right { get; set; }
+        public INode Value { get; set; }
+        public INode? Left { get; set; }
 
-        public BinaryExp(IConst? right, PredicateEnums predicate, IConst? left)
+        public BinaryExp(INode? parent, INode? right, INode value, INode? left)
         {
+            Parent = parent;
             Right = right;
-            Predicate = predicate;
+            Value = value;
             Left = left;
         }
 
         public override string? ToString()
         {
-            return $"{Left} {PredicateEnumParser.ConvertToString(Predicate)} {Right}";
+            return $"{Left}{Value}{Right}";
         }
     }
 }

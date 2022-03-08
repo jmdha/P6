@@ -24,6 +24,8 @@ namespace QueryTestSuite
             IQueryModifier modifier = new QueryModifier();
             modifier.ReorderMovableNodes(returnVal, 0, 1);
 
+            parsed = returnVal.ToString();
+
             SecretsService secrets = new SecretsService();
 
             var postgresModel = new DatabaseCommunicator(

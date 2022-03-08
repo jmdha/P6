@@ -8,5 +8,7 @@ namespace QueryEditorTool.Models
 {
     public interface IExp : INode
     {
+        public INode? Left { get; set; }
+        public INode? Right { get; set; }
     }
 }

@@ -8,10 +8,12 @@ namespace QueryEditorTool.Models.Constants
 {
     public class ConstVal : IConst
     {
+        public INode Parent { get; set; }
         public string Value { get; set; }
 
-        public ConstVal(string value)
+        public ConstVal(INode parent, string value)
         {
+            Parent = parent;
             Value = value;
         }
 
