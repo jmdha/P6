@@ -1,6 +1,7 @@
 ﻿using QueryEditorTool.Models;
 using QueryEditorTool.Models.Constants;
 using QueryEditorTool.Models.Expersions;
+using QueryEditorTool.Models.Statements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,28 +18,42 @@ namespace QueryEditorTool.QueryParsers
         public INode? ParseQuery(string query)
         {
             query = query.ToUpper();
-            INode? returnNode = ParseExpressions(null, query);
+            INode? returnNode = ParseStatement(null, query);
 
             return returnNode;
         }
 
-        internal IExp? ParseExpressions(INode? parent, string subQuery)
+        internal INode? ParseStatement(INode? parent, string subQuery)
         {
             subQuery = subQuery.Trim();
             if (subQuery.StartsWith("SELECT"))
             {
                 var returnVal = new SELECTStmt(
                     parent,
-                    ParseExpressions(null, subQuery.Substring(subQuery.IndexOf("FROM") + 5)),
-                    null,
+                    ParseStatement(null, subQuery.Substring(subQuery.IndexOf("FROM") + 5)),
                     ParseConstant(null, subQuery.Substring(subQuery.IndexOf("SELECT") + 6, subQuery.IndexOf("FROM") - 6)));
 
-                returnVal.Right.Parent = returnVal;
+                returnVal.Child.Parent = returnVal;
                 returnVal.Value.Parent = returnVal;
 
                 return returnVal;
             }
-            else
+            else if (subQuery.StartsWith("WHERE"))
+            {
+                var returnVal = new WHEREStmt(
+                    parent,
+                    ParseStatement(null, subQuery.Substring(subQuery.IndexOf("WHERE") + 5)));
+
+                returnVal.Child.Parent = returnVal;
+
+                return returnVal;
+            }
+            return ParseExpressions(parent, subQuery);
+        }
+
+        internal INode? ParseExpressions(INode? parent, string subQuery)
+        {
+            subQuery = subQuery.Trim();
             if (subQuery.LastIndexOf("JOIN") != -1)
             {
                 int joinIndex = subQuery.LastIndexOf("JOIN");
@@ -55,9 +70,9 @@ namespace QueryEditorTool.QueryParsers
                     rightTable = ParseConstant(null, rigthSide);
 
                 string binaryExp = subQuery.Substring(subQuery.LastIndexOf("ON") + 2);
-                IExp? conditionExpression = ParseExpressions(null, binaryExp);
+                INode? conditionExpression = ParseExpressions(null, binaryExp);
 
-                var returnVal = new JOINStmt(
+                var returnVal = new JOINExpr(
                     parent,
                     leftTable,
                     rightTable,
@@ -73,13 +88,12 @@ namespace QueryEditorTool.QueryParsers
                 _movableIndex++;
                 return returnVal;
             }
-            else
-            if (PredicateEnumParser.ContainsAny(subQuery) != "None")
+            else if (PredicateEnumParser.ContainsAny(subQuery) != "None")
             {
                 string operatorValue = PredicateEnumParser.ContainsAny(subQuery);
 
-                IConst? leftSide = ParseConstant(null, subQuery.Substring(0, subQuery.IndexOf(operatorValue)));
-                IConst? rightSide = ParseConstant(null, subQuery.Substring(subQuery.IndexOf(operatorValue) + 2));
+                INode? leftSide = ParseExpressions(null, subQuery.Substring(0, subQuery.IndexOf(operatorValue)));
+                INode? rightSide = ParseExpressions(null, subQuery.Substring(subQuery.IndexOf(operatorValue) + 2));
 
                 var returnVal = new BinaryExp(
                     parent,
@@ -108,10 +122,10 @@ namespace QueryEditorTool.QueryParsers
 
                 return returnVal;
             }
-            return null;
+            return ParseConstant(parent, subQuery);
         }
 
-        internal IConst? ParseConstant(INode? parent, string subQuery)
+        internal INode? ParseConstant(INode? parent, string subQuery)
         {
             subQuery = subQuery.Trim();
             subQuery = subQuery.Trim(')');
@@ -125,7 +139,7 @@ namespace QueryEditorTool.QueryParsers
 
         public void PrintJoinIDs(INode baseTree)
         {
-            if (baseTree is JOINStmt join)
+            if (baseTree is JOINExpr join)
             {
                 Console.WriteLine($"ID for join [{join}] is [{join.ItemIndex}]");
             }
@@ -134,6 +148,10 @@ namespace QueryEditorTool.QueryParsers
                 PrintJoinIDs(exp.Left);
                 PrintJoinIDs(exp.Right);
                 PrintJoinIDs(exp.Value);
+            }
+            if (baseTree is IStmt stmt)
+            {
+                PrintJoinIDs(stmt.Child);
             }
         }
     }

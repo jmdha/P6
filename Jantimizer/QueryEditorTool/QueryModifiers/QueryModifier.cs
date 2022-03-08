@@ -19,8 +19,8 @@ namespace QueryEditorTool.QueryModifiers
             INode node1 = FindMovableNode(baseTree, indexA);
             INode node2 = FindMovableNode(baseTree, indexB);
 
-            if (node1 is JOINStmt join1)
-                if (node2 is JOINStmt join2)
+            if (node1 is JOINExpr join1)
+                if (node2 is JOINExpr join2)
                     swapJoin(join1, join2);
 
             var tableList = new List<string>();
@@ -31,7 +31,7 @@ namespace QueryEditorTool.QueryModifiers
             return baseTree;
         }
 
-        private void swapJoin(JOINStmt n1, JOINStmt n2)
+        private void swapJoin(JOINExpr n1, JOINExpr n2)
         {
             INode value1 = n1.Value;
             INode value2 = n2.Value;
@@ -94,7 +94,7 @@ namespace QueryEditorTool.QueryModifiers
                 StitchInnerJoin(n2);
         }
 
-        private void StitchInnerJoin(JOINStmt A)
+        private void StitchInnerJoin(JOINExpr A)
         {
             if (A.Right == null)
             {
@@ -131,7 +131,7 @@ namespace QueryEditorTool.QueryModifiers
 
         private void RefreshJoins(INode node)
         {
-            if (node is JOINStmt join)
+            if (node is JOINExpr join)
             {
                 join.UsedTables = new List<ConstVal>();
                 join.GetTablesUsedInConditionRec(join.UsedTables, join.Value);
@@ -148,7 +148,7 @@ namespace QueryEditorTool.QueryModifiers
 
         private void StitchAllJoins(INode node, List<string> currentTables)
         {
-            if (node is JOINStmt join)
+            if (node is JOINExpr join)
             {
                 StitchAllJoins(join.Left, currentTables);
                 StitchAllJoins(join.Right, currentTables);

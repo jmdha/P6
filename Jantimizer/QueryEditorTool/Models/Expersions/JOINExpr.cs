@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models
 {
-    public class JOINStmt : IExp, IMovable, ICloneable
+    public class JOINExpr : IExp, IMovable, ICloneable
     {
         public List<ConstVal> UsedTables { get; set; } = new List<ConstVal>();
         public INode? Parent { get; set; }
@@ -17,7 +17,7 @@ namespace QueryEditorTool.Models
         public INode? Value { get; set; }
         public int ItemIndex { get; internal set; }
 
-        public JOINStmt(INode? parent, INode? left, INode? right, INode? value, int itemIndex)
+        public JOINExpr(INode? parent, INode? left, INode? right, INode? value, int itemIndex)
         {
             Parent = parent;
             Left = left;
@@ -34,7 +34,7 @@ namespace QueryEditorTool.Models
 
         public object Clone()
         {
-            var returnClone = new JOINStmt(Parent, Left, Right, Value, ItemIndex);
+            var returnClone = new JOINExpr(Parent, Left, Right, Value, ItemIndex);
             returnClone.GetTablesUsedInConditionRec(returnClone.UsedTables, returnClone.Value);
             return returnClone;
         }

@@ -4,24 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryEditorTool.Models
+namespace QueryEditorTool.Models.Statements
 {
-    public class SELECTStmt : IStmt, IValue
+    public class WHEREStmt : IStmt
     {
         public INode? Parent { get; set; }
         public INode? Child { get; set; }
-        public INode? Value { get; set; }
 
-        public SELECTStmt(INode? parent, INode? child, INode? value)
+        public WHEREStmt(INode? parent, INode? child)
         {
             Parent = parent;
             Child = child;
-            Value = value;
         }
 
         public override string? ToString()
         {
-            return $"SELECT {Value} FROM {Child}";
+            return $"WHERE {Child}";
         }
     }
 }

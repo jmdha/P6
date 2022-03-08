@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models
 {
-    public interface IExp : INode, IValue
+    public interface IValue
     {
-        public INode? Left { get; set; }
-        public INode? Right { get; set; }
+        public INode Value { get; set; }
     }
 }
