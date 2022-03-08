@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models.Expersions
 {
-    public class BinaryExp : IExp, IValue
+    public class BinaryExp : IExp
     {
         public INode? Parent { get; set; }
         public INode? Right { get; set; }

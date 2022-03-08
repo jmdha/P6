@@ -13,6 +13,9 @@ namespace QueryEditorTool.QueryModifiers
     {
         public INode ReorderMovableNodes(INode baseTree, int indexA, int indexB)
         {
+            if (Math.Abs(indexA - indexB) > 1)
+                throw new ArgumentOutOfRangeException("Error, can only shift one index layer at a time!");
+
             INode node1 = FindMovableNode(baseTree, indexA);
             INode node2 = FindMovableNode(baseTree, indexB);
 
@@ -22,6 +25,8 @@ namespace QueryEditorTool.QueryModifiers
 
             var tableList = new List<string>();
             StitchAllJoins(baseTree, tableList);
+
+            RefreshJoins(baseTree);
 
             return baseTree;
         }
@@ -38,29 +43,35 @@ namespace QueryEditorTool.QueryModifiers
             INode parent2 = n2.Parent;
 
             if (parent1 == n2)
-                parent1 = n1;
-            if (parent2 == n1)
+            {
+                parent1 = n2.Parent;
                 parent2 = n2;
+            }
+            if (parent2 == n1)
+            {
+                parent2 = n1.Parent;
+                parent1 = n1;
+            }
 
             if (left1 == n2)
             {
-                left1 = null;
+                left1 = n2.Left;
                 left2 = n2;
             }
             if (left2 == n1)
             {
-                left2 = null;
+                left2 = n1.Left;
                 left1 = n1;
             }
 
             if (right1 == n2)
             {
-                right1 = null;
+                right1 = n2.Right;
                 right2 = n2;
             }
             if (right2 == n1)
             {
-                right2 = null;
+                right2 = n1.Right;
                 right1 = n1;
             }
 
@@ -118,36 +129,65 @@ namespace QueryEditorTool.QueryModifiers
             }
         }
 
+        private void RefreshJoins(INode node)
+        {
+            if (node is JOINStmt join)
+            {
+                join.UsedTables = new List<ConstVal>();
+                join.GetTablesUsedInConditionRec(join.UsedTables, join.Value);
+            }
+            else
+            {
+                if (node is IExp exp)
+                {
+                    RefreshJoins(exp.Left);
+                    RefreshJoins(exp.Right);
+                }
+            }
+        }
+
         private void StitchAllJoins(INode node, List<string> currentTables)
         {
             if (node is JOINStmt join)
             {
+                StitchAllJoins(join.Left, currentTables);
+                StitchAllJoins(join.Right, currentTables);
+
                 if (join.Left is ConstVal Lval)
                 {
                     currentTables.Add(Lval.Value);
                 }
-                else
-                    StitchAllJoins(join.Left, currentTables);
                 if (join.Right is ConstVal Rval)
                 {
                     currentTables.Add(Rval.Value);
                 }
-                else
-                    StitchAllJoins(join.Right, currentTables);
                 string? missingTable = GetMissingTable(join.Value, currentTables);
-                if (missingTable != null)
+                int maxCounter = 0;
+                bool triedLeft = false;
+                while (missingTable != null)
                 {
-                    if (join.Left is ConstVal Lval2)
+                    if (missingTable != null)
                     {
-                        Lval2.Value = missingTable;
-                        return;
+                        if (join.Left is ConstVal Lval2 && triedLeft == false)
+                        {
+                            currentTables.RemoveAt(currentTables.IndexOf(Lval2.Value));
+                            Lval2.Value = missingTable;
+                            currentTables.Add(missingTable);
+                            triedLeft = true;
+                        }
+                        if (join.Right is ConstVal Rval2)
+                        {
+                            currentTables.RemoveAt(currentTables.IndexOf(Rval2.Value));
+                            Rval2.Value = missingTable;
+                            currentTables.Add(missingTable);
+                        }
                     }
-                    if (join.Right is ConstVal Rval2)
-                    {
-                        Rval2.Value = missingTable;
-                        return;
-                    }
+                    missingTable = GetMissingTable(join.Value, currentTables);
+                    maxCounter++;
+                    if (maxCounter > 2)
+                        throw new Exception("Impossible query order detected!");
                 }
+                return;
             }
             else 
             {
@@ -155,10 +195,6 @@ namespace QueryEditorTool.QueryModifiers
                 {
                     StitchAllJoins(exp.Left, currentTables);
                     StitchAllJoins(exp.Right, currentTables);
-                }
-                if (node is IValue val)
-                {
-                    StitchAllJoins(val.Value, currentTables);
                 }
             }
         }
@@ -196,12 +232,6 @@ namespace QueryEditorTool.QueryModifiers
                 if (node != null)
                     return node;
                 node = FindMovableNode(exp.Left, index);
-                if (node != null)
-                    return node;
-            }
-            if (parent is IValue val)
-            {
-                var node = FindMovableNode(val.Value, index);
                 if (node != null)
                     return node;
             }

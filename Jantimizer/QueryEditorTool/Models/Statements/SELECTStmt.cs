@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models
 {
-    internal class SELECTStmt : IValue, IExp
+    internal class SELECTStmt : IExp
     {
         public INode? Parent { get; set; }
         public INode? Right { get; set; }

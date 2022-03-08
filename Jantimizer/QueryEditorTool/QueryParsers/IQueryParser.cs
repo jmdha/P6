@@ -9,6 +9,7 @@ namespace QueryEditorTool.QueryParsers
 {
     public interface IQueryParser
     {
+        public void PrintJoinIDs(INode baseTree);
         public INode? ParseQuery(string query);
     }
 }

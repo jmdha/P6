@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QueryEditorTool.Models
 {
-    public class JOINStmt : IValue, IExp, IMovable, ICloneable
+    public class JOINStmt : IExp, IMovable, ICloneable
     {
         public List<ConstVal> UsedTables { get; set; } = new List<ConstVal>();
         public INode? Parent { get; set; }
@@ -16,7 +16,6 @@ namespace QueryEditorTool.Models
         public INode? Right { get; set; }
         public INode? Value { get; set; }
         public int ItemIndex { get; internal set; }
-        public bool IsInnerJoin { get; }
 
         public JOINStmt(INode? parent, INode? left, INode? right, INode? value, int itemIndex)
         {
@@ -25,11 +24,7 @@ namespace QueryEditorTool.Models
             Right = right;
             Value = value;
             ItemIndex = itemIndex;
-
-            if (Right is ConstVal && Left is ConstVal)
-                IsInnerJoin = true;
-            else
-                IsInnerJoin = false;
+            UsedTables = new List<ConstVal>();
         }
 
         public override string? ToString()
@@ -39,7 +34,24 @@ namespace QueryEditorTool.Models
 
         public object Clone()
         {
-            return new JOINStmt(Parent, Left, Right, Value, ItemIndex);
+            var returnClone = new JOINStmt(Parent, Left, Right, Value, ItemIndex);
+            returnClone.GetTablesUsedInConditionRec(returnClone.UsedTables, returnClone.Value);
+            return returnClone;
+        }
+
+        public void GetTablesUsedInConditionRec(List<ConstVal> tables, INode parent)
+        {
+            if (parent is ConstVal tableValue)
+            {
+                if (tableValue.Value.Contains('.'))
+                    tables.Add(new ConstVal(parent, tableValue.Value.Split('.')[0]));
+            }
+            if (parent is IExp exp)
+            {
+                GetTablesUsedInConditionRec(tables, exp.Right);
+                GetTablesUsedInConditionRec(tables, exp.Left);
+                GetTablesUsedInConditionRec(tables, exp.Value);
+            }
         }
     }
 }

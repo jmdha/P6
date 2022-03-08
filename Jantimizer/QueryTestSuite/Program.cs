@@ -18,13 +18,18 @@ namespace QueryTestSuite
         async static Task AsyncMain(string[] args)
         {
             IQueryParser parser = new QueryParser();
-            var returnVal = parser.ParseQuery("SELECT * FROM (A JOIN B ON A.Value1 > B.Value2) JOIN C ON C.Value3 < B.Value2");
+            //var returnVal = parser.ParseQuery("SELECT * FROM ((D JOIN A ON D.Value1 > A.Value2) JOIN B ON A.Value1 > B.Value2) JOIN C ON C.Value3 < B.Value2");
+            var returnVal = parser.ParseQuery("SELECT * FROM (A JOIN B ON A.Value1 > B.Value2) JOIN (D JOIN A ON D.Value1 > A.Value2) ON B.Value3 < D.Value2");
             string parsed = returnVal.ToString();
 
-            IQueryModifier modifier = new QueryModifier();
-            modifier.ReorderMovableNodes(returnVal, 0, 1);
+            parser.PrintJoinIDs(returnVal);
 
-            parsed = returnVal.ToString();
+            IQueryModifier modifier = new QueryModifier();
+
+            modifier.ReorderMovableNodes(returnVal, 0, 1);
+            parser.PrintJoinIDs(returnVal);
+            modifier.ReorderMovableNodes(returnVal, 1, 2);
+            parser.PrintJoinIDs(returnVal);
 
             SecretsService secrets = new SecretsService();
 

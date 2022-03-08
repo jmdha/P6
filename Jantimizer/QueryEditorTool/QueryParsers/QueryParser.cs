@@ -17,19 +17,19 @@ namespace QueryEditorTool.QueryParsers
         public INode? ParseQuery(string query)
         {
             query = query.ToUpper();
-            INode? returnNode = ParseValueStatement(null, query);
+            INode? returnNode = ParseExpressions(null, query);
 
             return returnNode;
         }
 
-        internal IValue? ParseValueStatement(INode? parent, string subQuery)
+        internal IExp? ParseExpressions(INode? parent, string subQuery)
         {
             subQuery = subQuery.Trim();
             if (subQuery.StartsWith("SELECT"))
             {
                 var returnVal = new SELECTStmt(
                     parent,
-                    ParseValueStatement(null, subQuery.Substring(subQuery.IndexOf("FROM") + 5)), 
+                    ParseExpressions(null, subQuery.Substring(subQuery.IndexOf("FROM") + 5)),
                     null,
                     ParseConstant(null, subQuery.Substring(subQuery.IndexOf("SELECT") + 6, subQuery.IndexOf("FROM") - 6)));
 
@@ -38,18 +38,19 @@ namespace QueryEditorTool.QueryParsers
 
                 return returnVal;
             }
+            else
             if (subQuery.LastIndexOf("JOIN") != -1)
             {
                 int joinIndex = subQuery.LastIndexOf("JOIN");
 
                 string leftSide = subQuery.Substring(joinIndex + 4);
                 string leftTableString = leftSide.Substring(0, leftSide.IndexOf("ON"));
-                INode? leftTable = ParseValueStatement(null, leftTableString);
+                INode? leftTable = ParseExpressions(null, leftTableString);
                 if (leftTable == null)
                     leftTable = ParseConstant(null, leftTableString);
 
                 string rigthSide = subQuery.Substring(0, joinIndex);
-                INode? rightTable = ParseValueStatement(null, rigthSide);
+                INode? rightTable = ParseExpressions(null, rigthSide);
                 if (rightTable == null)
                     rightTable = ParseConstant(null, rigthSide);
 
@@ -59,8 +60,8 @@ namespace QueryEditorTool.QueryParsers
                 var returnVal = new JOINStmt(
                     parent,
                     leftTable,
-                    rightTable, 
-                    conditionExpression, 
+                    rightTable,
+                    conditionExpression,
                     _movableIndex);
 
                 returnVal.Left.Parent = returnVal;
@@ -68,16 +69,11 @@ namespace QueryEditorTool.QueryParsers
                 returnVal.Value.Parent = returnVal;
 
 
-                GetTablesUsedInConditionRec(returnVal.UsedTables, returnVal.Value);
+                returnVal.GetTablesUsedInConditionRec(returnVal.UsedTables, returnVal.Value);
                 _movableIndex++;
                 return returnVal;
             }
-            return null;
-        }
-
-        internal IExp? ParseExpressions(INode? parent, string subQuery)
-        {
-            subQuery = subQuery.Trim();
+            else
             if (PredicateEnumParser.ContainsAny(subQuery) != "None")
             {
                 string operatorValue = PredicateEnumParser.ContainsAny(subQuery);
@@ -97,6 +93,7 @@ namespace QueryEditorTool.QueryParsers
 
                 return returnVal;
             }
+            else
             if ((subQuery.Count(x => x == '.')) == 1)
             {
                 var returnVal = new BinaryExp(
@@ -126,21 +123,17 @@ namespace QueryEditorTool.QueryParsers
             return null;
         }
 
-        internal void GetTablesUsedInConditionRec(List<ConstVal> tables, INode parent)
+        public void PrintJoinIDs(INode baseTree)
         {
-            if (parent is ConstVal tableValue)
+            if (baseTree is JOINStmt join)
             {
-                if (tableValue.Value.Contains('.'))
-                    tables.Add(new ConstVal(parent, tableValue.Value.Split('.')[0]));
+                Console.WriteLine($"ID for join [{join}] is [{join.ItemIndex}]");
             }
-            if (parent is IExp exp)
+            if (baseTree is IExp exp)
             {
-                GetTablesUsedInConditionRec(tables, exp.Right);
-                GetTablesUsedInConditionRec(tables, exp.Left);
-            }
-            if (parent is IValue val)
-            {
-                GetTablesUsedInConditionRec(tables, val.Value);
+                PrintJoinIDs(exp.Left);
+                PrintJoinIDs(exp.Right);
+                PrintJoinIDs(exp.Value);
             }
         }
     }
