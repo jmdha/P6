@@ -11,11 +11,12 @@ namespace QueryEditorTool.QueryParsers
 {
     public class QueryParser : IQueryParser
     {
+        private int _movableIndex = 0;
+
         public INode? ParseQuery(string query)
         {
-            INode? returnNode = null;
             query = query.ToUpper();
-            returnNode = ParseStatement(query);
+            INode? returnNode = ParseStatement(query);
 
             return returnNode;
         }
@@ -27,7 +28,7 @@ namespace QueryEditorTool.QueryParsers
             {
                 string value = subQuery.Substring(subQuery.IndexOf("SELECT") + 6, subQuery.IndexOf("FROM") - 6);
                 subQuery = subQuery.Substring(subQuery.IndexOf("FROM") + 5);
-                IConst selectValue = new ConstVal(value);
+                IConst? selectValue = new ConstVal(value);
                 return new SELECTStmt(selectValue, ParseStatement(subQuery));
             }
             if (subQuery.LastIndexOf("JOIN") != -1)
@@ -36,19 +37,21 @@ namespace QueryEditorTool.QueryParsers
 
                 string leftSide = subQuery.Substring(joinIndex + 4);
                 string leftTableString = leftSide.Substring(0, leftSide.IndexOf("ON"));
-                INode leftTable = ParseConstant(leftTableString);
+                INode? leftTable = ParseStatement(leftTableString);
                 if (leftTable == null)
-                    leftTable = ParseStatement(leftTableString);
+                    leftTable = ParseConstant(leftTableString);
 
                 string rigthSide = subQuery.Substring(0, joinIndex);
-                INode rightTable = ParseConstant(rigthSide);
+                INode? rightTable = ParseStatement(rigthSide);
                 if (rightTable == null)
-                    rightTable = ParseStatement(rigthSide);
+                    rightTable = ParseConstant(rigthSide);
 
                 string binaryExp = subQuery.Substring(subQuery.LastIndexOf("ON") + 2);
-                IExp conditionExpression = ParseExpressions(binaryExp);
+                IExp? conditionExpression = ParseExpressions(binaryExp);
 
-                return new JOINStmt(rightTable, leftTable, conditionExpression);
+                IStmt? joinStmt = new JOINStmt(rightTable, leftTable, conditionExpression, _movableIndex);
+                _movableIndex++;
+                return joinStmt;
             }
             return null;
         }
@@ -60,10 +63,10 @@ namespace QueryEditorTool.QueryParsers
             {
                 string operatorValue = PredicateEnumParser.ContainsAny(subQuery);
                 string leftSideStr = subQuery.Substring(0, subQuery.IndexOf(operatorValue));
-                IConst leftSide = ParseConstant(leftSideStr);
+                IConst? leftSide = ParseConstant(leftSideStr);
 
                 string rightSideStr = subQuery.Substring(subQuery.IndexOf(operatorValue) + 2);
-                IConst rightSide = ParseConstant(rightSideStr);
+                IConst? rightSide = ParseConstant(rightSideStr);
 
                 return new BinaryExp(rightSide, PredicateEnumParser.ConvertToEnum(operatorValue), leftSide);
 
@@ -74,14 +77,14 @@ namespace QueryEditorTool.QueryParsers
         internal IConst? ParseConstant(string subQuery)
         {
             subQuery = subQuery.Trim();
+            subQuery = subQuery.Trim(')');
+            subQuery = subQuery.Trim('(');
             if ((subQuery.Count(x => x == '.')) == 1)
             {
                 return new TableConst(subQuery.Substring(0, subQuery.IndexOf(".")), subQuery.Substring(subQuery.IndexOf(".") + 1));
             }
             if (!subQuery.Contains('(') && !subQuery.Contains(')'))
             {
-                subQuery = subQuery.Trim(')');
-                subQuery = subQuery.Trim('(');
                 return new TableConst(subQuery);
             }
             return null;

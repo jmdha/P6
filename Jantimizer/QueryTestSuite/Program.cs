@@ -1,4 +1,5 @@
-﻿using QueryEditorTool.QueryParsers;
+﻿using QueryEditorTool.QueryModifiers;
+using QueryEditorTool.QueryParsers;
 using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;
@@ -19,6 +20,9 @@ namespace QueryTestSuite
             IQueryParser parser = new QueryParser();
             var returnVal = parser.ParseQuery("SELECT * FROM (A JOIN B ON A.Value1 > B.Value2) JOIN C ON C.Value3 < B.Value2");
             string parsed = returnVal.ToString();
+
+            IQueryModifier modifier = new QueryModifier();
+            modifier.ReorderMovableNodes(returnVal, 0, 1);
 
             SecretsService secrets = new SecretsService();
 

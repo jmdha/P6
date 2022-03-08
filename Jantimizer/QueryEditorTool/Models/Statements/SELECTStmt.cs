@@ -8,10 +8,10 @@ namespace QueryEditorTool.Models
 {
     internal class SELECTStmt : IStmt
     {
-        public IConst SelectValues { get; set; }
-        public IStmt Statement { get; set; }
+        public IConst? SelectValues { get; set; }
+        public IStmt? Statement { get; set; }
 
-        public SELECTStmt(IConst selectValues, IStmt statement)
+        public SELECTStmt(IConst? selectValues, IStmt? statement)
         {
             SelectValues = selectValues;
             Statement = statement;

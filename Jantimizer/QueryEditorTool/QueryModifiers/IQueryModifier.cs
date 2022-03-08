@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QueryEditorTool.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,6 @@ namespace QueryEditorTool.QueryModifiers
 {
     public interface IQueryModifier
     {
+        public INode ReorderMovableNodes(INode baseTree, int indexA, int indexB);
     }
 }
