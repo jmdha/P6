@@ -55,8 +55,8 @@ namespace QueryParser.Models
             string[] orSplit = s.Split("OR");
             if (orSplit.Length > 0)
             {
-                foreach (string and in orSplit)
-                    SplitOverPredicates(and, tables);
+                foreach (string or in orSplit)
+                    SplitOverPredicates(or, tables);
             }
             else
                 SplitOverPredicates(s, tables);

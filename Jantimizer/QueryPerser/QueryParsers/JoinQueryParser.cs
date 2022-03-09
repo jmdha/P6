@@ -15,45 +15,88 @@ namespace QueryParser.QueryParsers
 
         public bool DoesQueryMatch(string query)
         {
-            if (query.ToUpper().Contains("JOIN"))
-                return true;
-            return false;
+            if (!query.ToUpper().Contains(" JOIN "))
+                return false;
+            if (!query.ToUpper().Contains("SELECT "))
+                return false;
+            if (!query.ToUpper().Contains(" FROM "))
+                return false;
+            return true;
         }
 
         public List<INode> ParseQuery(string query)
         {
             List<INode> returnNodes = new List<INode>();
 
+            // Remove all information in the query before the actual join statements.
             query = query.Substring(query.IndexOf("FROM") + 4);
             if (query[0] != '(')
                 query = $"({query})";
 
-            ParseSubQuery(query, returnNodes);
+            ParseSubQueryRec(query, returnNodes);
 
             StitchJoins(returnNodes);
 
             return returnNodes;
         }
 
-        private void ParseSubQuery(string subQuery, List<INode> nodes)
+        /// <summary>
+        /// Recursively look through the Join queries, one by one reducing the query given to the next iteration.
+        /// </summary>
+        /// <param name="subQuery"></param>
+        /// <param name="nodes"></param>
+        private void ParseSubQueryRec(string subQuery, List<INode> nodes)
         {
             subQuery = TrimSubQuery(subQuery);
 
             if (subQuery.Contains("(") && subQuery.Contains(")"))
             {
-                ParseSubQuery(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), nodes);
-                subQuery = subQuery.Replace(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), PlaceholderTableName);
+                string innerJoinQuery = GetSubQuery(subQuery);
+                ParseSubQueryRec(innerJoinQuery, nodes);
+                subQuery = subQuery.Replace(innerJoinQuery, PlaceholderTableName);
             }
 
-            string leftTable = subQuery.Split("JOIN")[0];
-            string rightSide = subQuery.Split("JOIN")[1].Trim();
+            nodes.Add(ParseIntoModel(subQuery));
+        }
 
-            string rightTable = rightSide.Split("ON")[0];
-            string condition = rightSide.Split("ON")[1];
+        /// <summary>
+        /// Parsing of a concrete sub query into a <see cref="JoinNode"/> class
+        /// </summary>
+        /// <param name="subQuery"></param>
+        /// <returns></returns>
+        private JoinNode ParseIntoModel(string subQuery)
+        {
+            string[] joinSplit = subQuery.Split("JOIN");
+            string leftTable = "";
+            string rightTable = "";
+            string condition = "";
+            if (joinSplit.Length > 0)
+                leftTable = joinSplit[0].Trim();
+            if (joinSplit.Length > 1)
+            {
+                string[] onSplit = joinSplit[1].Split("ON");
+
+                if (onSplit.Length > 0)
+                    rightTable = onSplit[0].Trim();
+                if (onSplit.Length > 1)
+                    condition = onSplit[1].Trim();
+            }
 
             var newNode = new JoinNode(_joinIndex, leftTable, rightTable, condition);
             _joinIndex++;
-            nodes.Add(newNode);
+            return newNode;
+        }
+
+        /// <summary>
+        /// Gets the subquery of the curent query, i.e. whatever is withing the next '(' and ')' characters.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        private string GetSubQuery(string query)
+        {
+            if (query.Contains("(") && query.Contains(""))
+                return query.Substring(query.IndexOf("("), query.LastIndexOf(")") + 1);
+            return PlaceholderTableName;
         }
 
         /// <summary>
@@ -63,9 +106,12 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private string TrimSubQuery(string subQuery)
         {
-            subQuery = subQuery.Substring(subQuery.IndexOf("(") + 1);
-            subQuery = subQuery.Substring(0, subQuery.LastIndexOf(")"));
-            subQuery = subQuery.Trim();
+            if (subQuery.Contains("(") && subQuery.Contains(""))
+            {
+                subQuery = subQuery.Substring(subQuery.IndexOf("(") + 1);
+                subQuery = subQuery.Substring(0, subQuery.LastIndexOf(")"));
+                subQuery = subQuery.Trim();
+            }
             return subQuery;
         }
 

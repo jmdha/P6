@@ -19,12 +19,11 @@ namespace QueryParser
 
         public List<INode>? ParseQuery(string query)
         {
-            List<INode>? resultNodes = new List<INode>();
             foreach(IQueryParser parser in QueryParsers)
             {
                 if (parser.DoesQueryMatch(query))
                 {
-                    resultNodes = ParseQuerySpecific(query, parser);
+                    List<INode>? resultNodes = ParseQuerySpecific(query, parser);
                     if (resultNodes != null)
                         return resultNodes;
                 }
