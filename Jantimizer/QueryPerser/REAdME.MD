@@ -3,6 +3,7 @@ This is a project to parse SQL queries. Currently, it is specialized in parsing 
 It requires a Join chain to be in the style:
 ```
 SELECT * FROM (A JOIN B ON ...) JOIN C ON ...
+SELECT * FROM ((A JOIN B ON ...) JOIN C ON ...) JOIN D ON ...
 ```
 With each inner join in brackets. 
 
