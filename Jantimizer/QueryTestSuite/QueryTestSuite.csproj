@@ -1,29 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <SSDTUnitTestPath Condition="'$(SSDTUnitTestPath)' == ''">$(VsInstallRoot)\Common7\IDE\Extensions\Microsoft\SQLDB</SSDTUnitTestPath>
+    <UserSecretsId>dbb3ccd0-6917-4ec5-a16c-eec788c33d49</UserSecretsId>
   </PropertyGroup>
+
   <PropertyGroup>
     <SSDTPath Condition="'$(SSDTPath)' == ''">$(VsInstallRoot)\Common7\IDE\Extensions\Microsoft\SQLDB\DAC</SSDTPath>
   </PropertyGroup>
+
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
   </PropertyGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
+    <UserSecretsId>8c0990b3-bd55-4561-95ab-69fec8917b23</UserSecretsId>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Tests\**" />
     <EmbeddedResource Remove="Tests\**" />
     <None Remove="Tests\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.1.7" />
-    <PackageReference Include="Npgsql" Version="6.0.3" />
+    <PackageReference Include="Npgsql" Version="6.0.1" />
   </ItemGroup>
+
   <ItemGroup>
     <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B2.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B3.sql" />
@@ -90,8 +103,5 @@
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
-  <PropertyGroup>
-    <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
-    <UserSecretsId>8c0990b3-bd55-4561-95ab-69fec8917b23</UserSecretsId>
-  </PropertyGroup>
+
 </Project>
