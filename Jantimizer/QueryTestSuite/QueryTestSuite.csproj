@@ -91,7 +91,6 @@
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QueryEditorTool\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPerser\QueryParser.csproj" />
   </ItemGroup>
   <PropertyGroup>
