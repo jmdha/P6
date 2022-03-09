@@ -1,25 +1,22 @@
 ﻿using QueryTestSuite.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QueryTestSuite.Connectors
+namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
         public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
+        private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels)
+        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels, DateTime timeStamp)
         {
             DatabaseModels = databaseModels;
+            TimeStamp = timeStamp;
         }
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            var testRuns = new List<Task<List<AnalysisResult>>>();
             var testRunners = new List<TestRunner>();
+            var testRuns = new List<Task<List<TestCase>>>();
 
             foreach(DatabaseCommunicator databaseModel in DatabaseModels)
             {
@@ -29,25 +26,15 @@ namespace QueryTestSuite.Connectors
                     databaseModel,
                     GetVariant(dir, "setup", databaseModel.Name),
                     GetVariant(dir, "cleanup", databaseModel.Name),
-                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name))
+                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name)),
+                    TimeStamp
                 );
-                testRuns.Add(runner.Run());
                 testRunners.Add(runner);
+                Console.WriteLine("Running tests");
+                testRuns.Add(runner.Run(true));
             }
 
             await Task.WhenAll(testRuns);
-
-            foreach(var runs in testRuns)
-            {
-                foreach (var run in await runs)
-                {
-                    Console.WriteLine($"Database predicted cardinality: [{(run.EstimatedCardinality)}], actual: [{run.ActualCardinality}]");
-                }
-            }
-
-            Console.WriteLine("Cleaning up");
-            foreach (var runner in testRunners)
-                await runner.Cleanup();
         }
 
         private FileInfo GetVariant(DirectoryInfo dir, string name, string type)

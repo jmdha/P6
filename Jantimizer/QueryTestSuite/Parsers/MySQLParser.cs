@@ -28,6 +28,7 @@ namespace QueryTestSuite.Parsers
             return RunAnalysis(resultQueue);
         }
 
+
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
