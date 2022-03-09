@@ -26,7 +26,7 @@ namespace QueryTestSuite.Connectors
 
             foreach(DatabaseCommunicator databaseModel in DatabaseModels)
             {
-                var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "cases/"));
+                var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
                 TestRunner runner = new TestRunner(
                     databaseModel,

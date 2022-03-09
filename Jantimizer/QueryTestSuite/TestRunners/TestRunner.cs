@@ -25,7 +25,7 @@ namespace QueryTestSuite.Models
             TimeStamp = timeStamp;
         }
 
-        public async Task<List<TestCase>> Run(bool runParallel = false, bool consoleOutput = true, bool saveResult = true)
+        public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -33,10 +33,7 @@ namespace QueryTestSuite.Models
             Console.WriteLine($"Running Setup: {SetupFile}");
             await DatabaseModel.Connector.CallQuery(SetupFile);
 
-            if (runParallel)
-                Results = await RunQueriesParallel();
-            else
-                Results = await RunQueriesSerial();
+            Results = await RunQueriesSerial();
 
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -50,53 +47,17 @@ namespace QueryTestSuite.Models
             return Results;
         }
 
-        private async Task<List<TestCase>> RunQueriesParallel()
-        {
-            List<Task<TestCase>> testTasks = new List<Task<TestCase>>();
-            foreach (FileInfo queryFile in CaseFiles)
-            {
-                Console.WriteLine($"Spawning Task for: {queryFile}");
-                Task<TestCase> testTask = GenerateAndRunTestCase(queryFile);
-                testTasks.Add(testTask);
-            }
-
-            await Task.WhenAll(testTasks);
-
-            var testCases = new List<TestCase>();
-            foreach (var testTask in testTasks)
-            {
-                testCases.Add(testTask.Result);
-            }
-            return testCases;
-        }
-
         private async Task<List<TestCase>> RunQueriesSerial()
         {
             var testCases = new List<TestCase>();
             foreach (FileInfo queryFile in CaseFiles)
             {
                 Console.WriteLine($"Running {queryFile}");
-                TestCase testCase = await GenerateAndRunTestCase(queryFile);
+                AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile));
+                TestCase testCase = new TestCase(queryFile, analysisResult);
                 testCases.Add(testCase);
             }
             return testCases;
-        }
-
-        private Task<TestCase> GenerateAndRunTestCase(FileInfo queryFile)
-        {
-            string testName = queryFile.Name;
-            string testCategory;
-            try
-            {
-                testCategory = queryFile.Directory.Parent.Name;
-            } catch (Exception ex)
-            {
-                testCategory = "N/A";
-                Console.WriteLine($"Could not get test caregory - {queryFile}");
-            }
-            
-            TestCase testCase = new TestCase(testName, testCategory);
-            return testCase.Run(DatabaseModel.Parser.ParsePlan(DatabaseModel.Connector.AnalyseQuery(queryFile)));
         }
 
         private void WriteResultToConsole()

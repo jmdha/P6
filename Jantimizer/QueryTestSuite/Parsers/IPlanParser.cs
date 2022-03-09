@@ -11,7 +11,6 @@ namespace QueryTestSuite.Parsers
 {
     public interface IPlanParser
     {
-        public Task<AnalysisResult> ParsePlan(DataSet planData);
-        public Task<AnalysisResult> ParsePlan(Task<DataSet> planData);
+        public AnalysisResult ParsePlan(DataSet planData);
     }
 }

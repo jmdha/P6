@@ -5,20 +5,25 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestCase
     {
-        public string Name { get; private set; }
-        public string Category { get; private set; }
+        public string Name { get; private set; } = "N/A";
+        public string Category { get; private set; } = "N/A";
         public AnalysisResult AnalysisResult { get; private set; }
 
-        public TestCase (string Name, string Category)
+        public TestCase (FileInfo fileInfo, AnalysisResult analysisResult)
         {
-            this.Name = Name;
-            this.Category = Category;
+            AnalysisResult = analysisResult;
+            GenerateName(fileInfo);
         }
 
-        public async Task<TestCase> Run(Task<AnalysisResult> AnalysisResult)
-        {
-            this.AnalysisResult = await AnalysisResult;
-            return this;
+        public void GenerateName(FileInfo fileInfo) {
+            Name = fileInfo.Name;
+            try
+            {
+                Category = fileInfo.Directory.Parent.Name;
+            } catch (Exception ex)
+            {
+                Console.WriteLine($"Could not get test caregory - {fileInfo}");
+            }
         }
     }
 }
