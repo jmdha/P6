@@ -33,19 +33,8 @@ namespace QueryParser
 
         public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
         {
-            try
-            {
-                List<INode> nodes = parser.ParseQuery(query);
-                return nodes;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error, the parser [{nameof(parser)}] could not process the query:");
-                Console.WriteLine($"\t {query}");
-                Console.WriteLine("Exception message:");
-                Console.WriteLine(ex.Message);
-            }
-            return null;
+            List<INode> nodes = parser.ParseQuery(query);
+            return nodes;
         }
     }
 }
