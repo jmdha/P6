@@ -33,9 +33,11 @@ namespace QueryParser.Models
         {
             List<string?> tables = new List<string?>();
             SplitOverAND(JoinCondition, tables);
-            tables.RemoveAll(x => x == null);
-            tables.ForEach(x => x.Trim());
-            return tables;
+
+            return tables
+                .Where(x => x != null)
+                .Select(x => x!.Trim())
+                .ToList();
         }
 
         private void SplitOverAND(string s, List<string?> tables)
