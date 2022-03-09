@@ -12,18 +12,10 @@ namespace QueryTestSuite.TestRunners
         public TestCase (FileInfo fileInfo, AnalysisResult analysisResult)
         {
             AnalysisResult = analysisResult;
-            GenerateName(fileInfo);
-        }
-
-        public void GenerateName(FileInfo fileInfo) {
             Name = fileInfo.Name;
-            try
-            {
-                Category = fileInfo.Directory.Parent.Name;
-            } catch (Exception ex)
-            {
-                Console.WriteLine($"Could not get test caregory - {fileInfo}");
-            }
+            if (fileInfo.Directory != null)
+                if (fileInfo.Directory.Parent != null)
+                    Category = fileInfo.Directory.Parent.Name;
         }
     }
 }
