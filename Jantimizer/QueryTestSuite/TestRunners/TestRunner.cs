@@ -1,7 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using QueryTestSuite.Models;
-using System.Globalization;
+using QueryTestSuite.Services;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -12,7 +12,7 @@ namespace QueryTestSuite.TestRunners
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
-        private DateTime TimeStamp;
+        private CSVWriter csvWriter;
 
         public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
@@ -21,7 +21,7 @@ namespace QueryTestSuite.TestRunners
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
-            TimeStamp = timeStamp;
+            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
         }
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -67,32 +67,7 @@ namespace QueryTestSuite.TestRunners
 
         private void SaveResult()
         {
-            string directory = $"Results\\{TimeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}";
-            string resultFileName = directory + "\\result.csv";
-            Directory.CreateDirectory(directory);
-            FileStream stream;
-            CsvConfiguration config;
-            if (File.Exists(resultFileName))
-            {
-                stream = File.Open(resultFileName, FileMode.Append);
-                config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    // Don't write the header again.
-                    HasHeaderRecord = false,
-                };
-
-            } else
-            {
-                stream = File.Open(resultFileName, FileMode.Create);
-                config = new CsvConfiguration(CultureInfo.InvariantCulture);
-            }
-            using (var writer = new StreamWriter(stream))
-            using (var csv = new CsvWriter(writer, config))
-            {
-                csv.WriteRecords(Results);
-                writer.Flush();
-            }
-
+            csvWriter.Write();
         }
 
     }
