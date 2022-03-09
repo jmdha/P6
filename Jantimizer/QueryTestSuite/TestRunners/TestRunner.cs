@@ -1,30 +1,30 @@
-﻿using QueryTestSuite.Connectors;
-using QueryTestSuite.Parsers;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using QueryTestSuite.Models;
+using System.Globalization;
 
-namespace QueryTestSuite.Models
+namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
         public DatabaseCommunicator DatabaseModel { get; }
-        public FileInfo SetupFile { get; set; }
-        public FileInfo CleanupFile { get; set; }
-        public IEnumerable<FileInfo> CaseFiles { get; set; }
+        public FileInfo SetupFile { get; private set; }
+        public FileInfo CleanupFile { get; private set; }
+        public IEnumerable<FileInfo> CaseFiles { get; private set; }
+        public List<TestCase> Results { get; private set; }
+        private DateTime TimeStamp;
 
-        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
             DatabaseModel = databaseModel;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
+            Results = new List<TestCase>();
+            TimeStamp = timeStamp;
         }
 
-        public async Task<List<AnalysisResult>> Run(bool runParallel = false)
+        public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             Console.WriteLine($"Running Cleanup: {CleanupFile}");
             await DatabaseModel.Connector.CallQuery(CleanupFile);
@@ -32,46 +32,68 @@ namespace QueryTestSuite.Models
             Console.WriteLine($"Running Setup: {SetupFile}");
             await DatabaseModel.Connector.CallQuery(SetupFile);
 
-            if (runParallel)
-                return await RunQueriesParallel();
-            else
-                return await RunQueriesSerial();
+            Results = await RunQueriesSerial();
+
+            Console.WriteLine($"Running Cleanup: {CleanupFile}");
+            await DatabaseModel.Connector.CallQuery(CleanupFile);
+
+            if (consoleOutput)
+                WriteResultToConsole();
+            if (saveResult)
+                SaveResult();
+
+
+            return Results;
         }
 
-        private async Task<List<AnalysisResult>> RunQueriesParallel()
+        private async Task<List<TestCase>> RunQueriesSerial()
         {
-            var queryAnalysisTasks = new List<Task<DataSet>>();
-            foreach (var queryFile in CaseFiles)
-            {
-                Console.WriteLine($"Spawning Task for: {queryFile}");
-                queryAnalysisTasks.Add(DatabaseModel.Connector.AnalyseQuery(queryFile));
-            }
-
-            await Task.WhenAll(queryAnalysisTasks);
-
-            var queryAnalysisResults = new List<AnalysisResult>();
-            foreach (var task in queryAnalysisTasks)
-            {
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await task));
-            }
-            return queryAnalysisResults;
-        }
-
-        private async Task<List<AnalysisResult>> RunQueriesSerial()
-        {
-            var queryAnalysisResults = new List<AnalysisResult>();
+            var testCases = new List<TestCase>();
             foreach (FileInfo queryFile in CaseFiles)
             {
                 Console.WriteLine($"Running {queryFile}");
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile)));
+                AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile));
+                TestCase testCase = new TestCase(queryFile, analysisResult);
+                testCases.Add(testCase);
             }
-            return queryAnalysisResults;
+            return testCases;
         }
 
-
-        public async Task Cleanup()
+        private void WriteResultToConsole()
         {
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            foreach(var testCase in Results)
+                Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.TestResult.EstimatedCardinality)}], actual: [{testCase.TestResult.ActualCardinality}]");
         }
+
+        private void SaveResult()
+        {
+            string directory = $"Results\\{TimeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}";
+            string resultFileName = directory + "\\result.csv";
+            Directory.CreateDirectory(directory);
+            FileStream stream;
+            CsvConfiguration config;
+            if (File.Exists(resultFileName))
+            {
+                stream = File.Open(resultFileName, FileMode.Append);
+                config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    // Don't write the header again.
+                    HasHeaderRecord = false,
+                };
+
+            } else
+            {
+                stream = File.Open(resultFileName, FileMode.Create);
+                config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            }
+            using (var writer = new StreamWriter(stream))
+            using (var csv = new CsvWriter(writer, config))
+            {
+                csv.WriteRecords(Results);
+                writer.Flush();
+            }
+
+        }
+
     }
 }

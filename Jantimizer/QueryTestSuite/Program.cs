@@ -4,7 +4,7 @@ using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;
 using QueryTestSuite.Services;
-using System.Data;
+using QueryTestSuite.TestRunners;
 
 namespace QueryTestSuite
 {
@@ -33,9 +33,11 @@ namespace QueryTestSuite
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
+            DateTime timeStamp = DateTime.Now;
+
             foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
             {
-                TestSuite suite = new TestSuite(connectorSet);
+                TestSuite suite = new TestSuite(connectorSet, timeStamp);
 
                 Console.WriteLine($"Running Collection: {testDir}");
                 await suite.RunTests(testDir);
