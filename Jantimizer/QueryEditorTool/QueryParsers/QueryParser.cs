@@ -11,6 +11,7 @@ namespace QueryEditorTool.QueryParsers
     public class QueryParser : IQueryParser
     {
         private int _movableIndex = 0;
+        private static string _placeHolderTableName = "...";
 
         public List<JoinNode> ParseQuery(string query)
         {
@@ -34,7 +35,7 @@ namespace QueryEditorTool.QueryParsers
             if (subQuery.Contains("(") && subQuery.Contains(")"))
             {
                 ParseSubQuery(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), nodes);
-                subQuery = subQuery.Replace(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), "...");
+                subQuery = subQuery.Replace(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), _placeHolderTableName);
             }
 
             string leftTable = subQuery.Split("JOIN")[0];
@@ -48,6 +49,11 @@ namespace QueryEditorTool.QueryParsers
             nodes.Add(newNode);
         }
 
+        /// <summary>
+        /// Trims a subquery, by removing '(' and ')' so that it can be parsed later.
+        /// </summary>
+        /// <param name="subQuery"></param>
+        /// <returns></returns>
         private string TrimSubQuery(string subQuery)
         {
             subQuery = subQuery.Substring(subQuery.IndexOf("(") + 1);
@@ -56,17 +62,34 @@ namespace QueryEditorTool.QueryParsers
             return subQuery;
         }
 
+        /// <summary>
+        /// To stitch join subqueries back together
+        /// 
+        /// <code>
+        ///     Example
+        ///     "... JOIN B ON B.Value1 > A.Value2"
+        ///     becomes
+        ///     "A JOIN B ON B.Value1 > A.Value2"
+        /// </code>
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private void StitchJoins(List<JoinNode> nodes)
         {
             foreach(JoinNode node in nodes)
             {
-                if (node.LeftTable == "...")
+                if (node.LeftTable == _placeHolderTableName)
                     node.LeftTable = GetFittingTable(node);
-                if (node.RightTable == "...")
+                if (node.RightTable == _placeHolderTableName)
                     node.RightTable = GetFittingTable(node);
             }
         }
 
+        /// <summary>
+        /// Finds a table that have not been used already, and puts in the placeholder.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         private string GetFittingTable(JoinNode node)
         {
             List<string> tables = new List<string>();
@@ -76,7 +99,7 @@ namespace QueryEditorTool.QueryParsers
                     tables.Add(table);
             }
             if (tables.Count == 0)
-                return "...";
+                return _placeHolderTableName;
             return tables[0];
         }
     }

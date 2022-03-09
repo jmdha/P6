@@ -19,7 +19,6 @@ namespace QueryTestSuite
         {
             IQueryParser parser = new QueryParser();
             var returnVal = parser.ParseQuery("SELECT * FROM ((D JOIN A ON D.Value1 > A.Value2) JOIN B ON A.Value1 > B.Value2) JOIN C ON C.Value3 < B.Value2");
-            string parsed = returnVal.ToString();
 
             SecretsService secrets = new SecretsService();
 
