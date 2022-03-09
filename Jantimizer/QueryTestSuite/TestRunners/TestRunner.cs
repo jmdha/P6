@@ -62,7 +62,7 @@ namespace QueryTestSuite.TestRunners
         private void WriteResultToConsole()
         {
             foreach(var testCase in Results)
-                Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.AnalysisResult.EstimatedCardinality)}], actual: [{testCase.AnalysisResult.ActualCardinality}]");
+                Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.TestResult.EstimatedCardinality)}], actual: [{testCase.TestResult.ActualCardinality}]");
         }
 
         private void SaveResult()

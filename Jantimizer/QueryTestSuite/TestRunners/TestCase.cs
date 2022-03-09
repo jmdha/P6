@@ -7,11 +7,11 @@ namespace QueryTestSuite.TestRunners
     {
         public string Name { get; private set; } = "N/A";
         public string Category { get; private set; } = "N/A";
-        public AnalysisResult AnalysisResult { get; private set; }
+        public AnalysisResult TestResult { get; private set; }
 
         public TestCase (FileInfo fileInfo, AnalysisResult analysisResult)
         {
-            AnalysisResult = analysisResult;
+            TestResult = analysisResult;
             Name = fileInfo.Name;
             if (fileInfo.Directory != null)
                 if (fileInfo.Directory.Parent != null)
