@@ -1,4 +1,4 @@
-﻿using QueryEditorTool.Models;
+﻿using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,16 +6,23 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryEditorTool.QueryParsers
+namespace QueryParser.QueryParsers
 {
-    public class QueryParser : IQueryParser
+    public class JoinQueryParser : IQueryParser
     {
-        private int _movableIndex = 0;
-        private static string _placeHolderTableName = "...";
+        private int _joinIndex = 0;
+        public string PlaceholderTableName { get; } = "...";
 
-        public List<JoinNode> ParseQuery(string query)
+        public bool DoesQueryMatch(string query)
         {
-            List<JoinNode> returnNodes = new List<JoinNode>();
+            if (query.ToUpper().Contains("JOIN"))
+                return true;
+            return false;
+        }
+
+        public List<INode> ParseQuery(string query)
+        {
+            List<INode> returnNodes = new List<INode>();
 
             query = query.Substring(query.IndexOf("FROM") + 4);
             if (query[0] != '(')
@@ -28,14 +35,14 @@ namespace QueryEditorTool.QueryParsers
             return returnNodes;
         }
 
-        private void ParseSubQuery(string subQuery, List<JoinNode> nodes)
+        private void ParseSubQuery(string subQuery, List<INode> nodes)
         {
             subQuery = TrimSubQuery(subQuery);
 
             if (subQuery.Contains("(") && subQuery.Contains(")"))
             {
                 ParseSubQuery(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), nodes);
-                subQuery = subQuery.Replace(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), _placeHolderTableName);
+                subQuery = subQuery.Replace(subQuery.Substring(subQuery.IndexOf("("), subQuery.LastIndexOf(")") + 1), PlaceholderTableName);
             }
 
             string leftTable = subQuery.Split("JOIN")[0];
@@ -44,8 +51,8 @@ namespace QueryEditorTool.QueryParsers
             string rightTable = rightSide.Split("ON")[0];
             string condition = rightSide.Split("ON")[1];
 
-            var newNode = new JoinNode(_movableIndex, leftTable, rightTable, condition);
-            _movableIndex++;
+            var newNode = new JoinNode(_joinIndex, leftTable, rightTable, condition);
+            _joinIndex++;
             nodes.Add(newNode);
         }
 
@@ -74,13 +81,13 @@ namespace QueryEditorTool.QueryParsers
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
-        private void StitchJoins(List<JoinNode> nodes)
+        private void StitchJoins(List<INode> nodes)
         {
             foreach(JoinNode node in nodes)
             {
-                if (node.LeftTable == _placeHolderTableName)
+                if (node.LeftTable == PlaceholderTableName)
                     node.LeftTable = GetFittingTable(node);
-                if (node.RightTable == _placeHolderTableName)
+                if (node.RightTable == PlaceholderTableName)
                     node.RightTable = GetFittingTable(node);
             }
         }
@@ -99,7 +106,7 @@ namespace QueryEditorTool.QueryParsers
                     tables.Add(table);
             }
             if (tables.Count == 0)
-                return _placeHolderTableName;
+                return PlaceholderTableName;
             return tables[0];
         }
     }

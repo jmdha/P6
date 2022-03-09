@@ -1,5 +1,5 @@
-﻿using QueryEditorTool.Models;
-using QueryEditorTool.QueryParsers;
+﻿using QueryParser;
+using QueryParser.QueryParsers;
 using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;

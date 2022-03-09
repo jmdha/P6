@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryEditorTool.Models
+namespace QueryParser.Models
 {
-    public class JoinNode
+    public class JoinNode : INode
     {
         public int Id { get; internal set; }
-        public string LeftTable { get; set; }
-        public string RightTable { get; set; }
-        public string JoinCondition { get; set; }
-        public List<string> ConditionTables => GetTablesUsedInCondition();
+        public string LeftTable { get; internal set; }
+        public string RightTable { get; internal set; }
+        public string JoinCondition { get; internal set; }
+        public List<string> ConditionTables { get; }
 
         public JoinNode(int id, string leftTable, string rightTable, string joinCondition)
         {
@@ -20,6 +20,8 @@ namespace QueryEditorTool.Models
             LeftTable = leftTable.Trim();
             RightTable = rightTable.Trim();
             JoinCondition = joinCondition.Trim();
+            ConditionTables = new List<string>();
+            ConditionTables = GenerateConditionTables();
         }
 
         public override string? ToString()
@@ -27,7 +29,7 @@ namespace QueryEditorTool.Models
             return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
         }
 
-        private List<string> GetTablesUsedInCondition()
+        private List<string> GenerateConditionTables()
         {
             List<string?> tables = new List<string?>();
             SplitOverAND(JoinCondition, tables);
