@@ -42,7 +42,7 @@ namespace QueryParser.Models
 
         private void SplitOverAND(string s, List<string?> tables)
         {
-            string[] andSplit = s.Split("AND");
+            string[] andSplit = s.Split(" AND ");
             if (andSplit.Length > 0)
             {
                 foreach (string and in andSplit)
@@ -54,7 +54,7 @@ namespace QueryParser.Models
 
         private void SplitOverOR(string s, List<string?> tables)
         {
-            string[] orSplit = s.Split("OR");
+            string[] orSplit = s.Split(" OR ");
             if (orSplit.Length > 0)
             {
                 foreach (string or in orSplit)
