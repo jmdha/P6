@@ -1,10 +1,9 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
-using QueryTestSuite.TestRunners;
-using System.Data;
+using QueryTestSuite.Models;
 using System.Globalization;
 
-namespace QueryTestSuite.Models
+namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {

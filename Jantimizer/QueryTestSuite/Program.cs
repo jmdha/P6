@@ -2,7 +2,7 @@
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;
 using QueryTestSuite.Services;
-using System.Data;
+using QueryTestSuite.TestRunners;
 
 namespace QueryTestSuite
 {
