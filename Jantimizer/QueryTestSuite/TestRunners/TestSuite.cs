@@ -1,12 +1,6 @@
 ﻿using QueryTestSuite.Models;
-using QueryTestSuite.TestRunners;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QueryTestSuite.Connectors
+namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
