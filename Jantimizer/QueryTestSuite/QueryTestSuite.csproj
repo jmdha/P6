@@ -93,9 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\QueryPerser\QueryParser.csproj" />
+    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
