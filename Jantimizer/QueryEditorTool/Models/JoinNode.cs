@@ -17,9 +17,9 @@ namespace QueryEditorTool.Models
         public JoinNode(int id, string leftTable, string rightTable, string joinCondition)
         {
             Id = id;
-            LeftTable = leftTable;
-            RightTable = rightTable;
-            JoinCondition = joinCondition;
+            LeftTable = leftTable.Trim();
+            RightTable = rightTable.Trim();
+            JoinCondition = joinCondition.Trim();
         }
 
         public override string? ToString()
@@ -79,7 +79,7 @@ namespace QueryEditorTool.Models
         private string? GetTableNameFromAttributeName(string s)
         {
             if (s.Contains("."))
-                return s.Split(".")[0];
+                return s.Split(".")[0].Trim();
             return null;
         }
     }
