@@ -92,7 +92,8 @@
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QueryPerser\QueryParser.csproj" />
+    <ProjectReference Include="..\Histograms\Histograms.csproj" />
+    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
