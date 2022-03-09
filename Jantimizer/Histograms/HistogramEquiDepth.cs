@@ -5,25 +5,31 @@
     /// </summary>
     public class HistogramEquiDepth : IHistogram
     {
-        public IHistogramBucket[] Buckets { get; set; }
+        public IHistogramBucket[] Buckets { get; }
 
-        public HistogramEquiDepth(int[] values, int bucketCount)
+        /// <summary>
+        /// Creates Ceil(|values|/depth) buckets. The last bucket may not be full
+        /// If called with 0 values, Buckets will be an empty array.
+        /// </summary>
+        /// <param name="values">The values to make a histogram for</param>
+        /// <param name="depth">The max elements per bucket (All but last bucket will have max elements)</param>
+        public HistogramEquiDepth(IEnumerable<int> values, int depth)
         {
             var sortedValues = values.OrderByDescending(x => -x).ToArray(); // Small first, large last
 
+            int bucketCount = (int)Math.Ceiling((double)sortedValues.Length / depth);
+
             Buckets = new HistogramBucket[bucketCount];
-            int bucketSize = sortedValues.Length / bucketCount; // Rounding error
 
-            for (int i = 0; i < bucketCount; i++)
+            for (int i = 0; i < Buckets.Length; i++)
             {
-                Buckets[i] = new HistogramBucket()
-                {
-                    ValueStart = sortedValues[i * bucketSize],
-                    Count = bucketSize
-                };
+                int remaining = sortedValues.Length - i * depth;
+
+                Buckets[i] = new HistogramBucket(
+                    Math.Min(depth, remaining),
+                    sortedValues[i * depth]
+                    );
             }
-
         }
-
     }
 }
