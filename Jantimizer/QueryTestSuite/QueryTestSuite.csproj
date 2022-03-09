@@ -92,6 +92,9 @@
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Histograms\Histograms.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\QueryPerser\QueryParser.csproj" />
   </ItemGroup>
   <PropertyGroup>
