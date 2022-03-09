@@ -5,7 +5,7 @@
     /// </summary>
     public class HistogramEquiWidth : IHistogram
     {
-        public IHistogramBucket[] Buckets { get; set; }
+        public IHistogramBucket[] Buckets { get; }
 
         public HistogramEquiWidth(int[] values, int bucketCount)
         {
