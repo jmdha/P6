@@ -93,5 +93,26 @@ namespace Histograms.Managers
             }
             Console.WriteLine(sb.ToString());
         }
+
+        public IHistogram GetHistogram(string table, string attribute) {
+            foreach (var gram in Histograms)
+                if (gram.TableName.Equals(table) && gram.AttributeName.Equals(attribute))
+                    return gram;
+            throw new ArgumentException("No histogram found");
+        }
+        public List<IHistogram> GetHistogramsByTable(string table) {
+            List<IHistogram> grams = new List<IHistogram>();
+            foreach (var gram in Histograms)
+                if (gram.TableName.Equals(table))
+                    grams.Add(gram);
+            return grams;
+        }
+        public List<IHistogram> GetHistogramsByAttribute(string attribute) {
+            List<IHistogram> grams = new List<IHistogram>();
+            foreach (var gram in Histograms)
+                if (gram.AttributeName.Equals(attribute))
+                    grams.Add(gram);
+            return grams;
+        }
     }
 }

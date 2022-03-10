@@ -8,7 +8,17 @@ namespace QueryParser.Models
 {
     public class JoinNode : INode
     {
+        public enum ComparisonType {
+            None,
+            Equal,
+            Less,
+            More,
+            EqualOrLess,
+            EqualOrMore
+        };
+
         public int Id { get; internal set; }
+        public ComparisonType ComType { get; internal set; }
         public string LeftTable { get; internal set; }
         public string LeftAttribute { get; internal set; }
         public string RightTable { get; internal set; }
@@ -16,9 +26,10 @@ namespace QueryParser.Models
         public string JoinCondition { get; internal set; }
         public List<string> ConditionTables { get; }
 
-        public JoinNode(int id, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
+        public JoinNode(int id, ComparisonType type, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
         {
             Id = id;
+            ComType = type;
             LeftTable = leftTable.Trim();
             LeftAttribute = leftAttribute.Trim();
             RightTable = rightTable.Trim();
@@ -68,11 +79,11 @@ namespace QueryParser.Models
         }
         private void SplitOverPredicates(string s, List<string?> tables)
         {
-            if (s.Contains(">")) GetTableNamesFromPredicate(s.Split(">"), tables);
-            if (s.Contains("<")) GetTableNamesFromPredicate(s.Split("<"), tables);
-            if (s.Contains(">=")) GetTableNamesFromPredicate(s.Split(">="), tables);
-            if (s.Contains("<=")) GetTableNamesFromPredicate(s.Split("<="), tables);
-            if (s.Contains("=")) GetTableNamesFromPredicate(s.Split("="), tables);
+            if (ComType == ComparisonType.More)         GetTableNamesFromPredicate(s.Split(">"), tables);
+            if (ComType == ComparisonType.Less)         GetTableNamesFromPredicate(s.Split("<"), tables);
+            if (ComType == ComparisonType.EqualOrMore)  GetTableNamesFromPredicate(s.Split(">="), tables);
+            if (ComType == ComparisonType.EqualOrLess)  GetTableNamesFromPredicate(s.Split("<="), tables);
+            if (ComType == ComparisonType.Equal)        GetTableNamesFromPredicate(s.Split("="), tables);
         }
 
         private void GetTableNamesFromPredicate(string[] s, List<string?> tables)

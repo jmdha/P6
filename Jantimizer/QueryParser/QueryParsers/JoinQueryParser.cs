@@ -66,6 +66,7 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private JoinNode ParseIntoModel(string subQuery)
         {
+            JoinNode.ComparisonType type = JoinNode.ComparisonType.None;
             string[] joinSplit = subQuery.Split(" JOIN ");
             System.Console.WriteLine("Begin");
             foreach(var e in joinSplit) {
@@ -88,17 +89,18 @@ namespace QueryParser.QueryParsers
                     condition = onSplit[1].Trim();
                 if (condition.Length > 1)
                 {
-                    string[] operators = {
-                        "<=",
-                        ">=",
-                        "=",
-                        ">",
-                        "<"
+                    var operators = new(JoinNode.ComparisonType, string)[]{
+                        (JoinNode.ComparisonType.EqualOrLess, "<="),
+                        (JoinNode.ComparisonType.EqualOrMore, ">="),
+                        (JoinNode.ComparisonType.Equal, "="),
+                        (JoinNode.ComparisonType.More, ">"),
+                        (JoinNode.ComparisonType.Less, "<")
                     };
                     string[] conditionSplit = {"", ""};
                     foreach (var op in operators) {
-                        if (condition.Contains(op)) {
-                            conditionSplit = condition.Split(op);
+                        if (condition.Contains(op.Item2)) {
+                            conditionSplit = condition.Split(op.Item2);
+                            type = op.Item1;
                             break;
                         }
                     }
@@ -109,7 +111,7 @@ namespace QueryParser.QueryParsers
                 }
             }
 
-            var newNode = new JoinNode(_joinIndex, leftTable, leftAttribute, rightTable, rightAttribute, condition);
+            var newNode = new JoinNode(_joinIndex, type, leftTable, leftAttribute, rightTable, rightAttribute, condition);
             _joinIndex++;
             return newNode;
         }
