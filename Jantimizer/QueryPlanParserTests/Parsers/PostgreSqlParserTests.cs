@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryPlanParser;
 using QueryPlanParser.Exceptions;
+using QueryPlanParser.Models;
 using QueryPlanParser.Parsers;
 using System;
 using System.Collections.Generic;
@@ -150,6 +151,118 @@ namespace QueryPlanParserTests.Parsers
             // Assert
             Assert.IsNull(result);
         }
+
+        #endregion
+
+        #region ParseQueryAnalysisRows
+
+        [TestMethod]
+        [DataRow(new string[] { "badRow", "badRow", "badRow" }, 0)]
+        [DataRow(new string[] { "Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "badRow", "badRow" }, 1)]
+        [DataRow(new string[] { "Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "badRow" }, 2)]
+        [DataRow(new string[] { "badRow", "Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)" }, 2)]
+        public void Can_ParseQueryAnalysisRows(string[] lines, int eCount)
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+
+            // Act
+            var result = parser.ParseQueryAnalysisRows(lines);
+
+            // Assert
+            Assert.AreEqual(eCount, result.Count());
+        }
+
+        [TestMethod]
+        public void Can_ParseQueryAnalysisRows_WithNoRows()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+
+            // Act
+            var result = parser.ParseQueryAnalysisRows(new string[0]);
+
+            // Assert
+            Assert.AreEqual(0, result.Count());
+        }
+
+        #endregion
+
+        #region RunAnalysis
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Cant_RunAnalysis_WithNoData()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+
+            // Act
+            parser.RunAnalysis(new Queue<AnalysisResultWithIndent>());
+        }
+
+        [TestMethod]
+        public void Can_RunAnalysis_WithOneRow()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+            List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
+            AnalysisResult eResult = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            list.Add(new AnalysisResultWithIndent(eResult, 0));
+
+            // Act
+            var result = parser.RunAnalysis(new Queue<AnalysisResultWithIndent>(list));
+
+            // Assert
+            Assert.AreEqual(eResult, result);
+        }
+
+        [TestMethod]
+        public void Can_RunAnalysis_WithMultipleRows1()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+            List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
+            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+
+            list.Add(new AnalysisResultWithIndent(eResult1, 0));
+            list.Add(new AnalysisResultWithIndent(eResult2, 6));
+            list.Add(new AnalysisResultWithIndent(eResult3, 12));
+
+            // Act
+            var result = parser.RunAnalysis(new Queue<AnalysisResultWithIndent>(list));
+
+            // Assert
+            Assert.AreEqual(eResult1, result);
+            Assert.AreEqual(eResult2, result.SubQueries[0]);
+            Assert.AreEqual(eResult3, result.SubQueries[0].SubQueries[0]);
+        }
+
+        [TestMethod]
+        public void Can_RunAnalysis_WithMultipleRows2()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+            List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
+            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+
+            list.Add(new AnalysisResultWithIndent(eResult1, 0));
+            list.Add(new AnalysisResultWithIndent(eResult2, 6));
+            list.Add(new AnalysisResultWithIndent(eResult3, 6));
+
+            // Act
+            var result = parser.RunAnalysis(new Queue<AnalysisResultWithIndent>(list));
+
+            // Assert
+            Assert.AreEqual(eResult1, result);
+            Assert.AreEqual(eResult2, result.SubQueries[0]);
+            Assert.AreEqual(eResult3, result.SubQueries[1]);
+        }
+
 
         #endregion
 

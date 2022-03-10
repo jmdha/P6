@@ -23,6 +23,9 @@ namespace QueryPlanParser.Parsers
             var resultRows = ParseQueryAnalysisRows(explainRows);
             resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
 
+            if (resultQueue.Count == 0)
+                throw new BadQueryPlanInputException("Analysis got no rows!");
+
             return RunAnalysis(resultQueue);
         }
 
