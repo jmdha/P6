@@ -91,7 +91,7 @@ namespace QueryPlanParser.Parsers
 
             // Create Result
             var analysisResult = new AnalysisResult(
-                rowData["name"].ToString().Trim(),
+                rowData["name"].Value.Trim(),
                 decimal.Parse(rowData["costMin"].Value),
                 ulong.Parse(rowData["estimatedRows"].Value),
                 ulong.Parse(rowData["actualRows"].Value),
