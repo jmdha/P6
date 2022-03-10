@@ -33,18 +33,17 @@ public class SingleEqualityJoin
 
 
 
-    // Both tables contain a 100 of the same value
     [TestMethod]
     [DataRow(10, 100, 100, 10000, 10)]
     [DataRow(20, 100, 100, 10000, 10)]
     [DataRow(10, 10, 100, 1000, 10)]
     [DataRow(10, 100, 100, 10000, 20)]
     [DataRow(100, 1, 1, 1, 10)]
-    public void SameConstant(int constant, int aAmount, int bAmount, int expectedHits, int depth)
+    public void SameValue(int value, int aAmount, int bAmount, int expectedHits, int depth)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, constant);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, constant);
+        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, value);
+        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, value);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -58,10 +57,16 @@ public class SingleEqualityJoin
     }
     
     [TestMethod]
-    public void Overlap() {
+    [DataRow(0, 100, 0, 100, 10, 10000)]
+    [DataRow(0, 100, 99, 199, 10, 100)]
+    [DataRow(0, 100, 101, 201, 10, 0)]
+    [DataRow(0, 100, 50, 150, 10, 50*50)]
+    [DataRow(50, 150, 0, 100, 10, 50*50)]
+    [DataRow(0, 100, 50, 150, 20, 60*60)]
+    public void Overlap(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits) {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
-        var aGram = CreateIncreasingHistogram("A", "ID", 10, 0, 100);
-        var bGram = CreateIncreasingHistogram("B", "ID", 10, 50, 150);
+        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -71,6 +76,6 @@ public class SingleEqualityJoin
         QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
-        Assert.AreEqual(50 * 50, cost);
+        Assert.AreEqual(expectedHits, cost);
     }
 }
