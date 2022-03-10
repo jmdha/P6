@@ -3,7 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
-    <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

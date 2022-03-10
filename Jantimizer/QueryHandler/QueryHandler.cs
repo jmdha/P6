@@ -44,7 +44,7 @@ namespace QueryHandler
                     rightGram.Buckets[rightBucketIndex].ValueStart <= leftGram.Buckets[leftBucketIndex].ValueEnd) {
                         if (leftBucketStart == -1)
                             leftBucketStart = leftBucketIndex;
-                        if (leftBucketStart < leftBucketIndex)
+                        if (leftBucketEnd < leftBucketIndex)
                             leftBucketEnd = leftBucketIndex;
                         if (rightBucketStart == -1)
                             rightBucketStart = rightBucketIndex;
@@ -56,7 +56,7 @@ namespace QueryHandler
                     rightGram.Buckets[rightBucketIndex].ValueEnd >= leftGram.Buckets[leftBucketIndex].ValueStart) {
                         if (leftBucketStart == -1)
                             leftBucketStart = leftBucketIndex;
-                        if (leftBucketStart < leftBucketIndex)
+                        if (leftBucketEnd < leftBucketIndex)
                             leftBucketEnd = leftBucketIndex;
                         if (rightBucketStart == -1)
                             rightBucketStart = rightBucketIndex;

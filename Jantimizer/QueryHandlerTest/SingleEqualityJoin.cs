@@ -35,11 +35,16 @@ public class SingleEqualityJoin
 
     // Both tables contain a 100 of the same value
     [TestMethod]
-    public void SameConstant()
+    [DataRow(10, 100, 100, 10000, 10)]
+    [DataRow(20, 100, 100, 10000, 10)]
+    [DataRow(10, 10, 100, 1000, 10)]
+    [DataRow(10, 100, 100, 10000, 20)]
+    [DataRow(100, 1, 1, 1, 10)]
+    public void SameConstant(int constant, int aAmount, int bAmount, int expectedHits, int depth)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
-        var aGram = CreateConstHistogram("A", "ID", 10, 100, 10);
-        var bGram = CreateConstHistogram("B", "ID", 10, 100, 10);
+        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, constant);
+        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, constant);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -49,7 +54,7 @@ public class SingleEqualityJoin
         QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
-        Assert.AreEqual(100 * 100, cost);
+        Assert.AreEqual(expectedHits, cost);
     }
     
     [TestMethod]
