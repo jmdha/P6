@@ -16,7 +16,10 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="Parsers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
   </ItemGroup>
 
 </Project>
