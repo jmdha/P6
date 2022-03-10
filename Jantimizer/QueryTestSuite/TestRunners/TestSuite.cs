@@ -1,13 +1,14 @@
-﻿using QueryTestSuite.Models;
+﻿using DatabaseConnector;
+using QueryTestSuite.Models;
 
 namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
-        public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
+        public IEnumerable<DBConnectorParser> DatabaseModels { get; }
         private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels, DateTime timeStamp)
+        public TestSuite(IEnumerable<DBConnectorParser> databaseModels, DateTime timeStamp)
         {
             DatabaseModels = databaseModels;
             TimeStamp = timeStamp;
@@ -18,7 +19,7 @@ namespace QueryTestSuite.TestRunners
             var testRunners = new List<TestRunner>();
             var testRuns = new List<Task<List<TestCase>>>();
 
-            foreach(DatabaseCommunicator databaseModel in DatabaseModels)
+            foreach(DBConnectorParser databaseModel in DatabaseModels)
             {
                 var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 

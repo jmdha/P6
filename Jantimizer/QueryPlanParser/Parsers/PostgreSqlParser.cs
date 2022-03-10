@@ -1,4 +1,4 @@
-﻿using QueryTestSuite.Models;
+﻿using QueryPlanParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,9 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Parsers
+namespace QueryPlanParser.Parsers
 {
-    public class MySQLParser : BasePlanParser
+    public class PostgreSqlParser : BasePlanParser
     {
         public override AnalysisResult ParsePlan(DataSet planData)
         {
@@ -22,12 +22,11 @@ namespace QueryTestSuite.Parsers
             }
             catch (NoNullAllowedException)
             {
-                throw new NoNullAllowedException($"Unexpected null-value from MySql Analysis");
+                throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis");
             }
 
             return RunAnalysis(resultQueue);
         }
-
 
         private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
@@ -48,9 +47,9 @@ namespace QueryTestSuite.Parsers
 
         private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(DataRowCollection rows)
         {
-            var rowLineSplit = rows[0]["EXPLAIN"].ToString()!.Trim().Split('\n');
-            foreach (string rowStr in rowLineSplit)
+            foreach (DataRow row in rows)
             {
+                var rowStr = row["QUERY PLAN"].ToString();
                 if (string.IsNullOrEmpty(rowStr))
                     throw new NoNullAllowedException($"Unexpected null-value: {{{rowStr}}}");
 
@@ -62,7 +61,7 @@ namespace QueryTestSuite.Parsers
 
 
 
-        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)(?:\((?<predicate>[^)]+)?\) *)?\(cost=(?<cost>\d+.\d+) rows=(?<estimatedRows>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
+        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
 
         /// <summary>
         /// Returns null if the row isn't a new subquery, e.g. if the row is the condition on a join.
@@ -85,7 +84,7 @@ namespace QueryTestSuite.Parsers
             // Create Result
             var analysisResult = new AnalysisResult(
                 rowData["name"].ToString().Trim(),
-                decimal.Parse(rowData["cost"].Value),
+                decimal.Parse(rowData["costMin"].Value),
                 ulong.Parse(rowData["estimatedRows"].Value),
                 ulong.Parse(rowData["actualRows"].Value),
                 TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value))
