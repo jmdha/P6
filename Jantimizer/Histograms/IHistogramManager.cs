@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Histograms
 {
-    public interface IHistogramManager<H, C> 
-        where H : IHistogram 
-        where C : IDbConnector
+    public interface IHistogramManager<HistogramType, ConnectorType> 
+        where HistogramType : IHistogram 
+        where ConnectorType : IDbConnector
     {
-        public C DbConnector { get; }
+        public ConnectorType DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).ToList();
         public List<string> Attributes(string table) => Histograms.Where(x => x.TableName == table).Select(x => x.AttributeName).ToList();

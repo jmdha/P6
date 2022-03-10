@@ -36,10 +36,10 @@ namespace Histograms
 
         private void GenerateHistogramFromSorted(List<int> sorted)
         {
-            for (int i = 0; i < sorted.Count; i += Depth)
+            for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
-                IHistogramBucket newBucket = new HistogramBucket(sorted[i], 1);
-                for (int j = i + 1; j < i + Depth && j < sorted.Count; j++)
+                IHistogramBucket newBucket = new HistogramBucket(sorted[bStart], 1);
+                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                     newBucket.Count++;
                 Buckets.Add(newBucket);
             }
