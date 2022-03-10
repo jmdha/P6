@@ -24,10 +24,9 @@
             for (int i = 0; i < Buckets.Length; i++)
             {
                 int remaining = sortedValues.Length - i * depth;
-
                 Buckets[i] = new HistogramBucket(
-                    Math.Min(depth, remaining),
-                    sortedValues[i * depth]
+                    sortedValues[i * depth],
+                    Math.Min(depth, remaining)
                     );
             }
         }
