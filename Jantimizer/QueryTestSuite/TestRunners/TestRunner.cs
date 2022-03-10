@@ -38,7 +38,7 @@ namespace QueryTestSuite.TestRunners
 
             Console.WriteLine($"Running Setup: {SetupFile}");
             await DatabaseModel.Connector.CallQuery(SetupFile);
-            await HistogramManager.AddHistogram(SetupFile);
+            await HistogramManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();
 

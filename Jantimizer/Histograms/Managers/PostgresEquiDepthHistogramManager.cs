@@ -37,42 +37,50 @@ namespace Histograms.Managers
             Depth = depth;
         }
 
-        public async Task AddHistogram(string setupQuery)
-        {
-            IParserManager parser = new ParserManager(new List<IQueryParser> { new CreateTableQueryParser() });
-            List<INode> nodes = parser.ParseQuery(setupQuery, false);
-            if (nodes.Count > 0)
-            {
-                if (nodes[0] is CreateTableNode node)
-                {
-                    var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{node.TableName}';");
-                    if (returnRows.Tables.Count > 0)
-                    {
-                        foreach (DataRow row in returnRows.Tables[0].Rows)
-                        {
-                            string attributeName = $"{row["column_name"]}";
-                            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {node.TableName}");
-                            if (attributeValues.Tables.Count > 0)
-                            {
-                                IHistogram newHistogram = new HistogramEquiDepth(node.TableName, attributeName, Depth);
-                                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
-                                Histograms.Add(newHistogram);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        public async Task AddHistogram(FileInfo setupQueryFile)
+        public async Task AddHistograms(FileInfo setupQueryFile)
         {
             foreach (string line in File.ReadAllLines(setupQueryFile.FullName))
-                await AddHistogram(line);
+                await AddHistograms(line);
         }
 
         public void AddHistogram(IHistogram histogram)
         {
             Histograms.Add(histogram);
+        }
+
+        public async Task AddHistograms(string setupQuery)
+        {
+            IParserManager parser = new ParserManager(new List<IQueryParser> { new CreateTableQueryParser() });
+            List<INode> nodes = parser.ParseQuery(setupQuery, false);
+            if (nodes.Count > 0 && nodes[0] is CreateTableNode node)
+            {
+                foreach (DataRow row in (await GetAttributenamesForTable(node.TableName)).Rows)
+                {
+                    await AddHistogramForAttribute(row, node.TableName);
+                }
+            }
+        }
+
+        private async Task<DataTable> GetAttributenamesForTable(string tableName)
+        {
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{tableName}';");
+            if (returnRows.Tables.Count > 0)
+            {
+                return returnRows.Tables[0];
+            }
+            return new DataTable();
+        }
+
+        private async Task AddHistogramForAttribute(DataRow row, string tableName)
+        {
+            string attributeName = $"{row["column_name"]}";
+            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
+            if (attributeValues.Tables.Count > 0)
+            {
+                IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
+                Histograms.Add(newHistogram);
+            }
         }
 
         public void PrintAllHistograms()
