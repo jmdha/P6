@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace DatabaseConnector.Connectors
 {
-    internal class MySqlConnector : DbConnector
+    public class MySqlConnector : DbConnector
     {
         public MySqlConnector(string connectionString) : base(connectionString)
         {

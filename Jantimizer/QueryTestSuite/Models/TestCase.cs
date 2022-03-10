@@ -1,7 +1,7 @@
-﻿using QueryTestSuite.Models;
-using CsvHelper;
+﻿using CsvHelper;
+using DatabaseConnector.Models;
 
-namespace QueryTestSuite.TestRunners
+namespace QueryTestSuite.Models
 {
     internal class TestCase
     {

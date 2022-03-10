@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace DatabaseConnector.Connectors
 {
-    internal class PostgreSqlConnector : DbConnector
+    public class PostgreSqlConnector : DbConnector
     {
         public PostgreSqlConnector(string connectionString) : base(connectionString)
         {

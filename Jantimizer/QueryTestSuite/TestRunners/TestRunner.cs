@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using DatabaseConnector.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 

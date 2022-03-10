@@ -1,8 +1,8 @@
-﻿using QueryParser;
+﻿using DatabaseConnector.Connectors;
+using DatabaseConnector.Models;
+using DatabaseConnector.Parsers;
+using QueryParser;
 using QueryParser.QueryParsers;
-using QueryTestSuite.Connectors;
-using QueryTestSuite.Models;
-using QueryTestSuite.Parsers;
 using QueryTestSuite.Services;
 using QueryTestSuite.TestRunners;
 
@@ -25,7 +25,7 @@ namespace QueryTestSuite
                 new PostgreSqlParser());
             var mySqlModel = new DatabaseCommunicator(
                 "mysql",
-                new Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
+                new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
                 new MySQLParser());
 
             var connectorSet = new List<DatabaseCommunicator>() { postgresModel };

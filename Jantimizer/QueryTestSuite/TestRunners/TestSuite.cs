@@ -1,4 +1,5 @@
-﻿using QueryTestSuite.Models;
+﻿using DatabaseConnector.Models;
+using QueryTestSuite.Models;
 
 namespace QueryTestSuite.TestRunners
 {
