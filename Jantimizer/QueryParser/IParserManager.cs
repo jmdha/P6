@@ -24,7 +24,7 @@ namespace QueryParser
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<INode>? ParseQuery(string query);
+        public List<INode> ParseQuery(string query, bool throwIfNotFound = true);
 
         /// <summary>
         /// Forces a query to be parsed by a certain <see cref="IQueryParser"/>.

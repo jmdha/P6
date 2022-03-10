@@ -18,7 +18,7 @@ namespace QueryParser
             QueryParsers = queryParsers;
         }
 
-        public List<INode>? ParseQuery(string query)
+        public List<INode> ParseQuery(string query, bool throwIfNotFound = true)
         {
             foreach(IQueryParser parser in QueryParsers)
             {
@@ -29,7 +29,9 @@ namespace QueryParser
                         return resultNodes;
                 }
             }
-            throw new ParserException("Error, no valid parser found for the query!", QueryParsers, query);
+            if (throwIfNotFound)
+                throw new ParserException("Error, no valid parser found for the query!", QueryParsers, query);
+            return new List<INode>();
         }
 
         public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
