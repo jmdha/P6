@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DatabaseConnector.Connectors
+namespace DatabaseConnector
 {
     public interface IDbConnector
     {

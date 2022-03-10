@@ -93,6 +93,7 @@
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
+    <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>

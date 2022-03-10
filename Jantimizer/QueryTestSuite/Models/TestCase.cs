@@ -1,5 +1,5 @@
 ﻿using CsvHelper;
-using DatabaseConnector.Models;
+using QueryPlanParser.Models;
 
 namespace QueryTestSuite.Models
 {
