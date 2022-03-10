@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Connectors
+namespace DatabaseConnector.Connectors
 {
     public interface IDbConnector
     {

@@ -1,5 +1,5 @@
-﻿using QueryTestSuite.Connectors;
-using QueryTestSuite.Models;
+﻿using DatabaseConnector.Connectors;
+using DatabaseConnector.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Parsers
+namespace DatabaseConnector.Parsers
 {
     public interface IPlanParser
     {

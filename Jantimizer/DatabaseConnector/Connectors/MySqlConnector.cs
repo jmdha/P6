@@ -1,9 +1,9 @@
 ﻿using MySqlConnector;
-using QueryTestSuite.Models;
+using DatabaseConnector.Models;
 using System.Data;
 using System.Text.RegularExpressions;
 
-namespace QueryTestSuite.Connectors
+namespace DatabaseConnector.Connectors
 {
     internal class MySqlConnector : DbConnector
     {

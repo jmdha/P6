@@ -1,4 +1,4 @@
-﻿using QueryTestSuite.Models;
+﻿using DatabaseConnector.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Parsers
+namespace DatabaseConnector.Parsers
 {
     public class PostgreSqlParser : BasePlanParser
     {

@@ -1,4 +1,4 @@
-﻿using QueryTestSuite.Models;
+﻿using DatabaseConnector.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Connectors
+namespace DatabaseConnector.Connectors
 {
     public abstract class DbConnector : IDbConnector
     {
