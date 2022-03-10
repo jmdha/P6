@@ -1,4 +1,4 @@
-﻿using QueryParser.Models;
+using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +29,7 @@ namespace QueryParser.QueryParsers
             List<INode> returnNodes = new List<INode>();
 
             // Remove all information in the query before the actual join statements.
-            query = query.Substring(query.IndexOf(" FROM ") + 4);
+            query = query.Substring(query.IndexOf(" FROM ") + 5);
             if (query[0] != '(')
                 query = $"({query})";
 
