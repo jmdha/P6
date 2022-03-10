@@ -1,4 +1,4 @@
-using QueryParser.Models;
+﻿using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace QueryParser.QueryParsers
     public class JoinQueryParser : IQueryParser
     {
         private int _joinIndex = 0;
-        public string PlaceholderTableName { get; } = "...";
+        public string PlaceholderTableName { get; } = "|||";
 
         public bool DoesQueryMatch(string query)
         {
@@ -67,8 +67,14 @@ namespace QueryParser.QueryParsers
         private JoinNode ParseIntoModel(string subQuery)
         {
             string[] joinSplit = subQuery.Split(" JOIN ");
+            System.Console.WriteLine("Begin");
+            foreach(var e in joinSplit) {
+                Console.WriteLine(e);
+            }
             string leftTable = "";
+            string leftAttribute = "";
             string rightTable = "";
+            string rightAttribute = "";
             string condition = "";
             if (joinSplit.Length > 0)
                 leftTable = joinSplit[0].Trim();
@@ -80,9 +86,30 @@ namespace QueryParser.QueryParsers
                     rightTable = onSplit[0].Trim();
                 if (onSplit.Length > 1)
                     condition = onSplit[1].Trim();
+                if (condition.Length > 1)
+                {
+                    string[] operators = {
+                        "<=",
+                        ">=",
+                        "=",
+                        ">",
+                        "<"
+                    };
+                    string[] conditionSplit = {"", ""};
+                    foreach (var op in operators) {
+                        if (condition.Contains(op)) {
+                            conditionSplit = condition.Split(op);
+                            break;
+                        }
+                    }
+                    if (conditionSplit[0].Contains('.'))
+                        leftAttribute = conditionSplit[0].Split('.')[1].Trim();
+                    if (conditionSplit[1].Contains('.'))
+                        rightAttribute = conditionSplit[1].Split('.')[1].Trim();
+                }
             }
 
-            var newNode = new JoinNode(_joinIndex, leftTable, rightTable, condition);
+            var newNode = new JoinNode(_joinIndex, leftTable, leftAttribute, rightTable, rightAttribute, condition);
             _joinIndex++;
             return newNode;
         }

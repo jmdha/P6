@@ -10,15 +10,19 @@ namespace QueryParser.Models
     {
         public int Id { get; internal set; }
         public string LeftTable { get; internal set; }
+        public string LeftAttribute { get; internal set; }
         public string RightTable { get; internal set; }
+        public string RightAttribute { get; internal set; }
         public string JoinCondition { get; internal set; }
         public List<string> ConditionTables { get; }
 
-        public JoinNode(int id, string leftTable, string rightTable, string joinCondition)
+        public JoinNode(int id, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
         {
             Id = id;
             LeftTable = leftTable.Trim();
+            LeftAttribute = leftAttribute.Trim();
             RightTable = rightTable.Trim();
+            RightAttribute = rightAttribute.Trim();
             JoinCondition = joinCondition.Trim();
             ConditionTables = GenerateConditionTables();
         }
