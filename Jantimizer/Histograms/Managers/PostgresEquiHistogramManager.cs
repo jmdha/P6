@@ -13,8 +13,18 @@ namespace Histograms.Managers
     {
         public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
-        public List<string> Tables => Histograms.Select(x => x.TableName).ToList();
-        public List<string> Attributes(string table) => Histograms.Where(x => x.TableName == table).Select(x => x.AttributeName).ToList();
+        public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
+        public List<string> Attributes {
+            get
+            {
+                var returnList = new List<string>();
+                foreach(var histogram in Histograms)
+                {
+                    returnList.Add($"{histogram.TableName}.{histogram.AttributeName}");
+                }
+                return returnList;
+            }
+        }
         public int Depth { get; }
 
         public PostgresEquiHistogramManager(string connectionString, int depth)
