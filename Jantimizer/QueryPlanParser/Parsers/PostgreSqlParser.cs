@@ -1,4 +1,5 @@
-﻿using QueryPlanParser.Models;
+﻿using QueryPlanParser.Exceptions;
+using QueryPlanParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,15 +16,9 @@ namespace QueryPlanParser.Parsers
         {
             Queue<AnalysisResultWithIndent> resultQueue;
 
-            try
-            {
-                var resultRows = ParseQueryAnalysisRows(planData.Tables[0].Rows);
-                resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
-            }
-            catch (NoNullAllowedException)
-            {
-                throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis");
-            }
+            string[] explainRows = GetExplainRows(planData.Tables[0].Rows);
+            var resultRows = ParseQueryAnalysisRows(explainRows);
+            resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
 
             return RunAnalysis(resultQueue);
         }
@@ -36,7 +31,7 @@ namespace QueryPlanParser.Parsers
             // Recursively add subqueries
             while (rows.Count > 0)
             {
-                if (rows.Peek().indentation > row.indentation)
+                if (rows.Peek().Indentation > row.Indentation)
                     analysisRes.SubQueries.Add(RunAnalysis(rows));
                 else
                     break;
@@ -45,21 +40,31 @@ namespace QueryPlanParser.Parsers
             return analysisRes;
         }
 
-        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(DataRowCollection rows)
+        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(string[] rows)
         {
-            foreach (DataRow row in rows)
+            foreach (string rowStr in rows)
             {
-                var rowStr = row["QUERY PLAN"].ToString();
-                if (string.IsNullOrEmpty(rowStr))
-                    throw new NoNullAllowedException($"Unexpected null-value: {{{rowStr}}}");
-
                 var parsed = ParseQueryAnalysisRow(rowStr);
                 if (parsed != null)
                     yield return parsed;
             }
         }
 
-
+        private string[] GetExplainRows(DataRowCollection rows)
+        {
+            if (rows.Count > 0)
+            {
+                List<string> explainRows = new List<string>();
+                foreach (DataRow row in rows)
+                {
+                    if (!row.Table.Columns.Contains("QUERY PLAN"))
+                        throw new BadQueryPlanInputException("Database did not return a correct query plan!");
+                    explainRows.Add(row["QUERY PLAN"].ToString());
+                }
+                return explainRows.ToArray();
+            }
+            throw new BadQueryPlanInputException("Database did not return a correct query plan!");
+        }
 
         private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
 

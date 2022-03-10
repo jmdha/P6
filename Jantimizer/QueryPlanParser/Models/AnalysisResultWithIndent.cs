@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace QueryPlanParser.Models
 {
-    public class AnalysisResultWithIndent
+    internal class AnalysisResultWithIndent
     {
-        public AnalysisResult AnalysisResult { get; set; }
-        public int indentation { get; set; }
+        public AnalysisResult AnalysisResult { get; }
+        public int Indentation { get; }
 
         public AnalysisResultWithIndent(AnalysisResult analysisResult, int indentation)
         {
             AnalysisResult = analysisResult;
-            this.indentation = indentation;
+            Indentation = indentation;
         }
     }
 }
