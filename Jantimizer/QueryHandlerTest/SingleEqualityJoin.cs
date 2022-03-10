@@ -22,6 +22,15 @@ public class SingleEqualityJoin
         return tempGram;
     }
 
+    Histograms.HistogramEquiDepth CreateIncreasingHistogram(string tableName, string attibuteName, int depth, int minValue, int maxValue) {
+        var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
+        List<int> values = new List<int>();
+        for (int i = minValue; i < maxValue; i++)
+            values.Add(i);
+        tempGram.GenerateHistogram(values);
+        return tempGram;
+    }
+
 
 
     // Both tables contain a 100 of the same value
@@ -31,10 +40,8 @@ public class SingleEqualityJoin
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
         var aGram = CreateConstHistogram("A", "ID", 10, 100, 10);
         var bGram = CreateConstHistogram("B", "ID", 10, 100, 10);
-        var cGram = CreateConstHistogram("C", "ID", 10, 100, 10);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
-        histogramManager.AddHistogram(cGram);
 
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
@@ -43,5 +50,22 @@ public class SingleEqualityJoin
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(100 * 100, cost);
+    }
+    
+    [TestMethod]
+    public void Overlap() {
+        var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
+        var aGram = CreateIncreasingHistogram("A", "ID", 10, 0, 100);
+        var bGram = CreateIncreasingHistogram("B", "ID", 10, 50, 150);
+        histogramManager.AddHistogram(aGram);
+        histogramManager.AddHistogram(bGram);
+
+        QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
+        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
+
+        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+
+        Assert.AreEqual(50 * 50, cost);
     }
 }
