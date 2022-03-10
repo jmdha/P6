@@ -1,12 +1,12 @@
-﻿using QueryTestSuite.Connectors;
-using QueryTestSuite.Parsers;
+﻿using DatabaseConnector.Connectors;
+using DatabaseConnector.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Models
+namespace DatabaseConnector.Models
 {
     public class DatabaseCommunicator
     {

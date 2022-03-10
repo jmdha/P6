@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Models
+namespace DatabaseConnector.Models
 {
     public class AnalysisResult
     {
