@@ -9,9 +9,9 @@ using DatabaseConnector;
 
 namespace QueryHandler
 {
-    public class JoinCost
+    public static class JoinCost
     {
-        public int CalculateJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager  histograms) {
+        public static int CalculateJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager  histograms) {
             IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
             IHistogram rightGram = histograms.GetHistogram(joinNode.RightTable, joinNode.RightAttribute);
             int leftBucketStart = -1;
@@ -96,7 +96,7 @@ namespace QueryHandler
             return leftBucketCount * rightBucketCount;
         }
 
-        private bool CheckEqualBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
         {
             return ((rightValueStart >= leftValueStart &&
                          rightValueStart <= leftValueEnd) ||
@@ -104,24 +104,24 @@ namespace QueryHandler
                          rightValueEnd >= leftValueStart));
         }
 
-        private bool CheckLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
         {
             return leftValueStart < rightValueEnd;
         }
 
-        private bool CheckMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
         {
             return leftValueEnd > rightValueStart;
         }
 
-        private bool CheckEqualOrLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualOrLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
         {
             return (
                 CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
                 CheckLessBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd));
         }
 
-        private bool CheckEqualOrMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualOrMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
         {
             return (
                 CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
