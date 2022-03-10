@@ -23,7 +23,7 @@ namespace QueryPlanParser.Parsers
             return RunAnalysis(resultQueue);
         }
 
-        private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
+        internal AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
             var analysisRes = row.AnalysisResult;
@@ -40,7 +40,7 @@ namespace QueryPlanParser.Parsers
             return analysisRes;
         }
 
-        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(string[] rows)
+        internal IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(string[] rows)
         {
             foreach (string rowStr in rows)
             {
@@ -50,7 +50,7 @@ namespace QueryPlanParser.Parsers
             }
         }
 
-        private string[] GetExplainRows(DataRowCollection rows)
+        internal string[] GetExplainRows(DataRowCollection rows)
         {
             if (rows.Count > 0)
             {
@@ -59,7 +59,7 @@ namespace QueryPlanParser.Parsers
                 {
                     if (!row.Table.Columns.Contains("QUERY PLAN"))
                         throw new BadQueryPlanInputException("Database did not return a correct query plan!");
-                    explainRows.Add(row["QUERY PLAN"].ToString());
+                    explainRows.Add(row["QUERY PLAN"].ToString()!);
                 }
                 return explainRows.ToArray();
             }
@@ -73,7 +73,7 @@ namespace QueryPlanParser.Parsers
         /// </summary>
         /// <param name="rowStr">The content from a single row after running EXPLAIN ANALYZE</param>
         /// <returns>AnalysisResult, IndentationSize</returns>
-        private AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
+        internal AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
         {
             // Regex Matching
             var match = RowParserRegex.Match(rowStr);
