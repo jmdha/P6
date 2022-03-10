@@ -68,10 +68,6 @@ namespace QueryParser.QueryParsers
         {
             JoinNode.ComparisonType type = JoinNode.ComparisonType.None;
             string[] joinSplit = subQuery.Split(" JOIN ");
-            System.Console.WriteLine("Begin");
-            foreach(var e in joinSplit) {
-                Console.WriteLine(e);
-            }
             string leftTable = "";
             string leftAttribute = "";
             string rightTable = "";
