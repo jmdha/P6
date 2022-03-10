@@ -1,16 +1,11 @@
-﻿# Example of Histogram
+﻿# Histograms
 
-(to be updated later)
+There will be an implementation for each of the histogram types and connector type. Histograms can then be made based on the setup SQL file givne.
+
+# Example Usage
 
 ```csharp
-    await postgresModel.Connector.CallQuery(new FileInfo("../../../Tests/RandomNumberBlocks/cleanup.postgre.sql"));
-    await postgresModel.Connector.CallQuery(new FileInfo("../../../Tests/RandomNumberBlocks/setup.postgre.sql"));
-    var valuesToIndexQueryResult = await postgresModel.Connector.CallQuery("SELECT int4 FROM c");
-    var valuesToIndexRows = valuesToIndexQueryResult.Tables[0].Rows;
-    var valuesToIndex = new List<int>();
-    for(int i=0; i< valuesToIndexRows.Count; i++)
-        valuesToIndex.Add((int)valuesToIndexRows[i]["int4"]);
-
-    int[] histogramValues = valuesToIndex.ToArray();
-    var histogram = new HistogramEquiDepth(histogramValues, 20);
+var histogramManager = new PostgresEquiHistogramManager("SomeConnectionString", 10);
+await histogramManager.AddHistogram(SetupFile);
+histogramManager.PrintAllHistograms();
 ```
