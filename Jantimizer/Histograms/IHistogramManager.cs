@@ -18,5 +18,7 @@ namespace Histograms
         public Task AddHistogram(string setupQuery);
         public Task AddHistogram(FileInfo setupQueryFile);
         public void AddHistogram(IHistogram histogram);
+
+        public void PrintAllHistograms();
     }
 }

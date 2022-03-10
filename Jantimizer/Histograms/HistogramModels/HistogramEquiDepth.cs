@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 
 namespace Histograms
 {
@@ -42,6 +43,17 @@ namespace Histograms
                     newBucket.Count++;
                 Buckets.Add(newBucket);
             }
+        }
+
+        public override string? ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"\t Data for attribute {TableName}.{AttributeName}:");
+            foreach(var bucket in Buckets)
+            {
+                sb.AppendLine($"\t\t{bucket}");
+            }
+            return sb.ToString();
         }
     }
 }

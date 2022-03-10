@@ -10,5 +10,10 @@
             ValueStart = valueStart;
             Count = count;
         }
+
+        public override string? ToString()
+        {
+            return $"Start: [{ValueStart}], Count: [{Count}]";
+        }
     }
 }

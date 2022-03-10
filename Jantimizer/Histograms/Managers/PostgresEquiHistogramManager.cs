@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Histograms
+namespace Histograms.Managers
 {
-    public class PostgresEquiHistogramManager : IHistogramManager<HistogramEquiDepth, PostgreSqlConnector>
+    public class PostgresEquiHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
-        public PostgreSqlConnector DbConnector { get; }
+        public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).ToList();
         public List<string> Attributes(string table) => Histograms.Where(x => x.TableName == table).Select(x => x.AttributeName).ToList();
@@ -56,6 +56,17 @@ namespace Histograms
         public void AddHistogram(IHistogram histogram)
         {
             Histograms.Add(histogram);
+        }
+
+        public void PrintAllHistograms()
+        {
+            StringBuilder sb = new StringBuilder();
+            Console.WriteLine("Recorded Histograms:");
+            foreach(var histogram in Histograms)
+            {
+                sb.AppendLine(histogram.ToString());
+            }
+            Console.WriteLine(sb.ToString());
         }
     }
 }
