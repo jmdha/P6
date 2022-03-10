@@ -1,7 +1,12 @@
-﻿namespace Histograms
+﻿using System.Data;
+
+namespace Histograms
 {
     public interface IHistogram
     {
-        public IHistogramBucket[] Buckets { get; }
+        public List<IHistogramBucket> Buckets { get; }
+
+        public void GenerateHistogram(DataTable table, string key);
+        public void GenerateHistogram(List<int> column);
     }
 }

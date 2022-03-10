@@ -1,34 +1,41 @@
-﻿namespace Histograms
+﻿using System.Data;
+
+namespace Histograms
 {
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
     public class HistogramEquiDepth : IHistogram
     {
-        public IHistogramBucket[] Buckets { get; }
+        public List<IHistogramBucket> Buckets { get; }
+        public int Depth { get; }
 
-        /// <summary>
-        /// Creates Ceil(|values|/depth) buckets. The last bucket may not be full
-        /// If called with 0 values, Buckets will be an empty array.
-        /// </summary>
-        /// <param name="values">The values to make a histogram for</param>
-        /// <param name="depth">The max elements per bucket (All but last bucket will have max elements)</param>
-        public HistogramEquiDepth(IEnumerable<int> values, int depth)
+        public HistogramEquiDepth(int depth)
         {
-            var sortedValues = values.OrderByDescending(x => -x).ToArray(); // Small first, large last
+            Depth = depth;
+            Buckets = new List<IHistogramBucket>();
+        }
 
-            int bucketCount = (int)Math.Ceiling((double)sortedValues.Length / depth);
+        public void GenerateHistogram(DataTable table, string key)
+        {
+            List<int> sorted = table.AsEnumerable().Select(x => (int)x[key]).OrderByDescending(x => -x).ToList();
+            GenerateHistogramFromSorted(sorted);
+        }
 
-            Buckets = new HistogramBucket[bucketCount];
+        public void GenerateHistogram(List<int> column)
+        {
+            List<int> sorted = column.OrderByDescending(x => -x).ToList();
+            GenerateHistogramFromSorted(sorted);
+        }
 
-            for (int i = 0; i < Buckets.Length; i++)
+        private void GenerateHistogramFromSorted(List<int> sorted)
+        {
+            for (int i = 0; i < sorted.Count; i += Depth)
             {
-                int remaining = sortedValues.Length - i * depth;
-
-                Buckets[i] = new HistogramBucket(
-                    Math.Min(depth, remaining),
-                    sortedValues[i * depth]
-                    );
+                IHistogramBucket newBucket = new HistogramBucket(sorted[i], 1);
+                for (int j = i + 1; j <= Depth && j < sorted.Count; j++)
+                    newBucket.Count++;
+                Buckets.Add(newBucket);
             }
         }
     }

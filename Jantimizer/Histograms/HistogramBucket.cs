@@ -3,7 +3,7 @@
     public class HistogramBucket : IHistogramBucket
     {
         public int ValueStart { get; }
-        public int Count { get; }
+        public int Count { get; set; }
 
         public HistogramBucket(int valueStart, int count)
         {
