@@ -1,24 +1,23 @@
-﻿using MySqlConnector;
-using QueryTestSuite.Models;
+﻿using Npgsql;
 using System.Data;
 using System.Text.RegularExpressions;
 
-namespace QueryTestSuite.Connectors
+namespace DatabaseConnector.Connectors
 {
-    internal class MySqlConnector : DbConnector
+    public class PostgreSqlConnector : DbConnector
     {
-        public MySqlConnector(string connectionString) : base(connectionString)
+        public PostgreSqlConnector(string connectionString) : base(connectionString)
         {
 
         }
 
         public override async Task<DataSet> CallQuery(string query)
         {
-            await using var conn = new MySqlConnection(ConnectionString);
+            await using var conn = new NpgsqlConnection(ConnectionString);
             await conn.OpenAsync();
 
-            await using (var cmd = new MySqlCommand(query, conn))
-            using (var sqlAdapter = new MySqlDataAdapter(cmd))
+            await using (var cmd = new NpgsqlCommand(query, conn))
+            using (var sqlAdapter = new NpgsqlDataAdapter(cmd))
             {
                 DataSet dt = new DataSet();
                 await Task.Run(() => sqlAdapter.Fill(dt));
