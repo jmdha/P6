@@ -38,7 +38,7 @@ namespace Histograms
             for (int i = 0; i < sorted.Count; i += Depth)
             {
                 IHistogramBucket newBucket = new HistogramBucket(sorted[i], 1);
-                for (int j = i + 1; j <= Depth && j < sorted.Count; j++)
+                for (int j = i + 1; j < i + Depth && j < sorted.Count; j++)
                     newBucket.Count++;
                 Buckets.Add(newBucket);
             }

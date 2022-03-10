@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatabaseConnector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Histograms
 {
-    public interface IHistogramManager<T> where T : IHistogram
+    public interface IHistogramManager<H, C> 
+        where H : IHistogram 
+        where C : IDbConnector
     {
+        public C DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).ToList();
         public List<string> Attributes(string table) => Histograms.Where(x => x.TableName == table).Select(x => x.AttributeName).ToList();

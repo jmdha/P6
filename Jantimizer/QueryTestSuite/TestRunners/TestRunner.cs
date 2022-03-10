@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using DatabaseConnector.Connectors;
 using Histograms;
 using QueryPlanParser.Models;
 using QueryTestSuite.Models;
@@ -14,7 +15,7 @@ namespace QueryTestSuite.TestRunners
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
-        public IHistogramManager<HistogramEquiDepth> HistogramManager { get; private set; }
+        public IHistogramManager<HistogramEquiDepth, PostgreSqlConnector> HistogramManager { get; private set; }
         private CSVWriter csvWriter;
 
         public TestRunner(DBConnectorParser databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
@@ -25,7 +26,7 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            HistogramManager = new HistogramManager<HistogramEquiDepth>();
+            HistogramManager = new PostgresEquiHistogramManager(databaseModel.Connector.ConnectionString, 10);
         }
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
