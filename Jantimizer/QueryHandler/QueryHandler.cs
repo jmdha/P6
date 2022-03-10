@@ -31,8 +31,8 @@ namespace QueryHandler
         }
 
         private int CalculateEqualJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager histograms) {
-            Histograms.IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
-            Histograms.IHistogram rightGram = histograms.GetHistogram(joinNode.RightTable, joinNode.RightAttribute);
+            IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
+            IHistogram rightGram = histograms.GetHistogram(joinNode.RightTable, joinNode.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
             int rightBucketStart = -1;
@@ -40,20 +40,11 @@ namespace QueryHandler
             
             for (int leftBucketIndex = 0; leftBucketIndex < leftGram.Buckets.Count; leftBucketIndex++) {
                 for (int rightBucketIndex = 0; rightBucketIndex < rightGram.Buckets.Count; rightBucketIndex++) {
-                    if (rightGram.Buckets[rightBucketIndex].ValueStart >= leftGram.Buckets[leftBucketIndex].ValueStart && 
-                    rightGram.Buckets[rightBucketIndex].ValueStart <= leftGram.Buckets[leftBucketIndex].ValueEnd) {
-                        if (leftBucketStart == -1)
-                            leftBucketStart = leftBucketIndex;
-                        if (leftBucketEnd < leftBucketIndex)
-                            leftBucketEnd = leftBucketIndex;
-                        if (rightBucketStart == -1)
-                            rightBucketStart = rightBucketIndex;
-                        if (rightBucketEnd < rightBucketIndex)
-                            rightBucketEnd = rightBucketIndex;
-                        continue;
-                    }
-                    if (rightGram.Buckets[rightBucketIndex].ValueEnd <= leftGram.Buckets[leftBucketIndex].ValueEnd && 
-                    rightGram.Buckets[rightBucketIndex].ValueEnd >= leftGram.Buckets[leftBucketIndex].ValueStart) {
+                    // If either rightBucketStart or end is in the range of the left bucket
+                    if ((rightGram.Buckets[rightBucketIndex].ValueStart >= leftGram.Buckets[leftBucketIndex].ValueStart && 
+                         rightGram.Buckets[rightBucketIndex].ValueStart <= leftGram.Buckets[leftBucketIndex].ValueEnd) ||
+                        (rightGram.Buckets[rightBucketIndex].ValueEnd <= leftGram.Buckets[leftBucketIndex].ValueEnd &&
+                         rightGram.Buckets[rightBucketIndex].ValueEnd >= leftGram.Buckets[leftBucketIndex].ValueStart)) {
                         if (leftBucketStart == -1)
                             leftBucketStart = leftBucketIndex;
                         if (leftBucketEnd < leftBucketIndex)
