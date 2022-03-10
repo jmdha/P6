@@ -1,4 +1,6 @@
-﻿using QueryTestSuite.Connectors;
+﻿using QueryParser;
+using QueryParser.QueryParsers;
+using QueryTestSuite.Connectors;
 using QueryTestSuite.Models;
 using QueryTestSuite.Parsers;
 using QueryTestSuite.Services;
