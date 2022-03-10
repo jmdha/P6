@@ -11,7 +11,7 @@ using QueryParser.QueryParsers;
 namespace QueryHandlerTest;
 
 [TestClass]
-public class UnitTest1
+public class SingleEqualityJoin
 {
     Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, int value) {
         var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
@@ -23,8 +23,10 @@ public class UnitTest1
     }
 
 
+
+    // Both tables contain a 100 of the same value
     [TestMethod]
-    public void TestMethod1()
+    public void SameConstant()
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
         var aGram = CreateConstHistogram("A", "ID", 10, 100, 10);
