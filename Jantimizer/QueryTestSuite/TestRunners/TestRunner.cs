@@ -28,7 +28,7 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            HistogramManager = new PostgresEquiHistogramManager(databaseModel.Connector.ConnectionString, 10);
+            HistogramManager = new PostgresEquiDepthHistogramManager(databaseModel.Connector.ConnectionString, 10);
         }
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)

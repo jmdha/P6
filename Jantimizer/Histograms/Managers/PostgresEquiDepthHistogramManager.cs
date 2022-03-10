@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiHistogramManager : IHistogramManager<IHistogram, IDbConnector>
+    public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
         public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
@@ -30,7 +30,7 @@ namespace Histograms.Managers
         }
         public int Depth { get; }
 
-        public PostgresEquiHistogramManager(string connectionString, int depth)
+        public PostgresEquiDepthHistogramManager(string connectionString, int depth)
         {
             DbConnector = new PostgreSqlConnector(connectionString);
             Histograms = new List<IHistogram>();
