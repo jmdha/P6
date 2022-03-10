@@ -1,5 +1,8 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
+using QueryParser;
+using QueryParser.Models;
+using QueryParser.QueryParsers;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -36,21 +39,25 @@ namespace Histograms.Managers
 
         public async Task AddHistogram(string setupQuery)
         {
-            if (setupQuery.ToUpper().StartsWith("CREATE TABLE "))
+            IParserManager parser = new ParserManager(new List<IQueryParser> { new CreateTableQueryParser() });
+            List<INode> nodes = parser.ParseQuery(setupQuery, false);
+            if (nodes.Count > 0)
             {
-                string tableName = setupQuery.ToUpper().Replace("CREATE TABLE ", "").Split(" ")[0].ToLower();
-                var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{tableName}';");
-                if (returnRows.Tables.Count > 0)
+                if (nodes[0] is CreateTableNode node)
                 {
-                    foreach (DataRow row in returnRows.Tables[0].Rows)
+                    var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{node.TableName}';");
+                    if (returnRows.Tables.Count > 0)
                     {
-                        string attributeName = $"{row["column_name"]}";
-                        var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
-                        if (attributeValues.Tables.Count > 0)
+                        foreach (DataRow row in returnRows.Tables[0].Rows)
                         {
-                            IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                            newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
-                            Histograms.Add(newHistogram);
+                            string attributeName = $"{row["column_name"]}";
+                            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {node.TableName}");
+                            if (attributeValues.Tables.Count > 0)
+                            {
+                                IHistogram newHistogram = new HistogramEquiDepth(node.TableName, attributeName, Depth);
+                                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
+                                Histograms.Add(newHistogram);
+                            }
                         }
                     }
                 }
