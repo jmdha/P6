@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using Histograms;
 using QueryPlanParser.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
@@ -13,6 +14,7 @@ namespace QueryTestSuite.TestRunners
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
+        public IHistogramManager<HistogramEquiDepth> HistogramManager { get; private set; }
         private CSVWriter csvWriter;
 
         public TestRunner(DBConnectorParser databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
@@ -23,6 +25,7 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
+            HistogramManager = new HistogramManager<HistogramEquiDepth>();
         }
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -32,6 +35,7 @@ namespace QueryTestSuite.TestRunners
 
             Console.WriteLine($"Running Setup: {SetupFile}");
             await DatabaseModel.Connector.CallQuery(SetupFile);
+            await HistogramManager.AddHistogram(SetupFile);
 
             Results = await RunQueriesSerial();
 
