@@ -50,7 +50,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -73,7 +73,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -104,7 +104,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -124,7 +124,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -155,7 +155,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -175,7 +175,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -206,7 +206,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -226,7 +226,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -257,7 +257,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
@@ -277,7 +277,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
 
-        QueryHandler.QueryHandler QH = new QueryHandler.QueryHandler();
+        QueryHandler.JoinCost QH = new QueryHandler.JoinCost();
         int cost = QH.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);

@@ -9,7 +9,7 @@ using DatabaseConnector;
 
 namespace QueryHandler
 {
-    public class QueryHandler
+    public class JoinCost
     {
         public int CalculateJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager  histograms) {
             IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
