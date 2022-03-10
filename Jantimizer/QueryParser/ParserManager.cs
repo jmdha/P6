@@ -1,4 +1,5 @@
-﻿using QueryParser.Models;
+﻿using QueryParser.Exceptions;
+using QueryParser.Models;
 using QueryParser.QueryParsers;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace QueryParser
                         return resultNodes;
                 }
             }
-            return null;
+            throw new ParserException("Error, no valid parser found for the query!", QueryParsers, query);
         }
 
         public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser

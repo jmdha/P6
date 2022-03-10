@@ -29,7 +29,7 @@ namespace QueryParser.QueryParsers
             List<INode> returnNodes = new List<INode>();
 
             // Remove all information in the query before the actual join statements.
-            query = query.Substring(query.IndexOf("FROM") + 4);
+            query = query.Substring(query.IndexOf(" FROM ") + 4);
             if (query[0] != '(')
                 query = $"({query})";
 
@@ -66,7 +66,7 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private JoinNode ParseIntoModel(string subQuery)
         {
-            string[] joinSplit = subQuery.Split("JOIN");
+            string[] joinSplit = subQuery.Split(" JOIN ");
             string leftTable = "";
             string rightTable = "";
             string condition = "";
@@ -74,7 +74,7 @@ namespace QueryParser.QueryParsers
                 leftTable = joinSplit[0].Trim();
             if (joinSplit.Length > 1)
             {
-                string[] onSplit = joinSplit[1].Split("ON");
+                string[] onSplit = joinSplit[1].Split(" ON ");
 
                 if (onSplit.Length > 0)
                     rightTable = onSplit[0].Trim();

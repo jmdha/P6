@@ -20,7 +20,6 @@ namespace QueryParser.Models
             LeftTable = leftTable.Trim();
             RightTable = rightTable.Trim();
             JoinCondition = joinCondition.Trim();
-            ConditionTables = new List<string>();
             ConditionTables = GenerateConditionTables();
         }
 
