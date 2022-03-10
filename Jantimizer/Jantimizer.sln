@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryTestSuite", "QueryTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParser", "QueryParser\QueryParser.csproj", "{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryHandler", "QueryHandler\QueryHandler.csproj", "{7644CC19-B4A9-488B-B1A4-3C34E086E763}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "QueryHandler\QueryOptimiser.csproj", "{7644CC19-B4A9-488B-B1A4-3C34E086E763}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryHandlerTest", "QueryHandlerTest\QueryHandlerTest.csproj", "{6AC20AC8-CC33-4F83-B79C-FC47EE70122D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "QueryHandlerTest\QueryOptimiserTest.csproj", "{6AC20AC8-CC33-4F83-B79C-FC47EE70122D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
 EndProject

@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using QueryHandler;
+using QueryOptimiser;
 using Histograms;
 using Histograms.Managers;
 using QueryParser;
@@ -11,7 +11,7 @@ using QueryParser.QueryParsers;
 namespace QueryHandlerTest;
 
 [TestClass]
-public class SingleJoin
+public class JoinCostTest
 {
     Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, int value) {
         var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
@@ -50,7 +50,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -72,7 +72,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>(){new JoinQueryParser()});
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -102,7 +102,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
         
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -121,7 +121,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
         
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -151,7 +151,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -170,7 +170,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -200,7 +200,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -219,7 +219,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -249,7 +249,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -268,7 +268,7 @@ public class SingleJoin
         QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
 
-        int cost = QueryHandler.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
+        int cost = QueryOptimiser.JoinCost.CalculateJoinCost(nodes[0] as QueryParser.Models.JoinNode, histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }

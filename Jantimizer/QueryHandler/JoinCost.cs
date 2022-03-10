@@ -7,7 +7,7 @@ using QueryParser.Models;
 using Histograms;
 using DatabaseConnector;
 
-namespace QueryHandler
+namespace QueryOptimiser
 {
     public static class JoinCost
     {
