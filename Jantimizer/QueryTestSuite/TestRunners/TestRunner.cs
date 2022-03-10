@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
+using DatabaseConnector;
 using DatabaseConnector.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
@@ -8,14 +9,14 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        public DatabaseCommunicator DatabaseModel { get; }
+        public DatabaseParserConnector DatabaseModel { get; }
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(DatabaseParserConnector databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
             DatabaseModel = databaseModel;
             SetupFile = setupFile;

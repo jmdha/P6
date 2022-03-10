@@ -1,4 +1,5 @@
-﻿using DatabaseConnector.Connectors;
+﻿using DatabaseConnector;
+using DatabaseConnector.Connectors;
 using DatabaseConnector.Models;
 using DatabaseConnector.Parsers;
 using QueryParser;
@@ -19,16 +20,16 @@ namespace QueryTestSuite
         {
             SecretsService secrets = new SecretsService();
 
-            var postgresModel = new DatabaseCommunicator(
+            var postgresModel = new DatabaseParserConnector(
                 "postgre",
                 new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL")),
                 new PostgreSqlParser());
-            var mySqlModel = new DatabaseCommunicator(
+            var mySqlModel = new DatabaseParserConnector(
                 "mysql",
                 new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
                 new MySQLParser());
 
-            var connectorSet = new List<DatabaseCommunicator>() { postgresModel };
+            var connectorSet = new List<DatabaseParserConnector>() { postgresModel };
 
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
