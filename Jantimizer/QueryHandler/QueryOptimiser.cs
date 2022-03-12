@@ -4,20 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using QueryOptimiser.QueryGenerators;
 using QueryParser;
 using QueryParser.Models;
 using Histograms;
+using Histograms.Managers;
 
 namespace QueryOptimiser
 {
     public class QueryOptimiser
     {
         public IParserManager ParserManager { get; private set; }
-        public Histograms.Managers.PostgresEquiDepthHistogramManager GramManager { get; private set; }
+        public IQueryGenerator QueryGenerator { get; private set; }
+        public PostgresEquiDepthHistogramManager GramManager { get; private set; }
 
-        public QueryOptimiser(QueryParser.IParserManager parserManager, Histograms.Managers.PostgresEquiDepthHistogramManager gramManager)
+        public QueryOptimiser(IParserManager parserManager, IQueryGenerator queryGenerator, PostgresEquiDepthHistogramManager gramManager)
         {
             ParserManager = parserManager;
+            QueryGenerator = queryGenerator;
             GramManager = gramManager;
         }
 
@@ -28,21 +32,20 @@ namespace QueryOptimiser
             return OptimiseQuery(nodes);
         }
 
-        public string OptimiseQuery(List<QueryParser.Models.INode> nodes)
+        public string OptimiseQuery(List<INode> nodes)
         {
-            string optimisedQuery = "";
-            List<Tuple<QueryParser.Models.INode, int>> valuedNodes = ValueQuery(nodes);
+            List<Tuple<INode, int>> valuedNodes = ValueQuery(nodes);
 
-            return optimisedQuery;
+            return QueryGenerator.GenerateQuery(valuedNodes);
         }
 
-        public List<Tuple<QueryParser.Models.INode, int>> ValueQuery(List<QueryParser.Models.INode> nodes)
+        public List<Tuple<INode, int>> ValueQuery(List<INode> nodes)
         {
-            List<Tuple<QueryParser.Models.INode, int>> valuedNodes = new List<Tuple<QueryParser.Models.INode, int>>();
+            List<Tuple<INode, int>> valuedNodes = new List<Tuple<INode, int>>();
             foreach (var node in nodes)
             {
                 int cost = -1;
-                if (node is QueryParser.Models.JoinNode)
+                if (node is JoinNode)
                     cost = JoinCost.CalculateJoinCost((JoinNode) node, GramManager);
                 valuedNodes.Add(Tuple.Create(node, cost));
             }

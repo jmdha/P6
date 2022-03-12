@@ -64,6 +64,10 @@ public class GeneratorTest
         "SELECT * FROM (((C JOIN D ON C.ID = D.ID) JOIN B ON B.ID = C.ID) JOIN A ON A.ID = B.ID);",
         "SELECT * FROM ((A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID) JOIN D ON C.ID = D.ID",
         new[] { 10, 10, 0 })]
+    [DataRow(
+        "SELECT * FROM (((C JOIN D ON C.ID = D.ID) JOIN A ON A.ID = B.ID) JOIN B ON B.ID = C.ID);",
+        "SELECT * FROM ((A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID) JOIN D ON C.ID = D.ID",
+        new[] { 10, 20, 0 })]
     public void JoinQueryValued(string expected, string input, int[] values)
     {
         ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
