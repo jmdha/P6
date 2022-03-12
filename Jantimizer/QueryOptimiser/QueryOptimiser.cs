@@ -25,6 +25,10 @@ namespace QueryOptimiser
             GramManager = gramManager;
         }
 
+        /// <summary>
+        /// Reorders a querys join order according to the cost of each join operation
+        /// </summary>
+        /// <returns></returns>
         public string OptimiseQuery(string query)
         {
             List<INode> nodes = ParserManager.ParseQuery(query);
@@ -32,6 +36,10 @@ namespace QueryOptimiser
             return OptimiseQuery(nodes);
         }
 
+        /// <summary>
+        /// Reorders a querys join order according to the cost of each join operation
+        /// </summary>
+        /// <returns></returns>
         public string OptimiseQuery(List<INode> nodes)
         {
             List<Tuple<INode, int>> valuedNodes = ValueQuery(nodes);
@@ -39,6 +47,10 @@ namespace QueryOptimiser
             return QueryGenerator.GenerateQuery(valuedNodes);
         }
 
+        /// <summary>
+        /// Calculates worst case cost of each join operation
+        /// </summary>
+        /// <returns></returns>
         public List<Tuple<INode, int>> ValueQuery(List<INode> nodes)
         {
             List<Tuple<INode, int>> valuedNodes = new List<Tuple<INode, int>>();

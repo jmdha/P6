@@ -11,6 +11,11 @@ namespace QueryOptimiser
 {
     public static class JoinCost
     {
+        /// <summary>
+        /// Gives an estimate of the cost of a join operation
+        /// <para>Specifically it gives the worst case cardinality estimate</para>
+        /// </summary>
+        /// <returns></returns>
         public static int CalculateJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager  histograms) {
             IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
             IHistogram rightGram = histograms.GetHistogram(joinNode.RightTable, joinNode.RightAttribute);
