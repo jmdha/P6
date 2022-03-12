@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using QueryParser;
+using QueryParser.Models;
 using Histograms;
 
 namespace QueryOptimiser
@@ -20,13 +21,17 @@ namespace QueryOptimiser
             GramManager = gramManager;
         }
 
+        public string OptimiseQuery(string query)
+        {
+            List<INode> nodes = ParserManager.ParseQuery(query);
+
+            return OptimiseQuery(nodes);
+        }
+
         public string OptimiseQuery(List<QueryParser.Models.INode> nodes)
         {
             string optimisedQuery = "";
             List<Tuple<QueryParser.Models.INode, int>> valuedNodes = ValueQuery(nodes);
-
-
-            
 
             return optimisedQuery;
         }
@@ -38,7 +43,7 @@ namespace QueryOptimiser
             {
                 int cost = -1;
                 if (node is QueryParser.Models.JoinNode)
-                    cost = JoinCost.CalculateJoinCost(node as QueryParser.Models.JoinNode, GramManager);
+                    cost = JoinCost.CalculateJoinCost((JoinNode) node, GramManager);
                 valuedNodes.Add(Tuple.Create(node, cost));
             }
             return valuedNodes;
