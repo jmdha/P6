@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryTestSuite", "QueryTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParser", "QueryParser\QueryParser.csproj", "{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "QueryHandler\QueryOptimiser.csproj", "{7644CC19-B4A9-488B-B1A4-3C34E086E763}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "QueryHandlerTest\QueryOptimiserTest.csproj", "{6AC20AC8-CC33-4F83-B79C-FC47EE70122D}"
@@ -16,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "DatabaseConnector\DatabaseConnector.csproj", "{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "QueryOptimiser\QueryOptimiser.csproj", "{6BA92D63-FB2E-4283-94A9-898A816CC9E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +31,6 @@ Global
 		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7644CC19-B4A9-488B-B1A4-3C34E086E763}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7644CC19-B4A9-488B-B1A4-3C34E086E763}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7644CC19-B4A9-488B-B1A4-3C34E086E763}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7644CC19-B4A9-488B-B1A4-3C34E086E763}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +47,10 @@ Global
 		{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

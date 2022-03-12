@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
-    <ProjectReference Include="..\QueryHandler\QueryOptimiser.csproj" />
+    <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
 
