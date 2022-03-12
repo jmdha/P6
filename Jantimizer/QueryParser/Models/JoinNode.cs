@@ -43,6 +43,11 @@ namespace QueryParser.Models
             return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
         }
 
+        public string GetSuffixString()
+        {
+            return $" JOIN {RightTable} ON {JoinCondition})";
+        }
+
         private List<string> GenerateConditionTables()
         {
             List<string?> tables = new List<string?>();

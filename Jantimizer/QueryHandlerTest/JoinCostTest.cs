@@ -5,32 +5,13 @@ using Histograms;
 using Histograms.Managers;
 using QueryParser;
 using QueryParser.QueryParsers;
+using QueryOptimiserTest;
 
-
-
-namespace QueryHandlerTest;
+namespace CostTest;
 
 [TestClass]
 public class JoinCostTest
 {
-    Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, int value) {
-        var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
-        List<int> values = new List<int>();
-        for (int i = 0; i < tableSize; i++)
-            values.Add(value);
-        tempGram.GenerateHistogram(values);
-        return tempGram;
-    }
-
-    Histograms.HistogramEquiDepth CreateIncreasingHistogram(string tableName, string attibuteName, int depth, int minValue, int maxValue) {
-        var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
-        List<int> values = new List<int>();
-        for (int i = minValue; i < maxValue; i++)
-            values.Add(i);
-        tempGram.GenerateHistogram(values);
-        return tempGram;
-    }
-
     #region Equality
 
     [TestMethod]
@@ -42,8 +23,8 @@ public class JoinCostTest
     public void EqualitySameValue(int value, int aAmount, int bAmount, int expectedHits, int depth)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, value);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, value);
+        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, value);
+        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, value);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -64,8 +45,8 @@ public class JoinCostTest
     [DataRow(0, 100, 50, 150, 20, 60*60)]
     public void EqualityOverlap(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits) {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -94,8 +75,8 @@ public class JoinCostTest
     public void LessConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -113,8 +94,8 @@ public class JoinCostTest
     public void LessIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -143,8 +124,8 @@ public class JoinCostTest
     public void MoreConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -162,8 +143,8 @@ public class JoinCostTest
     public void MoreIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -192,8 +173,8 @@ public class JoinCostTest
     public void EqualOrLessConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -211,8 +192,8 @@ public class JoinCostTest
     public void EqualOrLessIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -241,8 +222,8 @@ public class JoinCostTest
     public void EqualOrMoreConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
@@ -260,8 +241,8 @@ public class JoinCostTest
     public void EqualOrMoreIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager("SomeConnectionString", depth);
-        var aGram = CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
