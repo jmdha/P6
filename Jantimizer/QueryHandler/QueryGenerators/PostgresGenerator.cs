@@ -14,14 +14,36 @@ namespace QueryOptimiser.QueryGenerators
 
         public string GenerateQuery(List<INode> nodes)
         {
+            List<string> tables = new List<string>();
             string query = Prefix;
             for (int i = 1; i < nodes.Count; i++)
                 query += '(';
             query += nodes[0].ToString();
 
+            if (nodes[0] is JoinNode)
+            {
+                JoinNode jNode = (JoinNode)nodes[0];
+                tables.Add(jNode.LeftTable);
+                tables.Add(jNode.RightTable);
+            }
+                
+
             for (int i = 1; i < nodes.Count; i++)
             {
-                query += nodes[i].GetSuffixString();
+                string table = "";
+                if (nodes[i] is JoinNode)
+                {
+                    JoinNode jNode = (JoinNode)nodes[i];
+                    if (!tables.Contains(jNode.LeftTable))
+                        table = jNode.LeftTable;
+                    else if (!tables.Contains(jNode.RightTable))
+                        table = jNode.RightTable;
+                    else
+                        throw new Exception("Invalid join" + nodes[i].ToString());
+                    tables.Add(table);
+                }
+                    
+                query += nodes[i].GetSuffixString(table);
             }
 
             query += Suffix;
@@ -38,7 +60,3 @@ namespace QueryOptimiser.QueryGenerators
         }
     }
 }
-
-
-// (a join b on a = b) join c on b = c <=> (b join c on b = c) join a on a = b
-// ((a join b on a = b) join c on b = c) join c on a = c <=> ((a join c on a = c) join b on a = b) join c on b = c

@@ -19,7 +19,7 @@ namespace QueryParser.Models
             Query = query;
         }
 
-        public string GetSuffixString()
+        public string GetSuffixString(string param)
         {
             throw new NotImplementedException();
         }

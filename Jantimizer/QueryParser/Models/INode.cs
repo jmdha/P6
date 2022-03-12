@@ -9,6 +9,6 @@ namespace QueryParser.Models
     public interface INode
     {
         public int Id { get; }
-        public string GetSuffixString();
+        public string GetSuffixString(string param);
     }
 }

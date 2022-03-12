@@ -43,9 +43,10 @@ namespace QueryParser.Models
             return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
         }
 
-        public string GetSuffixString()
+        // The table which should be joined on
+        public string GetSuffixString(string param)
         {
-            return $" JOIN {RightTable} ON {JoinCondition})";
+            return $" JOIN {param} ON {JoinCondition})";
         }
 
         private List<string> GenerateConditionTables()
