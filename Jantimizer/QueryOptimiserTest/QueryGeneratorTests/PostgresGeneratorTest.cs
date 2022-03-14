@@ -11,7 +11,7 @@ using System.Collections.Generic;
 namespace GeneratorTest;
 
 [TestClass]
-public class GeneratorTest
+public class PostgresGeneratorTest
 {
     [TestMethod]
     [DataRow(

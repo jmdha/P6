@@ -85,15 +85,8 @@ namespace QueryParser.QueryParsers
                     condition = onSplit[1].Trim();
                 if (condition.Length > 1)
                 {
-                    var operators = new(JoinNode.ComparisonType, string)[]{
-                        (JoinNode.ComparisonType.EqualOrLess, "<="),
-                        (JoinNode.ComparisonType.EqualOrMore, ">="),
-                        (JoinNode.ComparisonType.Equal, "="),
-                        (JoinNode.ComparisonType.More, ">"),
-                        (JoinNode.ComparisonType.Less, "<")
-                    };
                     string[] conditionSplit = {"", ""};
-                    foreach (var op in operators) {
+                    foreach (var op in Utilities.Operators) {
                         if (condition.Contains(op.Item2)) {
                             conditionSplit = condition.Split(op.Item2);
                             type = op.Item1;
