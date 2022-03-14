@@ -11,7 +11,7 @@ using QueryOptimiser.Cost.Nodes.EquiDepth;
 using DatabaseConnector;
 using DatabaseConnector.Connectors;
 
-namespace CostTest;
+namespace CostEquiDepthTest;
 
 [TestClass]
 public class JoinCostTest
