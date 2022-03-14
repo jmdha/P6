@@ -64,13 +64,22 @@ namespace QueryTestSuite.TestRunners
             int max = CaseFiles.Count();
             foreach (FileInfo queryFile in CaseFiles)
             {
-                PrintUtilitie.PrintProgressBar(count, max, 50, true, 2);
-                PrintUtilitie.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
-                PrintUtilitie.Print($"\t Executing SQL statement...             ", 0);
-                DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
-                AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
-                TestCase testCase = new TestCase(queryFile, analysisResult);
-                testCases.Add(testCase);
+                try
+                {
+                    PrintUtilitie.PrintProgressBar(count, max, 50, true, 2);
+                    PrintUtilitie.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
+                    PrintUtilitie.Print($"\t Executing SQL statement...             ", 0);
+                    DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
+                    TestCase testCase = new TestCase(queryFile, analysisResult);
+                    testCases.Add(testCase);
+                }
+                catch (Exception ex)
+                {
+                    PrintUtilitie.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
+                    PrintUtilitie.PrintLine(ex.ToString(), 1);
+                    Console.WriteLine(ex);
+                }
                 count++;
             }
             PrintUtilitie.PrintProgressBar(50, 50, 50, true, 2);
