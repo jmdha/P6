@@ -1,6 +1,6 @@
 ﻿namespace PrintUtilities
 {
-    public static class PrintUtilitie
+    public static class PrintUtil
     {
         public static void Print(string text, int indent = 0, ConsoleColor color = ConsoleColor.White)
         {

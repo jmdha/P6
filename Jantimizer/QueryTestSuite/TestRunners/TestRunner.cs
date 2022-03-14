@@ -35,16 +35,16 @@ namespace QueryTestSuite.TestRunners
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            PrintUtilitie.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
             await DatabaseModel.Connector.CallQuery(CleanupFile);
 
-            PrintUtilitie.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
+            PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
             await DatabaseModel.Connector.CallQuery(SetupFile);
             await HistogramManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();
 
-            PrintUtilitie.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
             await DatabaseModel.Connector.CallQuery(CleanupFile);
 
             if (consoleOutput)
@@ -58,7 +58,7 @@ namespace QueryTestSuite.TestRunners
 
         private async Task<List<TestCase>> RunQueriesSerial()
         {
-            PrintUtilitie.PrintLine($"Running tests for [{DatabaseModel.Name}] connector", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Running tests for [{DatabaseModel.Name}] connector", 2, ConsoleColor.Green);
             var testCases = new List<TestCase>();
             int count = 0;
             int max = CaseFiles.Count();
@@ -66,9 +66,9 @@ namespace QueryTestSuite.TestRunners
             {
                 try
                 {
-                    PrintUtilitie.PrintProgressBar(count, max, 50, true, 2);
-                    PrintUtilitie.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
-                    PrintUtilitie.Print($"\t Executing SQL statement...             ", 0);
+                    PrintUtil.PrintProgressBar(count, max, 50, true, 2);
+                    PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
+                    PrintUtil.Print($"\t Executing SQL statement...             ", 0);
                     DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
                     TestCase testCase = new TestCase(queryFile, analysisResult);
@@ -76,24 +76,24 @@ namespace QueryTestSuite.TestRunners
                 }
                 catch (Exception ex)
                 {
-                    PrintUtilitie.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
-                    PrintUtilitie.PrintLine(ex.ToString(), 1);
+                    PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
+                    PrintUtil.PrintLine(ex.ToString(), 1);
                     Console.WriteLine(ex);
                 }
                 count++;
             }
-            PrintUtilitie.PrintProgressBar(50, 50, 50, true, 2);
-            PrintUtilitie.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
+            PrintUtil.PrintProgressBar(50, 50, 50, true, 2);
+            PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
             Console.WriteLine();
             return testCases;
         }
 
         private void WriteResultToConsole()
         {
-            PrintUtilitie.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
-            PrintUtilitie.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)"), 2, ConsoleColor.DarkGray);
+            PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)"), 2, ConsoleColor.DarkGray);
             foreach (var testCase in Results)
-                PrintUtilitie.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString()), 2, ConsoleColor.Blue);
+                PrintUtil.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString()), 2, ConsoleColor.Blue);
         }
 
         private string FormatList(string category, string caseName, string predicted, string actual)
