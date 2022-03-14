@@ -79,7 +79,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
 
             // Assert
             Assert.AreEqual(eName, result.AnalysisResult.Name);
-            Assert.AreEqual(eCost, result.AnalysisResult.EstimatedCost.ToString());
+            Assert.AreEqual(eCost, result.AnalysisResult.EstimatedCost.ToString(System.Globalization.CultureInfo.InvariantCulture));
             Assert.AreEqual(eRows, result.AnalysisResult.EstimatedCardinality);
             Assert.AreEqual(aRows, result.AnalysisResult.ActualCardinality);
             Assert.AreEqual(aTime, result.AnalysisResult.ActualTime.ToString());
