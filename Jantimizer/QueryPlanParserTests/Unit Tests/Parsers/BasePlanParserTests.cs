@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryPlanParserTests.Parsers
+namespace QueryPlanParserTests.UnitTests.Parsers
 {
     [TestClass]
     public class BasePlanParserTests
