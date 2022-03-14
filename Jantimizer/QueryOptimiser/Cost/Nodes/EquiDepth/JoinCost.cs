@@ -7,18 +7,18 @@ using QueryParser.Models;
 using Histograms;
 using DatabaseConnector;
 
-namespace QueryOptimiser
+namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
-    public static class JoinCost
+    public class JoinCost : INodeCostEquiDepth<JoinNode, IDbConnector>
     {
         /// <summary>
         /// Gives an estimate of the cost of a join operation
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        public static int CalculateJoinCost(JoinNode joinNode, Histograms.Managers.PostgresEquiDepthHistogramManager  histograms) {
-            IHistogram leftGram = histograms.GetHistogram(joinNode.LeftTable, joinNode.LeftAttribute);
-            IHistogram rightGram = histograms.GetHistogram(joinNode.RightTable, joinNode.RightAttribute);
+        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
+            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
             int rightBucketStart = -1;
@@ -29,7 +29,7 @@ namespace QueryOptimiser
                 for (int rightBucketIndex = 0; rightBucketIndex < rightGram.Buckets.Count; rightBucketIndex++)
                 {
                     bool inBounds = false;
-                    switch (joinNode.ComType)
+                    switch (node.ComType)
                     {
                         case JoinNode.ComparisonType.Equal:
                             inBounds = CheckEqualBounds(
@@ -67,9 +67,9 @@ namespace QueryOptimiser
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
                         case JoinNode.ComparisonType.None:
-                            throw new ArgumentException("No join type specified : " + joinNode.ToString());
+                            throw new ArgumentException("No join type specified : " + node.ToString());
                         default:
-                            throw new ArgumentException("Unhandled join type: " + joinNode.ToString());
+                            throw new ArgumentException("Unhandled join type: " + node.ToString());
                     }
 
                     if (inBounds)
@@ -132,5 +132,7 @@ namespace QueryOptimiser
                 CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
                 CheckMoreBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd));
         }
+
+        
     }
 }

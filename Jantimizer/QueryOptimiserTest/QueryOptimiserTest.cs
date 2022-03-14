@@ -6,6 +6,7 @@ using Histograms.Managers;
 using QueryParser;
 using QueryParser.QueryParsers;
 using QueryParser.Models;
+using DatabaseConnector;
 
 namespace QueryOptimiserTest;
 
@@ -49,7 +50,7 @@ public class QueryOptimiserTest
         histogramManager.AddHistogram(cGram);
 
         ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        QueryOptimiser.QueryOptimiser queryOptimiser = new QueryOptimiser.QueryOptimiser(PM, new QueryOptimiser.QueryGenerators.PostgresGenerator(), histogramManager);
+        var queryOptimiser = new QueryOptimiser.QueryOptimiser(PM, new QueryOptimiser.QueryGenerators.PostgresGenerator(), histogramManager);
 
         string query = queryOptimiser.OptimiseQuery(input);
 

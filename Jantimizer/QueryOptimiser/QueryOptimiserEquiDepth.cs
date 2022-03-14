@@ -5,24 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 
 using QueryOptimiser.QueryGenerators;
+using QueryOptimiser.Cost.CostCalculators;
 using QueryParser;
 using QueryParser.Models;
 using Histograms;
 using Histograms.Managers;
+using DatabaseConnector;
 
 namespace QueryOptimiser
 {
-    public class QueryOptimiser
+    public class QueryOptimiser : IQueryOptimiser<IHistogram, IDbConnector>
     {
-        public IParserManager ParserManager { get; private set; }
-        public IQueryGenerator QueryGenerator { get; private set; }
-        public PostgresEquiDepthHistogramManager GramManager { get; private set; }
+        public IParserManager ParserManager { get; set; }
+        public IQueryGenerator QueryGenerator { get; set; }
+        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
+        public ICostCalculator<IHistogram, IDbConnector> CostCalculator { get; set; }
 
-        public QueryOptimiser(IParserManager parserManager, IQueryGenerator queryGenerator, PostgresEquiDepthHistogramManager gramManager)
+        public QueryOptimiser(IParserManager parserManager, IQueryGenerator queryGenerator, IHistogramManager<IHistogram, IDbConnector> histogramManager)
         {
             ParserManager = parserManager;
             QueryGenerator = queryGenerator;
-            GramManager = gramManager;
+            HistogramManager = histogramManager;
+            CostCalculator = new CostCalculatorEquiDepth(histogramManager);
         }
 
         /// <summary>
@@ -56,9 +60,7 @@ namespace QueryOptimiser
             List<Tuple<INode, int>> valuedNodes = new List<Tuple<INode, int>>();
             foreach (var node in nodes)
             {
-                int cost = -1;
-                if (node is JoinNode)
-                    cost = JoinCost.CalculateJoinCost((JoinNode) node, GramManager);
+                int cost = CostCalculator.CalculateCost(node);
                 valuedNodes.Add(Tuple.Create(node, cost));
             }
             return valuedNodes;
