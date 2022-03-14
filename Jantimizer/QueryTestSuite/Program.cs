@@ -32,7 +32,6 @@ namespace QueryTestSuite
 
             var connectorSet = new List<DBConnectorParser>() { postgresModel };
 
-
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
             DateTime timeStamp = DateTime.Now;
