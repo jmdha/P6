@@ -93,10 +93,10 @@ namespace QueryPlanParser.Parsers
             // Create Result
             var analysisResult = new AnalysisResult(
                 rowData["name"].Value.Trim(),
-                decimal.Parse(rowData["costMin"].Value),
-                ulong.Parse(rowData["estimatedRows"].Value),
-                ulong.Parse(rowData["actualRows"].Value),
-                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value))
+                decimal.Parse(rowData["costMin"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["estimatedRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["actualRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value, System.Globalization.CultureInfo.InvariantCulture))
             );
 
             // Return

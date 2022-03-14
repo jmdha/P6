@@ -23,7 +23,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
         {
             // ARRANGE
             // ACT
-            var result = BasePlanParser.TimeSpanFromMs(decimal.Parse(decimalValue));
+            var result = BasePlanParser.TimeSpanFromMs(decimal.Parse(decimalValue, System.Globalization.CultureInfo.InvariantCulture));
 
             // ASSERT
             Assert.AreEqual(expectedTimespan, result.ToString());
