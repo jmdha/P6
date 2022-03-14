@@ -11,6 +11,8 @@ namespace DatabaseConnector
     {
         public string ConnectionString { get; set; }
 
+        public bool CheckConnection();
+
         public Task<DataSet> CallQuery(FileInfo sqlFile);
         public Task<DataSet> CallQuery(string query);
 
