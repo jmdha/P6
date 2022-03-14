@@ -1,5 +1,6 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
+using PrintUtilities;
 using QueryParser;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Parsers;
@@ -40,8 +41,9 @@ namespace QueryTestSuite
             {
                 TestSuite suite = new TestSuite(connectorSet, timeStamp);
 
-                Console.WriteLine($"Running Collection: {testDir}");
+                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
                 await suite.RunTests(testDir);
+                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
             }
         }
     }

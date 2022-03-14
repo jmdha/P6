@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "Databa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{B77161E7-E29E-4A79-A1DE-850745936198}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrintUtilities", "PrintUtilities\PrintUtilities.csproj", "{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryPlanParserTests", "QueryPlanParserTests\QueryPlanParserTests.csproj", "{96FB8101-5B1B-4B0F-93CC-634E7961F782}"
 EndProject
 Global
@@ -41,6 +43,10 @@ Global
 		{B77161E7-E29E-4A79-A1DE-850745936198}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B77161E7-E29E-4A79-A1DE-850745936198}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B77161E7-E29E-4A79-A1DE-850745936198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{96FB8101-5B1B-4B0F-93CC-634E7961F782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{96FB8101-5B1B-4B0F-93CC-634E7961F782}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96FB8101-5B1B-4B0F-93CC-634E7961F782}.Release|Any CPU.ActiveCfg = Release|Any CPU
