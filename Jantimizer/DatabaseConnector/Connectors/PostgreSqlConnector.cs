@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using System.Data;
-using System.Text.RegularExpressions;
 
 namespace DatabaseConnector.Connectors
 {
@@ -13,7 +12,7 @@ namespace DatabaseConnector.Connectors
 
         public override async Task<DataSet> AnalyseQuery(string query)
         {
-            if (!query.ToUpper().Contains("EXPLAIN ANALYZE"))
+            if (!query.ToUpper().Trim().StartsWith("EXPLAIN ANALYZE "))
                 return await CallQuery($"EXPLAIN ANALYZE {query}");
             return await CallQuery(query);
         }
