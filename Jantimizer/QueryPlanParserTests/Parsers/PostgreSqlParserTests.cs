@@ -325,7 +325,7 @@ namespace QueryPlanParserTests.Parsers
             PostgreSqlParser parser = new PostgreSqlParser();
             DataTable table = new DataTable();
             table.Columns.Add(new DataColumn("QUERY PLAN"));
-            foreach(string line in lines)
+            foreach (string line in lines)
                 table.Rows.Add(AddRow(table, new string[] { line }));
             DataSet dataSet = new DataSet();
             dataSet.Tables.Add(table);
@@ -336,6 +336,21 @@ namespace QueryPlanParserTests.Parsers
             // Assert
             for (int i = 0; i < nameDepth.Length; i++)
                 Assert.AreEqual(nameDepth[i], GetNameDepth(result, 0, eNameOrder[i]));
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(BadQueryPlanInputException))]
+        public void Cant_ParsePlan_IfNoDataIsGiven()
+        {
+            // Arrange
+            PostgreSqlParser parser = new PostgreSqlParser();
+            DataTable table = new DataTable();
+            table.Columns.Add(new DataColumn("QUERY PLAN"));
+            DataSet dataSet = new DataSet();
+            dataSet.Tables.Add(table);
+
+            // Act
+            parser.ParsePlan(dataSet);
         }
 
         #endregion
