@@ -9,8 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("QueryPlanParserTests")]
-
 namespace QueryPlanParser.Parsers
 {
     public class PostgreSqlParser : BasePlanParser

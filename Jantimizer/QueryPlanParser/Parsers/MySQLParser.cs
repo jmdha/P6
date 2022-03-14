@@ -20,6 +20,9 @@ namespace QueryPlanParser.Parsers
             var resultRows = ParseQueryAnalysisRows(explainRows);
             resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
 
+            if (resultQueue.Count == 0)
+                throw new BadQueryPlanInputException("Analysis got no rows!");
+
             return RunAnalysis(resultQueue);
         }
 
@@ -52,10 +55,13 @@ namespace QueryPlanParser.Parsers
 
         internal string[] GetExplainRows(DataRowCollection rows)
         {
-            if (rows.Count > 0 && rows.Contains("EXPLAIN")) {
-                object varObject = rows[0]["EXPLAIN"];
-                if (varObject != null)
-                    return varObject.ToString()!.Trim().Split('\n');
+            if (rows.Count > 0) {
+                if (rows[0].Table.Columns.Contains("EXPLAIN"))
+                {
+                    object varObject = rows[0]["EXPLAIN"];
+                    if (varObject != null)
+                        return varObject.ToString()!.Trim().Split('\n');
+                }
             }
             throw new BadQueryPlanInputException("Database did not return a correct query plan!");
         }
