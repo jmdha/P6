@@ -7,6 +7,7 @@ using Histograms.Managers;
 using QueryPlanParser.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
+using System.Data;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -59,10 +60,19 @@ namespace QueryTestSuite.TestRunners
             var testCases = new List<TestCase>();
             foreach (FileInfo queryFile in CaseFiles)
             {
-                Console.WriteLine($"Running {queryFile}");
-                AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile));
-                TestCase testCase = new TestCase(queryFile, analysisResult);
-                testCases.Add(testCase);
+                try
+                {
+                    Console.WriteLine($"Running {queryFile}");
+                    DataSet returnSet = await DatabaseModel.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(returnSet);
+                    TestCase testCase = new TestCase(queryFile, analysisResult);
+                    testCases.Add(testCase);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine($"Error! The query file [{queryFile}] failed with the following error:");
+                    Console.WriteLine(ex);
+                }
             }
             return testCases;
         }

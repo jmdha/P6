@@ -11,12 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Histograms\Hi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryPlanParserTests", "QueryPlanParserTests\QueryPlanParserTests.csproj", "{96FB8101-5B1B-4B0F-93CC-634E7961F782}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "DatabaseConnector\DatabaseConnector.csproj", "{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "QueryOptimiser\QueryOptimiser.csproj", "{6BA92D63-FB2E-4283-94A9-898A816CC9E6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "QueryOptimiserTest\QueryOptimiserTest.csproj", "{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
