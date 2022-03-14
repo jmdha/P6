@@ -7,6 +7,7 @@ using QueryParser.QueryParsers;
 using QueryParser.Models;
 using System;
 using System.Collections.Generic;
+using QueryOptimiser.Cost.Nodes;
 
 namespace GeneratorTest;
 
@@ -72,9 +73,9 @@ public class PostgresGeneratorTest
     {
         ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = PM.ParseQuery(input);
-        List<Tuple<INode, int>> valuedNodes = new List<Tuple<INode, int>>();
+        List<ValuedNode> valuedNodes = new List<ValuedNode>();
         for (int i = 0; i < nodes.Count; i++)
-            valuedNodes.Add(new Tuple<INode, int> (nodes[i], values[i]));
+            valuedNodes.Add(new ValuedNode(values[i], nodes[i]));
 
         PostgresGenerator gen = new PostgresGenerator();
         string query = gen.GenerateQuery(valuedNodes);

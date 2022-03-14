@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QueryOptimiser.Cost.Nodes;
 using QueryParser.Models;
 
 namespace QueryOptimiser.QueryGenerators
@@ -20,6 +21,6 @@ namespace QueryOptimiser.QueryGenerators
         /// <para>As opposed to <see cref="GenerateQuery(List{INode})"/> this also reorders it according to the cost of each join operation, lowest first</para>
         /// </summary>
         /// <returns></returns>
-        public string GenerateQuery(List<Tuple<INode, int>> nodes);
+        public string GenerateQuery(List<ValuedNode> nodes);
     }
 }

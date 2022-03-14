@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QueryParser.Models;
 using QueryOptimiser.Cost.CostCalculators;
+using QueryOptimiser.Cost.Nodes;
 
 namespace QueryOptimiser
 {
@@ -38,6 +39,6 @@ namespace QueryOptimiser
         /// Calculates worst case cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public List<Tuple<INode, int>> ValueQuery(List<INode> nodes);
+        public List<ValuedNode> ValueQuery(List<INode> nodes);
     }
 }

@@ -1,4 +1,5 @@
-﻿using QueryParser.Models;
+﻿using QueryOptimiser.Cost.Nodes;
+using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,12 +51,12 @@ namespace QueryOptimiser.QueryGenerators
             return query;
         }
 
-        public string GenerateQuery(List<Tuple<INode, int>> nodes)
+        public string GenerateQuery(List<ValuedNode> nodes)
         {
-            nodes.Sort((a, b) => a.Item2 <= b.Item2 ? -1 : 1);
+            nodes.Sort((a, b) => a.Cost <= b.Cost ? -1 : 1);
             List<INode> sortedNodes = new List<INode>();
             for (int i = 0; i < nodes.Count; i++)
-                sortedNodes.Add(nodes[i].Item1);
+                sortedNodes.Add(nodes[i].Node);
             return GenerateQuery(sortedNodes);
         }
     }

@@ -11,6 +11,7 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Managers;
 using DatabaseConnector;
+using QueryOptimiser.Cost.Nodes;
 
 namespace QueryOptimiser
 {
@@ -46,7 +47,7 @@ namespace QueryOptimiser
         /// <returns></returns>
         public string OptimiseQuery(List<INode> nodes)
         {
-            List<Tuple<INode, int>> valuedNodes = ValueQuery(nodes);
+            List<ValuedNode> valuedNodes = ValueQuery(nodes);
 
             return QueryGenerator.GenerateQuery(valuedNodes);
         }
@@ -55,13 +56,13 @@ namespace QueryOptimiser
         /// Calculates worst case cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public List<Tuple<INode, int>> ValueQuery(List<INode> nodes)
+        public List<ValuedNode> ValueQuery(List<INode> nodes)
         {
-            List<Tuple<INode, int>> valuedNodes = new List<Tuple<INode, int>>();
+            List<ValuedNode> valuedNodes = new List<ValuedNode>();
             foreach (var node in nodes)
             {
                 int cost = CostCalculator.CalculateCost(node);
-                valuedNodes.Add(Tuple.Create(node, cost));
+                valuedNodes.Add(new ValuedNode(cost, node));
             }
             return valuedNodes;
         }
