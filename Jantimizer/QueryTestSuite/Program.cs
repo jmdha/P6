@@ -36,6 +36,12 @@ namespace QueryTestSuite
 
             DateTime timeStamp = DateTime.Now;
 
+            var parser = new JoinOrderBenchmarkParser(postgresModel.Connector as PostgreSqlConnector);
+            var jobQuery = File.ReadAllText(@"C:\Users\Henrik\source\repos\join-order-benchmark\30a.sql");
+            var tables = await parser.GetTables(jobQuery);
+
+
+
             foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
             {
                 TestSuite suite = new TestSuite(connectorSet, timeStamp);
