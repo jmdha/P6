@@ -8,15 +8,12 @@ namespace QueryPlanParser.Models
 {
     public class AnalysisResult
     {
-        public string Name { get; set; }
-
-        public decimal EstimatedCost { get; set; }
-        public ulong EstimatedCardinality { get; set; }
-
-        public ulong ActualCardinality { get; set; }
-        public TimeSpan ActualTime { get; set; }
-
-        public List<AnalysisResult> SubQueries = new List<AnalysisResult>();
+        public string Name { get; }
+        public decimal EstimatedCost { get; }
+        public ulong EstimatedCardinality { get; }
+        public ulong ActualCardinality { get; }
+        public TimeSpan ActualTime { get; }
+        public List<AnalysisResult> SubQueries { get; }
 
         public AnalysisResult(string name, decimal estimatedCost, ulong estimatedCardinality, ulong actualCardinality, TimeSpan actualTime)
         {
@@ -25,6 +22,7 @@ namespace QueryPlanParser.Models
             EstimatedCardinality = estimatedCardinality;
             ActualCardinality = actualCardinality;
             ActualTime = actualTime;
+            SubQueries = new List<AnalysisResult>();
         }
 
         public override string ToString()
