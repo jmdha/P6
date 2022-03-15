@@ -32,17 +32,22 @@ namespace QueryTestSuite
 
             var connectorSet = new List<DBConnectorParser>() { postgresModel };
 
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
-            DateTime timeStamp = DateTime.Now;
-
-            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
-                TestSuite suite = new TestSuite(connectorSet, timeStamp);
+                string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
-                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                await suite.RunTests(testDir);
-                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                DateTime timeStamp = DateTime.Now;
+
+                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+                {
+                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
+
+                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
+                    await suite.RunTests(testDir);
+                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                }
+
+                DatabaseStarter.StopAllServers(connectorSet);
             }
         }
     }
