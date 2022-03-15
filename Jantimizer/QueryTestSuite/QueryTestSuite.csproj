@@ -92,6 +92,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
+    <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     
