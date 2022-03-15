@@ -82,6 +82,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             var result = parser.ParseQueryAnalysisRow(line);
 
             // Assert
+            Assert.IsNotNull(result);
             Assert.AreEqual(eName, result.AnalysisResult.Name);
             Assert.AreEqual(eCost, result.AnalysisResult.EstimatedCost.ToString(System.Globalization.CultureInfo.InvariantCulture));
             Assert.AreEqual(eRows, result.AnalysisResult.EstimatedCardinality);
@@ -133,6 +134,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             var result = parser.ParseQueryAnalysisRow(line);
 
             // Assert
+            Assert.IsNotNull(result);
             Assert.AreEqual(expectedIndent, result.Indentation);
         }
 
