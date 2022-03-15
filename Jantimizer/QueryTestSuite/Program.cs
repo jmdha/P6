@@ -32,17 +32,35 @@ namespace QueryTestSuite
 
             var connectorSet = new List<DBConnectorParser>() { postgresModel };
 
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
-            DateTime timeStamp = DateTime.Now;
-
-            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+            PrintUtil.PrintLine($"Checking if databases are online...", 0, ConsoleColor.DarkGray);
+            bool allGood = true;
+            foreach(var connector in connectorSet)
             {
-                TestSuite suite = new TestSuite(connectorSet, timeStamp);
+                if (connector.Connector.CheckConnection())
+                {
+                    PrintUtil.PrintLine($"Connectorr [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                }
+                else
+                {
+                    PrintUtil.PrintLine($"Error! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Red);
+                    allGood = false;
+                }
+            }
 
-                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                await suite.RunTests(testDir);
-                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+            if (allGood)
+            {
+                string testBaseDirPath = Path.GetFullPath("../../../Tests");
+
+                DateTime timeStamp = DateTime.Now;
+
+                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+                {
+                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
+
+                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
+                    await suite.RunTests(testDir);
+                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                }
             }
         }
     }
