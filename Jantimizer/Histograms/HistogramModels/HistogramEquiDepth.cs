@@ -42,8 +42,7 @@ namespace Histograms
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
                     newBucket.Count++;
-                    if (sorted[bIter] > newBucket.ValueEnd)
-                        newBucket.ValueEnd = sorted[bIter];
+                    newBucket.ValueEnd = sorted[bIter];
                 }
                 Buckets.Add(newBucket);
             }

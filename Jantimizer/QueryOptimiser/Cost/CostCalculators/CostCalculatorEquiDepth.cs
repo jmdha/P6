@@ -17,9 +17,9 @@ namespace QueryOptimiser.Cost.CostCalculators
 
         public int CalculateCost(INode node)
         {
-            if (node is JoinNode)
+            if (node is JoinNode joinNode)
             {
-                return new JoinCost().CalculateCost((JoinNode)node, HistogramManager);
+                return new JoinCost().CalculateCost(joinNode, HistogramManager);
             }
             else
             {
