@@ -86,10 +86,14 @@ namespace QueryParser.QueryParsers
                 if (condition.Length > 1)
                 {
                     string[] conditionSplit = {"", ""};
-                    foreach (var op in Utilities.Operators) {
-                        if (condition.Contains(op.Item2)) {
-                            conditionSplit = condition.Split(op.Item2);
-                            type = op.Item1;
+                    var operatorTypes = (JoinNode.ComparisonType[])Enum.GetValues(typeof(JoinNode.ComparisonType));
+                    foreach (var op in operatorTypes) {
+                        if (op == JoinNode.ComparisonType.None)
+                            continue;
+                        string operatorString = Utilities.GetOperatorString(op);
+                        if (condition.Contains(operatorString)) {
+                            conditionSplit = condition.Split(operatorString);
+                            type = op;
                             break;
                         }
                     }

@@ -10,11 +10,11 @@ namespace QueryParser.Models
     {
         public enum ComparisonType {
             None,
+            EqualOrLess,
+            EqualOrMore,
             Equal,
             Less,
-            More,
-            EqualOrLess,
-            EqualOrMore
+            More
         };
 
         public int Id { get; internal set; }
