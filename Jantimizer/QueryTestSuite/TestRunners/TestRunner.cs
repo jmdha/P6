@@ -5,6 +5,11 @@ using DatabaseConnector.Connectors;
 using Histograms;
 using Histograms.Managers;
 using PrintUtilities;
+using QueryOptimiser;
+using QueryOptimiser.QueryGenerators;
+using QueryParser;
+using QueryParser.Models;
+using QueryParser.QueryParsers;
 using QueryPlanParser.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
@@ -71,34 +76,48 @@ namespace QueryTestSuite.TestRunners
                     PrintUtil.Print($"\t Executing SQL statement...             ", 0);
                     DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
-                    TestCase testCase = new TestCase(queryFile, analysisResult);
+
+                    IQueryOptimiser<HistogramEquiDepth, IDbConnector> optimiser = new QueryOptimiserEquiDepth(
+                        new PostgresGenerator(),
+                        HistogramManager);
+                    IParserManager manager = new ParserManager(new List<IQueryParser>() { 
+                        new JoinQueryParser()    
+                    });
+                    List<INode> nodes = manager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
+
+                    AnalysisResult jantimiserResult = new AnalysisResult(
+                        "Jantimiser",
+                        0,
+                        optimiser.OptimiseQueryCardinality(nodes),
+                        0,
+                        new TimeSpan());
+                    
+                    TestCase testCase = new TestCase(queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
                 {
                     PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
                     PrintUtil.PrintLine(ex.ToString(), 1);
-                    Console.WriteLine(ex);
                 }
                 count++;
             }
             PrintUtil.PrintProgressBar(50, 50, 50, true, 2);
             PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
-            Console.WriteLine();
             return testCases;
         }
 
         private void WriteResultToConsole()
         {
             PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
-            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)"), 2, ConsoleColor.DarkGray);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)", "Jantimiser (Rows)"), 2, ConsoleColor.DarkGray);
             foreach (var testCase in Results)
-                PrintUtil.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString()), 2, ConsoleColor.Blue);
+                PrintUtil.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString(), testCase.JantimiserResult.EstimatedCardinality.ToString()), 2, ConsoleColor.Blue);
         }
 
-        private string FormatList(string category, string caseName, string predicted, string actual)
+        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser)
         {
-            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20}", category, caseName, predicted, actual);
+            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20}", category, caseName, predicted, actual, jantimiser);
         }
 
         private void SaveResult()

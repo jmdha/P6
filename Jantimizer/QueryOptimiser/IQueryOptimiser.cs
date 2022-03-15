@@ -21,6 +21,8 @@ namespace QueryOptimiser
         /// <returns></returns>
         public string OptimiseQuery(List<INode> nodes);
 
+        public ulong OptimiseQueryCardinality(List<INode> nodes);
+
         /// <summary>
         /// Calculates worst case cost of each join operation
         /// </summary>

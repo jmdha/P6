@@ -32,6 +32,14 @@ namespace QueryOptimiser
             return QueryGenerator.GenerateQuery(valuedNodes);
         }
 
+        public ulong OptimiseQueryCardinality(List<INode> nodes)
+        {
+            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes);
+            if (valuedNodes.Count == 0)
+                return 0;
+            return (ulong)valuedNodes[valuedNodes.Count - 1].Cost;
+        }
+
         /// <summary>
         /// Calculates worst case cost of each join operation
         /// </summary>
