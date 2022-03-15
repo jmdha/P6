@@ -37,7 +37,11 @@ namespace QueryOptimiser
             List<ValuedNode> valuedNodes = CalculateNodeCost(nodes);
             if (valuedNodes.Count == 0)
                 return 0;
-            return (ulong)valuedNodes[valuedNodes.Count - 1].Cost;
+            ulong expCardinality = 0;
+            foreach (ValuedNode node in valuedNodes)
+                expCardinality *= (ulong)node.Cost;
+
+            return expCardinality;
         }
 
         /// <summary>
