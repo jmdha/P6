@@ -38,7 +38,7 @@ namespace DatabaseConnector.Connectors
                 return false;
             }
             else
-                throw new Exception("Error, PostGres 14 server installation was not found!");
+                throw new Exception("Error, PostGres server installation was not found!");
         }
 
         public override bool StopServer()
@@ -50,7 +50,7 @@ namespace DatabaseConnector.Connectors
                 return true;
             }
             else
-                throw new Exception("Error, PostGres 14 server installation was not found!");
+                throw new Exception("Error, PostGres server installation was not found!");
         }
 
         private string GetPostgresPath()

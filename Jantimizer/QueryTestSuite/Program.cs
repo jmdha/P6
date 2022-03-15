@@ -32,29 +32,7 @@ namespace QueryTestSuite
 
             var connectorSet = new List<DBConnectorParser>() { postgresModel };
 
-            PrintUtil.PrintLine($"Checking if databases are online...", 0, ConsoleColor.DarkGray);
-            bool allGood = true;
-            foreach(var connector in connectorSet)
-            {
-                if (connector.Connector.CheckConnection())
-                {
-                    PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
-                }
-                else
-                {
-                    PrintUtil.PrintLine($"Error! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Red);
-                    PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
-
-                    if (!await connector.Connector.StartServer())
-                    {
-                        PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
-                        allGood = false;
-                        break;
-                    }
-                }
-            }
-
-            if (allGood)
+            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
                 string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
