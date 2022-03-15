@@ -35,5 +35,12 @@ namespace QueryTestSuite.Services
             }
             return true;
         }
+
+        public static void StopAllServers(List<DBConnectorParser> connectorParsers)
+        {
+            PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
+            foreach (var connector in connectorParsers)
+                connector.Connector.StopServer();
+        }
     }
 }

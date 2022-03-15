@@ -47,8 +47,7 @@ namespace QueryTestSuite
                     PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
                 }
 
-                foreach (var connector in connectorSet)
-                    connector.Connector.StopServer();
+                DatabaseStarter.StopAllServers(connectorSet);
             }
         }
     }
