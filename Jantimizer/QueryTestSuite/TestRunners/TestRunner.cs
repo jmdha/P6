@@ -35,7 +35,7 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCase>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            HistogramManager = new PostgresEquiDepthHistogramManager(databaseModel.Connector.ConnectionString, 10);
+            HistogramManager = new PostgresEquiDepthHistogramManager(databaseModel.Connector.ConnectionString, 1000);
         }
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -45,6 +45,8 @@ namespace QueryTestSuite.TestRunners
 
             PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
             await DatabaseModel.Connector.CallQuery(SetupFile);
+
+            PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
             await HistogramManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();
@@ -102,7 +104,7 @@ namespace QueryTestSuite.TestRunners
                 }
                 count++;
             }
-            PrintUtil.PrintProgressBar(50, 50, 50, true, 2);
+            PrintUtil.PrintProgressBar(max, max, 50, true, 2);
             PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
             return testCases;
         }
@@ -119,25 +121,30 @@ namespace QueryTestSuite.TestRunners
                     testCase.TestResult.EstimatedCardinality.ToString(), 
                     testCase.TestResult.ActualCardinality.ToString(), 
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
-                    GetAccuracy((decimal)testCase.TestResult.ActualCardinality, (decimal)testCase.TestResult.EstimatedCardinality),
-                    GetAccuracy((decimal)testCase.TestResult.ActualCardinality, (decimal)testCase.JantimiserResult.EstimatedCardinality)
+                    GetAccuracy(testCase.TestResult.ActualCardinality, testCase.TestResult.EstimatedCardinality),
+                    GetAccuracy(testCase.TestResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality)
                     ), 2, ConsoleColor.Blue);
             }
         }
 
-        private string GetAccuracy(decimal val1, decimal val2)
+        private string GetAccuracy(ulong val1, ulong val2)
         {
             string retString = "";
             if (val1 == 0 && val2 == 0)
-                return "100 %";
+                return "100   %";
             if (val1 == 0)
-                return "inf %";
-            if (val1 < val2 || val1 > val2)
+                return "inf   %";
+            if (val1 < val2)
             {
-                decimal value = val1 / val2;
-                return $"{Math.Round(value, 2)} %";
+                decimal value = ((decimal)val1 / (decimal)val2) * 100;
+                return string.Format("{0, -5} %", Math.Round(value, 2));
             }
-            return "100 %";
+            if (val1 > val2)
+            {
+                decimal value = ((decimal)val2 / (decimal)val1) * 100;
+                return string.Format("{0, -5} %", Math.Round(value, 2));
+            }
+            return "100   %";
         }
 
         private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
