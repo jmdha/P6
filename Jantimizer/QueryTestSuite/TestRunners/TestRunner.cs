@@ -112,36 +112,37 @@ namespace QueryTestSuite.TestRunners
         private void WriteResultToConsole()
         {
             PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
-            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)", "Jantimiser (Rows)", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
             foreach (var testCase in Results)
             {
                 PrintUtil.PrintLine(FormatList(
                     testCase.Category, 
                     testCase.Name, 
-                    testCase.TestResult.EstimatedCardinality.ToString(), 
-                    testCase.TestResult.ActualCardinality.ToString(), 
+                    testCase.TestResult.EstimatedCardinality.ToString(),
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
+                    testCase.TestResult.ActualCardinality.ToString(), 
                     GetAccuracy(testCase.TestResult.ActualCardinality, testCase.TestResult.EstimatedCardinality),
                     GetAccuracy(testCase.TestResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality)
                     ), 2, ConsoleColor.Blue);
             }
         }
 
-        private string GetAccuracy(ulong val1, ulong val2)
+        private string GetAccuracy(ulong actualValue, ulong predictedValue)
         {
-            string retString = "";
-            if (val1 == 0 && val2 == 0)
+            if (actualValue == 0 && predictedValue == 0)
                 return "100   %";
-            if (val1 == 0)
+            if (actualValue == 0)
                 return "inf   %";
-            if (val1 < val2)
+            if (actualValue != 0 && predictedValue == 0)
+                return "inf   %";
+            if (actualValue < predictedValue)
             {
-                decimal value = ((decimal)val1 / (decimal)val2) * 100;
+                decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
                 return string.Format("{0, -5} %", Math.Round(value, 2));
             }
-            if (val1 > val2)
+            if (actualValue > predictedValue)
             {
-                decimal value = ((decimal)val2 / (decimal)val1) * 100;
+                decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
                 return string.Format("{0, -5} %", Math.Round(value, 2));
             }
             return "100   %";
