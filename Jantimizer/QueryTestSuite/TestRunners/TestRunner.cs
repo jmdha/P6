@@ -110,14 +110,39 @@ namespace QueryTestSuite.TestRunners
         private void WriteResultToConsole()
         {
             PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
-            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)", "Jantimiser (Rows)"), 2, ConsoleColor.DarkGray);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)", "Jantimiser (Rows)", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
             foreach (var testCase in Results)
-                PrintUtil.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString(), testCase.JantimiserResult.EstimatedCardinality.ToString()), 2, ConsoleColor.Blue);
+            {
+                PrintUtil.PrintLine(FormatList(
+                    testCase.Category, 
+                    testCase.Name, 
+                    testCase.TestResult.EstimatedCardinality.ToString(), 
+                    testCase.TestResult.ActualCardinality.ToString(), 
+                    testCase.JantimiserResult.EstimatedCardinality.ToString(),
+                    GetAccuracy((decimal)testCase.TestResult.ActualCardinality, (decimal)testCase.TestResult.EstimatedCardinality),
+                    GetAccuracy((decimal)testCase.TestResult.ActualCardinality, (decimal)testCase.JantimiserResult.EstimatedCardinality)
+                    ), 2, ConsoleColor.Blue);
+            }
         }
 
-        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser)
+        private string GetAccuracy(decimal val1, decimal val2)
         {
-            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20}", category, caseName, predicted, actual, jantimiser);
+            string retString = "";
+            if (val1 == 0 && val2 == 0)
+                return "100 %";
+            if (val1 == 0)
+                return "inf %";
+            if (val1 < val2 || val1 > val2)
+            {
+                decimal value = val1 / val2;
+                return $"{Math.Round(value, 2)} %";
+            }
+            return "100 %";
+        }
+
+        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
+        {
+            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20} {5,-10} {6,-10}", category, caseName, predicted, actual, jantimiser, dBAccuracy, jantimiserAccuracy);
         }
 
         private void SaveResult()
