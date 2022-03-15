@@ -4,9 +4,11 @@ using DatabaseConnector;
 using DatabaseConnector.Connectors;
 using Histograms;
 using Histograms.Managers;
+using PrintUtilities;
 using QueryPlanParser.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
+using System.Data;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -33,16 +35,16 @@ namespace QueryTestSuite.TestRunners
 
         public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            Console.WriteLine($"Running Cleanup: {CleanupFile}");
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
             await DatabaseModel.Connector.CallQuery(CleanupFile);
 
-            Console.WriteLine($"Running Setup: {SetupFile}");
+            PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
             await DatabaseModel.Connector.CallQuery(SetupFile);
             await HistogramManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();
 
-            Console.WriteLine($"Running Cleanup: {CleanupFile}");
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
             await DatabaseModel.Connector.CallQuery(CleanupFile);
 
             if (consoleOutput)
@@ -56,27 +58,52 @@ namespace QueryTestSuite.TestRunners
 
         private async Task<List<TestCase>> RunQueriesSerial()
         {
+            PrintUtil.PrintLine($"Running tests for [{DatabaseModel.Name}] connector", 2, ConsoleColor.Green);
             var testCases = new List<TestCase>();
+            int count = 0;
+            int max = CaseFiles.Count();
             foreach (FileInfo queryFile in CaseFiles)
             {
-                Console.WriteLine($"Running {queryFile}");
-                AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile));
-                TestCase testCase = new TestCase(queryFile, analysisResult);
-                testCases.Add(testCase);
+                try
+                {
+                    PrintUtil.PrintProgressBar(count, max, 50, true, 2);
+                    PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
+                    PrintUtil.Print($"\t Executing SQL statement...             ", 0);
+                    DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
+                    TestCase testCase = new TestCase(queryFile, analysisResult);
+                    testCases.Add(testCase);
+                }
+                catch (Exception ex)
+                {
+                    PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
+                    PrintUtil.PrintLine(ex.ToString(), 1);
+                    Console.WriteLine(ex);
+                }
+                count++;
             }
+            PrintUtil.PrintProgressBar(50, 50, 50, true, 2);
+            PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
+            Console.WriteLine();
             return testCases;
         }
 
         private void WriteResultToConsole()
         {
-            foreach(var testCase in Results)
-                Console.WriteLine($"{DatabaseModel.Name} | {testCase.Category} | {testCase.Name} | Database predicted cardinality: [{(testCase.TestResult.EstimatedCardinality)}], actual: [{testCase.TestResult.ActualCardinality}]");
+            PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "Predicted (Rows)", "Actual (Rows)"), 2, ConsoleColor.DarkGray);
+            foreach (var testCase in Results)
+                PrintUtil.PrintLine(FormatList(testCase.Category, testCase.Name, testCase.TestResult.EstimatedCardinality.ToString(), testCase.TestResult.ActualCardinality.ToString()), 2, ConsoleColor.Blue);
+        }
+
+        private string FormatList(string category, string caseName, string predicted, string actual)
+        {
+            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20}", category, caseName, predicted, actual);
         }
 
         private void SaveResult()
         {
             csvWriter.Write();
         }
-
     }
 }

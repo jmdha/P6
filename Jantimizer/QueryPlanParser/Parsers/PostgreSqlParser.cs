@@ -1,8 +1,10 @@
-﻿using QueryPlanParser.Models;
+﻿using QueryPlanParser.Exceptions;
+using QueryPlanParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,20 +17,17 @@ namespace QueryPlanParser.Parsers
         {
             Queue<AnalysisResultWithIndent> resultQueue;
 
-            try
-            {
-                var resultRows = ParseQueryAnalysisRows(planData.Tables[0].Rows);
-                resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
-            }
-            catch (NoNullAllowedException)
-            {
-                throw new NoNullAllowedException($"Unexpected null-value from PostGre Analysis");
-            }
+            string[] explainRows = GetExplainRows(planData.Tables[0].Rows);
+            var resultRows = ParseQueryAnalysisRows(explainRows);
+            resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
+
+            if (resultQueue.Count == 0)
+                throw new BadQueryPlanInputException("Analysis got no rows!");
 
             return RunAnalysis(resultQueue);
         }
 
-        private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
+        internal AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
             var analysisRes = row.AnalysisResult;
@@ -36,7 +35,7 @@ namespace QueryPlanParser.Parsers
             // Recursively add subqueries
             while (rows.Count > 0)
             {
-                if (rows.Peek().indentation > row.indentation)
+                if (rows.Peek().Indentation > row.Indentation)
                     analysisRes.SubQueries.Add(RunAnalysis(rows));
                 else
                     break;
@@ -45,21 +44,31 @@ namespace QueryPlanParser.Parsers
             return analysisRes;
         }
 
-        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(DataRowCollection rows)
+        internal IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(string[] rows)
         {
-            foreach (DataRow row in rows)
+            foreach (string rowStr in rows)
             {
-                var rowStr = row["QUERY PLAN"].ToString();
-                if (string.IsNullOrEmpty(rowStr))
-                    throw new NoNullAllowedException($"Unexpected null-value: {{{rowStr}}}");
-
                 var parsed = ParseQueryAnalysisRow(rowStr);
                 if (parsed != null)
                     yield return parsed;
             }
         }
 
-
+        internal string[] GetExplainRows(DataRowCollection rows)
+        {
+            if (rows.Count > 0)
+            {
+                List<string> explainRows = new List<string>();
+                foreach (DataRow row in rows)
+                {
+                    if (!row.Table.Columns.Contains("QUERY PLAN"))
+                        throw new BadQueryPlanInputException("Database did not return a correct query plan!");
+                    explainRows.Add(row["QUERY PLAN"].ToString()!);
+                }
+                return explainRows.ToArray();
+            }
+            throw new BadQueryPlanInputException("Database did not return a correct query plan!");
+        }
 
         private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
 
@@ -68,7 +77,7 @@ namespace QueryPlanParser.Parsers
         /// </summary>
         /// <param name="rowStr">The content from a single row after running EXPLAIN ANALYZE</param>
         /// <returns>AnalysisResult, IndentationSize</returns>
-        private AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
+        internal AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
         {
             // Regex Matching
             var match = RowParserRegex.Match(rowStr);
@@ -83,11 +92,11 @@ namespace QueryPlanParser.Parsers
 
             // Create Result
             var analysisResult = new AnalysisResult(
-                rowData["name"].ToString().Trim(),
-                decimal.Parse(rowData["costMin"].Value),
-                ulong.Parse(rowData["estimatedRows"].Value),
-                ulong.Parse(rowData["actualRows"].Value),
-                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value))
+                rowData["name"].Value.Trim(),
+                decimal.Parse(rowData["costMin"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["estimatedRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["actualRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value, System.Globalization.CultureInfo.InvariantCulture))
             );
 
             // Return

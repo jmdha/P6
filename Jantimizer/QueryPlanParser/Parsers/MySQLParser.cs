@@ -1,4 +1,5 @@
-﻿using QueryPlanParser.Models;
+﻿using QueryPlanParser.Exceptions;
+using QueryPlanParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,21 +16,17 @@ namespace QueryPlanParser.Parsers
         {
             Queue<AnalysisResultWithIndent> resultQueue;
 
-            try
-            {
-                var resultRows = ParseQueryAnalysisRows(planData.Tables[0].Rows);
-                resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
-            }
-            catch (NoNullAllowedException)
-            {
-                throw new NoNullAllowedException($"Unexpected null-value from MySql Analysis");
-            }
+            string[] explainRows = GetExplainRows(planData.Tables[0].Rows);
+            var resultRows = ParseQueryAnalysisRows(explainRows);
+            resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
+
+            if (resultQueue.Count == 0)
+                throw new BadQueryPlanInputException("Analysis got no rows!");
 
             return RunAnalysis(resultQueue);
         }
 
-
-        private AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
+        internal AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
             var analysisRes = row.AnalysisResult;
@@ -37,7 +34,7 @@ namespace QueryPlanParser.Parsers
             // Recursively add subqueries
             while (rows.Count > 0)
             {
-                if (rows.Peek().indentation > row.indentation)
+                if (rows.Peek().Indentation > row.Indentation)
                     analysisRes.SubQueries.Add(RunAnalysis(rows));
                 else
                     break;
@@ -46,21 +43,28 @@ namespace QueryPlanParser.Parsers
             return analysisRes;
         }
 
-        private IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(DataRowCollection rows)
+        internal IEnumerable<AnalysisResultWithIndent> ParseQueryAnalysisRows(string[] rows)
         {
-            var rowLineSplit = rows[0]["EXPLAIN"].ToString()!.Trim().Split('\n');
-            foreach (string rowStr in rowLineSplit)
+            foreach (string rowStr in rows)
             {
-                if (string.IsNullOrEmpty(rowStr))
-                    throw new NoNullAllowedException($"Unexpected null-value: {{{rowStr}}}");
-
                 var parsed = ParseQueryAnalysisRow(rowStr);
                 if (parsed != null)
                     yield return parsed;
             }
         }
 
-
+        internal string[] GetExplainRows(DataRowCollection rows)
+        {
+            if (rows.Count > 0) {
+                if (rows[0].Table.Columns.Contains("EXPLAIN"))
+                {
+                    object varObject = rows[0]["EXPLAIN"];
+                    if (varObject != null)
+                        return varObject.ToString()!.Trim().Split('\n');
+                }
+            }
+            throw new BadQueryPlanInputException("Database did not return a correct query plan!");
+        }
 
         private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)(?:\((?<predicate>[^)]+)?\) *)?\(cost=(?<cost>\d+.\d+) rows=(?<estimatedRows>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
 
@@ -69,7 +73,7 @@ namespace QueryPlanParser.Parsers
         /// </summary>
         /// <param name="rowStr">The content from a single row after running EXPLAIN ANALYZE</param>
         /// <returns>AnalysisResult, IndentationSize</returns>
-        private AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
+        internal AnalysisResultWithIndent? ParseQueryAnalysisRow(string rowStr)
         {
             // Regex Matching
             var match = RowParserRegex.Match(rowStr);
@@ -84,11 +88,11 @@ namespace QueryPlanParser.Parsers
 
             // Create Result
             var analysisResult = new AnalysisResult(
-                rowData["name"].ToString().Trim(),
-                decimal.Parse(rowData["cost"].Value),
-                ulong.Parse(rowData["estimatedRows"].Value),
-                ulong.Parse(rowData["actualRows"].Value),
-                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value))
+                rowData["name"].Value.Trim(),
+                decimal.Parse(rowData["cost"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["estimatedRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                ulong.Parse(rowData["actualRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
+                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value, System.Globalization.CultureInfo.InvariantCulture))
             );
 
             // Return

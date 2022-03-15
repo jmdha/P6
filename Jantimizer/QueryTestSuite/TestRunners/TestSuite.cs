@@ -31,7 +31,6 @@ namespace QueryTestSuite.TestRunners
                     TimeStamp
                 );
                 testRunners.Add(runner);
-                Console.WriteLine("Running tests");
                 testRuns.Add(runner.Run(true));
             }
 
