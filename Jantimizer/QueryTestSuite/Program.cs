@@ -38,12 +38,19 @@ namespace QueryTestSuite
             {
                 if (connector.Connector.CheckConnection())
                 {
-                    PrintUtil.PrintLine($"Connectorr [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                    PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
                 }
                 else
                 {
                     PrintUtil.PrintLine($"Error! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Red);
-                    allGood = false;
+                    PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
+
+                    if (!await connector.Connector.StartServer())
+                    {
+                        PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
+                        allGood = false;
+                        break;
+                    }
                 }
             }
 
@@ -61,6 +68,9 @@ namespace QueryTestSuite
                     await suite.RunTests(testDir);
                     PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
                 }
+
+                foreach (var connector in connectorSet)
+                    connector.Connector.StopServer();
             }
         }
     }
