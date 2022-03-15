@@ -18,5 +18,10 @@ namespace QueryParser.Models
             TableName = tableName;
             Query = query;
         }
+
+        public string GetSuffixString(string param)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

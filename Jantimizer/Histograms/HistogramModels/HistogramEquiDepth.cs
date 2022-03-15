@@ -38,9 +38,12 @@ namespace Histograms
         {
             for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
-                IHistogramBucket newBucket = new HistogramBucket(sorted[bStart], 1);
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                IHistogramBucket newBucket = new HistogramBucket(sorted[bStart], sorted[bStart], 1);
+
+                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
                     newBucket.Count++;
+                    newBucket.ValueEnd = sorted[bIter];
+                }
                 Buckets.Add(newBucket);
             }
         }

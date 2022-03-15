@@ -8,17 +8,32 @@ namespace QueryParser.Models
 {
     public class JoinNode : INode
     {
+        public enum ComparisonType {
+            None,
+            EqualOrLess,
+            EqualOrMore,
+            Equal,
+            Less,
+            More
+        };
+
         public int Id { get; internal set; }
+        public ComparisonType ComType { get; internal set; }
         public string LeftTable { get; internal set; }
+        public string LeftAttribute { get; internal set; }
         public string RightTable { get; internal set; }
+        public string RightAttribute { get; internal set; }
         public string JoinCondition { get; internal set; }
         public List<string> ConditionTables { get; }
 
-        public JoinNode(int id, string leftTable, string rightTable, string joinCondition)
+        public JoinNode(int id, ComparisonType type, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
         {
             Id = id;
+            ComType = type;
             LeftTable = leftTable.Trim();
+            LeftAttribute = leftAttribute.Trim();
             RightTable = rightTable.Trim();
+            RightAttribute = rightAttribute.Trim();
             JoinCondition = joinCondition.Trim();
             ConditionTables = GenerateConditionTables();
         }
@@ -26,6 +41,12 @@ namespace QueryParser.Models
         public override string? ToString()
         {
             return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
+        }
+
+        // The table which should be joined on
+        public string GetSuffixString(string param)
+        {
+            return $" JOIN {param} ON {JoinCondition})";
         }
 
         private List<string> GenerateConditionTables()
@@ -64,11 +85,11 @@ namespace QueryParser.Models
         }
         private void SplitOverPredicates(string s, List<string?> tables)
         {
-            if (s.Contains(">")) GetTableNamesFromPredicate(s.Split(">"), tables);
-            if (s.Contains("<")) GetTableNamesFromPredicate(s.Split("<"), tables);
-            if (s.Contains(">=")) GetTableNamesFromPredicate(s.Split(">="), tables);
-            if (s.Contains("<=")) GetTableNamesFromPredicate(s.Split("<="), tables);
-            if (s.Contains("=")) GetTableNamesFromPredicate(s.Split("="), tables);
+            if (ComType == ComparisonType.More)         GetTableNamesFromPredicate(s.Split(">"), tables);
+            if (ComType == ComparisonType.Less)         GetTableNamesFromPredicate(s.Split("<"), tables);
+            if (ComType == ComparisonType.EqualOrMore)  GetTableNamesFromPredicate(s.Split(">="), tables);
+            if (ComType == ComparisonType.EqualOrLess)  GetTableNamesFromPredicate(s.Split("<="), tables);
+            if (ComType == ComparisonType.Equal)        GetTableNamesFromPredicate(s.Split("="), tables);
         }
 
         private void GetTableNamesFromPredicate(string[] s, List<string?> tables)
