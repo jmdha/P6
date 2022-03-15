@@ -1,30 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using QueryOptimiser.QueryGenerators;
-using QueryOptimiser.Cost.CostCalculators;
-using QueryParser;
-using QueryParser.Models;
-using Histograms;
-using Histograms.Managers;
+﻿
 using DatabaseConnector;
+using Histograms;
+using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.QueryGenerators;
+using QueryParser.Models;
 
 namespace QueryOptimiser
 {
-    public class QueryOptimiser : IQueryOptimiser<IHistogram, IDbConnector>
+    public class QueryOptimiserEquiDepth : IQueryOptimiser<HistogramEquiDepth, IDbConnector>
     {
-        public IParserManager ParserManager { get; set; }
         public IQueryGenerator QueryGenerator { get; set; }
-        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
-        public ICostCalculator<IHistogram, IDbConnector> CostCalculator { get; set; }
+        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; set; }
+        public ICostCalculator<HistogramEquiDepth, IDbConnector> CostCalculator { get; set; }
 
-        public QueryOptimiser(IParserManager parserManager, IQueryGenerator queryGenerator, IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        public QueryOptimiserEquiDepth(IQueryGenerator queryGenerator, IHistogramManager<HistogramEquiDepth, IDbConnector> histogramManager)
         {
-            ParserManager = parserManager;
             QueryGenerator = queryGenerator;
             HistogramManager = histogramManager;
             CostCalculator = new CostCalculatorEquiDepth(histogramManager);
@@ -34,20 +25,9 @@ namespace QueryOptimiser
         /// Reorders a querys join order according to the cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public string OptimiseQuery(string query)
-        {
-            List<INode> nodes = ParserManager.ParseQuery(query);
-
-            return OptimiseQuery(nodes);
-        }
-
-        /// <summary>
-        /// Reorders a querys join order according to the cost of each join operation
-        /// </summary>
-        /// <returns></returns>
         public string OptimiseQuery(List<INode> nodes)
         {
-            List<ValuedNode> valuedNodes = ValueQuery(nodes);
+            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes);
 
             return QueryGenerator.GenerateQuery(valuedNodes);
         }
@@ -56,7 +36,7 @@ namespace QueryOptimiser
         /// Calculates worst case cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public List<ValuedNode> ValueQuery(List<INode> nodes)
+        public List<ValuedNode> CalculateNodeCost(List<INode> nodes)
         {
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             foreach (var node in nodes)

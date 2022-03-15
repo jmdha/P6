@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Histograms;
+﻿
 using DatabaseConnector;
-using QueryParser.Models;
+using Histograms;
 using QueryOptimiser.Cost.Nodes.EquiDepth;
+using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
-    public class CostCalculatorEquiDepth : ICostCalculator<IHistogram, IDbConnector>
+    public class CostCalculatorEquiDepth : ICostCalculator<HistogramEquiDepth, IDbConnector>
     {
-        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
+        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; set; }
 
-        public CostCalculatorEquiDepth(IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        public CostCalculatorEquiDepth(IHistogramManager<HistogramEquiDepth, IDbConnector> histogramManager)
         {
             HistogramManager = histogramManager;
         }
@@ -23,9 +18,13 @@ namespace QueryOptimiser.Cost.CostCalculators
         public int CalculateCost(INode node)
         {
             if (node is JoinNode)
+            {
                 return new JoinCost().CalculateCost((JoinNode)node, HistogramManager);
+            }
             else
+            {
                 throw new ArgumentException("Non handled node type " + node.ToString());
+            }
         }
     }
 }

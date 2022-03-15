@@ -1,16 +1,11 @@
 ﻿using QueryParser.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace QueryOptimiser.Cost.Nodes
 {
     public class ValuedNode
     {
-        internal int Cost { get; set; }
-        internal INode Node { get; set; }
+        public int Cost { get; }
+        public INode Node { get; }
 
         public ValuedNode(int cost, INode node)
         {

@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 using DatabaseConnector;
-using QueryOptimiser.Cost.Nodes;
-using QueryParser.Models;
 using Histograms;
+using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
-    internal interface INodeCostEquiDepth<NodeType, DbConnectorType> : INodeCost<NodeType, IHistogram, DbConnectorType >
+    internal interface INodeCostEquiDepth<NodeType, DbConnectorType> : INodeCost<NodeType, HistogramEquiDepth, DbConnectorType>
         where NodeType : INode
         where DbConnectorType : IDbConnector
     {

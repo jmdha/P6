@@ -18,7 +18,7 @@ namespace QueryTestSuite.TestRunners
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCase> Results { get; private set; }
-        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; private set; }
+        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; private set; }
         private CSVWriter csvWriter;
 
         public TestRunner(DBConnectorParser databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)

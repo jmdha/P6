@@ -50,9 +50,10 @@ public class QueryOptimiserTest
         histogramManager.AddHistogram(cGram);
 
         ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var queryOptimiser = new QueryOptimiser.QueryOptimiser(PM, new QueryOptimiser.QueryGenerators.PostgresGenerator(), histogramManager);
+        List<INode> queryNodes = PM.ParseQuery(input);
+        var queryOptimiser = new QueryOptimiserEquiDepth(new QueryOptimiser.QueryGenerators.PostgresGenerator(), histogramManager);
 
-        string query = queryOptimiser.OptimiseQuery(input);
+        string query = queryOptimiser.OptimiseQuery(queryNodes);
 
         Assert.AreEqual(expected, query);
     }

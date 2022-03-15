@@ -3,28 +3,23 @@ using DatabaseConnector.Connectors;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
+    public class PostgresEquiDepthHistogramManager : IHistogramManager<HistogramEquiDepth, IDbConnector>
     {
         public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
-        public List<string> Attributes {
+        public List<string> Attributes
+        {
             get
             {
                 var returnList = new List<string>();
-                foreach(var histogram in Histograms)
-                {
+                foreach (var histogram in Histograms)
                     returnList.Add($"{histogram.TableName}.{histogram.AttributeName}");
-                }
                 return returnList;
             }
         }
@@ -55,9 +50,7 @@ namespace Histograms.Managers
             if (nodes.Count > 0 && nodes[0] is CreateTableNode node)
             {
                 foreach (DataRow row in (await GetAttributenamesForTable(node.TableName)).Rows)
-                {
                     await AddHistogramForAttribute(row, node.TableName);
-                }
             }
         }
 
@@ -65,9 +58,7 @@ namespace Histograms.Managers
         {
             var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{tableName}';");
             if (returnRows.Tables.Count > 0)
-            {
                 return returnRows.Tables[0];
-            }
             return new DataTable();
         }
 
@@ -87,31 +78,35 @@ namespace Histograms.Managers
         {
             StringBuilder sb = new StringBuilder();
             Console.WriteLine("Recorded Histograms:");
-            foreach(var histogram in Histograms)
-            {
+            foreach (var histogram in Histograms)
                 sb.AppendLine(histogram.ToString());
-            }
             Console.WriteLine(sb.ToString());
         }
 
-        public IHistogram GetHistogram(string table, string attribute) {
+        public IHistogram GetHistogram(string table, string attribute)
+        {
             foreach (var gram in Histograms)
                 if (gram.TableName.Equals(table) && gram.AttributeName.Equals(attribute))
                     return gram;
+
             throw new ArgumentException("No histogram found");
         }
-        public List<IHistogram> GetHistogramsByTable(string table) {
+        public List<IHistogram> GetHistogramsByTable(string table)
+        {
             List<IHistogram> grams = new List<IHistogram>();
             foreach (var gram in Histograms)
                 if (gram.TableName.Equals(table))
                     grams.Add(gram);
+
             return grams;
         }
-        public List<IHistogram> GetHistogramsByAttribute(string attribute) {
+        public List<IHistogram> GetHistogramsByAttribute(string attribute)
+        {
             List<IHistogram> grams = new List<IHistogram>();
             foreach (var gram in Histograms)
                 if (gram.AttributeName.Equals(attribute))
                     grams.Add(gram);
+
             return grams;
         }
     }
