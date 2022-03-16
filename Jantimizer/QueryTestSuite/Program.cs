@@ -31,7 +31,7 @@ namespace QueryTestSuite
             var postParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var postGenerator = new PostgresGenerator();
 
-            var postgresModel = new TestCase(
+            var postgresModel = new SuiteData(
                 "postgre",
                 postConnector,
                 postPlanParser,
@@ -40,7 +40,7 @@ namespace QueryTestSuite
                 postParserManager,
                 postGenerator);
 
-            var connectorSet = new List<TestCase>() { postgresModel };
+            var connectorSet = new List<SuiteData>() { postgresModel };
 
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {

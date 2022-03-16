@@ -23,7 +23,7 @@ namespace QueryOptimiser
         /// <returns></returns>
         public List<ValuedNode> OptimiseQuery(List<INode> nodes)
         {
-            return CalculateNodeCost(nodes).OrderByDescending(x => x.Cost).ToList();
+            return CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
         }
 
         public ulong OptimiseQueryCardinality(List<INode> nodes)

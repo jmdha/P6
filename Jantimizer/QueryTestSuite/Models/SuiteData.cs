@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
-    internal class TestCase
+    internal class SuiteData
     {
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
@@ -26,7 +26,7 @@ namespace QueryTestSuite.Models
 
         public IQueryGenerator Generator { get; set; }
 
-        public TestCase(string name, IDbConnector connector, IPlanParser parser, IHistogramManager<IHistogram, IDbConnector> histoManager, IQueryOptimiser<IHistogram, IDbConnector> optimiser, IParserManager queryParserManager, IQueryGenerator generator)
+        public SuiteData(string name, IDbConnector connector, IPlanParser parser, IHistogramManager<IHistogram, IDbConnector> histoManager, IQueryOptimiser<IHistogram, IDbConnector> optimiser, IParserManager queryParserManager, IQueryGenerator generator)
         {
             Name = name;
             Connector = connector;

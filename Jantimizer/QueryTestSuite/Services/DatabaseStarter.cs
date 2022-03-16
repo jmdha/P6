@@ -10,7 +10,7 @@ namespace QueryTestSuite.Services
 {
     internal static class DatabaseStarter
     {
-        public static async Task<bool> CheckAndStartServers(List<TestCase> connectorParsers)
+        public static async Task<bool> CheckAndStartServers(List<SuiteData> connectorParsers)
         {
             PrintUtil.PrintLine($"Checking if databases are online...", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
@@ -36,7 +36,7 @@ namespace QueryTestSuite.Services
             return true;
         }
 
-        public static void StopAllServers(List<TestCase> connectorParsers)
+        public static void StopAllServers(List<SuiteData> connectorParsers)
         {
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)

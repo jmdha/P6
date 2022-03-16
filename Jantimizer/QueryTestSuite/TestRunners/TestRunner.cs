@@ -18,14 +18,14 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        public TestCase Case { get; }
+        public SuiteData Case { get; }
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(TestCase @case, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(SuiteData @case, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
             Case = @case;
             SetupFile = setupFile;

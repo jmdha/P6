@@ -26,6 +26,8 @@ namespace QueryParser.QueryParsers
 
         public List<INode> ParseQuery(string query)
         {
+            _joinIndex = 0;
+
             List<INode> returnNodes = new List<INode>();
 
             // Remove all information in the query before the actual join statements.

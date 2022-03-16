@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -15,14 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\QueryGenerator\QueryGenerator.csproj" />
-    <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
-    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CostTest\EquiDepth\" />
   </ItemGroup>
 
 </Project>
