@@ -40,7 +40,8 @@ namespace QueryTestSuite.Services
         {
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
-                connector.Connector.StopServer();
+                if (connector.Connector.CheckConnection())
+                    connector.Connector.StopServer();
         }
     }
 }

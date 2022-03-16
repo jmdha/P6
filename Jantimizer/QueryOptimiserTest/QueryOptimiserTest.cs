@@ -62,11 +62,16 @@ public class QueryOptimiserTest
 
         for (int i = 0; i < expectedNodes.Count; i++)
         {
-            JoinNode expNode = expectedNodes[i] as JoinNode;
-            JoinNode actNode = resultNodes[i].Node as JoinNode;
+            Assert.IsNotNull(expectedNodes[i]);
+            Assert.IsInstanceOfType(expectedNodes[i], typeof(JoinNode));
+            Assert.IsNotNull(resultNodes[i].Node);
+            Assert.IsInstanceOfType(resultNodes[i].Node, typeof(JoinNode));
 
-            Assert.AreEqual(expNode.JoinCondition, actNode.JoinCondition);
-            Assert.AreEqual(expNode.ComType, actNode.ComType);
+            if (expectedNodes[i] is JoinNode expNode && resultNodes[i].Node is JoinNode actNode)
+            {
+                Assert.AreEqual(expNode.JoinCondition, actNode.JoinCondition);
+                Assert.AreEqual(expNode.ComType, actNode.ComType);
+            }
         }
     }
 }
