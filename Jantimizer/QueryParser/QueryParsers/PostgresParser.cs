@@ -79,7 +79,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@"Join Filter:(?: )(?<conditions>.+)?$", RegexOptions.Compiled);
+        private static Regex JoinFinder = new Regex(@"Join Filter:(?: )(?<predicates>.+)?", RegexOptions.Compiled);
         private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
@@ -88,16 +88,16 @@ namespace QueryParser.QueryParsers
             foreach (Match match in matches)
             {
                 GroupCollection groups = match.Groups;
-                var tableRef1 = result.GetTableRef(groups["t1"].Value);
-                var tableRef2 = result.GetTableRef(groups["t2"].Value);
+                //var tableRef1 = result.GetTableRef(groups["t1"].Value);
+                //var tableRef2 = result.GetTableRef(groups["t2"].Value);
 
                 var join = new JoinNode(
                     id++,
-                    (string)null
+                    match.Groups["predicates"].Value
                 );
 
-                tableRef1.Joins.Add(join);
-                tableRef2.Joins.Add(join);
+                //tableRef1.Joins.Add(join);
+                //tableRef2.Joins.Add(join);
 
                 result.Joins.Add(join);
             }

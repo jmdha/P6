@@ -53,14 +53,14 @@ namespace QueryParser.Models
             for (int i = 0; i < relationTypes.Length; i++)
             {
                 sides = predicate.Split(JoinPredicateRelation.GetRelationString(relationTypes[i]));
-                if (sides.Length > 0)
+                if (sides.Length == 2)
                 {
                     relationType = relationTypes[i];
                     break;
                 }
             }
             if (relationType == JoinPredicateRelation.RelationType.None || sides.Length < 1)
-                return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate));
+                return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", "")));
             else if (sides.Length != 2)
                 throw new InvalidDataException("Somehow only had one side " + predicate);
 

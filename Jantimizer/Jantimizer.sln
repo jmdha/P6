@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "Query
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrintUtilities", "PrintUtilities\PrintUtilities.csproj", "{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryGenerator", "QueryGenerator\QueryGenerator.csproj", "{827A6598-077B-4795-BBE3-F877C4D869BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryGenerator", "QueryGenerator\QueryGenerator.csproj", "{827A6598-077B-4795-BBE3-F877C4D869BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryGeneratorTests", "QueryGeneratorTests\QueryGeneratorTests.csproj", "{FCE3BA03-C4AB-4ED8-9368-11E518709596}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryGeneratorTests", "QueryGeneratorTests\QueryGeneratorTests.csproj", "{FCE3BA03-C4AB-4ED8-9368-11E518709596}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "QueryParserTest\QueryParserTest.csproj", "{6C5E3759-0B76-422E-88FD-7AE532561902}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{FCE3BA03-C4AB-4ED8-9368-11E518709596}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCE3BA03-C4AB-4ED8-9368-11E518709596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCE3BA03-C4AB-4ED8-9368-11E518709596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C5E3759-0B76-422E-88FD-7AE532561902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5E3759-0B76-422E-88FD-7AE532561902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5E3759-0B76-422E-88FD-7AE532561902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5E3759-0B76-422E-88FD-7AE532561902}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
