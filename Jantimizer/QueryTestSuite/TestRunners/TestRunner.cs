@@ -56,7 +56,6 @@ namespace QueryTestSuite.TestRunners
             if (saveResult)
                 SaveResult();
 
-
             return Results;
         }
 

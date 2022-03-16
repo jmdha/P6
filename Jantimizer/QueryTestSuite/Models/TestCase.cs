@@ -23,6 +23,7 @@ namespace QueryTestSuite.Models
 
         public IQueryOptimiser<IHistogram, IDbConnector> Optimiser { get; set; }
         public IParserManager QueryParserManager { get; set; }
+
         public IQueryGenerator Generator { get; set; }
 
         public TestCase(string name, IDbConnector connector, IPlanParser parser, IHistogramManager<IHistogram, IDbConnector> histoManager, IQueryOptimiser<IHistogram, IDbConnector> optimiser, IParserManager queryParserManager, IQueryGenerator generator)
