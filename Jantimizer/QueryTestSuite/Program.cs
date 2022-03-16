@@ -1,6 +1,9 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
+using Histograms.Managers;
 using PrintUtilities;
+using QueryGenerator;
+using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Parsers;
@@ -21,34 +24,40 @@ namespace QueryTestSuite
         {
             SecretsService secrets = new SecretsService();
 
-            var postgresModel = new DBConnectorParser(
+            var postConnector = new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL"));
+            var postPlanParser = new PostgreSqlParser();
+            var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionString, 10);
+            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
+            var postGenerator = new PostgresGenerator();
+
+            var postgresModel = new SuiteData(
                 "postgre",
-                new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL")),
-                new PostgreSqlParser());
-            var mySqlModel = new DBConnectorParser(
-                "mysql",
-                new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
-                new MySQLParser());
+                postConnector,
+                postPlanParser,
+                postHistoManager,
+                postOptimiser,
+                postParserManager,
+                postGenerator);
 
-            var connectorSet = new List<DBConnectorParser>() { postgresModel };
+            var connectorSet = new List<SuiteData>() { postgresModel };
 
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
-            DateTime timeStamp = DateTime.Now;
-
-            var parser = new PostgresParser(postgresModel.Connector as PostgreSqlConnector);
-            var jobQuery = File.ReadAllText(@"C:\Users\Henrik\source\repos\join-order-benchmark\30a.sql");
-            var parserRes = await parser.ParseQuery(jobQuery);
-
-
-
-            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
-                TestSuite suite = new TestSuite(connectorSet, timeStamp);
+                string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
-                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                await suite.RunTests(testDir);
-                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                DateTime timeStamp = DateTime.Now;
+
+                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+                {
+                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
+
+                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
+                    await suite.RunTests(testDir);
+                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                }
+
+                DatabaseStarter.StopAllServers(connectorSet);
             }
         }
     }

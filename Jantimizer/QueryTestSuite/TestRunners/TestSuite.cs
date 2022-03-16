@@ -5,10 +5,10 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
-        public IEnumerable<DBConnectorParser> DatabaseModels { get; }
+        public IEnumerable<SuiteData> DatabaseModels { get; }
         private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<DBConnectorParser> databaseModels, DateTime timeStamp)
+        public TestSuite(IEnumerable<SuiteData> databaseModels, DateTime timeStamp)
         {
             DatabaseModels = databaseModels;
             TimeStamp = timeStamp;
@@ -17,9 +17,9 @@ namespace QueryTestSuite.TestRunners
         public async Task RunTests(DirectoryInfo dir)
         {
             var testRunners = new List<TestRunner>();
-            var testRuns = new List<Task<List<TestCase>>>();
+            var testRuns = new List<Task<List<TestCaseResult>>>();
 
-            foreach(DBConnectorParser databaseModel in DatabaseModels)
+            foreach(SuiteData databaseModel in DatabaseModels)
             {
                 var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 

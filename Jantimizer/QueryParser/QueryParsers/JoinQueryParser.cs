@@ -11,7 +11,7 @@ namespace QueryParser.QueryParsers
     public class JoinQueryParser : IQueryParser
     {
         private int _joinIndex = 0;
-        public string PlaceholderTableName { get; } = "...";
+        public string PlaceholderTableName { get; } = "|||";
 
         public bool DoesQueryMatch(string query)
         {
@@ -26,10 +26,12 @@ namespace QueryParser.QueryParsers
 
         public List<INode> ParseQuery(string query)
         {
+            _joinIndex = 0;
+
             List<INode> returnNodes = new List<INode>();
 
             // Remove all information in the query before the actual join statements.
-            query = query.Substring(query.IndexOf(" FROM ") + 4);
+            query = query.Substring(query.IndexOf(" FROM ") + 5);
             if (query[0] != '(')
                 query = $"({query})";
 
@@ -66,9 +68,12 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private JoinNode ParseIntoModel(string subQuery)
         {
+            JoinNode.ComparisonType type = JoinNode.ComparisonType.None;
             string[] joinSplit = subQuery.Split(" JOIN ");
             string leftTable = "";
+            string leftAttribute = "";
             string rightTable = "";
+            string rightAttribute = "";
             string condition = "";
             if (joinSplit.Length > 0)
                 leftTable = joinSplit[0].Trim();
@@ -80,9 +85,28 @@ namespace QueryParser.QueryParsers
                     rightTable = onSplit[0].Trim();
                 if (onSplit.Length > 1)
                     condition = onSplit[1].Trim();
+                if (condition.Length > 1)
+                {
+                    string[] conditionSplit = {"", ""};
+                    var operatorTypes = (JoinNode.ComparisonType[])Enum.GetValues(typeof(JoinNode.ComparisonType));
+                    foreach (var op in operatorTypes) {
+                        if (op == JoinNode.ComparisonType.None)
+                            continue;
+                        string operatorString = Utilities.GetOperatorString(op);
+                        if (condition.Contains(operatorString)) {
+                            conditionSplit = condition.Split(operatorString);
+                            type = op;
+                            break;
+                        }
+                    }
+                    if (conditionSplit[0].Contains('.'))
+                        leftAttribute = conditionSplit[0].Split('.')[1].Trim();
+                    if (conditionSplit[1].Contains('.'))
+                        rightAttribute = conditionSplit[1].Split('.')[1].Trim();
+                }
             }
 
-            var newNode = new JoinNode(_joinIndex, leftTable, rightTable, condition);
+            var newNode = new JoinNode(_joinIndex, type, leftTable, leftAttribute, rightTable, rightAttribute, condition);
             _joinIndex++;
             return newNode;
         }

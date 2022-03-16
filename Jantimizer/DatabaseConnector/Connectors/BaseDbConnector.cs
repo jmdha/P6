@@ -64,5 +64,7 @@ namespace DatabaseConnector.Connectors
 
         public Task<DataSet> AnalyseQuery(FileInfo sqlFile) => AnalyseQuery(File.ReadAllText(sqlFile.FullName));
         public abstract Task<DataSet> AnalyseQuery(string query);
+        public abstract Task<bool> StartServer();
+        public abstract bool StopServer();
     }
 }

@@ -16,5 +16,15 @@ namespace DatabaseConnector.Connectors
                 return await CallQuery($"EXPLAIN ANALYZE {query}");
             return await CallQuery(query);
         }
+
+        public override async Task<bool> StartServer()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool StopServer()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

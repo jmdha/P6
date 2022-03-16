@@ -24,21 +24,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE4.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B2.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B3.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B4.sql" />
@@ -56,21 +41,6 @@
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE4.sql" />
     <None Include="Tests\ConstantNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\ConstantNumberBlocks\setup.postgre.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE4.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B2.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B3.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B4.sql" />
@@ -93,8 +63,11 @@
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
+    <ProjectReference Include="..\QueryGenerator\QueryGenerator.csproj" />
+    <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
+    
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
