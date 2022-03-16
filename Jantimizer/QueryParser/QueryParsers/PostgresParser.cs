@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace QueryParser.QueryParsers
 {
-    public class JoinOrderBenchmarkParser /*: IQueryParser*/
+    public class PostgresParser /*: IQueryParser*/
     {
         private PostgreSqlConnector Connector { get; set; }
 
-        public JoinOrderBenchmarkParser(PostgreSqlConnector connector)
+        public PostgresParser(PostgreSqlConnector connector)
         {
             Connector = connector;
         }

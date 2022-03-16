@@ -36,7 +36,7 @@ namespace QueryTestSuite
 
             DateTime timeStamp = DateTime.Now;
 
-            var parser = new JoinOrderBenchmarkParser(postgresModel.Connector as PostgreSqlConnector);
+            var parser = new PostgresParser(postgresModel.Connector as PostgreSqlConnector);
             var jobQuery = File.ReadAllText(@"C:\Users\Henrik\source\repos\join-order-benchmark\30a.sql");
             var parserRes = await parser.ParseQuery(jobQuery);
 
