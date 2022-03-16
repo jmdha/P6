@@ -1,6 +1,93 @@
-CREATE TABLE A AS SELECT s, (RANDOM() * 10)::integer FROM generate_Series(1,10) s;
-CREATE TABLE B AS SELECT s, (RANDOM() * 100)::integer FROM generate_Series(1,50) s;
-CREATE TABLE C AS SELECT s, (RANDOM() * 1000)::integer FROM generate_Series(1,100) s;
-CREATE TABLE D AS SELECT s, (RANDOM() * 10000)::integer FROM generate_Series(1,500) s;
+CREATE TABLE A (
+	S INT NOT NULL AUTO_INCREMENT,
+    V INT NOT NULL,
+    PRIMARY KEY (S)
+);
+CREATE TABLE B (
+	S INT NOT NULL AUTO_INCREMENT,
+    V INT NOT NULL,
+    PRIMARY KEY (S)
+);
+CREATE TABLE C (
+	S INT NOT NULL AUTO_INCREMENT,
+    V INT NOT NULL,
+    PRIMARY KEY (S)
+);
+CREATE TABLE D (
+	S INT NOT NULL AUTO_INCREMENT,
+    V INT NOT NULL,
+    PRIMARY KEY (S)
+);
 
-ANALYZE;
+DROP PROCEDURE IF EXISTS LoadTestData_A;
+delimiter #
+CREATE PROCEDURE LoadTestData_A()
+BEGIN
+	DECLARE v_max INT UNSIGNED DEFAULT 10;
+	DECLARE v_counter INT UNSIGNED DEFAULT 0;
+
+	TRUNCATE TABLE A;
+	START TRANSACTION;
+	WHILE v_counter < v_max DO
+		INSERT INTO A (V) VALUES ( floor(0 + (rand() * 10)) );
+        SET v_counter=v_counter+1;
+	END WHILE;
+	COMMIT;
+END #
+delimiter ;
+
+DROP PROCEDURE IF EXISTS LoadTestData_B;
+delimiter #
+CREATE PROCEDURE LoadTestData_B()
+BEGIN
+	DECLARE v_max INT UNSIGNED DEFAULT 50;
+	DECLARE v_counter INT UNSIGNED DEFAULT 0;
+
+	TRUNCATE TABLE A;
+	START TRANSACTION;
+	WHILE v_counter < v_max DO
+		INSERT INTO B (V) VALUES ( floor(0 + (rand() * 100)) );
+        SET v_counter=v_counter+1;
+	END WHILE;
+	COMMIT;
+END #
+delimiter ;
+
+DROP PROCEDURE IF EXISTS LoadTestData_C;
+delimiter #
+CREATE PROCEDURE LoadTestData_C()
+BEGIN
+	DECLARE v_max INT UNSIGNED DEFAULT 100;
+	DECLARE v_counter INT UNSIGNED DEFAULT 0;
+
+	TRUNCATE TABLE A;
+	START TRANSACTION;
+	WHILE v_counter < v_max DO
+		INSERT INTO C (V) VALUES ( floor(0 + (rand() * 1000)) );
+        SET v_counter=v_counter+1;
+	END WHILE;
+	COMMIT;
+END #
+delimiter ;
+
+DROP PROCEDURE IF EXISTS LoadTestData_D;
+delimiter #
+CREATE PROCEDURE LoadTestData_D()
+BEGIN
+	DECLARE v_max INT UNSIGNED DEFAULT 500;
+	DECLARE v_counter INT UNSIGNED DEFAULT 0;
+
+	TRUNCATE TABLE D;
+	START TRANSACTION;
+	WHILE v_counter < v_max DO
+		INSERT INTO D (V) VALUES ( floor(0 + (rand() * 10000)) );
+        SET v_counter=v_counter+1;
+	END WHILE;
+	COMMIT;
+END #
+delimiter ;
+
+CALL LoadTestData_A();
+CALL LoadTestData_B();
+CALL LoadTestData_C();
+CALL LoadTestData_D();
