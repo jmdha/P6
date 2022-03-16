@@ -102,39 +102,91 @@ namespace QueryTestSuite.TestRunners
         {
             PrintUtil.PrintLine($"Displaying report for [{Case.Name}] analysis", 2, ConsoleColor.Green);
             PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
+
             foreach (var testCase in Results)
             {
-                PrintUtil.PrintLine(FormatList(
-                    testCase.Category, 
-                    testCase.Name, 
+                var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
+                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality);
+
+                var colors = new List<ConsoleColor>() {
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue
+                };
+
+                if (DbAnalysisAccuracy > JantimiserEstimateAccuracy)
+                    colors.Add(ConsoleColor.Red);
+                else if (DbAnalysisAccuracy < JantimiserEstimateAccuracy)
+                    colors.Add(ConsoleColor.Green);
+                else
+                    colors.Add(ConsoleColor.Yellow);
+
+                PrintUtil.PrintLine(new List<string>() {
+                    testCase.Category,
+                    testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
-                    testCase.DbAnalysisResult.ActualCardinality.ToString(), 
-                    GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality),
-                    GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality)
-                    ), 2, ConsoleColor.Blue);
+                    testCase.DbAnalysisResult.ActualCardinality.ToString(),
+                    GetAccuracyAsString(DbAnalysisAccuracy),
+                    GetAccuracyAsString(JantimiserEstimateAccuracy)
+                }, 
+                new List<string>() {
+                    "{0, -31}",
+                    "{0, -21}",
+                    "{0, -21}", 
+                    "{0, -21}", 
+                    "{0, -21}", 
+                    "{0, -11}", 
+                    "{0, -11}"
+                },
+                colors,
+                2);
             }
         }
 
-        private string GetAccuracy(ulong actualValue, ulong predictedValue)
+        private string GetAccuracyAsString(ulong actualValue, ulong predictedValue)
+        {
+            decimal acc = GetAccuracy(actualValue, predictedValue);
+            if (acc == 100)
+                return "100   %";
+            else if (acc == -1)
+                return "inf   %";
+            else 
+                return string.Format("{0, -5} %", acc);
+        }
+
+        private string GetAccuracyAsString(decimal accuracy)
+        {
+            if (accuracy == 100)
+                return "100   %";
+            else if (accuracy == -1)
+                return "inf   %";
+            else 
+                return string.Format("{0, -5} %", accuracy);
+        }
+
+        private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
         {
             if (actualValue == 0 && predictedValue == 0)
-                return "100   %";
+                return 100;
             if (actualValue == 0)
-                return "inf   %";
+                return -1;
             if (actualValue != 0 && predictedValue == 0)
-                return "inf   %";
+                return -1;
             if (actualValue < predictedValue)
             {
                 decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
-                return string.Format("{0, -5} %", Math.Round(value, 2));
+                return Math.Round(value, 2);
             }
             if (actualValue > predictedValue)
             {
                 decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
-                return string.Format("{0, -5} %", Math.Round(value, 2));
+                return Math.Round(value, 2);
             }
-            return "100   %";
+            return 100;
         }
 
         private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
