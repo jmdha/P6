@@ -22,5 +22,10 @@ namespace QueryTestSuite.Services
         {
             return configuration.GetConnectionString(key);
         }
+
+        public bool GetLaunchOption(string key)
+        {
+            return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
+        }
     }
 }

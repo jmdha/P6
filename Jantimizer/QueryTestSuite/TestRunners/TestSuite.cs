@@ -5,35 +5,38 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
-        public IEnumerable<SuiteData> DatabaseModels { get; }
+        public IEnumerable<SuiteData> SuiteDatas { get; }
         private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<SuiteData> databaseModels, DateTime timeStamp)
+        public TestSuite(IEnumerable<SuiteData> suiteData, DateTime timeStamp)
         {
-            DatabaseModels = databaseModels;
+            SuiteDatas = suiteData;
             TimeStamp = timeStamp;
         }
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            foreach(SuiteData databaseModel in DatabaseModels)
+            foreach(SuiteData suitData in SuiteDatas)
             {
-                var testRunners = new List<TestRunner>();
-                var testRuns = new List<Task<List<TestCaseResult>>>();
+                if (suitData.Run)
+                {
+                    var testRunners = new List<TestRunner>();
+                    var testRuns = new List<Task<List<TestCaseResult>>>();
 
-                var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
+                    var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
-                TestRunner runner = new TestRunner(
-                    databaseModel,
-                    GetVariant(dir, "setup", databaseModel.Name),
-                    GetVariant(dir, "cleanup", databaseModel.Name),
-                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name)),
-                    TimeStamp
-                );
-                testRunners.Add(runner);
-                testRuns.Add(runner.Run(true));
+                    TestRunner runner = new TestRunner(
+                        suitData,
+                        GetVariant(dir, "setup", suitData.Name),
+                        GetVariant(dir, "cleanup", suitData.Name),
+                        GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, suitData.Name)),
+                        TimeStamp
+                    );
+                    testRunners.Add(runner);
+                    testRuns.Add(runner.Run(true));
 
-                await Task.WhenAll(testRuns);
+                    await Task.WhenAll(testRuns);
+                }
             }
         }
 

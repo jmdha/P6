@@ -32,6 +32,7 @@ namespace QueryTestSuite
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postGenerator = new PostgresGenerator();
             var postgresModel = new SuiteData(
+                secrets.GetLaunchOption("POSGRESQL"),
                 "postgre",
                 postConnector,
                 postPlanParser,
@@ -47,6 +48,7 @@ namespace QueryTestSuite
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var mySQLGenerator = new MySQLGenerator();
             var mySQLModel = new SuiteData(
+                secrets.GetLaunchOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
                 mySQLPlanParser,

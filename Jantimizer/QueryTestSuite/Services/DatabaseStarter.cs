@@ -15,22 +15,25 @@ namespace QueryTestSuite.Services
             PrintUtil.PrintLine($"Checking if databases are online...", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
             {
-                if (connector.Connector.CheckConnection())
+                if (connector.Run)
                 {
-                    PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
-                }
-                else
-                {
-                    PrintUtil.PrintLine($"Warning! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Yellow);
-                    PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
-
-                    if (!await connector.Connector.StartServer())
+                    if (connector.Connector.CheckConnection())
                     {
-                        PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
-                        return false;
+                        PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
                     }
                     else
-                        PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                    {
+                        PrintUtil.PrintLine($"Warning! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Yellow);
+                        PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
+
+                        if (!await connector.Connector.StartServer())
+                        {
+                            PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
+                            return false;
+                        }
+                        else
+                            PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                    }
                 }
             }
             return true;
@@ -41,15 +44,19 @@ namespace QueryTestSuite.Services
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
             {
-                if (connector.Connector.CheckConnection())
+                if (connector.Run)
                 {
-                    try
+                    if (connector.Connector.CheckConnection())
                     {
-                        connector.Connector.StopServer();
-                    }
-                    catch (Exception ex) {
-                        PrintUtil.PrintLine($"Connector [{connector.Name}] could not be closed!", 0, ConsoleColor.Red);
-                        PrintUtil.PrintLine($"Exception: {ex}", 0, ConsoleColor.Red);
+                        try
+                        {
+                            connector.Connector.StopServer();
+                        }
+                        catch (Exception ex)
+                        {
+                            PrintUtil.PrintLine($"Connector [{connector.Name}] could not be closed!", 0, ConsoleColor.Red);
+                            PrintUtil.PrintLine($"Exception: {ex}", 0, ConsoleColor.Red);
+                        }
                     }
                 }
             }
