@@ -158,7 +158,7 @@ namespace QueryParser.QueryParsers
 
                 var join = new JoinNode(
                     id++,
-                    (string)null
+                    (string) null
                 );
 
                 tableRef1.Joins.Add(join);

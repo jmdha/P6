@@ -31,42 +31,42 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                     bool inBounds = false;
                     switch (node.ComType)
                     {
-                        case JoinNode.ComparisonType.Equal:
+                        case ComparisonType.Type.Equal:
                             inBounds = CheckEqualBounds(
                                 leftGram.Buckets[leftBucketIndex].ValueStart,
                                 rightGram.Buckets[rightBucketIndex].ValueStart,
                                 leftGram.Buckets[leftBucketIndex].ValueEnd,
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
-                        case JoinNode.ComparisonType.Less:
+                        case ComparisonType.Type.Less:
                             inBounds = CheckLessBounds(
                                 leftGram.Buckets[leftBucketIndex].ValueStart,
                                 rightGram.Buckets[rightBucketIndex].ValueStart,
                                 leftGram.Buckets[leftBucketIndex].ValueEnd,
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
-                        case JoinNode.ComparisonType.More:
+                        case ComparisonType.Type.More:
                             inBounds = CheckMoreBounds(
                                 leftGram.Buckets[leftBucketIndex].ValueStart,
                                 rightGram.Buckets[rightBucketIndex].ValueStart,
                                 leftGram.Buckets[leftBucketIndex].ValueEnd,
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
-                        case JoinNode.ComparisonType.EqualOrLess:
+                        case ComparisonType.Type.EqualOrLess:
                             inBounds = CheckEqualOrLessBounds(
                                 leftGram.Buckets[leftBucketIndex].ValueStart,
                                 rightGram.Buckets[rightBucketIndex].ValueStart,
                                 leftGram.Buckets[leftBucketIndex].ValueEnd,
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
-                        case JoinNode.ComparisonType.EqualOrMore:
+                        case ComparisonType.Type.EqualOrMore:
                             inBounds = CheckEqualOrMoreBounds(
                                 leftGram.Buckets[leftBucketIndex].ValueStart,
                                 rightGram.Buckets[rightBucketIndex].ValueStart,
                                 leftGram.Buckets[leftBucketIndex].ValueEnd,
                                 rightGram.Buckets[rightBucketIndex].ValueEnd);
                             break;
-                        case JoinNode.ComparisonType.None:
+                        case ComparisonType.Type.None:
                             throw new ArgumentException("No join type specified : " + node.ToString());
                         default:
                             throw new ArgumentException("Unhandled join type: " + node.ToString());

@@ -9,15 +9,6 @@ namespace QueryParser.Models
 {
     public partial class JoinNode : INode
     {
-        public enum ComparisonType {
-            None,
-            EqualOrLess,
-            EqualOrMore,
-            Equal,
-            Less,
-            More
-        };
-
         public int Id { get; internal set; }
         public List<JoinPredicate> Predicates { get; internal set; }
         public JoinPredicateRelation Relation { get; internal set; }

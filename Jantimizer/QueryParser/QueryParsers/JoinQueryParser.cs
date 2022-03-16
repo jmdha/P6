@@ -68,7 +68,7 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private JoinNode ParseIntoModel(string subQuery)
         {
-            JoinNode.ComparisonType type = JoinNode.ComparisonType.None;
+            ComparisonType.Type type = ComparisonType.Type.None;
             string[] joinSplit = subQuery.Split(" JOIN ");
             string leftTable = "";
             string leftAttribute = "";
@@ -88,11 +88,11 @@ namespace QueryParser.QueryParsers
                 if (condition.Length > 1)
                 {
                     string[] conditionSplit = {"", ""};
-                    var operatorTypes = (JoinNode.ComparisonType[])Enum.GetValues(typeof(JoinNode.ComparisonType));
+                    var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
                     foreach (var op in operatorTypes) {
-                        if (op == JoinNode.ComparisonType.None)
+                        if (op == ComparisonType.Type.None)
                             continue;
-                        string operatorString = Utilities.GetOperatorString(op);
+                        string operatorString = ComparisonType.GetOperatorString(op);
                         if (condition.Contains(operatorString)) {
                             conditionSplit = condition.Split(operatorString);
                             type = op;
