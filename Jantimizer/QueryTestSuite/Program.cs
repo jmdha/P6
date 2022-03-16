@@ -1,6 +1,9 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
+using Histograms.Managers;
 using PrintUtilities;
+using QueryGenerator;
+using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Parsers;
@@ -21,16 +24,23 @@ namespace QueryTestSuite
         {
             SecretsService secrets = new SecretsService();
 
-            var postgresModel = new DBConnectorParser(
-                "postgre",
-                new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL")),
-                new PostgreSqlParser());
-            var mySqlModel = new DBConnectorParser(
-                "mysql",
-                new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
-                new MySQLParser());
+            var postConnector = new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL"));
+            var postPlanParser = new PostgreSqlParser();
+            var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionString, 10);
+            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
+            var postGenerator = new PostgresGenerator();
 
-            var connectorSet = new List<DBConnectorParser>() { postgresModel };
+            var postgresModel = new TestCase(
+                "postgre",
+                postConnector,
+                postPlanParser,
+                postHistoManager,
+                postOptimiser,
+                postParserManager,
+                postGenerator);
+
+            var connectorSet = new List<TestCase>() { postgresModel };
 
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {

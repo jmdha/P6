@@ -1,23 +1,39 @@
-﻿using CsvHelper;
-using QueryPlanParser.Models;
+﻿using DatabaseConnector;
+using Histograms;
+using QueryGenerator;
+using QueryOptimiser;
+using QueryParser;
+using QueryParser.QueryParsers;
+using QueryPlanParser;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QueryTestSuite.Models
 {
     internal class TestCase
     {
-        public string Name { get; private set; } = "N/A";
-        public string Category { get; private set; } = "N/A";
-        public AnalysisResult TestResult { get; private set; }
-        public AnalysisResult JantimiserResult { get; private set; }
+        public string Name { get; set; }
+        public IDbConnector Connector { get; set; }
+        public IPlanParser Parser { get; set; }
 
-        public TestCase (FileInfo fileInfo, AnalysisResult analysisResult, AnalysisResult jantimiserResult)
+        public IHistogramManager<IHistogram, IDbConnector> HistoManager { get; set; }
+
+        public IQueryOptimiser<IHistogram, IDbConnector> Optimiser { get; set; }
+        public IParserManager QueryParserManager { get; set; }
+        public IQueryGenerator Generator { get; set; }
+
+        public TestCase(string name, IDbConnector connector, IPlanParser parser, IHistogramManager<IHistogram, IDbConnector> histoManager, IQueryOptimiser<IHistogram, IDbConnector> optimiser, IParserManager queryParserManager, IQueryGenerator generator)
         {
-            TestResult = analysisResult;
-            JantimiserResult = jantimiserResult;
-            Name = fileInfo.Name;
-            if (fileInfo.Directory != null)
-                if (fileInfo.Directory.Parent != null)
-                    Category = fileInfo.Directory.Parent.Name;
+            Name = name;
+            Connector = connector;
+            Parser = parser;
+            HistoManager = histoManager;
+            Optimiser = optimiser;
+            QueryParserManager = queryParserManager;
+            Generator = generator;
         }
     }
 }

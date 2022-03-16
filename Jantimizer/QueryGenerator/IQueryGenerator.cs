@@ -1,12 +1,12 @@
-﻿using System;
+﻿using QueryOptimiser.Cost.Nodes;
+using QueryParser.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QueryOptimiser.Cost.Nodes;
-using QueryParser.Models;
 
-namespace QueryOptimiser.QueryGenerators
+namespace QueryGenerator
 {
     public interface IQueryGenerator
     {

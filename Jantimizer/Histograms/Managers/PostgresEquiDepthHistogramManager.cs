@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiDepthHistogramManager : IHistogramManager<HistogramEquiDepth, IDbConnector>
+    public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
         public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }

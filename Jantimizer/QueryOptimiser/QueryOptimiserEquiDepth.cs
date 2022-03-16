@@ -1,22 +1,18 @@
-﻿
-using DatabaseConnector;
+﻿using DatabaseConnector;
 using Histograms;
 using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
-using QueryOptimiser.QueryGenerators;
 using QueryParser.Models;
 
 namespace QueryOptimiser
 {
-    public class QueryOptimiserEquiDepth : IQueryOptimiser<HistogramEquiDepth, IDbConnector>
+    public class QueryOptimiserEquiDepth : IQueryOptimiser<IHistogram, IDbConnector>
     {
-        public IQueryGenerator QueryGenerator { get; set; }
-        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; set; }
-        public ICostCalculator<HistogramEquiDepth, IDbConnector> CostCalculator { get; set; }
+        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
+        public ICostCalculator<IHistogram, IDbConnector> CostCalculator { get; set; }
 
-        public QueryOptimiserEquiDepth(IQueryGenerator queryGenerator, IHistogramManager<HistogramEquiDepth, IDbConnector> histogramManager)
+        public QueryOptimiserEquiDepth(IHistogramManager<IHistogram, IDbConnector> histogramManager)
         {
-            QueryGenerator = queryGenerator;
             HistogramManager = histogramManager;
             CostCalculator = new CostCalculatorEquiDepth(histogramManager);
         }
@@ -25,11 +21,9 @@ namespace QueryOptimiser
         /// Reorders a querys join order according to the cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public string OptimiseQuery(List<INode> nodes)
+        public List<ValuedNode> OptimiseQuery(List<INode> nodes)
         {
-            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes);
-
-            return QueryGenerator.GenerateQuery(valuedNodes);
+            return CalculateNodeCost(nodes).OrderByDescending(x => x.Cost).ToList();
         }
 
         public ulong OptimiseQueryCardinality(List<INode> nodes)

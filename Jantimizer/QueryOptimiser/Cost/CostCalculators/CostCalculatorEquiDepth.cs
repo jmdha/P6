@@ -6,11 +6,11 @@ using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
-    public class CostCalculatorEquiDepth : ICostCalculator<HistogramEquiDepth, IDbConnector>
+    public class CostCalculatorEquiDepth : ICostCalculator<IHistogram, IDbConnector>
     {
-        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; set; }
+        public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
 
-        public CostCalculatorEquiDepth(IHistogramManager<HistogramEquiDepth, IDbConnector> histogramManager)
+        public CostCalculatorEquiDepth(IHistogramManager<IHistogram, IDbConnector> histogramManager)
         {
             HistogramManager = histogramManager;
         }

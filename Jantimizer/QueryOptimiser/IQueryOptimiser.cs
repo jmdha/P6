@@ -2,7 +2,6 @@
 using Histograms;
 using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
-using QueryOptimiser.QueryGenerators;
 using QueryParser.Models;
 
 namespace QueryOptimiser
@@ -11,7 +10,6 @@ namespace QueryOptimiser
         where HistogramType : IHistogram
         where ConnectorType : IDbConnector
     {
-        public IQueryGenerator QueryGenerator { get; }
         public IHistogramManager<HistogramType, ConnectorType> HistogramManager { get; }
         public ICostCalculator<HistogramType, ConnectorType> CostCalculator { get; }
 
@@ -19,7 +17,7 @@ namespace QueryOptimiser
         /// Reorders a querys join order according to the cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public string OptimiseQuery(List<INode> nodes);
+        public List<ValuedNode> OptimiseQuery(List<INode> nodes);
 
         public ulong OptimiseQueryCardinality(List<INode> nodes);
 

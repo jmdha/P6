@@ -63,6 +63,7 @@
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
+    <ProjectReference Include="..\QueryGenerator\QueryGenerator.csproj" />
     <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />

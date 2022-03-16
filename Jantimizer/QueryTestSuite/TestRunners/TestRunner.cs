@@ -6,7 +6,6 @@ using Histograms;
 using Histograms.Managers;
 using PrintUtilities;
 using QueryOptimiser;
-using QueryOptimiser.QueryGenerators;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
@@ -19,40 +18,38 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        public DBConnectorParser DatabaseModel { get; }
+        public TestCase Case { get; }
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
-        public List<TestCase> Results { get; private set; }
-        public IHistogramManager<HistogramEquiDepth, IDbConnector> HistogramManager { get; private set; }
+        public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(DBConnectorParser databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(TestCase @case, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            DatabaseModel = databaseModel;
+            Case = @case;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
-            Results = new List<TestCase>();
+            Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            HistogramManager = new PostgresEquiDepthHistogramManager(databaseModel.Connector.ConnectionString, 10);
         }
 
-        public async Task<List<TestCase>> Run(bool consoleOutput = true, bool saveResult = true)
+        public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            await Case.Connector.CallQuery(CleanupFile);
 
             PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
-            await DatabaseModel.Connector.CallQuery(SetupFile);
+            await Case.Connector.CallQuery(SetupFile);
 
             PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
-            await HistogramManager.AddHistograms(SetupFile);
+            await Case.HistoManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();
 
             PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            await Case.Connector.CallQuery(CleanupFile);
 
             if (consoleOutput)
                 WriteResultToConsole();
@@ -63,10 +60,10 @@ namespace QueryTestSuite.TestRunners
             return Results;
         }
 
-        private async Task<List<TestCase>> RunQueriesSerial()
+        private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            PrintUtil.PrintLine($"Running tests for [{DatabaseModel.Name}] connector", 2, ConsoleColor.Green);
-            var testCases = new List<TestCase>();
+            PrintUtil.PrintLine($"Running tests for [{Case.Name}] connector", 2, ConsoleColor.Green);
+            var testCases = new List<TestCaseResult>();
             int count = 0;
             int max = CaseFiles.Count();
             foreach (FileInfo queryFile in CaseFiles)
@@ -76,25 +73,18 @@ namespace QueryTestSuite.TestRunners
                     PrintUtil.PrintProgressBar(count, max, 50, true, 2);
                     PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
                     PrintUtil.Print($"\t Executing SQL statement...             ", 0);
-                    DataSet dbResult = await DatabaseModel.Connector.AnalyseQuery(queryFile);
-                    AnalysisResult analysisResult = DatabaseModel.Parser.ParsePlan(dbResult);
+                    DataSet dbResult = await Case.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = Case.Parser.ParsePlan(dbResult);
 
-                    IQueryOptimiser<HistogramEquiDepth, IDbConnector> optimiser = new QueryOptimiserEquiDepth(
-                        new PostgresGenerator(),
-                        HistogramManager);
-                    IParserManager manager = new ParserManager(new List<IQueryParser>() { 
-                        new JoinQueryParser()    
-                    });
-                    List<INode> nodes = manager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
-
+                    List<INode> nodes = Case.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
                     AnalysisResult jantimiserResult = new AnalysisResult(
                         "Jantimiser",
                         0,
-                        optimiser.OptimiseQueryCardinality(nodes),
+                        Case.Optimiser.OptimiseQueryCardinality(nodes),
                         0,
                         new TimeSpan());
                     
-                    TestCase testCase = new TestCase(queryFile, analysisResult, jantimiserResult);
+                    TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
@@ -111,7 +101,7 @@ namespace QueryTestSuite.TestRunners
 
         private void WriteResultToConsole()
         {
-            PrintUtil.PrintLine($"Displaying report for [{DatabaseModel.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Displaying report for [{Case.Name}] analysis", 2, ConsoleColor.Green);
             PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
             foreach (var testCase in Results)
             {

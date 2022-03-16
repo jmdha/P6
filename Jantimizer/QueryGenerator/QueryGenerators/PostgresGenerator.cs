@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryOptimiser.QueryGenerators
+namespace QueryGenerator
 {
     public class PostgresGenerator : IQueryGenerator
     {
