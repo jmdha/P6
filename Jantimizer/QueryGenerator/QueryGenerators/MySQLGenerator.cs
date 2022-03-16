@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QueryGenerator.QueryGenerators
 {
-    public class PostgresGenerator : IQueryGenerator
+    public class MySQLGenerator : IQueryGenerator
     {
         static string Prefix = "SELECT * FROM ";
         static string Suffix = ";";
@@ -27,7 +27,7 @@ namespace QueryGenerator.QueryGenerators
                 tables.Add(jNode.LeftTable);
                 tables.Add(jNode.RightTable);
             }
-                
+
 
             for (int i = 1; i < nodes.Count; i++)
             {
@@ -43,7 +43,7 @@ namespace QueryGenerator.QueryGenerators
                         throw new Exception("Invalid join" + nodes[i].ToString());
                     tables.Add(table);
                 }
-                    
+
                 query += nodes[i].GetSuffixString(table);
             }
 
