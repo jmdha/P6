@@ -11,6 +11,7 @@ namespace QueryParser.Models
         public int Id { get; internal set; }
         public string LeftTable { get; internal set; }
         public string RightTable { get; internal set; }
+
         public string JoinCondition { get; internal set; }
         public List<string> ConditionTables { get; }
 

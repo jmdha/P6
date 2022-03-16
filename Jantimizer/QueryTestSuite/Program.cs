@@ -38,7 +38,7 @@ namespace QueryTestSuite
 
             var parser = new JoinOrderBenchmarkParser(postgresModel.Connector as PostgreSqlConnector);
             var jobQuery = File.ReadAllText(@"C:\Users\Henrik\source\repos\join-order-benchmark\30a.sql");
-            var tables = await parser.GetTables(jobQuery);
+            var parserRes = await parser.ParseQuery(jobQuery);
 
 
 

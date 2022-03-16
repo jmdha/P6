@@ -6,6 +6,9 @@
         public string TableName { get; set; }
         public string Alias { get; set; }
 
+        public List<FilterNode> Filters { get; set; } = new();
+        public List<JoinNode> Joins { get; set; } = new();
+
         public TableReferenceNode(int id, string tableName, string alias)
         {
             Id = id;

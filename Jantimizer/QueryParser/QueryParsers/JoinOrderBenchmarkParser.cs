@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.QueryParsers
 {
-    public class JoinOrderBenchmarkParser : IQueryParser
+    public class JoinOrderBenchmarkParser /*: IQueryParser*/
     {
         private PostgreSqlConnector Connector { get; set; }
 
@@ -44,42 +44,124 @@ namespace QueryParser.QueryParsers
 
 
 
-        public List<INode> ParseQuery(string query)
+        public async Task<ParserResult> ParseQuery(string query)
         {
-            var explanation = Connector.CallQuery($"EXPLAIN {query}");
+            string explanationTextBlock = await GetPGExplainationTextBlock(query);
 
+            var result = new ParserResult();
 
+            InsertTables(explanationTextBlock, ref result);
+            InsertFilters(explanationTextBlock, ref result);
+            InsertJoins(explanationTextBlock, ref result);
+            InsertConditions(explanationTextBlock, ref result);
 
-            throw new NotImplementedException();
+            return result;
         }
 
+
+        private static Regex JoinFinder = new Regex(@": \((?<t1>\w+)\.(?<prop1>\w+) (?<relation>[=<>]{1,2}) (?<t2>\w+)\.(?<prop2>\w+)\)", RegexOptions.Compiled);
+        public void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
+        {
+            MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
+
+            int id = 0;
+            foreach (Match match in matches)
+            {
+                GroupCollection groups = match.Groups;
+                var tableRef1 = result.Tables[groups["t1"].Value];
+                var tableRef2 = result.Tables[groups["t2"].Value];
+
+                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}");
+
+                tableRef1.Joins.Add(join);
+                tableRef2.Joins.Add(join);
+
+                result.Joins.Add(join);
+            }
+        }
 
         private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
-        public async Task<List<INode>> GetTables(string query)
+        private void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
         {
-            List<Match> matchedRows = await GetExplanationMatches(query, TableFinder);
+            MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
 
-            int id=0;
-            return matchedRows
-                .Select(match => new TableReferenceNode(
-                    id:         id++,
-                    tableName:  match.Groups["tableName"].Value,
-                    alias:      (match.Groups["alias"] ?? match.Groups["tableName"]).Value
-                ) as INode)
-                .ToList();
+            int id = 0;
+            foreach (Match match in matches)
+            {
+                string alias = getAliasFromRegexMatch(match);
+
+                result.Tables[alias] = new TableReferenceNode(
+                    id: id++,
+                    tableName: match.Groups["tableName"].Value,
+                    alias: alias
+                );
+            }
         }
 
-        private async Task<List<Match>> GetExplanationMatches(string query, Regex regex)
-        {
-            List<string> explanationRows = await GetPGExplainationRows(query);
+        private static readonly Regex FilterAndConditionFinder = new Regex(@"
+                (?:^\s*->.*?\sScan(?:\susing\s\w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?\s\s\(cost=[^\n]+)
 
-            return explanationRows
-                .Select(row => regex.Match(row))
-                .Where((match) => !string.IsNullOrEmpty(match.Value))
-                .ToList();
+                (?:\s+ Index\ Cond:\ \((?<joinProp>\w+)\ (?<relation>[=<>]{1,2})\ (?<otherAlias>\w+)\.(?<otherProp>\w+)\))?
+
+                (?:\s+ Filter:\ \((?<filterProp>\w+)\ (?<filterCondition>[=<>]{1,2})\ (?<filterValue>\d+)\))?
+            ",
+            RegexOptions.Compiled |
+            RegexOptions.Multiline |
+            RegexOptions.IgnorePatternWhitespace
+        );
+
+        public void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
+        {
+            var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups["filterProp"] == null)
+                    continue;
+
+                var tableRef = result.Tables[getAliasFromRegexMatch(match)];
+
+                tableRef.Filters.Add(new FilterNode(
+                    tableReference: tableRef,
+                    attributeName: match.Groups["filterProp"].Value,
+                    relation: match.Groups["filterCondition"].Value,
+                    constant: match.Groups["filterValue"].Value
+                ));
+            }
         }
 
-        private async Task<List<string>> GetPGExplainationRows(string query)
+        private string getAliasFromRegexMatch(Match match)
+        {
+            if (match.Groups["alias"] != null)
+                return match.Groups["alias"].Value;
+
+            return match.Groups["tableName"].Value;
+        }
+
+        public void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
+        {
+            var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
+
+            int id = 0;
+            foreach (Match match in matches)
+            {
+                if (match.Groups["joinProp"] == null)
+                    continue;
+
+                GroupCollection groups = match.Groups;
+                var tableRef1 = result.Tables[getAliasFromRegexMatch(match)];
+                var tableRef2 = result.Tables[groups["otherAlias"].Value];
+
+                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}");
+
+                tableRef1.Joins.Add(join);
+                tableRef2.Joins.Add(join);
+
+                result.Joins.Add(join);
+            }
+        }
+
+        private async Task<string> GetPGExplainationTextBlock(string query)
         {
             string explainQuery = $"EXPLAIN {query}";
             var explanation = await Connector.CallQuery(explainQuery);
@@ -87,19 +169,19 @@ namespace QueryParser.QueryParsers
 
             var stringRows = new List<string>();
 
-            foreach(DataRow row in rawRows)
+            foreach (DataRow row in rawRows)
             {
                 object queryPlan = row["QUERY PLAN"];
-                if(queryPlan == null)
+                if (queryPlan == null)
                     throw new NullReferenceException($"\"QUERY PLAN\" not found from running '{explainQuery}' on postgres. Verify the connection");
 
                 string? rowStr = queryPlan.ToString();
 
-                if(!string.IsNullOrEmpty(rowStr))
+                if (!string.IsNullOrEmpty(rowStr))
                     stringRows.Add(rowStr);
             }
 
-            return stringRows;
+            return string.Join('\n', stringRows);
         }
     }
 }
