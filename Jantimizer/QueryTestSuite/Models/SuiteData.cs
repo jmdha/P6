@@ -26,7 +26,14 @@ namespace QueryTestSuite.Models
 
         public IQueryGenerator Generator { get; set; }
 
-        public SuiteData(string name, IDbConnector connector, IPlanParser parser, IHistogramManager<IHistogram, IDbConnector> histoManager, IQueryOptimiser<IHistogram, IDbConnector> optimiser, IParserManager queryParserManager, IQueryGenerator generator)
+        public SuiteData(
+            string name, 
+            IDbConnector connector, 
+            IPlanParser parser, 
+            IHistogramManager<IHistogram, IDbConnector> histoManager, 
+            IQueryOptimiser<IHistogram, IDbConnector> optimiser, 
+            IParserManager queryParserManager, 
+            IQueryGenerator generator)
         {
             Name = name;
             Connector = connector;
