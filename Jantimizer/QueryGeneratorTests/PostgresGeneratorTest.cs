@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryGenerator;
+using QueryGenerator.QueryGenerators;
 using QueryOptimiser.Cost.Nodes;
 using QueryParser;
 using QueryParser.QueryParsers;
