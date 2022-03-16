@@ -22,9 +22,7 @@ namespace QueryParser.QueryParsers
 
         public bool DoesQueryMatch(string query)
         {
-
-            var explanation = Connector.CallQuery($"EXPLAIN {query}");
-            throw new NotImplementedException();
+            return true;
         }
 
 
@@ -111,7 +109,7 @@ namespace QueryParser.QueryParsers
 
             foreach (Match match in matches)
             {
-                if (match.Groups["filterProp"] == null)
+                if (!match.Groups["filterProp"].Success)
                     continue;
 
                 var tableRef = result.Tables[getAliasFromRegexMatch(match)];
@@ -132,12 +130,12 @@ namespace QueryParser.QueryParsers
             int id = 0;
             foreach (Match match in matches)
             {
-                if (match.Groups["joinProp"] == null)
+                if (!match.Groups["joinProp"].Success)
                     continue;
 
                 GroupCollection groups = match.Groups;
-                var tableRef1 = result.Tables[getAliasFromRegexMatch(match)];
-                var tableRef2 = result.Tables[groups["otherAlias"].Value];
+                var tableRef1 = result.GetTableRef(getAliasFromRegexMatch(match));
+                var tableRef2 = result.GetTableRef(groups["otherAlias"].Value);
 
                 var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}");
 
