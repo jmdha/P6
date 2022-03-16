@@ -28,7 +28,7 @@ namespace QueryTestSuite
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionString, 10);
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postGenerator = new PostgresGenerator();
 
             var postgresModel = new SuiteData(
@@ -45,7 +45,6 @@ namespace QueryTestSuite
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
                 string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
                 DateTime timeStamp = DateTime.Now;
 
                 foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())

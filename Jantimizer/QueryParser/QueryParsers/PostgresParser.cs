@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.QueryParsers
 {
-    public class PostgresParser /*: IQueryParser*/
+    public class PostgresParser : IQueryParser
     {
         private PostgreSqlConnector Connector { get; set; }
 
@@ -26,8 +26,14 @@ namespace QueryParser.QueryParsers
         }
 
 
+        public List<INode> ParseQuery(string query)
+        {
+            var parsed = ParseQueryAsync(query);
+            parsed.Wait();
+            return parsed.Result.Joins.Select(j => j as INode).ToList();
+        }
 
-        public async Task<ParserResult> ParseQuery(string query)
+        public async Task<ParserResult> ParseQueryAsync(string query)
         {
             string explanationTextBlock = await GetPGExplainationTextBlock(query);
 
@@ -62,7 +68,7 @@ namespace QueryParser.QueryParsers
 
         private string getAliasFromRegexMatch(Match match)
         {
-            if (match.Groups["alias"] != null)
+            if (match.Groups["alias"].Success)
                 return match.Groups["alias"].Value;
 
             return match.Groups["tableName"].Value;
@@ -77,8 +83,8 @@ namespace QueryParser.QueryParsers
             foreach (Match match in matches)
             {
                 GroupCollection groups = match.Groups;
-                var tableRef1 = result.Tables[groups["t1"].Value];
-                var tableRef2 = result.Tables[groups["t2"].Value];
+                var tableRef1 = result.GetTableRef(groups["t1"].Value);
+                var tableRef2 = result.GetTableRef(groups["t2"].Value);
 
                 var join = new JoinNode(
                     id++,
