@@ -17,7 +17,7 @@
         }
         public override string ToString()
         {
-            return $"{TableName} as {Alias}";
+            return $"{TableName} AS {Alias}";
         }
 
         public string GetSuffixString(string param)
