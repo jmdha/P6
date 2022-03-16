@@ -21,7 +21,7 @@
         {
             Console.Write($"{GetIndent(indent)}");
             for (int i = 0; i < text.Count; i++) {
-                Print(String.Format(format[i], text[i]), 0, colorsConsole[i]);
+                Print(String.Format(format[i], text[i]) + " ", 0, colorsConsole[i]);
             }
             Console.WriteLine();
             Console.ResetColor();

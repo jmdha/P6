@@ -134,13 +134,13 @@ namespace QueryTestSuite.TestRunners
                     GetAccuracyAsString(JantimiserEstimateAccuracy)
                 }, 
                 new List<string>() {
-                    "{0, -31}",
-                    "{0, -21}",
-                    "{0, -21}", 
-                    "{0, -21}", 
-                    "{0, -21}", 
-                    "{0, -11}", 
-                    "{0, -11}"
+                    "{0, -30}",
+                    "{0, -20}",
+                    "{0, -20}", 
+                    "{0, -20}", 
+                    "{0, -20}", 
+                    "{0, -10}", 
+                    "{0, -10}"
                 },
                 colors,
                 2);
