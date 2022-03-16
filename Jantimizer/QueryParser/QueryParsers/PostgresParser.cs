@@ -56,7 +56,7 @@ namespace QueryParser.QueryParsers
             int id = 0;
             foreach (Match match in matches)
             {
-                string alias = getAliasFromRegexMatch(match);
+                string alias = GetAliasFromRegexMatch(match);
 
                 result.Tables[alias] = new TableReferenceNode(
                     id: id++,
@@ -66,7 +66,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private string getAliasFromRegexMatch(Match match)
+        private string GetAliasFromRegexMatch(Match match)
         {
             if (match.Groups["alias"].Success)
                 return match.Groups["alias"].Value;
@@ -126,7 +126,7 @@ namespace QueryParser.QueryParsers
                 if (!match.Groups["filterProp"].Success)
                     continue;
 
-                var tableRef = result.Tables[getAliasFromRegexMatch(match)];
+                var tableRef = result.Tables[GetAliasFromRegexMatch(match)];
 
                 tableRef.Filters.Add(new FilterNode(
                     tableReference: tableRef,
@@ -148,7 +148,7 @@ namespace QueryParser.QueryParsers
                     continue;
 
                 GroupCollection groups = match.Groups;
-                var tableRef1 = result.GetTableRef(getAliasFromRegexMatch(match));
+                var tableRef1 = result.GetTableRef(GetAliasFromRegexMatch(match));
                 var tableRef2 = result.GetTableRef(groups["otherAlias"].Value);
 
                 var join = new JoinNode(
