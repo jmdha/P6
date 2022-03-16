@@ -207,7 +207,6 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
         var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.EqualOrLess);
 
         var joinCost = new JoinCost();
