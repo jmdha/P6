@@ -40,8 +40,19 @@ namespace QueryTestSuite.Services
         {
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
+            {
                 if (connector.Connector.CheckConnection())
-                    connector.Connector.StopServer();
+                {
+                    try
+                    {
+                        connector.Connector.StopServer();
+                    }
+                    catch (Exception ex) {
+                        PrintUtil.PrintLine($"Connector [{connector.Name}] could not be closed!", 0, ConsoleColor.Red);
+                        PrintUtil.PrintLine($"Exception: {ex}", 0, ConsoleColor.Red);
+                    }
+                }
+            }
         }
     }
 }
