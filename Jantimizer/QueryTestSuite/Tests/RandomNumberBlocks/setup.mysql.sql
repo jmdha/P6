@@ -43,7 +43,7 @@ BEGIN
 	TRUNCATE TABLE B;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO B (V) VALUES ( floor(0 + (rand() * 50)) );
+		INSERT INTO B (V) VALUES ( floor(0 + (rand() * 100)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -58,7 +58,7 @@ BEGIN
 	TRUNCATE TABLE C;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO C (V) VALUES ( floor(0 + (rand() * 100)) );
+		INSERT INTO C (V) VALUES ( floor(0 + (rand() * 1000)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -73,7 +73,7 @@ BEGIN
 	TRUNCATE TABLE D;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO D (V) VALUES ( floor(0 + (rand() * 1000)) );
+		INSERT INTO D (V) VALUES ( floor(0 + (rand() * 10000)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;

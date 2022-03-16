@@ -58,7 +58,7 @@ BEGIN
 	TRUNCATE TABLE C;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO C (V) VALUES ( 100 );
+		INSERT INTO C (V) VALUES ( 1000 );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -73,7 +73,7 @@ BEGIN
 	TRUNCATE TABLE D;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO D (V) VALUES ( 1000 );
+		INSERT INTO D (V) VALUES ( 10000 );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
