@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
+  </ItemGroup>
+
 </Project>
