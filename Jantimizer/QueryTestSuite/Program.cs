@@ -47,7 +47,7 @@ namespace QueryTestSuite
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var mySQLGenerator = new MySQLGenerator();
             var mySQLModel = new SuiteData(
-                "MySQL",
+                "mysql",
                 mySQLConnector,
                 mySQLPlanParser,
                 mySQLHistoManager,
