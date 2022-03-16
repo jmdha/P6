@@ -15,7 +15,7 @@ namespace QueryParser.Models
         public CreateTableNode(int id, string tableName, string query)
         {
             Id = id;
-            TableName = tableName;
+            TableName = tableName.ToLower();
             Query = query;
         }
 

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
+    public class MySQLEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
         public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
@@ -25,9 +25,9 @@ namespace Histograms.Managers
         }
         public int Depth { get; }
 
-        public PostgresEquiDepthHistogramManager(string connectionString, int depth)
+        public MySQLEquiDepthHistogramManager(string connectionString, int depth)
         {
-            DbConnector = new PostgreSqlConnector(connectionString);
+            DbConnector = new DatabaseConnector.Connectors.MySqlConnector(connectionString);
             Histograms = new List<IHistogram>();
             Depth = depth;
         }
@@ -56,7 +56,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -64,7 +64,7 @@ namespace Histograms.Managers
 
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
-            string attributeName = $"{row["column_name"]}".ToLower();
+            string attributeName = $"{row["COLUMN_NAME"]}".ToLower();
             var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
             if (attributeValues.Tables.Count > 0)
             {

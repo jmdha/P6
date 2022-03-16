@@ -39,7 +39,9 @@
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE2.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE3.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\ConstantNumberBlocks\cleanup.mysql.sql" />
     <None Include="Tests\ConstantNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\ConstantNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\ConstantNumberBlocks\setup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B2.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B3.sql" />
@@ -56,7 +58,9 @@
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE2.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE3.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\RandomNumberBlocks\cleanup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>

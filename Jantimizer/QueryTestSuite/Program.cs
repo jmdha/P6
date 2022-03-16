@@ -3,6 +3,7 @@ using DatabaseConnector.Connectors;
 using Histograms.Managers;
 using PrintUtilities;
 using QueryGenerator;
+using QueryGenerator.QueryGenerators;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
@@ -30,7 +31,6 @@ namespace QueryTestSuite
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var postGenerator = new PostgresGenerator();
-
             var postgresModel = new SuiteData(
                 "postgre",
                 postConnector,
@@ -40,7 +40,22 @@ namespace QueryTestSuite
                 postParserManager,
                 postGenerator);
 
-            var connectorSet = new List<SuiteData>() { postgresModel };
+            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL"));
+            var mySQLPlanParser = new MySQLParser();
+            var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionString, 10);
+            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
+            var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
+            var mySQLGenerator = new MySQLGenerator();
+            var mySQLModel = new SuiteData(
+                "mysql",
+                mySQLConnector,
+                mySQLPlanParser,
+                mySQLHistoManager,
+                mySQLOptimiser,
+                mySQLParserManager,
+                mySQLGenerator);
+
+            var connectorSet = new List<SuiteData>() { mySQLModel, postgresModel };
 
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
