@@ -80,7 +80,15 @@ namespace QueryParser.QueryParsers
                 var tableRef1 = result.Tables[groups["t1"].Value];
                 var tableRef2 = result.Tables[groups["t2"].Value];
 
-                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}");
+                var join = new JoinNode(
+                    id++,
+                    Utilities.GetOperatorType(groups["relation"].Value),
+                    tableRef1.Alias,
+                    groups["prop1"].Value,
+                    tableRef2.Alias,
+                    groups["prop2"].Value,
+                    $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}"
+                );
 
                 tableRef1.Joins.Add(join);
                 tableRef2.Joins.Add(join);
@@ -137,7 +145,15 @@ namespace QueryParser.QueryParsers
                 var tableRef1 = result.GetTableRef(getAliasFromRegexMatch(match));
                 var tableRef2 = result.GetTableRef(groups["otherAlias"].Value);
 
-                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}");
+                var join = new JoinNode(
+                    id++,
+                    Utilities.GetOperatorType(groups["relation"].Value),
+                    tableRef1.Alias,
+                    groups["prop1"].Value,
+                    tableRef2.Alias,
+                    groups["prop2"].Value,
+                    $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}"
+                );
 
                 tableRef1.Joins.Add(join);
                 tableRef2.Joins.Add(join);
