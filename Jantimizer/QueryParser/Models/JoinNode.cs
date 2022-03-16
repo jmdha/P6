@@ -10,30 +10,47 @@ namespace QueryParser.Models
     public partial class JoinNode : INode
     {
         public int Id { get; internal set; }
-        public List<JoinPredicate> Predicates { get; internal set; }
+        public string Predicate { get; internal set; }
         public JoinPredicateRelation Relation { get; internal set; }
-        
-        public JoinNode(int id, List<JoinPredicate> conditions)
+
+        public JoinNode(int id, string predicate)
         {
             Id = id;
-            Predicates = conditions;
+            Predicate = predicate;
+            Relation = ExtrapolateRelation(predicate);
         }
 
-        public JoinNode(int id, string conditions)
+        public JoinNode(int id, string predicate, ComparisonType.Type type, string leftTable, string leftAttribute, string rightTable, string rightAttribute)
         {
             Id = id;
-            Relation = ExtrapolateRelation(conditions);
+            Predicate = predicate;
+            Relation = new JoinPredicateRelation(new JoinPredicate(
+                leftTable,
+                leftAttribute,
+                rightTable,
+                rightAttribute,
+                predicate,
+                type));
         }
 
         public override string? ToString()
         {
-            return $"({Predicates[0].LeftTable} JOIN {Predicates[0].RightTable} ON {Predicates[0].Condition})";
+            if (Relation.LeafPredicate != null)
+            {
+                if (Relation.LeafPredicate.LeftTable.CompareTo(Relation.LeafPredicate.RightTable) <= 0)
+                    return $"({Relation.LeafPredicate.LeftTable} JOIN {Relation.LeafPredicate.RightTable} ON {Predicate})";
+                else
+                    return $"({Relation.LeafPredicate.RightTable} JOIN {Relation.LeafPredicate.LeftTable} ON {Predicate})";
+
+            }
+                
+            return $"({Predicate})";
         }
 
         // The table which should be joined on
         public string GetSuffixString(string param)
         {
-            return $" JOIN {param} ON {Predicates[0].Condition})";
+            return $" JOIN {param} ON {Predicate})";
         }
 
         private static JoinPredicateRelation ExtrapolateRelation(string predicate)
@@ -63,14 +80,14 @@ namespace QueryParser.Models
 
         private static JoinPredicate ExtrapolateJoinPredicate(string predicate)
         {
-            var operatorTypes = (ComparisonType[])Enum.GetValues(typeof(JoinNode.ComparisonType));
+            var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
-            ComparisonType comparisonType = ComparisonType.None;
+            ComparisonType.Type comparisonType = ComparisonType.Type.None;
             foreach (var op in operatorTypes)
             {
-                if (op == ComparisonType.None)
+                if (op == ComparisonType.Type.None)
                     continue;
-                string operatorString = Utilities.GetOperatorString(op);
+                string operatorString = ComparisonType.GetOperatorString(op);
                 if (predicate.Contains(operatorString))
                 {
                     predicateSplit = predicate.Split($" {operatorString} ");
@@ -78,7 +95,7 @@ namespace QueryParser.Models
                     break;
                 }
             }
-            if (comparisonType == ComparisonType.None)
+            if (comparisonType == ComparisonType.Type.None)
                 throw new InvalidDataException("Has no operator " + predicate);
 
             string[] leftSplit = predicateSplit[0].Split(".");

@@ -11,13 +11,16 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
     public class JoinCost : INodeCostEquiDepth<JoinNode, IDbConnector>
     {
-        /// <summary>
-        /// Gives an estimate of the cost of a join operation
-        /// <para>Specifically it gives the worst case cardinality estimate</para>
-        /// </summary>
-        /// <returns></returns>
-        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
-            /*IHistogram leftGram = histogramManager.GetHistogram(node., node.LeftAttribute);
+        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        {
+            if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate)
+                return CalculateCost(node.Relation.LeafPredicate, histogramManager);
+            else
+                throw new NotImplementedException();
+        }
+
+        public int CalculateCost(JoinNode.JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
@@ -98,8 +101,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             for (int i = rightBucketStart; i <= rightBucketEnd; i++)
                 rightBucketCount += rightGram.Buckets[i].Count;
 
-            return leftBucketCount * rightBucketCount;*/
-            return 0;
+            return leftBucketCount * rightBucketCount;
         }
 
         private static bool CheckEqualBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)

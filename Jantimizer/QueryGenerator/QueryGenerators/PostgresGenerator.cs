@@ -16,7 +16,7 @@ namespace QueryGenerator.QueryGenerators
 
         public string GenerateQuery(List<INode> nodes)
         {
-            /*
+            
             List<string> tables = new List<string>();
             string query = Prefix;
             for (int i = 1; i < nodes.Count; i++)
@@ -26,8 +26,7 @@ namespace QueryGenerator.QueryGenerators
             if (nodes[0] is JoinNode)
             {
                 JoinNode jNode = (JoinNode)nodes[0];
-                tables.Add(jNode.LeftTable);
-                tables.Add(jNode.RightTable);
+                tables.AddRange(jNode.Relation.GetJoinTables());
             }
                 
 
@@ -37,10 +36,23 @@ namespace QueryGenerator.QueryGenerators
                 if (nodes[i] is JoinNode)
                 {
                     JoinNode jNode = (JoinNode)nodes[i];
-                    if (!tables.Contains(jNode.LeftTable))
-                        table = jNode.LeftTable;
-                    else if (!tables.Contains(jNode.RightTable))
-                        table = jNode.RightTable;
+
+                    bool leftContains = false;
+                    List<string> leftJoinTables = jNode.Relation.GetJoinTables(true, false);
+                    foreach (string joinTable in leftJoinTables)
+                        if (tables.Contains(joinTable))
+                            leftContains = true;
+
+                    bool rightContains = false;
+                    List<string> rightJoinTables = jNode.Relation.GetJoinTables(false, true);
+                    foreach (string joinTable in rightJoinTables)
+                        if (tables.Contains(joinTable))
+                            rightContains = true;
+
+                    if (!leftContains)
+                        table = jNode.Relation.LeafPredicate.LeftTable;
+                    else if (!rightContains)
+                        table = jNode.Relation.LeafPredicate.RightTable;
                     else
                         throw new Exception("Invalid join" + nodes[i].ToString());
                     tables.Add(table);
@@ -51,8 +63,6 @@ namespace QueryGenerator.QueryGenerators
 
             query += Suffix;
             return query;
-            */
-            return "";
         }
 
         public string GenerateQuery(List<ValuedNode> nodes)

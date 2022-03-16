@@ -59,13 +59,13 @@ namespace QueryOptimiserTest
                 string leftTableName = GetTableName(i - 1);
                 string rightTableName = GetTableName(i);
                 nodes.Add(new JoinNode(
-                    0,
+                    i,
+                    $"{leftTableName} {ComparisonType.GetOperatorString(type)} {rightTableName}",
                     type,
                     leftTableName,
                     "ID",
                     rightTableName,
-                    "ID",
-                    $"{leftTableName} {ComparisonType.GetOperatorString(type)} {rightTableName}"));
+                    "ID"));
             }
 
             return nodes;

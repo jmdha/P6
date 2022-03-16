@@ -34,6 +34,23 @@ namespace QueryParser.Models
             Type = type;
         }
 
+        public List<string> GetJoinTables(bool left = true, bool right = true)
+        {
+            List<string> tables = new List<string>();
+            if (LeftRelation != null)
+                tables.AddRange(LeftRelation.GetJoinTables());
+            if (RightRelation != null)
+                tables.AddRange(RightRelation.GetJoinTables());
+            if (LeafPredicate != null)
+            {
+                if (left)
+                    tables.Add(LeafPredicate.LeftTable);
+                if (right)
+                    tables.Add(LeafPredicate.RightTable);
+            }
+            return tables;
+        }
+
         public static string GetRelationString(RelationType type)
         {
             switch (type)

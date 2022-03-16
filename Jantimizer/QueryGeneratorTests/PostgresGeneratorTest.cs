@@ -44,7 +44,7 @@ namespace GeneratorTest
             "SELECT * FROM (A JOIN B ON B.ID = A.ID) JOIN C ON B.ID = C.ID", 
             new []{ 0, 10 })]
         [DataRow(
-            "SELECT * FROM ((B JOIN A ON A.ID = B.ID) JOIN C ON C.ID = B.ID);", 
+            "SELECT * FROM ((A JOIN B ON A.ID = B.ID) JOIN C ON C.ID = B.ID);", 
             "SELECT * FROM (B JOIN A ON A.ID = B.ID) JOIN C ON C.ID = B.ID", 
             new []{ 0, 10 })]
         [DataRow(

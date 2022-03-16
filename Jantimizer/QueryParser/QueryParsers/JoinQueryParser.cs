@@ -106,7 +106,7 @@ namespace QueryParser.QueryParsers
                 }
             }
 
-            var newNode = new JoinNode(_joinIndex, (string)null);
+            var newNode = new JoinNode(_joinIndex, condition);
             _joinIndex++;
             return newNode;
         }
