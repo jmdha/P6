@@ -74,13 +74,13 @@ namespace Histograms.Managers
             }
         }
 
-        public void PrintAllHistograms()
+        public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();
-            Console.WriteLine("Recorded Histograms:");
+            sb.AppendLine("Recorded Histograms:");
             foreach (var histogram in Histograms)
                 sb.AppendLine(histogram.ToString());
-            Console.WriteLine(sb.ToString());
+            return sb.ToString();
         }
 
         public IHistogram GetHistogram(string table, string attribute)

@@ -23,7 +23,5 @@ namespace Histograms
         public IHistogram GetHistogram(string table, string attribute);
         public List<IHistogram> GetHistogramsByTable(string table);
         public List<IHistogram> GetHistogramsByAttribute(string attribute);
-
-        public void PrintAllHistograms();
     }
 }
