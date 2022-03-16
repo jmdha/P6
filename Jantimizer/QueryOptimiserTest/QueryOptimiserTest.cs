@@ -15,63 +15,68 @@ public class QueryOptimiserTest
 {
     [TestMethod]
     [DataRow(
-        "SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID",
-        "SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID",
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 100 },
-        new string[] { "A", "B", "C" })]
+    0,                                                                                                  // testID
+    new int[] { 0, 1 },                                                                                 // expectedNodeOrder
+    new string[] { "A", "B", "C" },                                                                     // name
+    new int[] { 10, 10, 10 },                                                                           // depth
+    new int[] { 0, 0, 0 },                                                                              // min
+    new int[] { 100, 100, 100 },                                                                        // max
+    new int[] { 0, 1 },                                                                                 // nodeId
+    new JoinNode.ComparisonType[] { JoinNode.ComparisonType.Equal, JoinNode.ComparisonType.Equal },     // nodeComparisonType
+    new string[] { "A", "B" },                                                                          // nodeLeftTable
+    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
+    new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
+    new string[] { "A = B", "B = C" }                                                                   // nodeCondition
+    )]
     [DataRow(
-        "SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID",
-        "SELECT * FROM (B JOIN C ON B.ID = C.ID) JOIN A ON A.ID = B.ID",
-        new int[] { 10, 0, 50 },
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 100 },
-        new string[] { "A", "B", "C" })]
-    [DataRow(
-        "SELECT * FROM (Q JOIN B ON Q.ID = B.ID) JOIN C ON B.ID = C.ID",
-        "SELECT * FROM (Q JOIN B ON Q.ID = B.ID) JOIN C ON B.ID = C.ID",
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 50 },
-        new int[] { 10, 0, 100 },
-        new string[] { "Q", "B", "C" })]
-    [DataRow(
-        "SELECT * FROM (D JOIN C ON D.ID = C.ID) JOIN A ON A.ID = D.ID",
-        "SELECT * FROM (A JOIN D ON A.ID = D.ID) JOIN C ON D.ID = C.ID",
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 100 },
-        new int[] { 10, 0, 50 },
-        new string[] { "A", "D", "C" })]
-    public void OptimiseQueryString(string expected, string input, int[] aGramParam, int[] bGramParam, int [] cGramParam, string[] tableNames)
+    1,                                                                                                  // testID
+    new int[] { 1, 0 },                                                                                 // expectedNodeOrder
+    new string[] { "A", "B", "C" },                                                                     // name
+    new int[] { 10, 10, 10 },                                                                           // depth
+    new int[] { 0, 0, 0 },                                                                              // min
+    new int[] { 100, 100, 50 },                                                                         // max
+    new int[] { 0, 1 },                                                                                 // nodeId
+    new JoinNode.ComparisonType[] { JoinNode.ComparisonType.Equal, JoinNode.ComparisonType.Equal },     // nodeComparisonType
+    new string[] { "A", "B" },                                                                          // nodeLeftTable
+    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
+    new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
+    new string[] { "A = B", "B = C" }                                                                   // nodeCondition
+    )]
+
+    public void OptimiseJoinQueryEqual(int testID, int[] expectedNodeOrder, string[] name, int[] depth, int[] min, int[] max, int[] nodeId, JoinNode.ComparisonType[] nodeComparisonType, string[] nodeLeftTable, string[] nodeRightTable, string[] nodeLeftAttribute, string[] nodeRightAttribute, string[] nodeCondition)
     {
+        // Arrange
         var histogramManager = new PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
-        var aGram = Utilities.CreateIncreasingHistogram(tableNames[0], "ID", aGramParam[0], aGramParam[1], aGramParam[2]);
-        var bGram = Utilities.CreateIncreasingHistogram(tableNames[1], "ID", bGramParam[0], bGramParam[1], bGramParam[2]);
-        var cGram = Utilities.CreateIncreasingHistogram(tableNames[2], "ID", cGramParam[0], cGramParam[1], cGramParam[2]);
-        histogramManager.AddHistogram(aGram);
-        histogramManager.AddHistogram(bGram);
-        histogramManager.AddHistogram(cGram);
-
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        List<INode> queryNodes = PM.ParseQuery(input);
-        List<INode> expectedNodes = PM.ParseQuery(expected);
-
+        for (int i = 0; i < depth.Length; i++)
+            histogramManager.AddHistogram(Utilities.CreateIncreasingHistogram(
+                name[i].ToString(),
+                "ID",
+                depth[i],
+                min[i],
+                max[i]
+            ));
+        
+        List<INode> queryNodes = new List<INode>();
+        for (int i = 0; i < nodeId.Length; i++) 
+            queryNodes.Add(new JoinNode(
+                nodeId[i], 
+                nodeComparisonType[i],
+                nodeLeftTable[i],
+                nodeLeftAttribute[i],
+                nodeRightTable[i],
+                nodeRightAttribute[i],
+                nodeCondition[i]));
+        
         var queryOptimiser = new QueryOptimiserEquiDepth(histogramManager);
 
+        // Act
         var resultNodes = queryOptimiser.OptimiseQuery(queryNodes);
 
-        for (int i = 0; i < expectedNodes.Count; i++)
-        {
-            Assert.IsNotNull(expectedNodes[i]);
-            Assert.IsInstanceOfType(expectedNodes[i], typeof(JoinNode));
-            Assert.IsNotNull(resultNodes[i].Node);
-            Assert.IsInstanceOfType(resultNodes[i].Node, typeof(JoinNode));
-
-            if (expectedNodes[i] is JoinNode expNode && resultNodes[i].Node is JoinNode actNode)
-            {
-                Assert.AreEqual(expNode.JoinCondition, actNode.JoinCondition);
-                Assert.AreEqual(expNode.ComType, actNode.ComType);
-            }
+        // Assert
+        for (int i = 0; i < expectedNodeOrder.Length; i++) {
+            Assert.AreEqual(expectedNodeOrder[i], resultNodes[i].Node.Id);
         }
     }
 }
