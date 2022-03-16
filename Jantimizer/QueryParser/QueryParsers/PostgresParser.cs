@@ -80,6 +80,7 @@ namespace QueryParser.QueryParsers
         }
 
         private static Regex JoinFinder = new Regex(@"Join Filter:(?: )(?<predicates>.+)?", RegexOptions.Compiled);
+        private static Regex TableWithinJoinFinder = new Regex(@"(?<tableNames>[a-z])[.]", RegexOptions.Compiled);
         private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
@@ -88,16 +89,20 @@ namespace QueryParser.QueryParsers
             foreach (Match match in matches)
             {
                 GroupCollection groups = match.Groups;
-                //var tableRef1 = result.GetTableRef(groups["t1"].Value);
-                //var tableRef2 = result.GetTableRef(groups["t2"].Value);
+
+                List<TableReferenceNode> tableRefs = new List<TableReferenceNode>();
+
+                MatchCollection tablesMatches = TableWithinJoinFinder.Matches(groups["predicates"].Value);
+                foreach (Match tMatch in tablesMatches)
+                    tableRefs.Add(result.GetTableRef(tMatch.Groups["tableNames"].Value));
 
                 var join = new JoinNode(
                     id++,
-                    match.Groups["predicates"].Value
+                    groups["predicates"].Value
                 );
 
-                //tableRef1.Joins.Add(join);
-                //tableRef2.Joins.Add(join);
+                foreach (TableReferenceNode tableRef in tableRefs)
+                    tableRef.Joins.Add(join);
 
                 result.Joins.Add(join);
             }
