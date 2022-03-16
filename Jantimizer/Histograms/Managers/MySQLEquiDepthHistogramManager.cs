@@ -27,7 +27,7 @@ namespace Histograms.Managers
 
         public MySQLEquiDepthHistogramManager(string connectionString, int depth)
         {
-            DbConnector = new PostgreSqlConnector(connectionString);
+            DbConnector = new DatabaseConnector.Connectors.MySqlConnector(connectionString);
             Histograms = new List<IHistogram>();
             Depth = depth;
         }
@@ -64,7 +64,7 @@ namespace Histograms.Managers
 
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
-            string attributeName = $"{row["COLUMN_NAME"]}";
+            string attributeName = $"{row["COLUMN_NAME"]}".ToLower();
             var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
             if (attributeValues.Tables.Count > 0)
             {

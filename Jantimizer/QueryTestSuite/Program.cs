@@ -55,7 +55,7 @@ namespace QueryTestSuite
                 mySQLParserManager,
                 mySQLGenerator);
 
-            var connectorSet = new List<SuiteData>() { postgresModel, mySQLModel };
+            var connectorSet = new List<SuiteData>() { mySQLModel, postgresModel };
 
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {

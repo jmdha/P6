@@ -20,7 +20,6 @@ CREATE TABLE D (
 );
 
 DROP PROCEDURE IF EXISTS LoadTestData_A;
-delimiter #
 CREATE PROCEDURE LoadTestData_A()
 BEGIN
 	DECLARE v_max INT UNSIGNED DEFAULT 10;
@@ -29,49 +28,43 @@ BEGIN
 	TRUNCATE TABLE A;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO A (V) VALUES ( floor(0 + (rand() * 10)) );
+		INSERT INTO A (v) VALUES ( floor(0 + (rand() * 10)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
-END #
-delimiter ;
+END;
 
 DROP PROCEDURE IF EXISTS LoadTestData_B;
-delimiter #
 CREATE PROCEDURE LoadTestData_B()
 BEGIN
 	DECLARE v_max INT UNSIGNED DEFAULT 50;
 	DECLARE v_counter INT UNSIGNED DEFAULT 0;
 
-	TRUNCATE TABLE A;
+	TRUNCATE TABLE B;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO B (V) VALUES ( floor(0 + (rand() * 100)) );
+		INSERT INTO B (V) VALUES ( floor(0 + (rand() * 50)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
-END #
-delimiter ;
+END;
 
 DROP PROCEDURE IF EXISTS LoadTestData_C;
-delimiter #
 CREATE PROCEDURE LoadTestData_C()
 BEGIN
 	DECLARE v_max INT UNSIGNED DEFAULT 100;
 	DECLARE v_counter INT UNSIGNED DEFAULT 0;
 
-	TRUNCATE TABLE A;
+	TRUNCATE TABLE C;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO C (V) VALUES ( floor(0 + (rand() * 1000)) );
+		INSERT INTO C (V) VALUES ( floor(0 + (rand() * 100)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
-END #
-delimiter ;
+END;
 
 DROP PROCEDURE IF EXISTS LoadTestData_D;
-delimiter #
 CREATE PROCEDURE LoadTestData_D()
 BEGIN
 	DECLARE v_max INT UNSIGNED DEFAULT 500;
@@ -80,12 +73,11 @@ BEGIN
 	TRUNCATE TABLE D;
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO D (V) VALUES ( floor(0 + (rand() * 10000)) );
+		INSERT INTO D (V) VALUES ( floor(0 + (rand() * 1000)) );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
-END #
-delimiter ;
+END;
 
 CALL LoadTestData_A();
 CALL LoadTestData_B();

@@ -16,11 +16,11 @@ namespace QueryTestSuite.TestRunners
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            var testRunners = new List<TestRunner>();
-            var testRuns = new List<Task<List<TestCaseResult>>>();
-
             foreach(SuiteData databaseModel in DatabaseModels)
             {
+                var testRunners = new List<TestRunner>();
+                var testRuns = new List<Task<List<TestCaseResult>>>();
+
                 var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
                 TestRunner runner = new TestRunner(
@@ -32,9 +32,9 @@ namespace QueryTestSuite.TestRunners
                 );
                 testRunners.Add(runner);
                 testRuns.Add(runner.Run(true));
-            }
 
-            await Task.WhenAll(testRuns);
+                await Task.WhenAll(testRuns);
+            }
         }
 
         private FileInfo GetVariant(DirectoryInfo dir, string name, string type)

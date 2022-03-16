@@ -64,7 +64,7 @@ namespace Histograms.Managers
 
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
-            string attributeName = $"{row["column_name"]}";
+            string attributeName = $"{row["column_name"]}".ToLower();
             var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
             if (attributeValues.Tables.Count > 0)
             {
