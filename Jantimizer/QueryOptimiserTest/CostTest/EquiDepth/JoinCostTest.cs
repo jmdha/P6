@@ -30,8 +30,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.Equal);
 
         var joinCost = new JoinCost();
 
@@ -55,8 +54,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.Equal);
 
         var joinCost = new JoinCost();
 
@@ -87,8 +85,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.Less);
 
         var joinCost = new JoinCost();
 
@@ -108,8 +105,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.Less);
 
         var joinCost = new JoinCost();
 
@@ -140,8 +136,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.More);
 
         var joinCost = new JoinCost();
 
@@ -161,8 +156,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.More);
 
         var joinCost = new JoinCost();
 
@@ -193,8 +187,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.EqualOrLess);
 
         var joinCost = new JoinCost();
 
@@ -215,7 +208,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(bGram);
 
         ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.EqualOrLess);
 
         var joinCost = new JoinCost();
 
@@ -246,8 +239,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.EqualOrMore);
 
         var joinCost = new JoinCost();
 
@@ -267,8 +259,7 @@ public class JoinCostTest
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(2, ComparisonType.Type.EqualOrMore);
 
         var joinCost = new JoinCost();
 
