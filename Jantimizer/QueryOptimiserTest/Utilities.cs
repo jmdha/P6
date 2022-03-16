@@ -51,8 +51,6 @@ namespace QueryOptimiserTest
         {
             if (nestDepth < 0)
                 throw new ArgumentOutOfRangeException("NestDepth must be positive!");
-            else if (nestDepth > 100)
-                throw new ArgumentOutOfRangeException("Please be reasonable...");
 
             var nodes = new List<INode>();
 
