@@ -107,11 +107,11 @@ namespace QueryTestSuite.TestRunners
                 PrintUtil.PrintLine(FormatList(
                     testCase.Category, 
                     testCase.Name, 
-                    testCase.TestResult.EstimatedCardinality.ToString(),
+                    testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
-                    testCase.TestResult.ActualCardinality.ToString(), 
-                    GetAccuracy(testCase.TestResult.ActualCardinality, testCase.TestResult.EstimatedCardinality),
-                    GetAccuracy(testCase.TestResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality)
+                    testCase.DbAnalysisResult.ActualCardinality.ToString(), 
+                    GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality),
+                    GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality)
                     ), 2, ConsoleColor.Blue);
             }
         }

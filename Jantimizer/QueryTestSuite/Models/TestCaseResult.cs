@@ -7,12 +7,16 @@ namespace QueryTestSuite.Models
     {
         public string Name { get; private set; } = "N/A";
         public string Category { get; private set; } = "N/A";
-        public AnalysisResult TestResult { get; private set; }
+
+        /// <summary> Result from the analysis query to the database system. </summary>
+        public AnalysisResult DbAnalysisResult { get; private set; }
+
+        /// <summary> Result from our optimiser estimates. </summary>
         public AnalysisResult JantimiserResult { get; private set; }
 
-        public TestCaseResult (FileInfo fileInfo, AnalysisResult analysisResult, AnalysisResult jantimiserResult)
+        public TestCaseResult (FileInfo fileInfo, AnalysisResult dbAnalysisResult, AnalysisResult jantimiserResult)
         {
-            TestResult = analysisResult;
+            DbAnalysisResult = dbAnalysisResult;
             JantimiserResult = jantimiserResult;
             Name = fileInfo.Name;
             if (fileInfo.Directory != null)
