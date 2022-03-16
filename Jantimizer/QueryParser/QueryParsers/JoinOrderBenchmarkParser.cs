@@ -28,21 +28,6 @@ namespace QueryParser.QueryParsers
         }
 
 
-        static Regex SelectFromWhereRegex = new Regex(@"
-                ^\s*SELECT\s+
-                    (?<select>.*?)\s+ # Captures everything between the first 'SELECT ' and the first ' FROM '
-                FROM\s+
-                    (?<from>.+)\s+    # Captures as much as possible, until the last occurance of 'WHERE'
-                WHERE                 
-                    \s(?<where>.+)$   # Captures everything after the last 'WHERE', presumably predicates
-            ",
-            RegexOptions.IgnoreCase |
-            RegexOptions.Singleline |
-            RegexOptions.IgnorePatternWhitespace |
-            RegexOptions.Compiled
-        );
-
-
 
         public async Task<ParserResult> ParseQuery(string query)
         {
@@ -58,27 +43,6 @@ namespace QueryParser.QueryParsers
             return result;
         }
 
-
-        private static Regex JoinFinder = new Regex(@": \((?<t1>\w+)\.(?<prop1>\w+) (?<relation>[=<>]{1,2}) (?<t2>\w+)\.(?<prop2>\w+)\)", RegexOptions.Compiled);
-        public void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
-        {
-            MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
-
-            int id = 0;
-            foreach (Match match in matches)
-            {
-                GroupCollection groups = match.Groups;
-                var tableRef1 = result.Tables[groups["t1"].Value];
-                var tableRef2 = result.Tables[groups["t2"].Value];
-
-                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}");
-
-                tableRef1.Joins.Add(join);
-                tableRef2.Joins.Add(join);
-
-                result.Joins.Add(join);
-            }
-        }
 
         private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
         private void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
@@ -98,6 +62,36 @@ namespace QueryParser.QueryParsers
             }
         }
 
+        private string getAliasFromRegexMatch(Match match)
+        {
+            if (match.Groups["alias"] != null)
+                return match.Groups["alias"].Value;
+
+            return match.Groups["tableName"].Value;
+        }
+
+        private static Regex JoinFinder = new Regex(@": \((?<t1>\w+)\.(?<prop1>\w+) (?<relation>[=<>]{1,2}) (?<t2>\w+)\.(?<prop2>\w+)\)", RegexOptions.Compiled);
+        private void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
+        {
+            MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
+
+            int id = 0;
+            foreach (Match match in matches)
+            {
+                GroupCollection groups = match.Groups;
+                var tableRef1 = result.Tables[groups["t1"].Value];
+                var tableRef2 = result.Tables[groups["t2"].Value];
+
+                var join = new JoinNode(id++, tableRef1.Alias, tableRef2.Alias, $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}");
+
+                tableRef1.Joins.Add(join);
+                tableRef2.Joins.Add(join);
+
+                result.Joins.Add(join);
+            }
+        }
+
+
         private static readonly Regex FilterAndConditionFinder = new Regex(@"
                 (?:^\s*->.*?\sScan(?:\susing\s\w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?\s\s\(cost=[^\n]+)
 
@@ -110,7 +104,8 @@ namespace QueryParser.QueryParsers
             RegexOptions.IgnorePatternWhitespace
         );
 
-        public void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
+
+        private void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -130,15 +125,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private string getAliasFromRegexMatch(Match match)
-        {
-            if (match.Groups["alias"] != null)
-                return match.Groups["alias"].Value;
-
-            return match.Groups["tableName"].Value;
-        }
-
-        public void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
+        private void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
