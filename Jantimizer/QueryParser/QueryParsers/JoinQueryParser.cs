@@ -106,7 +106,7 @@ namespace QueryParser.QueryParsers
                 }
             }
 
-            var newNode = new JoinNode(_joinIndex, type, leftTable, leftAttribute, rightTable, rightAttribute, condition);
+            var newNode = new JoinNode(_joinIndex, (string)null);
             _joinIndex++;
             return newNode;
         }
@@ -155,10 +155,10 @@ namespace QueryParser.QueryParsers
         {
             foreach(JoinNode node in nodes)
             {
-                if (node.LeftTable == PlaceholderTableName)
-                    node.LeftTable = GetFittingTable(node);
-                if (node.RightTable == PlaceholderTableName)
-                    node.RightTable = GetFittingTable(node);
+                //if (node.LeftTable == PlaceholderTableName)
+                //    node.LeftTable = GetFittingTable(node);
+                //if (node.RightTable == PlaceholderTableName)
+                //    node.RightTable = GetFittingTable(node);
             }
         }
 
@@ -169,15 +169,15 @@ namespace QueryParser.QueryParsers
         /// <returns></returns>
         private string GetFittingTable(JoinNode node)
         {
-            List<string> tables = new List<string>();
+           /* List<string> tables = new List<string>();
             foreach(string table in node.ConditionTables)
             {
                 if (table != node.LeftTable && table != node.RightTable) 
                     tables.Add(table);
             }
             if (tables.Count == 0)
-                return PlaceholderTableName;
-            return tables[0];
+                return PlaceholderTableName;*/
+            return "";
         }
     }
 }

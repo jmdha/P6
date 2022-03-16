@@ -17,7 +17,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
         /// </summary>
         /// <returns></returns>
         public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
-            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
+            /*IHistogram leftGram = histogramManager.GetHistogram(node., node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
@@ -98,7 +98,8 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             for (int i = rightBucketStart; i <= rightBucketEnd; i++)
                 rightBucketCount += rightGram.Buckets[i].Count;
 
-            return leftBucketCount * rightBucketCount;
+            return leftBucketCount * rightBucketCount;*/
+            return 0;
         }
 
         private static bool CheckEqualBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QueryParser.QueryParsers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public class JoinNode : INode
+    public partial class JoinNode : INode
     {
         public enum ComparisonType {
             None,
@@ -18,93 +19,91 @@ namespace QueryParser.Models
         };
 
         public int Id { get; internal set; }
-        public ComparisonType ComType { get; internal set; }
-        public string LeftTable { get; internal set; }
-        public string LeftAttribute { get; internal set; }
-        public string RightTable { get; internal set; }
-        public string RightAttribute { get; internal set; }
-        public string JoinCondition { get; internal set; }
-        public List<string> ConditionTables { get; }
-
-        public JoinNode(int id, ComparisonType type, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
+        public List<JoinPredicate> Predicates { get; internal set; }
+        public JoinPredicateRelation Relation { get; internal set; }
+        
+        public JoinNode(int id, List<JoinPredicate> conditions)
         {
             Id = id;
-            ComType = type;
-            LeftTable = leftTable.Trim();
-            LeftAttribute = leftAttribute.Trim();
-            RightTable = rightTable.Trim();
-            RightAttribute = rightAttribute.Trim();
-            JoinCondition = joinCondition.Trim();
-            ConditionTables = GenerateConditionTables();
+            Predicates = conditions;
+        }
+
+        public JoinNode(int id, string conditions)
+        {
+            Id = id;
+            Relation = ExtrapolateRelation(conditions);
         }
 
         public override string? ToString()
         {
-            return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
+            return $"({Predicates[0].LeftTable} JOIN {Predicates[0].RightTable} ON {Predicates[0].Condition})";
         }
 
         // The table which should be joined on
         public string GetSuffixString(string param)
         {
-            return $" JOIN {param} ON {JoinCondition})";
+            return $" JOIN {param} ON {Predicates[0].Condition})";
         }
 
-        private List<string> GenerateConditionTables()
+        private static JoinPredicateRelation ExtrapolateRelation(string predicate)
         {
-            List<string?> tables = new List<string?>();
-            SplitOverAND(JoinCondition, tables);
-
-            return tables
-                .Where(x => x != null)
-                .Select(x => x!.Trim())
-                .ToList();
-        }
-
-        private void SplitOverAND(string s, List<string?> tables)
-        {
-            string[] andSplit = s.Split(" AND ");
-            if (andSplit.Length > 0)
+            JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
+            string[] sides = new string[] {};
+            JoinPredicateRelation.RelationType relationType = JoinPredicateRelation.RelationType.None;
+            for (int i = 0; i < relationTypes.Length; i++)
             {
-                foreach (string and in andSplit)
-                    SplitOverOR(and, tables);
+                sides = predicate.Split(JoinPredicateRelation.GetRelationString(relationTypes[i]));
+                if (sides.Length > 0)
+                {
+                    relationType = relationTypes[i];
+                    break;
+                }
             }
-            else
-                SplitOverOR(s, tables);
+            if (relationType == JoinPredicateRelation.RelationType.None || sides.Length < 1)
+                return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate));
+            else if (sides.Length != 2)
+                throw new InvalidDataException("Somehow only had one side " + predicate);
+
+            JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0]);
+            JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1]);
+
+            return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        private void SplitOverOR(string s, List<string?> tables)
+        private static JoinPredicate ExtrapolateJoinPredicate(string predicate)
         {
-            string[] orSplit = s.Split(" OR ");
-            if (orSplit.Length > 0)
+            var operatorTypes = (ComparisonType[])Enum.GetValues(typeof(JoinNode.ComparisonType));
+            string[] predicateSplit = new string[] {};
+            ComparisonType comparisonType = ComparisonType.None;
+            foreach (var op in operatorTypes)
             {
-                foreach (string or in orSplit)
-                    SplitOverPredicates(or, tables);
+                if (op == ComparisonType.None)
+                    continue;
+                string operatorString = Utilities.GetOperatorString(op);
+                if (predicate.Contains(operatorString))
+                {
+                    predicateSplit = predicate.Split($" {operatorString} ");
+                    comparisonType = op;
+                    break;
+                }
             }
-            else
-                SplitOverPredicates(s, tables);
-        }
-        private void SplitOverPredicates(string s, List<string?> tables)
-        {
-            if (ComType == ComparisonType.More)         GetTableNamesFromPredicate(s.Split(">"), tables);
-            if (ComType == ComparisonType.Less)         GetTableNamesFromPredicate(s.Split("<"), tables);
-            if (ComType == ComparisonType.EqualOrMore)  GetTableNamesFromPredicate(s.Split(">="), tables);
-            if (ComType == ComparisonType.EqualOrLess)  GetTableNamesFromPredicate(s.Split("<="), tables);
-            if (ComType == ComparisonType.Equal)        GetTableNamesFromPredicate(s.Split("="), tables);
-        }
+            if (comparisonType == ComparisonType.None)
+                throw new InvalidDataException("Has no operator " + predicate);
 
-        private void GetTableNamesFromPredicate(string[] s, List<string?> tables)
-        {
-            if (s.Length > 0)
-                tables.Add(GetTableNameFromAttributeName(s[0]));
-            if (s.Length > 1)
-                tables.Add(GetTableNameFromAttributeName(s[1]));
-        }
+            string[] leftSplit = predicateSplit[0].Split(".");
+            string[] rightSplit = predicateSplit[1].Split(".");
 
-        private string? GetTableNameFromAttributeName(string s)
-        {
-            if (s.Contains("."))
-                return s.Split(".")[0].Trim();
-            return null;
+            if (leftSplit.Length != 2 || rightSplit.Length != 2)
+                throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
+
+            return new JoinPredicate(
+                leftSplit[0],
+                leftSplit[1],
+                rightSplit[0],
+                rightSplit[1],
+                predicate,
+                comparisonType
+                );
         }
     }
 }

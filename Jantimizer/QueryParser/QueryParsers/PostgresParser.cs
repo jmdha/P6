@@ -37,19 +37,24 @@ namespace QueryParser.QueryParsers
         {
             string explanationTextBlock = await GetPGExplainationTextBlock(query);
 
+            return AnalyseExplanationText(explanationTextBlock);
+        }
+
+        public static ParserResult AnalyseExplanationText(string explanationText)
+        {
             var result = new ParserResult();
 
-            InsertTables(explanationTextBlock, ref result);
-            InsertFilters(explanationTextBlock, ref result);
-            InsertJoins(explanationTextBlock, ref result);
-            InsertConditions(explanationTextBlock, ref result);
+            InsertTables(explanationText, ref result);
+            InsertFilters(explanationText, ref result);
+            InsertJoins(explanationText, ref result);
+            InsertConditions(explanationText, ref result);
 
             return result;
         }
 
 
         private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
-        private void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
+        private static void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
 
@@ -66,7 +71,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private string GetAliasFromRegexMatch(Match match)
+        private static string GetAliasFromRegexMatch(Match match)
         {
             if (match.Groups["alias"].Success)
                 return match.Groups["alias"].Value;
@@ -74,8 +79,8 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@": \((?<t1>\w+)\.(?<prop1>\w+) (?<relation>[=<>]{1,2}) (?<t2>\w+)\.(?<prop2>\w+)\)", RegexOptions.Compiled);
-        private void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
+        private static Regex JoinFinder = new Regex(@"Join Filter:(?: )(?<conditions>.+)?$", RegexOptions.Compiled);
+        private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
 
@@ -88,12 +93,7 @@ namespace QueryParser.QueryParsers
 
                 var join = new JoinNode(
                     id++,
-                    Utilities.GetOperatorType(groups["relation"].Value),
-                    tableRef1.Alias,
-                    groups["prop1"].Value,
-                    tableRef2.Alias,
-                    groups["prop2"].Value,
-                    $"{tableRef1.Alias}.{groups["prop1"]} {groups["relation"]} {tableRef2.Alias}.{groups["prop2"]}"
+                    (string)null
                 );
 
                 tableRef1.Joins.Add(join);
@@ -117,7 +117,7 @@ namespace QueryParser.QueryParsers
         );
 
 
-        private void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
+        private static void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -137,7 +137,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
+        private static void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -153,12 +153,7 @@ namespace QueryParser.QueryParsers
 
                 var join = new JoinNode(
                     id++,
-                    Utilities.GetOperatorType(groups["relation"].Value),
-                    tableRef1.Alias,
-                    groups["prop1"].Value,
-                    tableRef2.Alias,
-                    groups["prop2"].Value,
-                    $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}"
+                    (string)null
                 );
 
                 tableRef1.Joins.Add(join);

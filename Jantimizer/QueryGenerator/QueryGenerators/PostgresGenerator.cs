@@ -10,11 +10,13 @@ namespace QueryGenerator.QueryGenerators
 {
     public class PostgresGenerator : IQueryGenerator
     {
+        
         static string Prefix = "SELECT * FROM ";
         static string Suffix = ";";
 
         public string GenerateQuery(List<INode> nodes)
         {
+            /*
             List<string> tables = new List<string>();
             string query = Prefix;
             for (int i = 1; i < nodes.Count; i++)
@@ -49,6 +51,8 @@ namespace QueryGenerator.QueryGenerators
 
             query += Suffix;
             return query;
+            */
+            return "";
         }
 
         public string GenerateQuery(List<ValuedNode> nodes)

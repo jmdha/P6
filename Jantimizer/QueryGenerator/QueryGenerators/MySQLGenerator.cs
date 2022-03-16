@@ -15,7 +15,7 @@ namespace QueryGenerator.QueryGenerators
 
         public string GenerateQuery(List<INode> nodes)
         {
-            List<string> tables = new List<string>();
+            /*List<string> tables = new List<string>();
             string query = Prefix;
             for (int i = 1; i < nodes.Count; i++)
                 query += '(';
@@ -48,7 +48,8 @@ namespace QueryGenerator.QueryGenerators
             }
 
             query += Suffix;
-            return query;
+            return query;*/
+            return "";
         }
 
         public string GenerateQuery(List<ValuedNode> nodes)
