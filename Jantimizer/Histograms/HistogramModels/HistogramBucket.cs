@@ -4,13 +4,14 @@
     {
         public int ValueStart { get; }
         private int _valueEnd;
-        public int ValueEnd { get => _valueEnd; set {
+        public int ValueEnd { get => _valueEnd; internal set {
                 if (value < ValueStart)
                     throw new IndexOutOfRangeException("Bucket end value cannot be lower than start value!");
                 _valueEnd = value;
             } }
         private int count;
-        public int Count { get => count; set { 
+        public int Count { get => count; internal set
+            { 
                 if (value < 0)
                     throw new IndexOutOfRangeException("Count for a bucket cannot be less than 0!");
                 count = value;
