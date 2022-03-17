@@ -13,10 +13,31 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
     {
         public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
         {
-            if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate)
-                return CalculateCost(node.Relation.LeafPredicate, histogramManager);
-            else
-                throw new NotImplementedException();
+            if (node.Relation != null) {
+                if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate && node.Relation.LeafPredicate != null)
+                    return CalculateCost(node.Relation.LeafPredicate, histogramManager);
+                else if (node.Relation.Type == JoinPredicateRelation.RelationType.And || node.Relation.Type == JoinPredicateRelation.RelationType.Or)
+                    return CalculateCost(node.Relation, histogramManager);
+                else
+                    throw new ArgumentException("Missing noderelation type " + node.Relation.ToString());
+            } else
+                throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
+                
+        }
+
+        public int CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+            JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
+            JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
+
+            switch (nodeRelation.Type) {
+                case JoinPredicateRelation.RelationType.Predicate:
+                    return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
+                case JoinPredicateRelation.RelationType.And:
+                    return Math.Max(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
+                case JoinPredicateRelation.RelationType.Or:
+                    return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
+            }
+            throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
         }
 
         public int CalculateCost(JoinNode.JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {

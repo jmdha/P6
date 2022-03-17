@@ -105,11 +105,11 @@ namespace QueryParser.Models
                 throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
 
             return new JoinPredicate(
-                leftSplit[0],
-                leftSplit[1],
-                rightSplit[0],
-                rightSplit[1],
-                predicate,
+                leftSplit[0].Trim(),
+                leftSplit[1].Trim(),
+                rightSplit[0].Trim(),
+                rightSplit[1].Trim(),
+                predicate.Trim(),
                 comparisonType
                 );
         }

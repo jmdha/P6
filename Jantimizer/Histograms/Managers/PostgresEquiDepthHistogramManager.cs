@@ -91,11 +91,12 @@ namespace Histograms.Managers
 
         public IHistogram GetHistogram(string table, string attribute)
         {
-            foreach (var gram in Histograms)
+            foreach (var gram in Histograms) {
                 if (gram.TableName.Equals(table) && gram.AttributeName.Equals(attribute))
                     return gram;
+            }
 
-            throw new ArgumentException("No histogram found");
+            throw new ArgumentException($"No histogram found | Requested table |{table}| attribute |{attribute}|");
         }
         public List<IHistogram> GetHistogramsByTable(string table)
         {
