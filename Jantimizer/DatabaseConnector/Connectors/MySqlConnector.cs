@@ -18,7 +18,7 @@ namespace DatabaseConnector.Connectors
             return await CallQuery(query);
         }
 
-        public override async Task<bool> StartServer()
+        public override Task<bool> StartServer()
         {
             throw new NotImplementedException();
         }

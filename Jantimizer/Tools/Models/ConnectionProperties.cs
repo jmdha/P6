@@ -16,6 +16,17 @@ namespace Tools.Models
         public string Database { get; }
         public string Schema { get; }
 
+        public ConnectionProperties()
+        {
+            ConnectionString = "";
+            Server = "";
+            Port = -1;
+            Username = "";
+            Password = "";
+            Database = "";
+            Schema = "";
+        }
+
         public ConnectionProperties(string connectionString, string server, int port, string username, string password, string database, string schema)
         {
             ConnectionString = connectionString;
