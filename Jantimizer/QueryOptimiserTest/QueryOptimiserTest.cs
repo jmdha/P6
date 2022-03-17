@@ -17,77 +17,77 @@ public class QueryOptimiserTest
     [DataRow(
     0,                                                                                                  // testID
     new int[] { 0, 1 },                                                                                 // expectedNodeOrder
-    new string[] { "A", "B", "C" },                                                                     // name
+    new string[] { "T1", "T2", "T3" },                                                                     // name
     new int[] { 10, 10, 10 },                                                                           // depth
     new int[] { 0, 0, 0 },                                                                              // min
     new int[] { 100, 100, 100 },                                                                        // max
     new int[] { 0, 1 },                                                                                 // nodeId
     new ComparisonType.Type[] { ComparisonType.Type.Equal, ComparisonType.Type.Equal },                 // nodeComparisonType
-    new string[] { "A", "B" },                                                                          // nodeLeftTable
-    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "T1", "T2" },                                                                          // nodeLeftTable
+    new string[] { "T2", "T3" },                                                                          // nodeRightTable
     new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
     new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
-    new string[] { "A = B", "B = C" }                                                                   // nodeCondition
+    new string[] { "T1 = T2", "T2 = T3" }                                                                   // nodeCondition
     )]
     [DataRow(
     1,                                                                                                  // testID
     new int[] { 0, 1 },                                                                                 // expectedNodeOrder
-    new string[] { "A", "B", "C" },                                                                     // name
+    new string[] { "T1", "T2", "T3" },                                                                     // name
     new int[] { 10, 10, 10 },                                                                           // depth
     new int[] { 0, 0, 0 },                                                                              // min
     new int[] { 50, 100, 150 },                                                                         // max
     new int[] { 0, 1 },                                                                                 // nodeId
     new ComparisonType.Type[] { ComparisonType.Type.Equal, ComparisonType.Type.Equal },                 // nodeComparisonType
-    new string[] { "A", "B" },                                                                          // nodeLeftTable
-    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "T1", "T2" },                                                                          // nodeLeftTable
+    new string[] { "T2", "T3" },                                                                          // nodeRightTable
     new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
     new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
-    new string[] { "A < B", "B < C" }                                                                   // nodeCondition
+    new string[] { "T1 < T2", "T2 < T3" }                                                                   // nodeCondition
     )]
     [DataRow(
     2,                                                                                                  // testID
     new int[] { 1, 0 },                                                                                 // expectedNodeOrder
-    new string[] { "A", "B", "C" },                                                                     // name
+    new string[] { "T1", "T2", "T3" },                                                                     // name
     new int[] { 10, 10, 10 },                                                                           // depth
     new int[] { 0, 0, 0 },                                                                              // min
     new int[] { 100, 100, 50 },                                                                         // max
     new int[] { 0, 1 },                                                                                 // nodeId
     new ComparisonType.Type[] { ComparisonType.Type.Equal, ComparisonType.Type.Equal },                 // nodeComparisonType
-    new string[] { "A", "B" },                                                                          // nodeLeftTable
-    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "T1", "T2" },                                                                          // nodeLeftTable
+    new string[] { "T2", "T3" },                                                                          // nodeRightTable
     new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
     new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
-    new string[] { "A = B", "B = C" }                                                                   // nodeCondition
+    new string[] { "T1 = T2", "T2 = T3" }                                                                   // nodeCondition
     )]
     [DataRow(
     3,                                                                                                  // testID
     new int[] { 0, 1 },                                                                                 // expectedNodeOrder
-    new string[] { "A", "B", "C" },                                                                     // name
+    new string[] { "T1", "T2", "T3" },                                                                     // name
     new int[] { 10, 10, 10 },                                                                           // depth
     new int[] { 0, 0, 0 },                                                                              // min
     new int[] { 150, 100, 50 },                                                                         // max
     new int[] { 1, 0 },                                                                                 // nodeId
     new ComparisonType.Type[] { ComparisonType.Type.More, ComparisonType.Type.More },                   // nodeComparisonType
-    new string[] { "A", "B" },                                                                          // nodeLeftTable
-    new string[] { "B", "C" },                                                                          // nodeRightTable
+    new string[] { "T1", "T2" },                                                                          // nodeLeftTable
+    new string[] { "T2", "T3" },                                                                          // nodeRightTable
     new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
     new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
-    new string[] { "A > B", "B > C" }                                                                   // nodeCondition
+    new string[] { "T1 > T2", "T2 > T3" }                                                                   // nodeCondition
     )]
     [DataRow(
     4,                                                                                                  // testID
     new int[] { 0, 1 },                                                                                 // expectedNodeOrder
-    new string[] { "A", "B", "C" },                                                                     // name
+    new string[] { "T1", "T2", "T3" },                                                                     // name
     new int[] { 10, 10, 10 },                                                                           // depth
     new int[] { 0, 0, 0 },                                                                              // min
     new int[] { 50, 100, 150 },                                                                         // max
     new int[] { 1, 0 },                                                                                 // nodeId
     new ComparisonType.Type[] { ComparisonType.Type.Less, ComparisonType.Type.Less },                   // nodeComparisonType
-    new string[] { "B", "A" },                                                                          // nodeLeftTable
-    new string[] { "C", "B" },                                                                          // nodeRightTable
+    new string[] { "T2", "T1" },                                                                          // nodeLeftTable
+    new string[] { "T3", "T2" },                                                                          // nodeRightTable
     new string[] { "ID", "ID" },                                                                        // nodeLeftAttribute
     new string[] { "ID", "ID" },                                                                        // nodeRightAttribute
-    new string[] { "B < C", "A < B" }                                                                   // nodeCondition
+    new string[] { "T2 < T3", "T1 < T2" }                                                                   // nodeCondition
     )]
 
     public void OptimiseJoinQueryEqual(int testID, int[] expectedNodeOrder, string[] name, int[] depth, int[] min, int[] max, int[] nodeId, ComparisonType.Type[] nodeComparisonType, string[] nodeLeftTable, string[] nodeRightTable, string[] nodeLeftAttribute, string[] nodeRightAttribute, string[] nodeCondition)

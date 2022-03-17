@@ -29,22 +29,9 @@ namespace QueryOptimiserTest
             return tempGram;
         }
 
-        static private string GetTableName(int index)
+        static public string GetTableName(int index)
         {
-            int startIndex = System.Convert.ToInt32('A');
-            int endIndex = System.Convert.ToInt32('Z');
-
-            int indexedIndex = startIndex + index;
-
-            int overflow = (int) Math.Floor((double)indexedIndex / endIndex);
-            indexedIndex -= overflow * endIndex;
-
-            string tableName = "";
-
-            for (int i = 0; i < overflow; i++)
-                tableName += ((char)endIndex);
-            tableName += ((char)indexedIndex);
-            return tableName;
+            return "T" + index;
         }
 
         static internal List<INode> GenerateNodes(int nestDepth, ComparisonType.Type type)
