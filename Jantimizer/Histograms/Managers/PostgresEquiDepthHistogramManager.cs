@@ -6,6 +6,7 @@ using QueryParser.QueryParsers;
 using System.Data;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Tools.Models;
 
 [assembly : InternalsVisibleTo("HistogramsTests")]
 
@@ -28,9 +29,9 @@ namespace Histograms.Managers
         }
         public int Depth { get; }
 
-        public PostgresEquiDepthHistogramManager(string connectionString, int depth)
+        public PostgresEquiDepthHistogramManager(ConnectionProperties connectionProperties, int depth)
         {
-            DbConnector = new PostgreSqlConnector(connectionString);
+            DbConnector = new PostgreSqlConnector(connectionProperties);
             Histograms = new List<IHistogram>();
             Depth = depth;
         }
@@ -63,7 +64,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = '{DbConnector.ConnectionProperties.Schema}' AND table_name = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();

@@ -7,6 +7,7 @@ using QueryParser;
 using QueryParser.QueryParsers;
 using QueryParser.Models;
 using DatabaseConnector;
+using Tools.Models;
 
 namespace QueryOptimiserTest;
 
@@ -44,7 +45,7 @@ public class QueryOptimiserTest
         new string[] { "A", "D", "C" })]
     public void OptimiseQueryString(string expected, string input, int[] aGramParam, int[] bGramParam, int [] cGramParam, string[] tableNames)
     {
-        var histogramManager = new PostgresEquiDepthHistogramManager("SomeConnectionString", 10);
+        var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
         var aGram = Utilities.CreateIncreasingHistogram(tableNames[0], "ID", aGramParam[0], aGramParam[1], aGramParam[2]);
         var bGram = Utilities.CreateIncreasingHistogram(tableNames[1], "ID", bGramParam[0], bGramParam[1], bGramParam[2]);
         var cGram = Utilities.CreateIncreasingHistogram(tableNames[2], "ID", cGramParam[0], cGramParam[1], cGramParam[2]);
