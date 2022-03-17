@@ -25,9 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryGenerator", "QueryGene
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryGeneratorTests", "QueryGeneratorTests\QueryGeneratorTests.csproj", "{FCE3BA03-C4AB-4ED8-9368-11E518709596}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
