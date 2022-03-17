@@ -29,6 +29,21 @@ namespace QueryOptimiserTest
             return tempGram;
         }
 
+        static internal List<Histograms.HistogramEquiDepth> CreateIncreasingHistograms(int count, int[] depths, int[] minValues, int[] maxValues)
+        {
+            List<Histograms.HistogramEquiDepth> histograms = new List<Histograms.HistogramEquiDepth>();
+            for (int i = 0; i < count; i++) {
+                histograms.Add(CreateIncreasingHistogram(
+                    GetTableName(i),
+                    "ID",
+                    depths[i],
+                    minValues[i],
+                    maxValues[i]
+                ));
+            }
+            return histograms;
+        }
+
         static public string GetTableName(int index)
         {
             return "T" + index;
@@ -46,7 +61,7 @@ namespace QueryOptimiserTest
                 string leftTableName = GetTableName(i - 1);
                 string rightTableName = GetTableName(i);
                 nodes.Add(new JoinNode(
-                    0,
+                    i - 1,
                     type,
                     leftTableName,
                     "ID",
