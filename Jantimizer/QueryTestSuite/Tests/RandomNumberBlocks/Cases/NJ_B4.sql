@@ -1,1 +1,1 @@
-SELECT * FROM ((a JOIN b ON a.v > b.v) JOIN c ON b.v > c.v) JOIN d ON c.v > d.v
+SELECT * FROM ((a JOIN b ON b.v > a.v) JOIN c ON c.v > b.v) JOIN d ON d.v > c.v

@@ -33,7 +33,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                 case JoinPredicateRelation.RelationType.Predicate:
                     return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
                 case JoinPredicateRelation.RelationType.And:
-                    return Math.Max(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
+                    return Math.Min(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
                 case JoinPredicateRelation.RelationType.Or:
                     return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
             }

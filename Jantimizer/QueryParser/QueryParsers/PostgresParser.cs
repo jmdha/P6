@@ -79,8 +79,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@"Join Filter: +(?<predicates>.+)?", RegexOptions.Compiled);
-        private static Regex TableWithinJoinFinder = new Regex(@"(?<tableNames>[a-z])[.]", RegexOptions.Compiled);
+        private static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
         private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
