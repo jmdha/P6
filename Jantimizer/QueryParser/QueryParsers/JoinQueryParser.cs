@@ -106,7 +106,7 @@ namespace QueryParser.QueryParsers
                 }
             }
 
-            var newNode = new JoinNode(_joinIndex, condition);
+            var newNode = new JoinNode(_joinIndex, condition, PostgresParser.ExtrapolateRelation(condition));
             _joinIndex++;
             return newNode;
         }
