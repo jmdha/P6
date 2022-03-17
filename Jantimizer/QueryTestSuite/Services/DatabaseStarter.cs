@@ -15,7 +15,7 @@ namespace QueryTestSuite.Services
             PrintUtil.PrintLine($"Checking if databases are online...", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
             {
-                if (connector.Run)
+                if (connector.ShouldRun)
                 {
                     if (connector.Connector.CheckConnection())
                     {
@@ -44,7 +44,7 @@ namespace QueryTestSuite.Services
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
             {
-                if (connector.Run)
+                if (connector.ShouldRun)
                 {
                     if (connector.Connector.CheckConnection())
                     {

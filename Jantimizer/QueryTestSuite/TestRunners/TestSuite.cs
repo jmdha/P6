@@ -18,7 +18,7 @@ namespace QueryTestSuite.TestRunners
         {
             foreach(SuiteData suitData in SuiteDatas)
             {
-                if (suitData.Run)
+                if (suitData.ShouldRun)
                 {
                     var testRunners = new List<TestRunner>();
                     var testRuns = new List<Task<List<TestCaseResult>>>();
