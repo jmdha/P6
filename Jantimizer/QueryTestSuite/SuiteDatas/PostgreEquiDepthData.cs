@@ -1,6 +1,5 @@
 ﻿using DatabaseConnector.Connectors;
 using Histograms.Managers;
-using QueryGenerator.QueryGenerators;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
@@ -34,7 +33,6 @@ namespace QueryTestSuite.SuiteDatas
             var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionProperties, 10);
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
-            var postGenerator = new PostgresGenerator();
             var postgresModel = new SuiteData(
                 secrets.GetLaunchOption("POSGRESQL"),
                 "postgre",
@@ -42,8 +40,7 @@ namespace QueryTestSuite.SuiteDatas
                 postPlanParser,
                 postHistoManager,
                 postOptimiser,
-                postParserManager,
-                postGenerator);
+                postParserManager);
             return postgresModel;
         }
     }
