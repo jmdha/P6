@@ -44,6 +44,7 @@ namespace QueryTestSuite.TestRunners
             await Case.Connector.CallQuery(SetupFile);
 
             PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
+            Case.HistoManager.ClearHistograms();
             await Case.HistoManager.AddHistograms(SetupFile);
 
             Results = await RunQueriesSerial();

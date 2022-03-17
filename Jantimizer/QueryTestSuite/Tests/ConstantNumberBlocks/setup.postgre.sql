@@ -6,7 +6,7 @@ DECLARE
 	v_max INT := 10;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE a;
+	TRUNCATE a RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO a (v) VALUES ( 10 );
         v_counter := v_counter+1;
@@ -22,7 +22,7 @@ DECLARE
 	v_max INT := 50;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE b;
+	TRUNCATE b RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO b (v) VALUES ( 100 );
         v_counter := v_counter+1;
@@ -38,7 +38,7 @@ DECLARE
 	v_max INT := 100;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE c;
+	TRUNCATE c RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO c (v) VALUES ( 1000 );
         v_counter := v_counter+1;
@@ -54,7 +54,7 @@ DECLARE
 	v_max INT := 500;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE d;
+	TRUNCATE d RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO d (v) VALUES ( 10000 );
         v_counter := v_counter+1;

@@ -34,10 +34,14 @@ namespace Histograms.Managers
             Depth = depth;
         }
 
+        public void ClearHistograms()
+        {
+            Histograms.Clear();
+        }
+
         public async Task AddHistograms(FileInfo setupQueryFile)
         {
-            foreach (string line in File.ReadAllLines(setupQueryFile.FullName))
-                await AddHistograms(line);
+            await AddHistograms(File.ReadAllText(setupQueryFile.FullName));
         }
 
         public void AddHistogram(IHistogram histogram)
@@ -51,13 +55,21 @@ namespace Histograms.Managers
 
         public async Task AddHistograms(string setupQuery)
         {
-            IParserManager parser = new ParserManager(new List<IQueryParser> { new CreateTableQueryParser() });
-            List<INode> nodes = parser.ParseQuery(setupQuery, false);
-            if (nodes.Count > 0 && nodes[0] is CreateTableNode node)
+            DataRowCollection allTables = (await GetTablesInSchema()).Rows;
+            foreach (DataRow tables in allTables)
             {
-                foreach (DataRow row in (await GetAttributenamesForTable(node.TableName)).Rows)
-                    await AddHistogramForAttribute(row, node.TableName);
+                string tableName = $"{tables["table_name"]}".ToLower();
+                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
+                    await AddHistogramForAttribute(row, tableName);
             }
+        }
+
+        private async Task<DataTable> GetTablesInSchema()
+        {
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.tables WHERE table_schema = '{DbConnector.ConnectionProperties.Schema}';");
+            if (returnRows.Tables.Count > 0)
+                return returnRows.Tables[0];
+            return new DataTable();
         }
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
