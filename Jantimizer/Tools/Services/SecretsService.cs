@@ -34,5 +34,10 @@ namespace Tools.Services
             }
             return "Not Found";
         }
+
+        public bool GetLaunchOption(string key)
+        {
+            return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
+        }
     }
 }

@@ -35,6 +35,7 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var mySQLGenerator = new MySQLGenerator();
             var mySQLModel = new SuiteData(
+                secrets.GetLaunchOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
                 mySQLPlanParser,
