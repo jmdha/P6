@@ -10,7 +10,10 @@ using QueryParser.QueryParsers;
 using QueryPlanParser.Parsers;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
+using QueryTestSuite.SuiteDatas;
 using QueryTestSuite.TestRunners;
+using Tools.Models;
+using Tools.Services;
 
 namespace QueryTestSuite
 {
@@ -23,39 +26,11 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            SecretsService secrets = new SecretsService();
+            SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var postConnector = new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL"));
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionString, 10);
-            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
-            var postGenerator = new PostgresGenerator();
-            var postgresModel = new SuiteData(
-                "postgre",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postOptimiser,
-                postParserManager,
-                postGenerator);
-
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL"));
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionString, 10);
-            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
-            var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-            var mySQLGenerator = new MySQLGenerator();
-            var mySQLModel = new SuiteData(
-                "mysql",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLOptimiser,
-                mySQLParserManager,
-                mySQLGenerator);
-
-            var connectorSet = new List<SuiteData>() { postgresModel };
+            var connectorSet = new List<SuiteData>() { 
+                MySQLEquiDepthData.GetData(secrets),
+                PostgreEquiDepthData.GetData(secrets)};
 
             if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
