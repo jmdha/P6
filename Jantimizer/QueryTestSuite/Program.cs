@@ -11,6 +11,8 @@ using QueryPlanParser.Parsers;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using QueryTestSuite.TestRunners;
+using Tools.Models;
+using Tools.Services;
 
 namespace QueryTestSuite
 {
@@ -23,11 +25,20 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            SecretsService secrets = new SecretsService();
+            SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var postConnector = new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL"));
+            string postConnectionString = secrets.GetConnectionString("POSGRESQL");
+            var postConnectionProperties = new ConnectionProperties(
+                postConnectionString,
+                secrets.GetConnectionStringValue(postConnectionString, "Host"),
+                int.Parse(secrets.GetConnectionStringValue(postConnectionString, "Port")),
+                secrets.GetConnectionStringValue(postConnectionString, "Username"),
+                secrets.GetConnectionStringValue(postConnectionString, "Password"),
+                secrets.GetConnectionStringValue(postConnectionString, "Database"),
+                secrets.GetConnectionStringValue(postConnectionString, "SearchPath"));
+            var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionString, 10);
+            var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionProperties, 10);
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postGenerator = new PostgresGenerator();
@@ -40,9 +51,18 @@ namespace QueryTestSuite
                 postParserManager,
                 postGenerator);
 
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL"));
+            string mySQLConnectionString = secrets.GetConnectionString("MYSQL");
+            var mySQLConnectionProperties = new ConnectionProperties(
+                mySQLConnectionString,
+                secrets.GetConnectionStringValue(mySQLConnectionString, "Server"),
+                int.Parse(secrets.GetConnectionStringValue(mySQLConnectionString, "Port")),
+                secrets.GetConnectionStringValue(mySQLConnectionString, "Uid"),
+                secrets.GetConnectionStringValue(mySQLConnectionString, "Pwd"),
+                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"),
+                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"));
+            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionString, 10);
+            var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionProperties, 10);
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
             var mySQLGenerator = new MySQLGenerator();
