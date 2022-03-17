@@ -5,18 +5,18 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
-        public IEnumerable<SuiteData> SuiteDatas { get; }
+        public IEnumerable<SuiteData> SuiteDataItems { get; }
         private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<SuiteData> suiteData, DateTime timeStamp)
+        public TestSuite(IEnumerable<SuiteData> suiteDataItems, DateTime timeStamp)
         {
-            SuiteDatas = suiteData;
+            SuiteDataItems = suiteDataItems;
             TimeStamp = timeStamp;
         }
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            foreach(SuiteData suitData in SuiteDatas)
+            foreach(SuiteData suitData in SuiteDataItems)
             {
                 if (suitData.ShouldRun)
                 {
