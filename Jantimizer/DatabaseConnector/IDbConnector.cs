@@ -4,12 +4,13 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models;
 
 namespace DatabaseConnector
 {
     public interface IDbConnector
     {
-        public string ConnectionString { get; set; }
+        public ConnectionProperties ConnectionProperties { get; set; }
 
         public Task<bool> StartServer();
         public bool StopServer();
