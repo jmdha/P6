@@ -62,6 +62,10 @@
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\setup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
@@ -72,6 +76,9 @@
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
     
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tests\A_SetupTables\Cases\" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
