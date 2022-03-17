@@ -37,7 +37,7 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
         [TestMethod]
         [DataRow(5, 1)]
         [DataRow(1000, 999)]
-        [DataRow(5, 1)]
+        [DataRow(500000, 1)]
         [ExpectedException(typeof(IndexOutOfRangeException))]
         public void Cant_SetEndValueLessThanStart(int start, int stop)
         {
