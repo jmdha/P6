@@ -68,7 +68,7 @@ namespace QueryOptimiserTest
                         type,
                         new TableReferenceNode(i - 1, leftTableName, leftTableName),
                         "ID",
-                        new TableReferenceNode(i - 1, leftTableName, leftTableName),
+                        new TableReferenceNode(i, rightTableName, rightTableName),
                         "ID"
                     ));
                     
