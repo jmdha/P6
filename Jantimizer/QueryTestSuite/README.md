@@ -56,7 +56,7 @@ Postgres requires a `Host`, `Port`, `Username`, `Password`, `Database` and `Sear
 | `SearchPath`	 | `public`	            |
 
 **Example string**:
- `Host=localhost;Port=5432;Username=postgres;Password=password;Database=postgres`
+ `Host=localhost;Port=5432;Username=postgres;Password=password;Database=postgres;SearchPath=public`
 
 ### MySQL
 MySQL requires a `Server`, `Port`, `Uid`, `Pwd`, `Database` and `Schema`. The default for a local database are the following:
