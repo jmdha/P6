@@ -88,7 +88,7 @@ namespace QueryParser.QueryParsers
 
                 var join = new JoinNode(
                     id++,
-                    Utilities.GetOperatorType(groups["relation"].Value),
+                    ComparisonType.GetOperatorType(groups["relation"].Value),
                     tableRef1.Alias,
                     groups["prop1"].Value,
                     tableRef2.Alias,
@@ -153,7 +153,7 @@ namespace QueryParser.QueryParsers
 
                 var join = new JoinNode(
                     id++,
-                    Utilities.GetOperatorType(groups["relation"].Value),
+                    ComparisonType.GetOperatorType(groups["relation"].Value),
                     tableRef1.Alias,
                     groups["prop1"].Value,
                     tableRef2.Alias,

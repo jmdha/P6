@@ -26,13 +26,12 @@ public class JoinCostTest
     public void EqualitySameValue(int value, int aAmount, int bAmount, int expectedHits, int depth)
     {
         IHistogramManager<IHistogram, IDbConnector> histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, value);
-        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, value);
+        var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, value);
+        var bGram = Utilities.CreateConstHistogram(Utilities.GetTableName(1), "ID", depth, bAmount, value);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Equal);
 
         var joinCost = new JoinCost();
 
@@ -51,13 +50,12 @@ public class JoinCostTest
     public void EqualityOverlap(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         IHistogramManager<IHistogram, IDbConnector> histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(0), "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(1), "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID = B.ID) JOIN C ON B.ID = C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Equal);
 
         var joinCost = new JoinCost();
 
@@ -83,13 +81,12 @@ public class JoinCostTest
     public void LessConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram(Utilities.GetTableName(1), "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Less);
 
         var joinCost = new JoinCost();
 
@@ -104,13 +101,12 @@ public class JoinCostTest
     public void LessIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(0), "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(1), "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID < B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Less);
 
         var joinCost = new JoinCost();
 
@@ -136,13 +132,12 @@ public class JoinCostTest
     public void MoreConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram(Utilities.GetTableName(1), "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.More);
 
         var joinCost = new JoinCost();
 
@@ -157,13 +152,12 @@ public class JoinCostTest
     public void MoreIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(0), "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(1), "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID > B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.More);
 
         var joinCost = new JoinCost();
 
@@ -189,13 +183,12 @@ public class JoinCostTest
     public void EqualOrLessConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram(Utilities.GetTableName(1), "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrLess);
 
         var joinCost = new JoinCost();
 
@@ -210,13 +203,12 @@ public class JoinCostTest
     public void EqualOrLessIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(0), "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(1), "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID <= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrLess);
 
         var joinCost = new JoinCost();
 
@@ -242,13 +234,12 @@ public class JoinCostTest
     public void EqualOrMoreConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateConstHistogram("A", "ID", depth, aAmount, aValue);
-        var bGram = Utilities.CreateConstHistogram("B", "ID", depth, bAmount, bValue);
+        var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
+        var bGram = Utilities.CreateConstHistogram(Utilities.GetTableName(1), "ID", depth, bAmount, bValue);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrMore);
 
         var joinCost = new JoinCost();
 
@@ -263,13 +254,12 @@ public class JoinCostTest
     public void EqualOrMoreIncreasingValue(int aMin, int aMax, int bMin, int bMax, int depth, int expectedHits)
     {
         var histogramManager = new Histograms.Managers.PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
-        var aGram = Utilities.CreateIncreasingHistogram("A", "ID", depth, aMin, aMax);
-        var bGram = Utilities.CreateIncreasingHistogram("B", "ID", depth, bMin, bMax);
+        var aGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(0), "ID", depth, aMin, aMax);
+        var bGram = Utilities.CreateIncreasingHistogram(Utilities.GetTableName(1), "ID", depth, bMin, bMax);
         histogramManager.AddHistogram(aGram);
         histogramManager.AddHistogram(bGram);
 
-        QueryParser.ParserManager PM = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-        var nodes = PM.ParseQuery("SELECT * FROM (A JOIN B ON A.ID >= B.ID) JOIN C ON B.ID < C.ID");
+        var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrMore);
 
         var joinCost = new JoinCost();
 
