@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models;
 
 namespace HistogramsTests.Unit_Tests.Managers
 {
@@ -21,7 +22,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.DbConnector);
@@ -33,7 +34,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.Histograms);
@@ -46,7 +47,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            MySQLEquiDepthHistogramManager manager = new MySQLEquiDepthHistogramManager("", depth);
+            MySQLEquiDepthHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), depth);
 
             // ASSERT
             Assert.AreEqual(depth, manager.Depth);
@@ -63,7 +64,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Tables(string[] tableNames, string attribute, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
             foreach (string tableName in tableNames)
                 manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
 
@@ -83,7 +84,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Attributes(string[] attributeName, string tableName, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
             foreach (string attribute in attributeName)
                 manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
 
@@ -107,7 +108,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_AddHistogram(string tableName, string attributeName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth(tableName, attributeName, 10);
 
             // ACT
@@ -125,7 +126,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfTableNameEmpty(string tableName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth(tableName, "a", 10);
 
             // ACT
@@ -140,7 +141,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfAttributeNameEmpty(string attributeName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager("", 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth("A", attributeName, 10);
 
             // ACT
