@@ -34,9 +34,9 @@ namespace QueryParser.Models
             Type = type;
         }
 
-        public List<string> GetJoinTables(bool left = true, bool right = true)
+        public List<TableReferenceNode> GetJoinTables(bool left = true, bool right = true)
         {
-            List<string> tables = new List<string>();
+            List<TableReferenceNode> tables = new List<TableReferenceNode>();
             if (LeftRelation != null)
                 tables.AddRange(LeftRelation.GetJoinTables());
             if (RightRelation != null)

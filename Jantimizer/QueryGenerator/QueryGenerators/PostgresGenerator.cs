@@ -17,7 +17,7 @@ namespace QueryGenerator.QueryGenerators
         public string GenerateQuery(List<INode> nodes)
         {
             
-            List<string> tables = new List<string>();
+            List<TableReferenceNode> tables = new List<TableReferenceNode>();
             string query = Prefix;
             for (int i = 1; i < nodes.Count; i++)
                 query += '(';
@@ -32,20 +32,20 @@ namespace QueryGenerator.QueryGenerators
 
             for (int i = 1; i < nodes.Count; i++)
             {
-                string table = "";
+                TableReferenceNode table = new TableReferenceNode(-1, "...", "...");
                 if (nodes[i] is JoinNode)
                 {
                     JoinNode jNode = (JoinNode)nodes[i];
 
                     bool leftContains = false;
-                    List<string> leftJoinTables = jNode.Relation.GetJoinTables(true, false);
-                    foreach (string joinTable in leftJoinTables)
+                    List<TableReferenceNode> leftJoinTables = jNode.Relation.GetJoinTables(true, false);
+                    foreach (TableReferenceNode joinTable in leftJoinTables)
                         if (tables.Contains(joinTable))
                             leftContains = true;
 
                     bool rightContains = false;
-                    List<string> rightJoinTables = jNode.Relation.GetJoinTables(false, true);
-                    foreach (string joinTable in rightJoinTables)
+                    List<TableReferenceNode> rightJoinTables = jNode.Relation.GetJoinTables(false, true);
+                    foreach (TableReferenceNode joinTable in rightJoinTables)
                         if (tables.Contains(joinTable))
                             rightContains = true;
 
@@ -57,8 +57,7 @@ namespace QueryGenerator.QueryGenerators
                         throw new Exception("Invalid join" + nodes[i].ToString());
                     tables.Add(table);
                 }
-                    
-                query += nodes[i].GetSuffixString(table);
+                query += nodes[i].GetSuffixString(table.Alias);
             }
 
             query += Suffix;

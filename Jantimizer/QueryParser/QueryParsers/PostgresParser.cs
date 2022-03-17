@@ -79,7 +79,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@"Join Filter:(?: )(?<predicates>.+)?", RegexOptions.Compiled);
+        private static Regex JoinFinder = new Regex(@"Join Filter: +(?<predicates>.+)?", RegexOptions.Compiled);
         private static Regex TableWithinJoinFinder = new Regex(@"(?<tableNames>[a-z])[.]", RegexOptions.Compiled);
         private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
@@ -90,22 +90,13 @@ namespace QueryParser.QueryParsers
             {
                 GroupCollection groups = match.Groups;
 
-                List<TableReferenceNode> tableRefs = new List<TableReferenceNode>();
-
-                MatchCollection tablesMatches = TableWithinJoinFinder.Matches(groups["predicates"].Value);
-                foreach (Match tMatch in tablesMatches)
-                    tableRefs.Add(result.GetTableRef(tMatch.Groups["tableNames"].Value));
-
                 var predicate = groups["predicates"].Value;
 
                 var join = new JoinNode(
                     id++,
                     predicate,
-                    ExtrapolateRelation(predicate)
+                    ExtrapolateRelation(predicate, result)
                 );
-
-                foreach (TableReferenceNode tableRef in tableRefs)
-                    tableRef.Joins.Add(join);
 
                 result.Joins.Add(join);
             }
@@ -156,17 +147,12 @@ namespace QueryParser.QueryParsers
                     continue;
 
                 GroupCollection groups = match.Groups;
-                var tableRef1 = result.GetTableRef(GetAliasFromRegexMatch(match));
-                var tableRef2 = result.GetTableRef(groups["otherAlias"].Value);
 
                 var join = new JoinNode(
                     id++,
                     (string) null,
                     null
                 );
-
-                tableRef1.Joins.Add(join);
-                tableRef2.Joins.Add(join);
 
                 result.Joins.Add(join);
             }
@@ -195,7 +181,7 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        public static JoinPredicateRelation ExtrapolateRelation(string predicate)
+        public static JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
             JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
             string[] sides = new string[] {};
@@ -210,17 +196,17 @@ namespace QueryParser.QueryParsers
                 }
             }
             if (relationType == JoinPredicateRelation.RelationType.None || sides.Length < 1)
-                return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", "")));
+                return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", ""), result));
             else if (sides.Length != 2)
                 throw new InvalidDataException("Somehow only had one side " + predicate);
 
-            JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0]);
-            JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1]);
+            JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0], result);
+            JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1], result);
 
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        public static JoinNode.JoinPredicate ExtrapolateJoinPredicate(string predicate)
+        public static JoinNode.JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
@@ -247,9 +233,9 @@ namespace QueryParser.QueryParsers
                 throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
 
             return new JoinNode.JoinPredicate(
-                leftSplit[0].Trim(),
+                result.GetTableRef(leftSplit[0].Trim()),
                 leftSplit[1].Trim(),
-                rightSplit[0].Trim(),
+                result.GetTableRef(rightSplit[0].Trim()),
                 rightSplit[1].Trim(),
                 predicate.Trim(),
                 comparisonType

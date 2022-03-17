@@ -5,14 +5,14 @@
         public class JoinPredicate
         {
 
-            public string LeftTable { get; internal set; }
+            public TableReferenceNode LeftTable { get; internal set; }
             public string LeftAttribute { get; internal set; }
-            public string RightTable { get; internal set; }
+            public TableReferenceNode RightTable { get; internal set; }
             public string RightAttribute { get; internal set; }
             public string Condition { get; internal set; }
             public ComparisonType.Type ComType { get; internal set; }
 
-            public JoinPredicate(string leftTable, string leftAttribute, string rightTable, string rightAttribute, string condition, ComparisonType.Type type)
+            public JoinPredicate(TableReferenceNode leftTable, string leftAttribute, TableReferenceNode rightTable, string rightAttribute, string condition, ComparisonType.Type type)
             {
                 LeftTable = leftTable;
                 LeftAttribute = leftAttribute;

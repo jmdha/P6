@@ -66,9 +66,9 @@ namespace QueryOptimiserTest
                         i - 1,
                         $"{leftTableName} {QueryParser.Models.ComparisonType.GetOperatorString(type)} {rightTableName}",
                         type,
-                        leftTableName,
+                        new TableReferenceNode(i - 1, leftTableName, leftTableName),
                         "ID",
-                        rightTableName,
+                        new TableReferenceNode(i - 1, leftTableName, leftTableName),
                         "ID"
                     ));
                     

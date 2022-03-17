@@ -20,7 +20,7 @@ namespace QueryParser.Models
             Relation = relation;
         }
 
-        public JoinNode(int id, string predicate, ComparisonType.Type type, string leftTable, string leftAttribute, string rightTable, string rightAttribute)
+        public JoinNode(int id, string predicate, ComparisonType.Type type, TableReferenceNode leftTable, string leftAttribute, TableReferenceNode rightTable, string rightAttribute)
         {
             Id = id;
             Predicate = predicate;
@@ -37,7 +37,7 @@ namespace QueryParser.Models
         {
             if (Relation.LeafPredicate != null)
             {
-                if (Relation.LeafPredicate.LeftTable.CompareTo(Relation.LeafPredicate.RightTable) <= 0)
+                if (Relation.LeafPredicate.LeftTable.Alias.CompareTo(Relation.LeafPredicate.RightTable.Alias) <= 0)
                     return $"({Relation.LeafPredicate.LeftTable} JOIN {Relation.LeafPredicate.RightTable} ON {Predicate})";
                 else
                     return $"({Relation.LeafPredicate.RightTable} JOIN {Relation.LeafPredicate.LeftTable} ON {Predicate})";

@@ -41,8 +41,8 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
         }
 
         public int CalculateCost(JoinNode.JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
-            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
-            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
+            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
+            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
             int rightBucketStart = -1;
