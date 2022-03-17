@@ -21,7 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.2.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B2.sql" />
@@ -71,6 +71,7 @@
     <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
+    <ProjectReference Include="..\Tools\Tools.csproj" />
     
   </ItemGroup>
   <PropertyGroup>

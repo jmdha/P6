@@ -5,6 +5,7 @@ using QueryParser.Models;
 using QueryParser.QueryParsers;
 using System.Data;
 using System.Text;
+using Tools.Models;
 
 namespace Histograms.Managers
 {
@@ -25,9 +26,9 @@ namespace Histograms.Managers
         }
         public int Depth { get; }
 
-        public MySQLEquiDepthHistogramManager(string connectionString, int depth)
+        public MySQLEquiDepthHistogramManager(ConnectionProperties connectionProperties, int depth)
         {
-            DbConnector = new DatabaseConnector.Connectors.MySqlConnector(connectionString);
+            DbConnector = new DatabaseConnector.Connectors.MySqlConnector(connectionProperties);
             Histograms = new List<IHistogram>();
             Depth = depth;
         }
@@ -56,7 +57,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{DbConnector.ConnectionProperties.Schema}' AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();

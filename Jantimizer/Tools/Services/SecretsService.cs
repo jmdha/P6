@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Services
+namespace Tools.Services
 {
-    public class SecretsService
+    public class SecretsService<T> where T : class
     {
         private IConfiguration configuration;
 
         public SecretsService()
         {
             configuration = new ConfigurationBuilder()
-                .AddUserSecrets<Program>()
+                .AddUserSecrets<T>()
                 .Build();
         }
 
@@ -23,9 +23,16 @@ namespace QueryTestSuite.Services
             return configuration.GetConnectionString(key);
         }
 
-        public bool GetLaunchOption(string key)
+        public string GetConnectionStringValue(string connectionString, string key)
         {
-            return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
+            string[] split = connectionString.Split(';');
+            foreach (string s in split)
+            {
+                if (s.Contains('='))
+                    if (s.Split('=')[0] == key)
+                        return s.Split('=')[1];
+            }
+            return "Not Found";
         }
     }
 }

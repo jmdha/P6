@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
@@ -13,11 +14,11 @@ namespace DatabaseConnector.Connectors
         where Command : DbCommand, new()
         where Adapter : DbDataAdapter, new()
     {
-        public string ConnectionString { get; set; }
+        public ConnectionProperties ConnectionProperties { get; set; }
 
-        public BaseDbConnector(string connectionString)
+        public BaseDbConnector(ConnectionProperties connectionProperties)
         {
-            ConnectionString = connectionString;
+            ConnectionProperties = connectionProperties;
         }
 
         public bool CheckConnection()
@@ -26,7 +27,7 @@ namespace DatabaseConnector.Connectors
             {
                 try
                 {
-                    conn.ConnectionString = ConnectionString;
+                    conn.ConnectionString = ConnectionProperties.ConnectionString;
                     conn.Open();
                     return true;
                 }
@@ -41,7 +42,7 @@ namespace DatabaseConnector.Connectors
         {
             using (var conn = new Connector())
             {
-                conn.ConnectionString = ConnectionString;
+                conn.ConnectionString = ConnectionProperties.ConnectionString;
                 await conn.OpenAsync();
                 using (var cmd = new Command())
                 {
