@@ -1,12 +1,13 @@
 ﻿using Npgsql;
 using System.Data;
 using System.Diagnostics;
+using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
     public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand, NpgsqlDataAdapter>
     {
-        public PostgreSqlConnector(string connectionString) : base(connectionString)
+        public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
         {
 
         }
