@@ -4,13 +4,16 @@ using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Text;
+
+[assembly : InternalsVisibleTo("HistogramsTests")]
 
 namespace Histograms.Managers
 {
     public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
-        public IDbConnector DbConnector { get; }
+        public IDbConnector DbConnector { get; internal set; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
         public List<string> Attributes
@@ -40,6 +43,10 @@ namespace Histograms.Managers
 
         public void AddHistogram(IHistogram histogram)
         {
+            if (histogram.TableName.Trim() == "")
+                throw new ArgumentException("Table name cannot be empty!");
+            if (histogram.AttributeName.Trim() == "")
+                throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }
 
