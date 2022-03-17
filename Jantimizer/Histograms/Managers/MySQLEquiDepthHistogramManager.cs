@@ -40,6 +40,10 @@ namespace Histograms.Managers
 
         public void AddHistogram(IHistogram histogram)
         {
+            if (histogram.TableName.Trim() == "")
+                throw new ArgumentException("Table name cannot be empty!");
+            if (histogram.AttributeName.Trim() == "")
+                throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }
 
