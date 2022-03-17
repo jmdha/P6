@@ -13,8 +13,8 @@ namespace Histograms
     {
         public ConnectorType DbConnector { get; }
         public List<IHistogram> Histograms { get; }
-        public List<string> Tables => Histograms.Select(x => x.TableName).ToList();
-        public List<string> Attributes(string table) => Histograms.Where(x => x.TableName == table).Select(x => x.AttributeName).ToList();
+        public List<string> Tables { get; }
+        public List<string> Attributes { get; }
 
         public Task AddHistograms(string setupQuery);
         public Task AddHistograms(FileInfo setupQueryFile);
@@ -23,7 +23,5 @@ namespace Histograms
         public IHistogram GetHistogram(string table, string attribute);
         public List<IHistogram> GetHistogramsByTable(string table);
         public List<IHistogram> GetHistogramsByAttribute(string attribute);
-
-        public void PrintAllHistograms();
     }
 }

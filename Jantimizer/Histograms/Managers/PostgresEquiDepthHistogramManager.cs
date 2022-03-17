@@ -4,6 +4,7 @@ using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
 
@@ -41,6 +42,10 @@ namespace Histograms.Managers
 
         public void AddHistogram(IHistogram histogram)
         {
+            if (string.IsNullOrWhiteSpace(histogram.TableName))
+                throw new ArgumentException("Table name cannot be empty!");
+            if (string.IsNullOrWhiteSpace(histogram.AttributeName))
+                throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }
 
@@ -75,13 +80,13 @@ namespace Histograms.Managers
             }
         }
 
-        public void PrintAllHistograms()
+        public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();
-            Console.WriteLine("Recorded Histograms:");
+            sb.AppendLine("Recorded Histograms:");
             foreach (var histogram in Histograms)
                 sb.AppendLine(histogram.ToString());
-            Console.WriteLine(sb.ToString());
+            return sb.ToString();
         }
 
         public IHistogram GetHistogram(string table, string attribute)
