@@ -38,13 +38,15 @@ namespace Histograms
         {
             for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
-                IHistogramBucket newBucket = new HistogramBucket(sorted[bStart], sorted[bStart], 1);
+                int startValue = sorted[bStart];
+                int endValue = sorted[bStart];
+                int countValue = 1;
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
-                    newBucket.Count++;
-                    newBucket.ValueEnd = sorted[bIter];
+                    countValue++;
+                    endValue = sorted[bIter];
                 }
-                Buckets.Add(newBucket);
+                Buckets.Add(new HistogramBucket(startValue, endValue, countValue));
             }
         }
 
