@@ -41,9 +41,9 @@ namespace Histograms.Managers
 
         public void AddHistogram(IHistogram histogram)
         {
-            if (histogram.TableName.Trim() == "")
+            if (string.IsNullOrWhiteSpace(histogram.TableName))
                 throw new ArgumentException("Table name cannot be empty!");
-            if (histogram.AttributeName.Trim() == "")
+            if (string.IsNullOrWhiteSpace(histogram.AttributeName))
                 throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }

@@ -8,13 +8,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
 
-[assembly : InternalsVisibleTo("HistogramsTests")]
-
 namespace Histograms.Managers
 {
     public class PostgresEquiDepthHistogramManager : IHistogramManager<IHistogram, IDbConnector>
     {
-        public IDbConnector DbConnector { get; internal set; }
+        public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
         public List<string> Attributes
@@ -44,9 +42,9 @@ namespace Histograms.Managers
 
         public void AddHistogram(IHistogram histogram)
         {
-            if (histogram.TableName.Trim() == "")
+            if (string.IsNullOrWhiteSpace(histogram.TableName))
                 throw new ArgumentException("Table name cannot be empty!");
-            if (histogram.AttributeName.Trim() == "")
+            if (string.IsNullOrWhiteSpace(histogram.AttributeName))
                 throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }
