@@ -1,53 +1,45 @@
-﻿using QueryTestSuite.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DatabaseConnector;
+using QueryTestSuite.Models;
 
-namespace QueryTestSuite.Connectors
+namespace QueryTestSuite.TestRunners
 {
     internal class TestSuite
     {
-        public IEnumerable<DatabaseCommunicator> DatabaseModels { get; }
+        public IEnumerable<SuiteData> SuiteDataItems { get; }
+        private DateTime TimeStamp;
 
-        public TestSuite(IEnumerable<DatabaseCommunicator> databaseModels)
+        public TestSuite(IEnumerable<SuiteData> suiteDataItems, DateTime timeStamp)
         {
-            DatabaseModels = databaseModels;
+            SuiteDataItems = suiteDataItems;
+            TimeStamp = timeStamp;
         }
 
         public async Task RunTests(DirectoryInfo dir)
         {
-            var testRuns = new List<Task<List<AnalysisResult>>>();
-            var testRunners = new List<TestRunner>();
-
-            foreach(DatabaseCommunicator databaseModel in DatabaseModels)
+            foreach(SuiteData suitData in SuiteDataItems)
             {
-                var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "cases/"));
-
-                TestRunner runner = new TestRunner(
-                    databaseModel,
-                    GetVariant(dir, "setup", databaseModel.Name),
-                    GetVariant(dir, "cleanup", databaseModel.Name),
-                    GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, databaseModel.Name))
-                );
-                testRuns.Add(runner.Run());
-                testRunners.Add(runner);
-            }
-
-            await Task.WhenAll(testRuns);
-
-            foreach(var runs in testRuns)
-            {
-                foreach (var run in await runs)
+                if (suitData.ShouldRun)
                 {
-                    Console.WriteLine($"Database predicted cardinality: [{(run.EstimatedCardinality)}], actual: [{run.ActualCardinality}]");
+                    var testRunners = new List<TestRunner>();
+                    var testRuns = new List<Task<List<TestCaseResult>>>();
+
+                    if (!Directory.Exists(Path.Join(dir.FullName, "Cases/")))
+                        Directory.CreateDirectory(Path.Join(dir.FullName, "Cases/"));
+                    var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
+
+                    TestRunner runner = new TestRunner(
+                        suitData,
+                        GetVariant(dir, "setup", suitData.Name),
+                        GetVariant(dir, "cleanup", suitData.Name),
+                        GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, suitData.Name)),
+                        TimeStamp
+                    );
+                    testRunners.Add(runner);
+                    testRuns.Add(runner.Run(true));
+
+                    await Task.WhenAll(testRuns);
                 }
             }
-
-            Console.WriteLine("Cleaning up");
-            foreach (var runner in testRunners)
-                await runner.Cleanup();
         }
 
         private FileInfo GetVariant(DirectoryInfo dir, string name, string type)

@@ -1,8 +1,10 @@
-﻿using QueryTestSuite.Connectors;
+﻿using PrintUtilities;
 using QueryTestSuite.Models;
-using QueryTestSuite.Parsers;
 using QueryTestSuite.Services;
-using System.Data;
+using QueryTestSuite.SuiteDatas;
+using QueryTestSuite.TestRunners;
+using Tools.Models;
+using Tools.Services;
 
 namespace QueryTestSuite
 {
@@ -15,30 +17,28 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
-            SecretsService secrets = new SecretsService();
+            SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var postgresModel = new DatabaseCommunicator(
-                "postgre",
-                new PostgreSqlConnector(secrets.GetConnectionString("POSGRESQL")),
-                new PostgreSqlParser());
-            var mySqlModel = new DatabaseCommunicator(
-                "mysql",
-                new Connectors.MySqlConnector(secrets.GetConnectionString("MYSQL")),
-                new MySQLParser());
+            var connectorSet = new List<SuiteData>() { 
+                MySQLEquiDepthData.GetData(secrets),
+                PostgreEquiDepthData.GetData(secrets)};
 
-            var connectorSet = new List<DatabaseCommunicator>() { postgresModel };
-
-
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
-            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
             {
-                TestSuite suite = new TestSuite(connectorSet);
+                string testBaseDirPath = Path.GetFullPath("../../../Tests");
+                DateTime timeStamp = DateTime.Now;
 
-                Console.WriteLine($"Running Collection: {testDir}");
-                await suite.RunTests(testDir);
+                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+                {
+                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
+
+                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
+                    await suite.RunTests(testDir);
+                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+                }
+
+                DatabaseStarter.StopAllServers(connectorSet);
             }
         }
     }
 }
-

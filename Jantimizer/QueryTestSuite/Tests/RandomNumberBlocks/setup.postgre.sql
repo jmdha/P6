@@ -1,6 +1,67 @@
-CREATE TABLE A AS SELECT s, (RANDOM() * 10)::integer FROM generate_Series(1,10) s;
-CREATE TABLE B AS SELECT s, (RANDOM() * 100)::integer FROM generate_Series(1,50) s;
-CREATE TABLE C AS SELECT s, (RANDOM() * 1000)::integer FROM generate_Series(1,100) s;
-CREATE TABLE D AS SELECT s, (RANDOM() * 10000)::integer FROM generate_Series(1,500) s;
+DROP PROCEDURE IF EXISTS LoadTestData_A;
+CREATE PROCEDURE LoadTestData_A()
+language plpgsql    
+AS $$
+DECLARE
+	v_max INT := 10;
+	v_counter INT := 0;
+BEGIN
+	WHILE v_counter < v_max LOOP
+		INSERT INTO a (v) VALUES ( RANDOM() * 10 );
+        v_counter := v_counter+1;
+	END LOOP;
+	RETURN;
+END;$$;
 
-ANALYZE;
+DROP PROCEDURE IF EXISTS LoadTestData_B;
+CREATE PROCEDURE LoadTestData_B()
+language plpgsql    
+AS $$
+DECLARE
+	v_max INT := 50;
+	v_counter INT := 0;
+BEGIN
+	WHILE v_counter < v_max LOOP
+		INSERT INTO b (v) VALUES ( RANDOM() * 100 );
+        v_counter := v_counter+1;
+	END LOOP;
+	RETURN;
+END;$$;
+
+DROP PROCEDURE IF EXISTS LoadTestData_C;
+CREATE PROCEDURE LoadTestData_C()
+language plpgsql    
+AS $$
+DECLARE
+	v_max INT := 100;
+	v_counter INT := 0;
+BEGIN
+	WHILE v_counter < v_max LOOP
+		INSERT INTO c (v) VALUES ( RANDOM() * 1000 );
+        v_counter := v_counter+1;
+	END LOOP;
+	RETURN;
+END;$$;
+
+DROP PROCEDURE IF EXISTS LoadTestData_D;
+CREATE PROCEDURE LoadTestData_D()
+language plpgsql    
+AS $$
+DECLARE
+	v_max INT := 500;
+	v_counter INT := 0;
+BEGIN
+	WHILE v_counter < v_max LOOP
+		INSERT INTO d (v) VALUES ( RANDOM() * 10000 );
+        v_counter := v_counter+1;
+	END LOOP;
+	RETURN;
+END;$$;
+
+CALL LoadTestData_A();
+CALL LoadTestData_B();
+CALL LoadTestData_C();
+CALL LoadTestData_D();
+
+
+ANALYSE;

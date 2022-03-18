@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <SSDTUnitTestPath Condition="'$(SSDTUnitTestPath)' == ''">$(VsInstallRoot)\Common7\IDE\Extensions\Microsoft\SQLDB</SSDTUnitTestPath>
   </PropertyGroup>
@@ -20,26 +20,10 @@
     <None Remove="Tests\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
-    <PackageReference Include="MySqlConnector" Version="2.1.7" />
-    <PackageReference Include="Npgsql" Version="6.0.3" />
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_B4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_BE4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_E4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_S4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\IJ_SE4.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B2.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B3.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B4.sql" />
@@ -55,23 +39,10 @@
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE2.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE3.sql" />
     <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\ConstantNumberBlocks\cleanup.mysql.sql" />
     <None Include="Tests\ConstantNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\ConstantNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\ConstantNumberBlocks\setup.postgre.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_B4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_BE4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_E4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_S4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\IJ_SE4.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B2.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B3.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_B4.sql" />
@@ -87,8 +58,24 @@
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE2.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE3.sql" />
     <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\RandomNumberBlocks\cleanup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\setup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\setup.postgre.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
+    <ProjectReference Include="..\Histograms\Histograms.csproj" />
+    <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
+    <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
+    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
+    <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
+    <ProjectReference Include="..\Tools\Tools.csproj" />
+    
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>

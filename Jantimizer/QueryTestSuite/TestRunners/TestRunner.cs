@@ -1,77 +1,202 @@
-﻿using QueryTestSuite.Connectors;
-using QueryTestSuite.Parsers;
-using System;
-using System.Collections.Generic;
+﻿using CsvHelper;
+using CsvHelper.Configuration;
+using DatabaseConnector;
+using DatabaseConnector.Connectors;
+using Histograms;
+using Histograms.Managers;
+using PrintUtilities;
+using QueryOptimiser;
+using QueryParser;
+using QueryParser.Models;
+using QueryParser.QueryParsers;
+using QueryPlanParser.Models;
+using QueryTestSuite.Models;
+using QueryTestSuite.Services;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace QueryTestSuite.Models
+namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        public DatabaseCommunicator DatabaseModel { get; }
-        public FileInfo SetupFile { get; set; }
-        public FileInfo CleanupFile { get; set; }
-        public IEnumerable<FileInfo> CaseFiles { get; set; }
+        public SuiteData Case { get; }
+        public FileInfo SetupFile { get; private set; }
+        public FileInfo CleanupFile { get; private set; }
+        public IEnumerable<FileInfo> CaseFiles { get; private set; }
+        public List<TestCaseResult> Results { get; private set; }
+        private CSVWriter csvWriter;
 
-        public TestRunner(DatabaseCommunicator databaseModel, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(SuiteData @case, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            DatabaseModel = databaseModel;
+            Case = @case;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
+            Results = new List<TestCaseResult>();
+            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
         }
 
-        public async Task<List<AnalysisResult>> Run(bool runParallel = false)
+        public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            Console.WriteLine($"Running Cleanup: {CleanupFile}");
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+            await Case.Connector.CallQuery(CleanupFile);
 
-            Console.WriteLine($"Running Setup: {SetupFile}");
-            await DatabaseModel.Connector.CallQuery(SetupFile);
+            PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
+            await Case.Connector.CallQuery(SetupFile);
 
-            if (runParallel)
-                return await RunQueriesParallel();
-            else
-                return await RunQueriesSerial();
+            PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
+            await Case.HistoManager.AddHistogramsFromDB();
+
+            Results = await RunQueriesSerial();
+
+            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+            await Case.Connector.CallQuery(CleanupFile);
+
+            if (consoleOutput)
+                WriteResultToConsole();
+            if (saveResult)
+                SaveResult();
+
+            return Results;
         }
 
-        private async Task<List<AnalysisResult>> RunQueriesParallel()
+        private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            var queryAnalysisTasks = new List<Task<DataSet>>();
-            foreach (var queryFile in CaseFiles)
-            {
-                Console.WriteLine($"Spawning Task for: {queryFile}");
-                queryAnalysisTasks.Add(DatabaseModel.Connector.AnalyseQuery(queryFile));
-            }
-
-            await Task.WhenAll(queryAnalysisTasks);
-
-            var queryAnalysisResults = new List<AnalysisResult>();
-            foreach (var task in queryAnalysisTasks)
-            {
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await task));
-            }
-            return queryAnalysisResults;
-        }
-
-        private async Task<List<AnalysisResult>> RunQueriesSerial()
-        {
-            var queryAnalysisResults = new List<AnalysisResult>();
+            PrintUtil.PrintLine($"Running tests for [{Case.Name}] connector", 2, ConsoleColor.Green);
+            var testCases = new List<TestCaseResult>();
+            int count = 0;
+            int max = CaseFiles.Count();
             foreach (FileInfo queryFile in CaseFiles)
             {
-                Console.WriteLine($"Running {queryFile}");
-                queryAnalysisResults.Add(DatabaseModel.Parser.ParsePlan(await DatabaseModel.Connector.AnalyseQuery(queryFile)));
+                try
+                {
+                    PrintUtil.PrintProgressBar(count, max, 50, true, 2);
+                    PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
+                    PrintUtil.Print($"\t Executing SQL statement...             ", 0);
+                    DataSet dbResult = await Case.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = Case.Parser.ParsePlan(dbResult);
+
+                    List<INode> nodes = Case.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
+                    AnalysisResult jantimiserResult = new AnalysisResult(
+                        "Jantimiser",
+                        0,
+                        Case.Optimiser.OptimiseQueryCardinality(nodes),
+                        0,
+                        new TimeSpan());
+                    
+                    TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
+                    testCases.Add(testCase);
+                }
+                catch (Exception ex)
+                {
+                    PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
+                    PrintUtil.PrintLine(ex.ToString(), 1);
+                }
+                count++;
             }
-            return queryAnalysisResults;
+            PrintUtil.PrintProgressBar(max, max, 50, true, 2);
+            PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
+            return testCases;
         }
 
-
-        public async Task Cleanup()
+        private void WriteResultToConsole()
         {
-            await DatabaseModel.Connector.CallQuery(CleanupFile);
+            PrintUtil.PrintLine($"Displaying report for [{Case.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
+
+            foreach (var testCase in Results)
+            {
+                var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
+                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality);
+
+                var colors = new List<ConsoleColor>() {
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue,
+                    ConsoleColor.Blue
+                };
+
+                if (DbAnalysisAccuracy > JantimiserEstimateAccuracy)
+                    colors.Add(ConsoleColor.Red);
+                else if (DbAnalysisAccuracy < JantimiserEstimateAccuracy)
+                    colors.Add(ConsoleColor.Green);
+                else
+                    colors.Add(ConsoleColor.Yellow);
+
+                PrintUtil.PrintLine(new List<string>() {
+                    testCase.Category,
+                    testCase.Name,
+                    testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
+                    testCase.JantimiserResult.EstimatedCardinality.ToString(),
+                    testCase.DbAnalysisResult.ActualCardinality.ToString(),
+                    GetAccuracyAsString(DbAnalysisAccuracy),
+                    GetAccuracyAsString(JantimiserEstimateAccuracy)
+                }, 
+                new List<string>() {
+                    "{0, -30}",
+                    "{0, -20}",
+                    "{0, -20}", 
+                    "{0, -20}", 
+                    "{0, -20}", 
+                    "{0, -10}", 
+                    "{0, -10}"
+                },
+                colors,
+                2);
+            }
+        }
+
+        private string GetAccuracyAsString(ulong actualValue, ulong predictedValue)
+        {
+            decimal acc = GetAccuracy(actualValue, predictedValue);
+            if (acc == 100)
+                return "100   %";
+            else if (acc == -1)
+                return "inf   %";
+            else 
+                return string.Format("{0, -5} %", acc);
+        }
+
+        private string GetAccuracyAsString(decimal accuracy)
+        {
+            if (accuracy == 100)
+                return "100   %";
+            else if (accuracy == -1)
+                return "inf   %";
+            else 
+                return string.Format("{0, -5} %", accuracy);
+        }
+
+        private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
+        {
+            if (actualValue == 0 && predictedValue == 0)
+                return 100;
+            if (actualValue == 0)
+                return -1;
+            if (actualValue != 0 && predictedValue == 0)
+                return -1;
+            if (actualValue < predictedValue)
+            {
+                decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
+                return Math.Round(value, 2);
+            }
+            if (actualValue > predictedValue)
+            {
+                decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
+                return Math.Round(value, 2);
+            }
+            return 100;
+        }
+
+        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
+        {
+            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20} {5,-10} {6,-10}", category, caseName, predicted, actual, jantimiser, dBAccuracy, jantimiserAccuracy);
+        }
+
+        private void SaveResult()
+        {
+            csvWriter.Write();
         }
     }
 }
