@@ -40,7 +40,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
         }
 
-        public int CalculateCost(JoinNode.JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public int CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
             IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
             int leftBucketStart = -1;

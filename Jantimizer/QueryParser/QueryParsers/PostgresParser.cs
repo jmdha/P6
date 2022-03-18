@@ -212,7 +212,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        internal JoinNode.JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
@@ -238,7 +238,7 @@ namespace QueryParser.QueryParsers
             if (leftSplit.Length != 2 || rightSplit.Length != 2)
                 throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
 
-            return new JoinNode.JoinPredicate(
+            return new JoinPredicate(
                 result.GetTableRef(leftSplit[0].Trim()),
                 leftSplit[1].Trim(),
                 result.GetTableRef(rightSplit[0].Trim()),

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public partial class JoinNode : INode
+    public class JoinNode : INode
     {
         public int Id { get; internal set; }
         public string Predicate { get; internal set; }

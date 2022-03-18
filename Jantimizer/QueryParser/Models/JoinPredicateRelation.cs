@@ -16,12 +16,12 @@ namespace QueryParser.Models
             Predicate
         }
 
-        public JoinNode.JoinPredicate? LeafPredicate { get; internal set; }
+        public JoinPredicate? LeafPredicate { get; internal set; }
         public JoinPredicateRelation? LeftRelation { get; internal set; }
         public JoinPredicateRelation? RightRelation { get; internal set; }
         public RelationType Type { get; internal set; }
 
-        public JoinPredicateRelation(JoinNode.JoinPredicate leafCondition)
+        public JoinPredicateRelation(JoinPredicate leafCondition)
         {
             LeafPredicate = leafCondition;
             Type = RelationType.Predicate;
