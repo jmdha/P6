@@ -29,13 +29,15 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
             JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
 
-            switch (nodeRelation.Type) {
-                case JoinPredicateRelation.RelationType.Predicate:
-                    return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
-                case JoinPredicateRelation.RelationType.And:
+            if (leftRelation != null && rightRelation != null) {
+                if (nodeRelation.Type == JoinPredicateRelation.RelationType.And)
                     return Math.Min(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
-                case JoinPredicateRelation.RelationType.Or:
+                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.Or)
                     return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
+                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.None)
+                    throw new ArgumentNullException($"Noderelation type is not set {nodeRelation.ToString()}");
+                else
+                    throw new NotImplementedException($"The noderelation type of {nodeRelation.Type} is unhandled");
             }
             throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
         }
