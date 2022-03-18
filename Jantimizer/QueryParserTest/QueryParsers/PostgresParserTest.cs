@@ -10,6 +10,7 @@ namespace QueryParsers
     public class PostgresParserTest
     {
         #region AnalyseExplanation
+        #region JoinTest
         [TestMethod]
         [DataRow (
              $"Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
@@ -53,7 +54,8 @@ namespace QueryParsers
              "(a.v1 <= b.v2)")]
         public void AnalyseExplanationSingleJoinTest(string explainResults, ComparisonType.Type type, string predicate)
         {
-            ParserResult result = PostgresParser.AnalyseExplanationText(explainResults);
+        	PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
+            ParserResult result = parser.AnalyseExplanationText(explainResults);
             
             Assert.AreEqual(1, result.Joins.Count);
             Assert.AreEqual(predicate, result.Joins[0].Predicate);
@@ -93,7 +95,8 @@ namespace QueryParsers
              "a.v1 = b.v2")]
         public void AnalyseExplanationSingleAndTest(string explainResults, ComparisonType.Type leftType, ComparisonType.Type rightType, string predicate, string leftPredicate, string rightPredicate)
         {
-            ParserResult result = PostgresParser.AnalyseExplanationText(explainResults);
+			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
+            ParserResult result = parser.AnalyseExplanationText(explainResults);
 
             Assert.AreEqual(1, result.Joins.Count);
             Assert.AreEqual(predicate, result.Joins[0].Predicate);
@@ -141,7 +144,8 @@ namespace QueryParsers
              "a.v1 = b.v2")]
         public void AnalyseExplanationSingleOrTest(string explainResults, ComparisonType.Type leftType, ComparisonType.Type rightType, string predicate, string leftPredicate, string rightPredicate)
         {
-            ParserResult result = PostgresParser.AnalyseExplanationText(explainResults);
+			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
+            ParserResult result = parser.AnalyseExplanationText(explainResults);
 
             Assert.AreEqual(1, result.Joins.Count);
             Assert.AreEqual(predicate, result.Joins[0].Predicate);
@@ -163,6 +167,24 @@ namespace QueryParsers
             Assert.AreEqual(rightType, result.Joins[0].Relation.RightRelation!.LeafPredicate!.ComType);
             Assert.AreEqual(rightPredicate, result.Joins[0].Relation.RightRelation!.LeafPredicate!.Condition);
         }
+        #endregion
+        #region ConditionTest
+        [TestMethod]
+        [DataRow(
+             $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
+             $"              Index Cond: (v1 = b.v2)\n",
+             "a.v1 = b.v2"
+        )]
+        public void AnalyseExplanationConditionTest(string explainResults, string predicate) {
+			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
+			ParserResult result = new ParserResult();
+			result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
+			result.Tables.Add("b", new TableReferenceNode(0, "b", "b"));
+            parser.InsertConditions(explainResults, ref result);
+            Assert.AreEqual(1, result.Joins.Count);
+            Assert.AreEqual(predicate, result.Joins[0].Predicate);
+        }
+        #endregion
         #endregion
     }
 }

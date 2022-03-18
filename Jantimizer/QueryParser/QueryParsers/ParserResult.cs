@@ -17,7 +17,7 @@ namespace QueryParser.QueryParsers
         public TableReferenceNode GetTableRef(string alias)
         {
             if (!Tables.ContainsKey(alias))
-                throw new NullReferenceException($"No table '{alias}");
+                throw new NullReferenceException($"No table {alias}");
 
             return Tables[alias];
         }

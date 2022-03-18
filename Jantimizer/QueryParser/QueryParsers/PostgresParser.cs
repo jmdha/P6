@@ -4,9 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleToAttribute("QueryParserTest")]
 
 namespace QueryParser.QueryParsers
 {
@@ -40,7 +43,7 @@ namespace QueryParser.QueryParsers
             return AnalyseExplanationText(explanationTextBlock);
         }
 
-        public static ParserResult AnalyseExplanationText(string explanationText)
+        public ParserResult AnalyseExplanationText(string explanationText)
         {
             var result = new ParserResult();
 
@@ -54,7 +57,7 @@ namespace QueryParser.QueryParsers
 
 
         private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
-        private static void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
 
@@ -80,7 +83,7 @@ namespace QueryParser.QueryParsers
         }
 
         private static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
-        private static void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
 
@@ -115,7 +118,7 @@ namespace QueryParser.QueryParsers
         );
 
 
-        private static void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -135,7 +138,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private static void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -146,11 +149,15 @@ namespace QueryParser.QueryParsers
                     continue;
 
                 GroupCollection groups = match.Groups;
+                var tableRef1 = result.GetTableRef(GetAliasFromRegexMatch(match));
+                var tableRef2 = result.GetTableRef(groups["otherAlias"].Value);
+
+                string predicate = $"{tableRef1.Alias}.{groups["joinProp"]} {groups["relation"]} {tableRef2.Alias}.{groups["otherProp"]}";
 
                 var join = new JoinNode(
                     id++,
-                    (string) null,
-                    null
+                    predicate,
+                    ExtrapolateRelation(predicate, result)
                 );
 
                 result.Joins.Add(join);
@@ -180,7 +187,7 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        public static JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
+        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
             JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
             string[] sides = new string[] {};
@@ -205,7 +212,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        public static JoinNode.JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        internal JoinNode.JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
