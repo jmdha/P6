@@ -6,7 +6,6 @@ DECLARE
 	v_max INT := 10;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE a RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO a (v) VALUES ( RANDOM() * 10 );
         v_counter := v_counter+1;
@@ -22,7 +21,6 @@ DECLARE
 	v_max INT := 50;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE b RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO b (v) VALUES ( RANDOM() * 100 );
         v_counter := v_counter+1;
@@ -38,7 +36,6 @@ DECLARE
 	v_max INT := 100;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE c RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO c (v) VALUES ( RANDOM() * 1000 );
         v_counter := v_counter+1;
@@ -54,7 +51,6 @@ DECLARE
 	v_max INT := 500;
 	v_counter INT := 0;
 BEGIN
-	TRUNCATE d RESTART IDENTITY;
 	WHILE v_counter < v_max LOOP
 		INSERT INTO d (v) VALUES ( RANDOM() * 10000 );
         v_counter := v_counter+1;
