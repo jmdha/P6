@@ -15,11 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< HEAD:Jantimizer/QueryParserTest/QueryParserTest.csproj
-    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
-=======
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
->>>>>>> main:Jantimizer/DatabaseConnectorTests/DatabaseConnectorTests.csproj
   </ItemGroup>
 
 </Project>
