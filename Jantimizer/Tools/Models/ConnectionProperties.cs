@@ -13,8 +13,8 @@ namespace Tools.Models
         public int Port { get; }
         public string Username { get; }
         public string Password { get; }
-        public string Database { get; }
-        public string Schema { get; }
+        public string Database { get; set; }
+        public string Schema { get; set; }
 
         public ConnectionProperties()
         {

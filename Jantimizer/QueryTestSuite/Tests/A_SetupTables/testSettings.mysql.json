@@ -1,0 +1,7 @@
+﻿{
+  "DoCleanup": false,
+  "DoSetup": true,
+  "DoMakeHistograms" : false,
+  "Database": "basictests",
+  "Schema": "basictests"
+}

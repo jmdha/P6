@@ -27,7 +27,7 @@ namespace DatabaseConnector.Connectors
             {
                 try
                 {
-                    conn.ConnectionString = ConnectionProperties.ConnectionString;
+                    conn.ConnectionString = BuildConnectionString();
                     conn.Open();
                     return true;
                 }
@@ -38,11 +38,14 @@ namespace DatabaseConnector.Connectors
             }
         }
 
+
+        public abstract string BuildConnectionString();
+
         public async Task<DataSet> CallQuery(string query)
         {
             using (var conn = new Connector())
             {
-                conn.ConnectionString = ConnectionProperties.ConnectionString;
+                conn.ConnectionString = BuildConnectionString();
                 await conn.OpenAsync();
                 using (var cmd = new Command())
                 {

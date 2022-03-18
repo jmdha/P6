@@ -19,25 +19,21 @@ namespace QueryTestSuite
         {
             SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var connectorSet = new List<SuiteData>() { 
-                MySQLEquiDepthData.GetData(secrets),
-                PostgreEquiDepthData.GetData(secrets)};
+            var connectorSet = new List<SuiteData>() {
+                PostgreEquiDepthData.GetData(secrets),
+                MySQLEquiDepthData.GetData(secrets)
+            };
 
-            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
+            string testBaseDirPath = Path.GetFullPath("../../../Tests");
+            DateTime timeStamp = DateTime.Now;
+
+            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
             {
-                string testBaseDirPath = Path.GetFullPath("../../../Tests");
-                DateTime timeStamp = DateTime.Now;
+                TestSuite suite = new TestSuite(connectorSet, timeStamp);
 
-                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
-                {
-                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
-
-                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                    await suite.RunTests(testDir);
-                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
-                }
-
-                DatabaseStarter.StopAllServers(connectorSet);
+                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
+                await suite.RunTests(testDir);
+                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
             }
         }
     }

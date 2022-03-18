@@ -26,8 +26,8 @@ namespace QueryTestSuite.SuiteDatas
                 int.Parse(secrets.GetConnectionStringValue(postConnectionString, "Port")),
                 secrets.GetConnectionStringValue(postConnectionString, "Username"),
                 secrets.GetConnectionStringValue(postConnectionString, "Password"),
-                secrets.GetConnectionStringValue(postConnectionString, "Database"),
-                secrets.GetConnectionStringValue(postConnectionString, "SearchPath"));
+                "",
+                "");
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
 
             string mySQLConnectionString = secrets.GetConnectionString("MYSQL");
@@ -37,14 +37,15 @@ namespace QueryTestSuite.SuiteDatas
                 int.Parse(secrets.GetConnectionStringValue(mySQLConnectionString, "Port")),
                 secrets.GetConnectionStringValue(mySQLConnectionString, "Uid"),
                 secrets.GetConnectionStringValue(mySQLConnectionString, "Pwd"),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"));
+                "",
+                "");
             var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionProperties, 10);
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var mySQLModel = new SuiteData(
+                new TestSettings(),
                 secrets.GetLaunchOption("MYSQL"),
                 "mysql",
                 mySQLConnector,

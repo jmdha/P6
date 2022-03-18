@@ -1,4 +1,6 @@
-﻿DROP PROCEDURE IF EXISTS LoadTestData_A;
+﻿SET search_path TO basictests;
+
+DROP PROCEDURE IF EXISTS LoadTestData_A;
 CREATE PROCEDURE LoadTestData_A()
 language plpgsql    
 AS $$

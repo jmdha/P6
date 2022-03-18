@@ -13,21 +13,24 @@ using QueryPlanParser.Models;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using System.Data;
+using System.Text.Json;
 
 namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
         public SuiteData Case { get; }
+        public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(SuiteData @case, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(SuiteData @case, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
             Case = @case;
+            SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
@@ -37,19 +40,34 @@ namespace QueryTestSuite.TestRunners
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-            await Case.Connector.CallQuery(CleanupFile);
+            PrintUtil.PrintLine($"Parsing settings", 1, ConsoleColor.Blue);
+            ParseTestSettings(SettingsFile);
 
-            PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
-            await Case.Connector.CallQuery(SetupFile);
+            if (Case.Settings.DoCleanup)
+            {
+                PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+                await Case.Connector.CallQuery(CleanupFile);
+            }
 
-            PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
-            await Case.HistoManager.AddHistogramsFromDB();
+            if (Case.Settings.DoSetup)
+            {
+                PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
+                await Case.Connector.CallQuery(SetupFile);
+            }
+
+            if (Case.Settings.DoMakeHistograms)
+            {
+                PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
+                await Case.HistoManager.AddHistogramsFromDB();
+            }
 
             Results = await RunQueriesSerial();
 
-            PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-            await Case.Connector.CallQuery(CleanupFile);
+            if (Case.Settings.DoCleanup)
+            {
+                PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+                await Case.Connector.CallQuery(CleanupFile);
+            }
 
             if (consoleOutput)
                 WriteResultToConsole();
@@ -197,6 +215,17 @@ namespace QueryTestSuite.TestRunners
         private void SaveResult()
         {
             csvWriter.Write();
+        }
+
+        private void ParseTestSettings(FileInfo file)
+        {
+            var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
+            if (res is TestSettings set)
+            {
+                Case.Settings = set;
+                Case.Connector.ConnectionProperties.Database = set.Database;
+                Case.Connector.ConnectionProperties.Schema = set.Schema;
+            }
         }
     }
 }

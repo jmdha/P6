@@ -11,6 +11,14 @@ namespace DatabaseConnector.Connectors
 
         }
 
+        public override string BuildConnectionString()
+        {
+            string newStr = ConnectionProperties.ConnectionString;
+            if (!newStr.EndsWith(";"))
+                newStr += ";";
+            return $"{newStr}Database={ConnectionProperties.Database};";
+        }
+
         public override async Task<DataSet> AnalyseQuery(string query)
         {
             if (!query.ToUpper().Trim().StartsWith("EXPLAIN ANALYZE "))

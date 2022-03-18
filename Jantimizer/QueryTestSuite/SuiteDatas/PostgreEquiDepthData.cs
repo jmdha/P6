@@ -27,13 +27,14 @@ namespace QueryTestSuite.SuiteDatas
                 secrets.GetConnectionStringValue(postConnectionString, "Username"),
                 secrets.GetConnectionStringValue(postConnectionString, "Password"),
                 secrets.GetConnectionStringValue(postConnectionString, "Database"),
-                secrets.GetConnectionStringValue(postConnectionString, "SearchPath"));
+                "");
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionProperties, 10);
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postgresModel = new SuiteData(
+                new TestSettings(),
                 secrets.GetLaunchOption("POSGRESQL"),
                 "postgre",
                 postConnector,

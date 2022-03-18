@@ -49,7 +49,7 @@ To add a secrets file to the project:
 # Connection Strings
 All connectors in this project use standard ADO.NET style connection strings. A list of structures for the local connection strings can be seen below.
 ### PostgreSQL
-Postgres requires a `Host`, `Port`, `Username`, `Password`, `Database` and `SearchPath` (Schema). The default for a local database are the following:
+Postgres requires a `Host`, `Port`, `Username`, `Password` and `Database`. The default for a local database are the following:
 
 | Property Name  | Default value (Local) |
 | -------------- | --------------------- |
@@ -58,13 +58,12 @@ Postgres requires a `Host`, `Port`, `Username`, `Password`, `Database` and `Sear
 | `Username`     | `postgres`            |
 | `Password`     | `password`            |
 | `Database`     | `postgres`            |
-| `SearchPath`	 | `public`	            |
 
 **Example string**:
- `Host=localhost;Port=5432;Username=postgres;Password=password;Database=postgres;SearchPath=public`
+ `Host=localhost;Port=5432;Username=postgres;Password=password;Database=postgres`
 
 ### MySQL
-MySQL requires a `Server`, `Port`, `Uid`, `Pwd`, `Database` and `Schema`. The default for a local database are the following:
+MySQL requires a `Server`, `Port`, `Uid`, `Pwd` and `Database`. The default for a local database are the following:
 
 | Property Name  | Default value (Local) |
 | -------------- | --------------------- |

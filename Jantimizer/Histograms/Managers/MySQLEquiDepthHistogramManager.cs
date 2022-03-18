@@ -61,7 +61,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetTablesInSchema()
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{DbConnector.ConnectionProperties.Schema}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -69,7 +69,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{DbConnector.ConnectionProperties.Schema}' AND TABLE_NAME = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = database() AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();

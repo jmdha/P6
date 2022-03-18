@@ -20,6 +20,14 @@
     <None Remove="Tests\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Tests\A_SetupTables\testSettings.postgre.json" />
+    <Content Include="Tests\A_SetupTables\testSettings.mysql.json" />
+    <Content Include="Tests\ConstantNumberBlocks\testSettings.mysql.json" />
+    <Content Include="Tests\ConstantNumberBlocks\testSettings.postgre.json" />
+    <Content Include="Tests\RandomNumberBlocks\testSettings.mysql.json" />
+    <Content Include="Tests\RandomNumberBlocks\testSettings.postgre.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
@@ -62,8 +70,6 @@
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
-    <None Include="Tests\A_SetupTables\cleanup.mysql.sql" />
-    <None Include="Tests\A_SetupTables\cleanup.postgre.sql" />
     <None Include="Tests\A_SetupTables\setup.mysql.sql" />
     <None Include="Tests\A_SetupTables\setup.postgre.sql" />
   </ItemGroup>
