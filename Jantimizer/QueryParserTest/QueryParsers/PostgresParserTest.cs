@@ -173,16 +173,50 @@ namespace QueryParsers
         [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 = b.v2)\n",
+			 ComparisonType.Type.Equal,
              "a.v1 = b.v2"
         )]
-        public void AnalyseExplanationConditionTest(string explainResults, string predicate) {
+		[DataRow(
+             $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
+             $"              Index Cond: (v1 > b.v2)\n",
+			 ComparisonType.Type.More,
+             "a.v1 > b.v2"
+        )]
+		[DataRow(
+             $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
+             $"              Index Cond: (v1 < b.v2)\n",
+			 ComparisonType.Type.Less,
+             "a.v1 < b.v2"
+        )]
+		[DataRow(
+             $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
+             $"              Index Cond: (v1 >= b.v2)\n",
+			 ComparisonType.Type.EqualOrMore,
+             "a.v1 >= b.v2"
+        )]
+		[DataRow(
+             $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
+             $"              Index Cond: (v1 <= b.v2)\n",
+			 ComparisonType.Type.EqualOrLess,
+             "a.v1 <= b.v2"
+        )]
+        public void AnalyseExplanationConditionTest(string explainResults, ComparisonType.Type type, string predicate) {
 			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
 			ParserResult result = new ParserResult();
 			result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
 			result.Tables.Add("b", new TableReferenceNode(0, "b", "b"));
             parser.InsertConditions(explainResults, ref result);
             Assert.AreEqual(1, result.Joins.Count);
+			Assert.IsNotNull(result.Joins[0].Relation);
+			Assert.IsNotNull(result.Joins[0].Relation.LeafPredicate);
+			Assert.IsNull(result.Joins[0].Relation.LeftRelation);
+			Assert.IsNull(result.Joins[0].Relation.RightRelation);
             Assert.AreEqual(predicate, result.Joins[0].Predicate);
+			Assert.AreEqual("a", result.Joins[0].Relation!.LeafPredicate!.LeftTable.Alias);
+			Assert.AreEqual("b", result.Joins[0].Relation!.LeafPredicate!.RightTable.Alias);
+			Assert.AreEqual("v1", result.Joins[0].Relation!.LeafPredicate!.LeftAttribute);
+			Assert.AreEqual("v2", result.Joins[0].Relation!.LeafPredicate!.RightAttribute);
+			Assert.AreEqual(type, result.Joins[0].Relation!.LeafPredicate!.ComType);
         }
         #endregion
         #endregion
