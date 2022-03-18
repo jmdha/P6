@@ -50,6 +50,36 @@ namespace Histograms
             }
         }
 
+        public void GenerateHistogram(List<ValueCount> sortedGroups)
+        {
+            int? minValue = null;
+            int? maxValue = null;
+            long count = 0;
+
+            foreach (var grp in sortedGroups) {
+                if(minValue == null) // Begin new bucket
+                    minValue = grp.Value;
+
+                count += grp.Count;
+                maxValue = grp.Value;
+
+                if (count >= Depth)
+                {
+                    Buckets.Add(new HistogramBucket((int)minValue, grp.Value, count));
+                    minValue = null;
+                    maxValue = null;
+                    count = 0;
+                }
+            }
+
+            // Catch final value, if it wasn't enough to trigger a new bucket
+            if(minValue != null)
+            {
+                Buckets.Add(new HistogramBucket((int)minValue, (int)maxValue!, count));
+            }
+
+        }
+
         public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();

@@ -10,5 +10,6 @@ namespace Histograms
 
         public void GenerateHistogram(DataTable table, string key);
         public void GenerateHistogram(List<int> column);
+        public void GenerateHistogram(List<ValueCount> sortedGroups);
     }
 }

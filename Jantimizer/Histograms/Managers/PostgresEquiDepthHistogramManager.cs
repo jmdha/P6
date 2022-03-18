@@ -55,8 +55,10 @@ namespace Histograms.Managers
             foreach (DataRow tables in allTables)
             {
                 string tableName = $"{tables["table_name"]}".ToLower();
-                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
-                    await AddHistogramForAttribute(row, tableName);
+                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows) {
+                    if(row["data_type"].ToString() == "integer")
+                        await AddHistogramForAttribute(row, tableName);
+                }
             }
         }
 
@@ -79,11 +81,16 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["column_name"]}".ToLower();
-            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
-            if (attributeValues.Tables.Count > 0)
+            DataSet sortedGroupsDs = await DbConnector.CallQuery($"SELECT {attributeName} AS val, count({attributeName}) FROM {tableName} WHERE {attributeName} IS NOT NULL GROUP BY {attributeName} ORDER BY {attributeName} ASC");
+            List<ValueCount> sortedGroups = sortedGroupsDs.Tables[0].AsEnumerable().Select(r => new ValueCount((int)r["val"], (long)r["count"])).ToList();
+
+            //var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName} WHERE {attributeName} IS NOT NULL");
+            if (sortedGroupsDs.Tables.Count > 0)
             {
+                // SELECT keyword_id AS val, count(keyword_id) FROM movie_keyword GROUP BY keyword_id ORDER BY COUNT(keyword_id) DESC
                 IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
+                //newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
+                newHistogram.GenerateHistogram(sortedGroups);
                 Histograms.Add(newHistogram);
             }
         }
