@@ -14,6 +14,7 @@ using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using System.Data;
 using System.Text.Json;
+using Tools.Models;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -222,9 +223,7 @@ namespace QueryTestSuite.TestRunners
             var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
             if (res is TestSettings set)
             {
-                Case.Settings = set;
-                Case.Connector.ConnectionProperties.Database = set.Database;
-                Case.Connector.ConnectionProperties.Schema = set.Schema;
+                Case.Settings.Update(set, Case.Settings.Properties.Secrets);
             }
         }
     }

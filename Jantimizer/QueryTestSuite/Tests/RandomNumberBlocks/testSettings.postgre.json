@@ -2,6 +2,10 @@
   "DoCleanup": true,
   "DoSetup": true,
   "DoMakeHistograms": true,
-  "Database": "postgres",
-  "Schema": "basictests"
+  "Properties": {
+    "Server": "localhost",
+    "Port": 5432,
+    "Database": "postgres",
+    "Schema": "basictests"
+  }
 }

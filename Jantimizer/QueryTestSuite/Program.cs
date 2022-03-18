@@ -19,10 +19,12 @@ namespace QueryTestSuite
         {
             SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var connectorSet = new List<SuiteData>() {
-                PostgreEquiDepthData.GetData(secrets),
-                MySQLEquiDepthData.GetData(secrets)
-            };
+            var pgData = PostgreEquiDepthData.GetData(secrets);
+            var myData = MySQLEquiDepthData.GetData(secrets);
+
+            myData.QueryParserManager.QueryParsers.Add(pgData.QueryParserManager.QueryParsers[0]);
+
+            var connectorSet = new List<SuiteData>() {pgData, myData };
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
             DateTime timeStamp = DateTime.Now;

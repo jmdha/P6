@@ -14,10 +14,7 @@ namespace DatabaseConnector.Connectors
 
         public override string BuildConnectionString()
         {
-            string newStr = ConnectionProperties.ConnectionString;
-            if (!newStr.EndsWith(";"))
-                newStr += ";";
-            return $"{newStr}Database={ConnectionProperties.Database};SearchPath={ConnectionProperties.Schema}";
+            return $"Host={ConnectionProperties.Server};Port={ConnectionProperties.Port};Username={ConnectionProperties.Secrets.Username};Password={ConnectionProperties.Secrets.Password};Database={ConnectionProperties.Database};SearchPath={ConnectionProperties.Schema}";
         }
 
         public override async Task<DataSet> AnalyseQuery(string query)

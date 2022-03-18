@@ -1,7 +1,11 @@
 ﻿{
   "DoCleanup": true,
   "DoSetup": true,
-  "DoMakeHistograms" : true,
-  "Database": "basictests",
-  "Schema": "basictests"
+  "DoMakeHistograms": true,
+  "Properties": {
+    "Server": "localhost",
+    "Port": 3306,
+    "Database": "basictests",
+    "Schema": "basictests"
+  }
 }

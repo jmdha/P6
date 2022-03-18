@@ -2,40 +2,45 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Tools.Models
 {
     public class ConnectionProperties
     {
-        public string ConnectionString { get; }
-        public string Server { get; }
-        public int Port { get; }
-        public string Username { get; }
-        public string Password { get; }
+        public string Server { get; set; }
+        public int Port { get; set; }
+        [JsonIgnore]
+        public SecretsItem Secrets { get; set; }
         public string Database { get; set; }
         public string Schema { get; set; }
 
         public ConnectionProperties()
         {
-            ConnectionString = "";
             Server = "";
             Port = -1;
-            Username = "";
-            Password = "";
+            Secrets = new SecretsItem();
             Database = "";
             Schema = "";
         }
 
-        public ConnectionProperties(string connectionString, string server, int port, string username, string password, string database, string schema)
+        public ConnectionProperties(string server, int port, SecretsItem secrets, string database, string schema)
         {
-            ConnectionString = connectionString;
             Server = server;
             Port = port;
-            Username = username;
-            Password = password;
+            Secrets = secrets;
             Database = database;
             Schema = schema;
+        }
+
+        public ConnectionProperties(SecretsItem secrets)
+        {
+            Server = "";
+            Port = -1;
+            Secrets = secrets;
+            Database = "";
+            Schema = "";
         }
     }
 }

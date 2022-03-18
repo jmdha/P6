@@ -19,22 +19,14 @@ namespace QueryTestSuite.SuiteDatas
     {
         public static SuiteData GetData<T>(SecretsService<T> secrets) where T : class
         {
-            string postConnectionString = secrets.GetConnectionString("POSGRESQL");
-            var postConnectionProperties = new ConnectionProperties(
-                postConnectionString,
-                secrets.GetConnectionStringValue(postConnectionString, "Host"),
-                int.Parse(secrets.GetConnectionStringValue(postConnectionString, "Port")),
-                secrets.GetConnectionStringValue(postConnectionString, "Username"),
-                secrets.GetConnectionStringValue(postConnectionString, "Password"),
-                secrets.GetConnectionStringValue(postConnectionString, "Database"),
-                "");
+            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new PostgresEquiDepthHistogramManager(postConnector.ConnectionProperties, 10);
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postgresModel = new SuiteData(
-                new TestSettings(),
+                new TestSettings(true, true, true, postConnectionProperties),
                 secrets.GetLaunchOption("POSGRESQL"),
                 "postgre",
                 postConnector,
