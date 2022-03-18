@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Exceptions;
 
 namespace Tools.Services
 {
@@ -20,6 +21,8 @@ namespace Tools.Services
 
         public string GetConnectionString(string key)
         {
+            if (!configuration.GetSection("ConnectionStrings").GetSection(key).Exists())
+                throw new MissingKeyException($"Error, key missing '{key}' for launch option!");
             return configuration.GetConnectionString(key);
         }
 
@@ -37,7 +40,16 @@ namespace Tools.Services
 
         public bool GetLaunchOption(string key)
         {
+            if (!configuration.GetSection("LaunchSystem").GetSection(key).Exists())
+                throw new MissingKeyException($"Error, key missing '{key}' for launch option!");
             return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
+        }
+
+        public bool GetAutoStartOption(string key)
+        {
+            if (!configuration.GetSection("AutoStart").GetSection(key).Exists())
+                throw new MissingKeyException($"Error, key missing '{key}' for auto start option!");
+            return bool.Parse(configuration.GetSection("AutoStart")[key]);
         }
     }
 }

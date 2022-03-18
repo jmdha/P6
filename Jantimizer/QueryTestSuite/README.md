@@ -31,7 +31,8 @@ To add a secrets file to the project:
 * Right click on the project file.
 * Click "Manage User Secrets".
 * Paste the following structure and insert your connection strings instead.
-* Also optional to disable some of the database connectors if needed.
+* Optional to disable some of the database connectors if needed.
+* Optional to start the database systems if they are not online (and is set to run).
 
 ```
 {
@@ -40,6 +41,10 @@ To add a secrets file to the project:
     "MYSQL": "connection string here"
   },
   "LaunchSystem": {
+    "POSGRESQL": "True",
+    "MYSQL": "True"
+  },
+  "AutoStart": {
     "POSGRESQL": "True",
     "MYSQL": "True"
   }
