@@ -77,9 +77,6 @@
     <ProjectReference Include="..\Tools\Tools.csproj" />
     
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tests\A_SetupTables\Cases\" />
-  </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
     <UserSecretsId>8c0990b3-bd55-4561-95ab-69fec8917b23</UserSecretsId>
