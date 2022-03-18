@@ -35,6 +35,7 @@ namespace QueryTestSuite.SuiteDatas
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postgresModel = new SuiteData(
                 secrets.GetLaunchOption("POSGRESQL"),
+                secrets.GetAutoStartOption("POSGRESQL"),
                 "postgre",
                 postConnector,
                 postPlanParser,

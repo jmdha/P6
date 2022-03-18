@@ -15,6 +15,7 @@ namespace QueryTestSuite.Models
     internal class SuiteData
     {
         public bool ShouldRun { get; set; }
+        public bool ShouldAutostart { get; set; }
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
@@ -26,6 +27,7 @@ namespace QueryTestSuite.Models
 
         public SuiteData(
             bool run,
+            bool autostart,
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
@@ -34,6 +36,7 @@ namespace QueryTestSuite.Models
             IParserManager queryParserManager)
         {
             ShouldRun = run;
+            ShouldAutostart = autostart;
             Name = name;
             Connector = connector;
             Parser = parser;

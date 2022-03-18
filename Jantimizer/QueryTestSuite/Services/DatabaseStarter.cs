@@ -24,15 +24,23 @@ namespace QueryTestSuite.Services
                     else
                     {
                         PrintUtil.PrintLine($"Warning! Connector [{connector.Name}] is not online!", 0, ConsoleColor.Yellow);
-                        PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
-
-                        if (!await connector.Connector.StartServer())
+                        if (!connector.ShouldAutostart)
                         {
-                            PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
+                            PrintUtil.PrintLine($"Option to auto start is set to false. Exiting...", 0, ConsoleColor.Red);
                             return false;
                         }
                         else
-                            PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                        {
+                            PrintUtil.PrintLine($"Attempting to start...", 0, ConsoleColor.Yellow);
+
+                            if (!await connector.Connector.StartServer())
+                            {
+                                PrintUtil.PrintLine($"Error! Connector [{connector.Name}] could not start!", 0, ConsoleColor.Red);
+                                return false;
+                            }
+                            else
+                                PrintUtil.PrintLine($"Connector [{connector.Name}] is online!", 0, ConsoleColor.Green);
+                        }
                     }
                 }
             }
@@ -44,7 +52,7 @@ namespace QueryTestSuite.Services
             PrintUtil.PrintLine($"Stopping active servers", 0, ConsoleColor.DarkGray);
             foreach (var connector in connectorParsers)
             {
-                if (connector.ShouldRun)
+                if (connector.ShouldRun && connector.ShouldAutostart)
                 {
                     if (connector.Connector.CheckConnection())
                     {

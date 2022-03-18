@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
@@ -21,11 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "Query
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrintUtilities", "PrintUtilities\PrintUtilities.csproj", "{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "QueryParserTest\QueryParserTest.csproj", "{6C5E3759-0B76-422E-88FD-7AE532561902}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +89,10 @@ Global
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
