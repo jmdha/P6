@@ -10,7 +10,6 @@ namespace QueryParsers
     public class PostgresParserTest
     {
         #region AnalyseExplanation
-        #region JoinTest
         [TestMethod]
         [DataRow (
              $"Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
@@ -200,7 +199,7 @@ namespace QueryParsers
 			 ComparisonType.Type.EqualOrLess,
              "a.v1 <= b.v2"
         )]
-        public void AnalyseExplanationConditionTest(string explainResults, ComparisonType.Type type, string predicate) {
+        public void InsertConditionsTest(string explainResults, ComparisonType.Type type, string predicate) {
 			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
 			ParserResult result = new ParserResult();
 			result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
@@ -219,6 +218,61 @@ namespace QueryParsers
 			Assert.AreEqual(type, result.Joins[0].Relation!.LeafPredicate!.ComType);
         }
         #endregion
-        #endregion
+		#region FilterTest
+		[TestMethod]
+        [DataRow(
+			$"->  Index Scan using title_pkey on title a  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v1 = 0)\n",
+			"a",
+			ComparisonType.Type.Equal,
+            "v1",
+			"0"
+        )]
+		[DataRow(
+			$"->  Index Scan using title_pkey on title b  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v2 <= 1)\n",
+			"b",
+			ComparisonType.Type.EqualOrLess,
+            "v2",
+			"1"
+        )]
+		[DataRow(
+			$"->  Index Scan using title_pkey on title c  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v3 >= 2)\n",
+			"c",
+			ComparisonType.Type.EqualOrMore,
+            "v3",
+			"2"
+        )]
+		[DataRow(
+			$"->  Index Scan using title_pkey on title d  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v4 < 3)\n",
+			"d",
+			ComparisonType.Type.Less,
+            "v4",
+			"3"
+        )]
+		[DataRow(
+			$"->  Index Scan using title_pkey on title e  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v5 > 4)\n",
+			"e",
+			ComparisonType.Type.More,
+            "v5",
+			"4"
+        )]
+        public void InsertFiltersTest(string explainResults, string tableAlias, ComparisonType.Type type, string attribute, string constant) {
+			PostgresParser parser = new PostgresParser(new DatabaseConnector.Connectors.PostgreSqlConnector(new Tools.Models.ConnectionProperties()));
+			ParserResult result = new ParserResult();
+			TableReferenceNode tRefNode = new TableReferenceNode(0, tableAlias, tableAlias);
+			result.Tables.Add(tableAlias, tRefNode);
+            parser.InsertFilters(explainResults, ref result);
+			Assert.IsNotNull(result.Tables[tableAlias]);
+			Assert.AreEqual(1, result.Tables[tableAlias].Filters.Count);
+			Assert.AreEqual(tRefNode, result.Tables[tableAlias].Filters[0].TableReference);
+			Assert.AreEqual(type, result.Tables[tableAlias].Filters[0].ComType);
+			Assert.AreEqual(attribute, result.Tables[tableAlias].Filters[0].AttributeName);
+			Assert.AreEqual(constant, result.Tables[tableAlias].Filters[0].Constant);
+        }
+		#endregion
     }
 }

@@ -110,7 +110,7 @@ namespace QueryParser.QueryParsers
 
                 (?:\s+ Index\ Cond:\ \((?<joinProp>\w+)\ (?<relation>[=<>]{1,2})\ (?<otherAlias>\w+)\.(?<otherProp>\w+)\))?
 
-                (?:\s+ Filter:\ \((?<filterProp>\w+)\ (?<filterCondition>[=<>]{1,2})\ (?<filterValue>\d+)\))?
+                (?:\s+Filter:\ \((?<filterProp>\w+)\ (?<filterCondition>[=<>]{1,2})\ (?<filterValue>\d+)\))?
             ",
             RegexOptions.Compiled |
             RegexOptions.Multiline |
@@ -126,13 +126,13 @@ namespace QueryParser.QueryParsers
             {
                 if (!match.Groups["filterProp"].Success)
                     continue;
-
+                
                 var tableRef = result.Tables[GetAliasFromRegexMatch(match)];
 
                 tableRef.Filters.Add(new FilterNode(
                     tableReference: tableRef,
                     attributeName: match.Groups["filterProp"].Value,
-                    relation: match.Groups["filterCondition"].Value,
+                    comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),
                     constant: match.Groups["filterValue"].Value
                 ));
             }
@@ -187,7 +187,7 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
+        private JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
             JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
             string[] sides = new string[] {};
@@ -212,7 +212,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        private JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
