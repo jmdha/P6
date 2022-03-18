@@ -14,6 +14,6 @@ namespace QueryOptimiser.Cost.Nodes
         where HistogramType : IHistogram
         where DbConnectorType : IDbConnector
     {
-        internal int CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
+        internal long CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
     }
 }

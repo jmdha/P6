@@ -4,6 +4,6 @@
     {
         public int ValueStart { get; }
         public int ValueEnd { get; }
-        public int Count { get; }
+        public long Count { get; }
     }
 }

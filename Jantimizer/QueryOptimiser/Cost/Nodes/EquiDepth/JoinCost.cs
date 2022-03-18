@@ -16,7 +16,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public long CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
             IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
             int leftBucketStart = -1;
@@ -90,8 +90,8 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             if (leftBucketStart == -1 || leftBucketEnd == -1 || rightBucketEnd == -1 || rightBucketEnd == -1)
                 return 0;
 
-            int leftBucketCount = 0;
-            int rightBucketCount = 0;
+            long leftBucketCount = 0;
+            long rightBucketCount = 0;
 
             for (int i = leftBucketStart; i <= leftBucketEnd; i++)
                 leftBucketCount += leftGram.Buckets[i].Count;
