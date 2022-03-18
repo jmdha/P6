@@ -38,8 +38,10 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                     throw new ArgumentNullException($"Noderelation type is not set {nodeRelation.ToString()}");
                 else
                     throw new NotImplementedException($"The noderelation type of {nodeRelation.Type} is unhandled");
-            }
-            throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
+            } else if (nodeRelation.LeafPredicate != null) {
+                return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
+            } else 
+                throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());            
         }
 
         public int CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
