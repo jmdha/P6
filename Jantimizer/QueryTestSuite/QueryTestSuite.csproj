@@ -62,12 +62,15 @@
     <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
     <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\cleanup.postgre.sql" />
+    <None Include="Tests\A_SetupTables\setup.mysql.sql" />
+    <None Include="Tests\A_SetupTables\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
-    <ProjectReference Include="..\QueryGenerator\QueryGenerator.csproj" />
     <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />

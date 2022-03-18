@@ -1,6 +1,5 @@
 ﻿using DatabaseConnector;
 using Histograms;
-using QueryGenerator;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
@@ -25,8 +24,6 @@ namespace QueryTestSuite.Models
         public IQueryOptimiser<IHistogram, IDbConnector> Optimiser { get; set; }
         public IParserManager QueryParserManager { get; set; }
 
-        public IQueryGenerator Generator { get; set; }
-
         public SuiteData(
             bool run,
             string name, 
@@ -34,8 +31,7 @@ namespace QueryTestSuite.Models
             IPlanParser parser, 
             IHistogramManager<IHistogram, IDbConnector> histoManager, 
             IQueryOptimiser<IHistogram, IDbConnector> optimiser, 
-            IParserManager queryParserManager, 
-            IQueryGenerator generator)
+            IParserManager queryParserManager)
         {
             ShouldRun = run;
             Name = name;
@@ -44,7 +40,6 @@ namespace QueryTestSuite.Models
             HistoManager = histoManager;
             Optimiser = optimiser;
             QueryParserManager = queryParserManager;
-            Generator = generator;
         }
     }
 }
