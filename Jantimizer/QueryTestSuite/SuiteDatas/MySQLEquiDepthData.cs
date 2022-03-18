@@ -29,7 +29,6 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLModel = new SuiteData(
                 new TestSettings(true, true, true, mySQLConnectionProperties),
                 secrets.GetLaunchOption("MYSQL"),
-                secrets.GetAutoStartOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
                 mySQLPlanParser,

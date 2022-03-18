@@ -17,7 +17,6 @@ namespace QueryTestSuite.Models
         public TestSettings Settings { get; set; }
 
         public bool ShouldRun { get; set; }
-        public bool ShouldAutostart { get; set; }
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
@@ -30,7 +29,6 @@ namespace QueryTestSuite.Models
         public SuiteData(
             TestSettings settings,
             bool run,
-            bool autostart,
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
@@ -40,7 +38,6 @@ namespace QueryTestSuite.Models
         {
             Settings = settings;
             ShouldRun = run;
-            ShouldAutostart = autostart;
             Name = name;
             Connector = connector;
             Parser = parser;

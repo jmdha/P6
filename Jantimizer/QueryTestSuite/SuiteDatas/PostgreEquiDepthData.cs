@@ -28,7 +28,6 @@ namespace QueryTestSuite.SuiteDatas
             var postgresModel = new SuiteData(
                 new TestSettings(true, true, true, postConnectionProperties),
                 secrets.GetLaunchOption("POSGRESQL"),
-                secrets.GetAutoStartOption("POSGRESQL"),
                 "postgre",
                 postConnector,
                 postPlanParser,
