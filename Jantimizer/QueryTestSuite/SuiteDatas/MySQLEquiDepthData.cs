@@ -1,5 +1,5 @@
-﻿using Histograms.Managers;
-using QueryGenerator.QueryGenerators;
+﻿using DatabaseConnector.Connectors;
+using Histograms.Managers;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
@@ -19,6 +19,17 @@ namespace QueryTestSuite.SuiteDatas
     {
         public static SuiteData GetData<T>(SecretsService<T> secrets) where T : class
         {
+            string postConnectionString = secrets.GetConnectionString("POSGRESQL");
+            var postConnectionProperties = new ConnectionProperties(
+                postConnectionString,
+                secrets.GetConnectionStringValue(postConnectionString, "Host"),
+                int.Parse(secrets.GetConnectionStringValue(postConnectionString, "Port")),
+                secrets.GetConnectionStringValue(postConnectionString, "Username"),
+                secrets.GetConnectionStringValue(postConnectionString, "Password"),
+                secrets.GetConnectionStringValue(postConnectionString, "Database"),
+                secrets.GetConnectionStringValue(postConnectionString, "SearchPath"));
+            var postConnector = new PostgreSqlConnector(postConnectionProperties);
+
             string mySQLConnectionString = secrets.GetConnectionString("MYSQL");
             var mySQLConnectionProperties = new ConnectionProperties(
                 mySQLConnectionString,
@@ -32,8 +43,7 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionProperties, 10);
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
-            var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new JoinQueryParser() });
-            var mySQLGenerator = new MySQLGenerator();
+            var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var mySQLModel = new SuiteData(
                 secrets.GetLaunchOption("MYSQL"),
                 "mysql",
@@ -41,8 +51,7 @@ namespace QueryTestSuite.SuiteDatas
                 mySQLPlanParser,
                 mySQLHistoManager,
                 mySQLOptimiser,
-                mySQLParserManager,
-                mySQLGenerator);
+                mySQLParserManager);
             return mySQLModel;
         }
     }

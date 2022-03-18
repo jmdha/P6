@@ -23,6 +23,8 @@ namespace QueryTestSuite.TestRunners
                     var testRunners = new List<TestRunner>();
                     var testRuns = new List<Task<List<TestCaseResult>>>();
 
+                    if (!Directory.Exists(Path.Join(dir.FullName, "Cases/")))
+                        Directory.CreateDirectory(Path.Join(dir.FullName, "Cases/"));
                     var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
                     TestRunner runner = new TestRunner(

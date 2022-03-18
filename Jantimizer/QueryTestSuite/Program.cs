@@ -1,13 +1,4 @@
-﻿using DatabaseConnector;
-using DatabaseConnector.Connectors;
-using Histograms.Managers;
-using PrintUtilities;
-using QueryGenerator;
-using QueryGenerator.QueryGenerators;
-using QueryOptimiser;
-using QueryParser;
-using QueryParser.QueryParsers;
-using QueryPlanParser.Parsers;
+﻿using PrintUtilities;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;

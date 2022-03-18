@@ -46,11 +46,5 @@ namespace QueryParser.Models
                 
             return $"({Predicate})";
         }
-
-        // The table which should be joined on
-        public string GetSuffixString(string param)
-        {
-            return $" JOIN {param} ON {Predicate})";
-        }
     }
 }

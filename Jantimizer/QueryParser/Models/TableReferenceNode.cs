@@ -18,10 +18,5 @@
         {
             return $"{TableName} AS {Alias}";
         }
-
-        public string GetSuffixString(string param)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
