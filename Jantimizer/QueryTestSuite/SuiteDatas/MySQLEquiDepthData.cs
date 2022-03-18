@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
 using Tools.Services;
+using Tools.Exceptions;
 
 namespace QueryTestSuite.SuiteDatas
 {
@@ -46,6 +47,7 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var mySQLModel = new SuiteData(
                 secrets.GetLaunchOption("MYSQL"),
+                secrets.GetAutoStartOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
                 mySQLPlanParser,
