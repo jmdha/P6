@@ -25,15 +25,6 @@ namespace Tools.Models
             Schema = "";
         }
 
-        public ConnectionProperties(string server, int port, SecretsItem secrets, string database, string schema)
-        {
-            Server = server;
-            Port = port;
-            Secrets = secrets;
-            Database = database;
-            Schema = schema;
-        }
-
         public ConnectionProperties(SecretsItem secrets)
         {
             Server = "";
