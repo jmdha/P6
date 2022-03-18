@@ -64,18 +64,6 @@ namespace DatabaseConnectorTests.Connectors
             var result = await connector.CallQuery("abc");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(SocketException))]
-        public async Task Cant_CallQuery_IfServerNotExist()
-        {
-            // ARRANGE
-            var properties = new ConnectionProperties("Host=janhost;Port=5432;Username=postgres;Password=password;Database=postgres;SearchPath=public", "", 1, "", "", "", "");
-            IDbConnector connector = new DatabaseConnector.Connectors.PostgreSqlConnector(properties);
-
-            // ACT
-            var result = await connector.CallQuery("abc");
-        }
-
         #endregion
     }
 }
