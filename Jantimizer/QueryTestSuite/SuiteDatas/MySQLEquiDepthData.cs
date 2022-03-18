@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
 using Tools.Services;
+using Tools.Exceptions;
 
 namespace QueryTestSuite.SuiteDatas
 {
@@ -28,6 +29,7 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLModel = new SuiteData(
                 new TestSettings(true, true, true, mySQLConnectionProperties),
                 secrets.GetLaunchOption("MYSQL"),
+                secrets.GetAutoStartOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
                 mySQLPlanParser,
