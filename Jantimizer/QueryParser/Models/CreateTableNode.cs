@@ -18,10 +18,5 @@ namespace QueryParser.Models
             TableName = tableName.ToLower();
             Query = query;
         }
-
-        public string GetSuffixString(string param)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
