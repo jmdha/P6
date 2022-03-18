@@ -16,8 +16,7 @@ namespace Histograms
         public List<string> Tables { get; }
         public List<string> Attributes { get; }
 
-        public Task AddHistograms(string setupQuery);
-        public Task AddHistograms(FileInfo setupQueryFile);
+        public Task AddHistogramsFromDB();
         public void AddHistogram(IHistogram histogram);
         public void ClearHistograms();
 

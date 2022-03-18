@@ -38,12 +38,6 @@ namespace Histograms.Managers
             Histograms.Clear();
         }
 
-        public async Task AddHistograms(FileInfo setupQueryFile)
-        {
-            foreach (string line in File.ReadAllLines(setupQueryFile.FullName))
-                await AddHistograms(line);
-        }
-
         public void AddHistogram(IHistogram histogram)
         {
             if (string.IsNullOrWhiteSpace(histogram.TableName))
@@ -53,8 +47,9 @@ namespace Histograms.Managers
             Histograms.Add(histogram);
         }
 
-        public async Task AddHistograms(string setupQuery)
+        public async Task AddHistogramsFromDB()
         {
+            ClearHistograms();
             DataRowCollection allTables = (await GetTablesInSchema()).Rows;
             foreach (DataRow tables in allTables)
             {
