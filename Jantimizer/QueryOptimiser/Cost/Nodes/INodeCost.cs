@@ -14,6 +14,11 @@ namespace QueryOptimiser.Cost.Nodes
         where HistogramType : IHistogram
         where DbConnectorType : IDbConnector
     {
+        /// <summary>
+        /// Gives an estimate of the cost of the operation
+        /// <para>Specifically it gives the worst case cardinality estimate</para>
+        /// </summary>
+        /// <returns></returns>
         internal int CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
     }
 }

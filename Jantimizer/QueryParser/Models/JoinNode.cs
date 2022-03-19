@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QueryParser.QueryParsers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,87 +10,41 @@ namespace QueryParser.Models
     public class JoinNode : INode
     {
         public int Id { get; internal set; }
-        public ComparisonType.Type ComType { get; internal set; }
-        public string LeftTable { get; internal set; }
-        public string LeftAttribute { get; internal set; }
-        public string RightTable { get; internal set; }
-        public string RightAttribute { get; internal set; }
-        public string JoinCondition { get; internal set; }
-        public List<string> ConditionTables { get; }
+        public string Predicate { get; internal set; }
+        public JoinPredicateRelation Relation { get; internal set; }
 
-        public JoinNode(int id, ComparisonType.Type type, string leftTable, string leftAttribute, string rightTable, string rightAttribute, string joinCondition)
+        public JoinNode(int id, string predicate, JoinPredicateRelation relation)
         {
             Id = id;
-            ComType = type;
-            LeftTable = leftTable.Trim();
-            LeftAttribute = leftAttribute.Trim();
-            RightTable = rightTable.Trim();
-            RightAttribute = rightAttribute.Trim();
-            JoinCondition = joinCondition.Trim();
-            ConditionTables = GenerateConditionTables();
+            Predicate = predicate;
+            Relation = relation;
+        }
+
+        public JoinNode(int id, string predicate, ComparisonType.Type type, TableReferenceNode leftTable, string leftAttribute, TableReferenceNode rightTable, string rightAttribute)
+        {
+            Id = id;
+            Predicate = predicate;
+            Relation = new JoinPredicateRelation(new JoinPredicate(
+                leftTable,
+                leftAttribute,
+                rightTable,
+                rightAttribute,
+                predicate,
+                type));
         }
 
         public override string? ToString()
         {
-            return $"({LeftTable} JOIN {RightTable} ON {JoinCondition})";
-        }
-
-        private List<string> GenerateConditionTables()
-        {
-            List<string?> tables = new List<string?>();
-            SplitOverAND(JoinCondition, tables);
-
-            return tables
-                .Where(x => x != null)
-                .Select(x => x!.Trim())
-                .ToList();
-        }
-
-        private void SplitOverAND(string s, List<string?> tables)
-        {
-            string[] andSplit = s.Split(" AND ");
-            if (andSplit.Length > 0)
+            if (Relation.LeafPredicate != null)
             {
-                foreach (string and in andSplit)
-                    SplitOverOR(and, tables);
+                if (Relation.LeafPredicate.LeftTable.Alias.CompareTo(Relation.LeafPredicate.RightTable.Alias) <= 0)
+                    return $"({Relation.LeafPredicate.LeftTable} JOIN {Relation.LeafPredicate.RightTable} ON {Predicate})";
+                else
+                    return $"({Relation.LeafPredicate.RightTable} JOIN {Relation.LeafPredicate.LeftTable} ON {Predicate})";
+
             }
-            else
-                SplitOverOR(s, tables);
-        }
-
-        private void SplitOverOR(string s, List<string?> tables)
-        {
-            string[] orSplit = s.Split(" OR ");
-            if (orSplit.Length > 0)
-            {
-                foreach (string or in orSplit)
-                    SplitOverPredicates(or, tables);
-            }
-            else
-                SplitOverPredicates(s, tables);
-        }
-        private void SplitOverPredicates(string s, List<string?> tables)
-        {
-            if (ComType == ComparisonType.Type.More)         GetTableNamesFromPredicate(s.Split(">"), tables);
-            if (ComType == ComparisonType.Type.Less)         GetTableNamesFromPredicate(s.Split("<"), tables);
-            if (ComType == ComparisonType.Type.EqualOrMore)  GetTableNamesFromPredicate(s.Split(">="), tables);
-            if (ComType == ComparisonType.Type.EqualOrLess)  GetTableNamesFromPredicate(s.Split("<="), tables);
-            if (ComType == ComparisonType.Type.Equal)        GetTableNamesFromPredicate(s.Split("="), tables);
-        }
-
-        private void GetTableNamesFromPredicate(string[] s, List<string?> tables)
-        {
-            if (s.Length > 0)
-                tables.Add(GetTableNameFromAttributeName(s[0]));
-            if (s.Length > 1)
-                tables.Add(GetTableNameFromAttributeName(s[1]));
-        }
-
-        private string? GetTableNameFromAttributeName(string s)
-        {
-            if (s.Contains("."))
-                return s.Split(".")[0].Trim();
-            return null;
+                
+            return $"({Predicate})";
         }
     }
 }

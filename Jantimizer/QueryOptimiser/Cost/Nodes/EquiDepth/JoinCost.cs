@@ -11,14 +11,42 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
     public class JoinCost : INodeCostEquiDepth<JoinNode, IDbConnector>
     {
-        /// <summary>
-        /// Gives an estimate of the cost of a join operation
-        /// <para>Specifically it gives the worst case cardinality estimate</para>
-        /// </summary>
-        /// <returns></returns>
-        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
-            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable, node.LeftAttribute);
-            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable, node.RightAttribute);
+        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        {
+            if (node.Relation != null) {
+                if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate && node.Relation.LeafPredicate != null)
+                    return CalculateCost(node.Relation.LeafPredicate, histogramManager);
+                else if (node.Relation.Type == JoinPredicateRelation.RelationType.And || node.Relation.Type == JoinPredicateRelation.RelationType.Or)
+                    return CalculateCost(node.Relation, histogramManager);
+                else
+                    throw new ArgumentException("Missing noderelation type " + node.Relation.ToString());
+            } else
+                throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
+                
+        }
+
+        public int CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+            JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
+            JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
+
+            if (leftRelation != null && rightRelation != null) {
+                if (nodeRelation.Type == JoinPredicateRelation.RelationType.And)
+                    return Math.Min(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
+                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.Or)
+                    return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
+                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.None)
+                    throw new ArgumentNullException($"Noderelation type is not set {nodeRelation.ToString()}");
+                else
+                    throw new NotImplementedException($"The noderelation type of {nodeRelation.Type} is unhandled");
+            } else if (nodeRelation.LeafPredicate != null) {
+                return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
+            } else 
+                throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());            
+        }
+
+        public int CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
+            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
             int leftBucketStart = -1;
             int leftBucketEnd = -1;
             int rightBucketStart = -1;
