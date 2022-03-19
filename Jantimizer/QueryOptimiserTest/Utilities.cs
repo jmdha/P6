@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QueryParser;
 
 namespace QueryOptimiserTest
 {
@@ -60,14 +61,17 @@ namespace QueryOptimiserTest
             {
                 string leftTableName = GetTableName(i - 1);
                 string rightTableName = GetTableName(i);
-                nodes.Add(new JoinNode(
-                    i - 1,
-                    type,
-                    leftTableName,
-                    "ID",
-                    rightTableName,
-                    "ID",
-                    $"{leftTableName} {ComparisonType.GetOperatorString(type)} {rightTableName}"));
+                nodes.Add(
+                    new JoinNode(
+                        i - 1,
+                        $"{leftTableName} {QueryParser.Models.ComparisonType.GetOperatorString(type)} {rightTableName}",
+                        type,
+                        new TableReferenceNode(i - 1, leftTableName, leftTableName),
+                        "ID",
+                        new TableReferenceNode(i, rightTableName, rightTableName),
+                        "ID"
+                    ));
+                    
             }
 
             return nodes;
