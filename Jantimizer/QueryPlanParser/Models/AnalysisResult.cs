@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper.Configuration.Attributes;
 
 namespace QueryPlanParser.Models
 {
@@ -13,6 +14,7 @@ namespace QueryPlanParser.Models
         public ulong EstimatedCardinality { get; }
         public ulong ActualCardinality { get; }
         public TimeSpan ActualTime { get; }
+        [Ignore]
         public List<AnalysisResult> SubQueries { get; }
 
         public AnalysisResult(string name, decimal estimatedCost, ulong estimatedCardinality, ulong actualCardinality, TimeSpan actualTime)
