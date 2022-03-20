@@ -222,9 +222,7 @@ namespace QueryTestSuite.TestRunners
         {
             var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
             if (res is TestSettings set)
-            {
-                Case.Settings.Update(set, Case.Settings.Properties.Secrets);
-            }
+                Case.Settings.Update(set);
         }
     }
 }

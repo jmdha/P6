@@ -16,7 +16,10 @@ namespace QueryTestSuite.Models
 
         public TestSettings()
         {
-
+            DoCleanup = true;
+            DoSetup = true;
+            DoMakeHistograms = true;
+            Properties = new ConnectionProperties();
         }
 
         public TestSettings(bool doCleanup, bool doSetup, bool doMakeHistograms, ConnectionProperties properties)
@@ -27,15 +30,12 @@ namespace QueryTestSuite.Models
             Properties = properties;
         }
 
-        public void Update(TestSettings settings, SecretsItem secrets)
+        public void Update(TestSettings settings)
         {
             DoCleanup = settings.DoCleanup;
             DoSetup = settings.DoSetup;
             DoMakeHistograms = settings.DoMakeHistograms;
-            Properties.Server = settings.Properties.Server;
-            Properties.Port = settings.Properties.Port;
-            Properties.Database = settings.Properties.Database;
-            Properties.Schema = settings.Properties.Schema;
+            Properties.Update(settings.Properties);
         }
     }
 }

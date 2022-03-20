@@ -42,5 +42,13 @@ namespace Tools.Models
             Database = database;
             Schema = schema;
         }
+
+        public void Update(ConnectionProperties settings)
+        {
+            Server = settings.Server;
+            Port = settings.Port;
+            Database = settings.Database;
+            Schema = settings.Schema;
+        }
     }
 }
