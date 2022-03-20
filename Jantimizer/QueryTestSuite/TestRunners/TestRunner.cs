@@ -215,7 +215,7 @@ namespace QueryTestSuite.TestRunners
 
         private void SaveResult()
         {
-            csvWriter.Write();
+            csvWriter.Write<TestCaseResult, TestCaseResultMap>(Results, true);
         }
 
         private void ParseTestSettings(FileInfo file)
