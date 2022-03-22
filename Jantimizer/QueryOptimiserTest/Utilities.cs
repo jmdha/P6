@@ -10,7 +10,7 @@ namespace QueryOptimiserTest
 {
     static internal class Utilities
     {
-        static internal Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, int value)
+        static internal Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, IComparable value)
         {
             var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
             List<IComparable> values = new List<IComparable>();
