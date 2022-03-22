@@ -92,10 +92,17 @@ namespace QueryTestSuite.TestRunners
                 }
             }
 
+            if (consoleOutput)
+            {
+                PrintTestUpdate("Writing Console Header For: ", RunData.Name);
+                WriteHeaderToConsole();
+            }
+                
+
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
             {
                 PrintTestUpdate("Begining Test Run for:", RunData.Name);
-                Results = await RunQueriesSerial();
+                Results = await RunQueriesSerial(true);
             }
 
             if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
@@ -106,18 +113,19 @@ namespace QueryTestSuite.TestRunners
 
             if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
             {
-                PrintTestUpdate("Making Report", RunData.Name);
-                if (consoleOutput)
-                    WriteResultToConsole();
                 if (saveResult)
+                {
+                    PrintTestUpdate("Saving result to file", RunData.Name);
                     SaveResult();
+                }
+                    
             }
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
 
             return Results;
         }
 
-        private async Task<List<TestCaseResult>> RunQueriesSerial()
+        private async Task<List<TestCaseResult>> RunQueriesSerial(bool consoleOutput = false)
         {
             var testCases = new List<TestCaseResult>();
             int count = 1;
@@ -141,6 +149,8 @@ namespace QueryTestSuite.TestRunners
 
                     TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
+                    if (consoleOutput)
+                        WriteResultToConsole(testCase);
                 }
                 catch (Exception ex)
                 {
@@ -152,7 +162,7 @@ namespace QueryTestSuite.TestRunners
             return testCases;
         }
 
-        private void WriteResultToConsole()
+        private void WriteHeaderToConsole()
         {
             Printers[PrinterCategory.Report].PrintLine(new List<string>()
             {
@@ -166,13 +176,14 @@ namespace QueryTestSuite.TestRunners
             GetFormatStrings(),
             ConsoleColor.Blue,
             2);
+        }
 
-            foreach (var testCase in Results)
-            {
-                var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
-                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality);
+        private void WriteResultToConsole(TestCaseResult result)
+        {
+            var DbAnalysisAccuracy = GetAccuracy(result.DbAnalysisResult.ActualCardinality, result.DbAnalysisResult.EstimatedCardinality);
+            var JantimiserEstimateAccuracy = GetAccuracy(result.DbAnalysisResult.ActualCardinality, result.JantimiserResult.EstimatedCardinality);
 
-                var colors = new List<ConsoleColor>() {
+            var colors = new List<ConsoleColor>() {
                     ConsoleColor.Blue,
                     ConsoleColor.Blue,
                     ConsoleColor.Blue,
@@ -180,25 +191,24 @@ namespace QueryTestSuite.TestRunners
                     ConsoleColor.Blue
                 };
 
-                if (DbAnalysisAccuracy > JantimiserEstimateAccuracy)
-                    colors.Add(ConsoleColor.Red);
-                else if (DbAnalysisAccuracy < JantimiserEstimateAccuracy)
-                    colors.Add(ConsoleColor.Green);
-                else
-                    colors.Add(ConsoleColor.Yellow);
+            if (DbAnalysisAccuracy > JantimiserEstimateAccuracy)
+                colors.Add(ConsoleColor.Red);
+            else if (DbAnalysisAccuracy < JantimiserEstimateAccuracy)
+                colors.Add(ConsoleColor.Green);
+            else
+                colors.Add(ConsoleColor.Yellow);
 
-                Printers[PrinterCategory.Report].PrintLine(new List<string>() {
-                    testCase.Name,
-                    testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
-                    testCase.JantimiserResult.EstimatedCardinality.ToString(),
-                    testCase.DbAnalysisResult.ActualCardinality.ToString(),
+            Printers[PrinterCategory.Report].PrintLine(new List<string>() {
+                    result.Name,
+                    result.DbAnalysisResult.EstimatedCardinality.ToString(),
+                    result.JantimiserResult.EstimatedCardinality.ToString(),
+                    result.DbAnalysisResult.ActualCardinality.ToString(),
                     GetAccuracyAsString(DbAnalysisAccuracy),
                     GetAccuracyAsString(JantimiserEstimateAccuracy)
                 },
-                GetFormatStrings(),
-                colors,
-                2);
-            }
+            GetFormatStrings(),
+            colors,
+            2);
         }
 
         private string GetAccuracyAsString(decimal accuracy)
