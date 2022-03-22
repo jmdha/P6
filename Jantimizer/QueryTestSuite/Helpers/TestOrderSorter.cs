@@ -16,7 +16,7 @@ namespace QueryTestSuite.Helpers
             List<DirectoryInfo> result = new List<DirectoryInfo>();
 
             if (!File.Exists(orderFile))
-                throw new IOException("Error! Order file 'testorder.json' was not found!");
+                throw new IOException($"Error! Order file '{orderFile}' was not found!");
 
             var parseOrder = JsonSerializer.Deserialize(File.ReadAllText(orderFile), typeof(TestOrder));
             if (parseOrder is TestOrder order)
