@@ -6,7 +6,7 @@
   "DoRunTests": false,
   "DoMakeReport": false,
   "Properties": {
-    "Database": "postgres",
-    "Schema": "basictests"
+    "Database": null,
+    "Schema": null
   }
 }

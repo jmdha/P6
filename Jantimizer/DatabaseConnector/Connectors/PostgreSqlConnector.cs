@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 using Tools.Models;
 
 namespace DatabaseConnector.Connectors
@@ -16,7 +17,19 @@ namespace DatabaseConnector.Connectors
         {
             if (ConnectionProperties.Secrets == null)
                 throw new ArgumentNullException("Error, base connection properties was not set!");
-            return $"Host={ConnectionProperties.Secrets.Server};Port={ConnectionProperties.Secrets.Port};Username={ConnectionProperties.Secrets.Username};Password={ConnectionProperties.Secrets.Password};Database={ConnectionProperties.Database};SearchPath={ConnectionProperties.Schema}";
+
+            var sb = new StringBuilder();
+            sb.Append($"Host={ConnectionProperties.Secrets.Server};");
+            sb.Append($"Port={ConnectionProperties.Secrets.Port};");
+            sb.Append($"Username={ConnectionProperties.Secrets.Username};");
+            sb.Append($"Password={ConnectionProperties.Secrets.Password};");
+
+            if (ConnectionProperties.Database != null)
+                sb.Append($"Database={ConnectionProperties.Database};");
+            if (ConnectionProperties.Schema != null)
+                sb.Append($"SearchPath={ConnectionProperties.Schema};");
+
+            return sb.ToString();
         }
 
         public override async Task<DataSet> AnalyseQuery(string query)
