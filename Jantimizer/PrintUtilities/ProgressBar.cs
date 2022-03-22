@@ -10,8 +10,7 @@ namespace PrintUtilities
     public static class ProgressBar
     {
         public const int DefaultWidth = 100;
-        public const int RainbowSize = 4;
-        private static List<Color> rainbow = new List<Color>();
+        private static List<ConsoleColor> rainbow = new List<ConsoleColor>();
         public static IEnumerable<int> PrintProgress(int max, int width = DefaultWidth, bool inline = true, int indent = 0)
         {
             return PrintProgress(0, max, width, inline, indent);
@@ -37,6 +36,17 @@ namespace PrintUtilities
             }
         }
 
+        public static async IAsyncEnumerable<T> PrintProgress<T>(IAsyncEnumerable<T> ts, int max, int width = DefaultWidth, bool inline = true, int indent = 0)
+        {
+            int i = 0;
+            await foreach (T t in ts)
+            {
+                PrintProgressBar(i, max, width, inline, indent);
+                i++;
+                yield return t;
+            }
+        }
+
         public static void Finish(int max, int width = DefaultWidth, bool inline = true, int indent = 0)
         {
             PrintUtil.ClearLine();
@@ -56,35 +66,35 @@ namespace PrintUtilities
             for (int i = 0; i < width; i++)
             {
                 if (i < value)
-                    PrintUtil.Print("■", 0, FromColor(GetGradient(i)));
+                    PrintUtil.Print("■", 0, GetGradient(i));
                 else
                     PrintUtil.Print(" ", 0);
             }
             PrintUtil.Print($"] ({current}/{max})", 0, ConsoleColor.DarkGray);
         }
 
-        public static System.ConsoleColor FromColor(System.Drawing.Color c)
-        {
-            int index = (c.R > 128 | c.G > 128 | c.B > 128) ? 8 : 0; // Bright bit
-            index |= (c.R > 64) ? 4 : 0; // Red bit
-            index |= (c.G > 64) ? 2 : 0; // Green bit
-            index |= (c.B > 64) ? 1 : 0; // Blue bit
-            return (System.ConsoleColor)index;
-        }
-
-        public static Color GetGradient(int i)
+        public static ConsoleColor GetGradient(int i)
         {
             if (rainbow.Count == 0)
                 GenerateRainbow();
-            return (Color)rainbow[(i + 1) % RainbowSize];
+            return rainbow[i % rainbow.Count];
         }
 
         public static void GenerateRainbow()
         {
-            for (double i = 0; i < 1; i += 1/((double)RainbowSize))
-            {
-                rainbow.Add(ColorRGB.HSL2RGB(i, 0.5, 0.5));
-            }
+            rainbow.Add(ConsoleColor.Yellow);
+            rainbow.Add(ConsoleColor.DarkYellow);
+            rainbow.Add(ConsoleColor.Red);
+            rainbow.Add(ConsoleColor.DarkMagenta);
+            rainbow.Add(ConsoleColor.Magenta);
+            rainbow.Add(ConsoleColor.DarkBlue);
+            rainbow.Add(ConsoleColor.Blue);
+            rainbow.Add(ConsoleColor.Cyan);
+            rainbow.Add(ConsoleColor.DarkCyan);
+            rainbow.Add(ConsoleColor.DarkBlue);
+            rainbow.Add(ConsoleColor.Blue);
+            rainbow.Add(ConsoleColor.DarkGreen);
+            rainbow.Add(ConsoleColor.Green);
         }
     }
 }

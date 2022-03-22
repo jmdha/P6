@@ -59,8 +59,14 @@ namespace QueryTestSuite.TestRunners
             if (Case.Settings.DoMakeHistograms)
             {
                 PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
-                await Case.HistoManager.AddHistogramsFromDB();
-            }
+                List<Task> tasks = await Case.HistoManager.AddHistogramsFromDB();
+                
+                foreach(var t in ProgressBar.PrintProgress(tasks, indent: 1))
+                {
+                    t.Wait();
+                }
+                ProgressBar.Finish(tasks.Count, indent: 1);
+             }
 
             Results = await RunQueriesSerial();
 
