@@ -17,10 +17,7 @@
                 count = value;
             } }
 
-// Suppress warning for _valueEnd "not being set"
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public HistogramBucket(IComparable valueStart, IComparable valueEnd, int count)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             if(valueStart is null)
                 throw new ArgumentNullException(nameof(valueStart));
@@ -28,6 +25,8 @@
                 throw new ArgumentNullException(nameof(valueEnd));
 
             ValueStart = valueStart;
+
+            _valueEnd = null!; // Suppress warning for _valueEnd "not being set"
             ValueEnd = valueEnd;
             Count = count;
         }
