@@ -1,0 +1,12 @@
+﻿{
+  "DoPreCleanup": true,
+  "DoSetup": true,
+  "DoPostCleanup": true,
+  "DoMakeHistograms": true,
+  "DoRunTests": true,
+  "DoMakeReport": true,
+  "Properties": {
+    "Database": "basictests",
+    "Schema": "basictests"
+  }
+}

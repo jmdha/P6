@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 using Tools.Models;
 
 namespace DatabaseConnector.Connectors
@@ -12,67 +13,30 @@ namespace DatabaseConnector.Connectors
 
         }
 
+        public override string BuildConnectionString()
+        {
+            if (ConnectionProperties.Secrets == null)
+                throw new ArgumentNullException("Error, base connection properties was not set!");
+
+            var sb = new StringBuilder();
+            sb.Append($"Host={ConnectionProperties.Secrets.Server};");
+            sb.Append($"Port={ConnectionProperties.Secrets.Port};");
+            sb.Append($"Username={ConnectionProperties.Secrets.Username};");
+            sb.Append($"Password={ConnectionProperties.Secrets.Password};");
+
+            if (ConnectionProperties.Database != null)
+                sb.Append($"Database={ConnectionProperties.Database};");
+            if (ConnectionProperties.Schema != null)
+                sb.Append($"SearchPath={ConnectionProperties.Schema};");
+
+            return sb.ToString();
+        }
+
         public override async Task<DataSet> AnalyseQuery(string query)
         {
             if (!query.ToUpper().Trim().StartsWith("EXPLAIN ANALYZE "))
                 return await CallQuery($"EXPLAIN ANALYZE {query}");
             return await CallQuery(query);
-        }
-
-        public override async Task<bool> StartServer()
-        {
-            string posGresPath = GetPostgresPath();
-            if (Directory.Exists(@$"{posGresPath}\bin\"))
-            {
-                Process.Start(@$"{posGresPath}\bin\pg_ctl.exe", $"-D \"{posGresPath}\\data\" start");
-                int retryCount = 0;
-                while (retryCount < 10)
-                {
-                    await Task.Delay(1000);
-                    if (CheckConnection())
-                    {
-                        await Task.Delay(10000);
-                        return true;
-                    }
-                    retryCount++;
-                }
-                return false;
-            }
-            else
-                throw new Exception("Error, PostGres server installation was not found!");
-        }
-
-        public override bool StopServer()
-        {
-            string posGresPath = GetPostgresPath();
-            if (Directory.Exists(@$"{posGresPath}\bin\"))
-            {
-                Process.Start(@$"{posGresPath}\bin\pg_ctl.exe", $"-D \"{posGresPath}\\data\" stop");
-                return true;
-            }
-            else
-                throw new Exception("Error, PostGres server installation was not found!");
-        }
-
-        private string GetPostgresPath()
-        {
-            var drives = DriveInfo.GetDrives();
-            foreach (var drive in drives)
-            {
-                if (Directory.Exists(@$"{drive.Name}Program Files\PostgreSQL"))
-                    return GetPostgresVersion(@$"{drive.Name}Program Files\PostgreSQL");
-            }
-            return "Not Found";
-        }
-
-        private string GetPostgresVersion(string path)
-        {
-            for (int i = 0; i < 100; i++)
-            {
-                if (Directory.Exists($"{path}\\{i}"))
-                    return $"{path}\\{i}";
-            }
-            return "Not Found";
         }
     }
 }

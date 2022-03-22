@@ -1,0 +1,3 @@
+﻿{
+  "Order": ["A_SetupTables", "RandomNumberBlocks", "ConstantNumberBlocks", "*"]
+}

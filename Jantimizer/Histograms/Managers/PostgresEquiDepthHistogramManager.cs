@@ -48,23 +48,27 @@ namespace Histograms.Managers
             Histograms.Add(histogram);
         }
 
-        public async Task AddHistogramsFromDB()
+        public async Task<List<Task>> AddHistogramsFromDB()
         {
             ClearHistograms();
-            DataRowCollection allTables = (await GetTablesInSchema()).Rows;
-            foreach (DataRow tables in allTables)
+            List<Task> tasks = new List<Task>();
+            IEnumerable<DataRow> allTables = (await GetTablesInSchema()).Rows.Cast<DataRow>();
+            foreach (var table in allTables)
             {
-                string tableName = $"{tables["table_name"]}".ToLower();
-                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows) {
-                    if(row["data_type"].ToString() == "integer")
+                Task t = Task.Run(async () =>
+                {
+                    string tableName = $"{table["table_name"]}".ToLower();
+                    foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
                         await AddHistogramForAttribute(row, tableName);
-                }
+                });
+                tasks.Add(t);
             }
+            return tasks;
         }
 
         private async Task<DataTable> GetTablesInSchema()
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.tables WHERE table_schema = '{DbConnector.ConnectionProperties.Schema}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.tables WHERE table_schema = current_schema();");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -72,7 +76,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = '{DbConnector.ConnectionProperties.Schema}' AND table_name = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -106,11 +110,12 @@ namespace Histograms.Managers
 
         public IHistogram GetHistogram(string table, string attribute)
         {
-            foreach (var gram in Histograms)
+            foreach (var gram in Histograms) {
                 if (gram.TableName.Equals(table) && gram.AttributeName.Equals(attribute))
                     return gram;
+            }
 
-            throw new ArgumentException("No histogram found");
+            throw new ArgumentException($"No histogram found | Requested table |{table}| attribute |{attribute}|");
         }
         public List<IHistogram> GetHistogramsByTable(string table)
         {

@@ -14,6 +14,8 @@ namespace QueryTestSuite.Models
 {
     internal class SuiteData
     {
+        public TestSettings Settings { get; set; }
+
         public bool ShouldRun { get; set; }
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
@@ -25,6 +27,7 @@ namespace QueryTestSuite.Models
         public IParserManager QueryParserManager { get; set; }
 
         public SuiteData(
+            TestSettings settings,
             bool run,
             string name, 
             IDbConnector connector, 
@@ -33,6 +36,7 @@ namespace QueryTestSuite.Models
             IQueryOptimiser<IHistogram, IDbConnector> optimiser, 
             IParserManager queryParserManager)
         {
+            Settings = settings;
             ShouldRun = run;
             Name = name;
             Connector = connector;

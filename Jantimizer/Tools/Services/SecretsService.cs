@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models;
 
 namespace Tools.Services
 {
@@ -18,21 +19,13 @@ namespace Tools.Services
                 .Build();
         }
 
-        public string GetConnectionString(string key)
+        public SecretsItem GetSecretsItem(string key)
         {
-            return configuration.GetConnectionString(key);
-        }
-
-        public string GetConnectionStringValue(string connectionString, string key)
-        {
-            string[] split = connectionString.Split(';');
-            foreach (string s in split)
-            {
-                if (s.Contains('='))
-                    if (s.Split('=')[0] == key)
-                        return s.Split('=')[1];
-            }
-            return "Not Found";
+            return new SecretsItem(
+                configuration.GetSection("ConnectionProperties").GetSection(key)["Username"],
+                configuration.GetSection("ConnectionProperties").GetSection(key)["Password"],
+                configuration.GetSection("ConnectionProperties").GetSection(key)["Server"],
+                int.Parse(configuration.GetSection("ConnectionProperties").GetSection(key)["Port"]));
         }
 
         public bool GetLaunchOption(string key)

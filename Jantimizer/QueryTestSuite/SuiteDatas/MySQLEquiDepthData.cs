@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
 using Tools.Services;
+using Tools.Exceptions;
 
 namespace QueryTestSuite.SuiteDatas
 {
@@ -19,32 +20,14 @@ namespace QueryTestSuite.SuiteDatas
     {
         public static SuiteData GetData<T>(SecretsService<T> secrets) where T : class
         {
-            string postConnectionString = secrets.GetConnectionString("POSGRESQL");
-            var postConnectionProperties = new ConnectionProperties(
-                postConnectionString,
-                secrets.GetConnectionStringValue(postConnectionString, "Host"),
-                int.Parse(secrets.GetConnectionStringValue(postConnectionString, "Port")),
-                secrets.GetConnectionStringValue(postConnectionString, "Username"),
-                secrets.GetConnectionStringValue(postConnectionString, "Password"),
-                secrets.GetConnectionStringValue(postConnectionString, "Database"),
-                secrets.GetConnectionStringValue(postConnectionString, "SearchPath"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-
-            string mySQLConnectionString = secrets.GetConnectionString("MYSQL");
-            var mySQLConnectionProperties = new ConnectionProperties(
-                mySQLConnectionString,
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Server"),
-                int.Parse(secrets.GetConnectionStringValue(mySQLConnectionString, "Port")),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Uid"),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Pwd"),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"),
-                secrets.GetConnectionStringValue(mySQLConnectionString, "Database"));
+            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
             var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MySQLEquiDepthHistogramManager(mySQLConnector.ConnectionProperties, 10);
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
-            var mySQLParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var mySQLParserManager = new ParserManager(new List<IQueryParser>() {});
             var mySQLModel = new SuiteData(
+                new TestSettings(true, true, true, true, true, true, mySQLConnectionProperties),
                 secrets.GetLaunchOption("MYSQL"),
                 "mysql",
                 mySQLConnector,

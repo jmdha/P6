@@ -47,21 +47,27 @@ namespace Histograms.Managers
             Histograms.Add(histogram);
         }
 
-        public async Task AddHistogramsFromDB()
+        public async Task<List<Task>> AddHistogramsFromDB()
         {
             ClearHistograms();
-            DataRowCollection allTables = (await GetTablesInSchema()).Rows;
-            foreach (DataRow tables in allTables)
+            List<Task> tasks = new List<Task>();
+            IEnumerable<DataRow> allTables = (await GetTablesInSchema()).Rows.Cast<DataRow>();
+            foreach (var table in allTables)
             {
-                string tableName = $"{tables["TABLE_NAME"]}".ToLower();
-                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
-                    await AddHistogramForAttribute(row, tableName);
+                Task t = Task.Run(async () =>
+                {
+                    string tableName = $"{table["TABLE_NAME"]}".ToLower();
+                    foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
+                        await AddHistogramForAttribute(row, tableName);
+                });
+                tasks.Add(t);
             }
+            return tasks;
         }
 
         private async Task<DataTable> GetTablesInSchema()
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{DbConnector.ConnectionProperties.Schema}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -69,7 +75,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{DbConnector.ConnectionProperties.Schema}' AND TABLE_NAME = '{tableName}';");
+            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = database() AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();

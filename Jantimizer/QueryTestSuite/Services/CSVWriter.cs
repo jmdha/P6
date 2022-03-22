@@ -19,7 +19,8 @@ namespace QueryTestSuite.Services
             Path = directory + "/" + fileName;
         }
 
-        public void Write() {
+        public void Write<T, ClassMap>(IEnumerable<T> data, bool useMap = false)
+            where ClassMap : CsvHelper.Configuration.ClassMap {
             Directory.CreateDirectory(DirectoryName);
             FileStream stream;
             CsvConfiguration config;
@@ -40,7 +41,9 @@ namespace QueryTestSuite.Services
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer, config))
             {
-                csv.WriteRecords(Path);
+                if (useMap)
+                    csv.Context.RegisterClassMap<ClassMap>();
+                csv.WriteRecords(data);
                 writer.Flush();
             }
         }

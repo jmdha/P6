@@ -1,8 +1,10 @@
 ﻿using PrintUtilities;
+using QueryTestSuite.Helpers;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;
 using QueryTestSuite.TestRunners;
+using System.Text.Json;
 using Tools.Models;
 using Tools.Services;
 
@@ -19,26 +21,26 @@ namespace QueryTestSuite
         {
             SecretsService<Program> secrets = new SecretsService<Program>();
 
-            var connectorSet = new List<SuiteData>() { 
-                MySQLEquiDepthData.GetData(secrets),
-                PostgreEquiDepthData.GetData(secrets)};
+            var pgData = PostgreEquiDepthData.GetData(secrets);
+            var myData = MySQLEquiDepthData.GetData(secrets);
 
-            if (await DatabaseStarter.CheckAndStartServers(connectorSet))
-            {
-                string testBaseDirPath = Path.GetFullPath("../../../Tests");
-                DateTime timeStamp = DateTime.Now;
+            myData.QueryParserManager.QueryParsers.Add(pgData.QueryParserManager.QueryParsers[0]);
 
-                foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
-                {
-                    TestSuite suite = new TestSuite(connectorSet, timeStamp);
+            var connectorSet = new List<SuiteData>() {pgData, myData };
 
-                    PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                    await suite.RunTests(testDir);
-                    PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
-                }
+            string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
-                DatabaseStarter.StopAllServers(connectorSet);
-            }
+            foreach(DirectoryInfo dirInfo in TestOrderSorter.GetTestRunOrder(testBaseDirPath, Path.Join(testBaseDirPath, "testorder.json")))
+                await RunTestSuite(connectorSet, dirInfo);
+        }
+
+        private static async Task RunTestSuite(List<SuiteData> connectorSet, DirectoryInfo info) 
+        {
+            TestSuite suite = new TestSuite(connectorSet, DateTime.Now);
+
+            PrintUtil.PrintLine($"Running test collection [{info.Name}]", 0, ConsoleColor.Magenta);
+            await suite.RunTests(info);
+            PrintUtil.PrintLine($"Test collection [{info.Name}] finished!", 0, ConsoleColor.Magenta);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace QueryParser
 {
     public class ParserManager : IParserManager
     {
-        public List<IQueryParser> QueryParsers { get; internal set; }
+        public List<IQueryParser> QueryParsers { get; set; }
 
         public ParserManager(List<IQueryParser> queryParsers)
         {
