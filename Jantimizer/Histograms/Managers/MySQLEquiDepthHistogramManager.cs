@@ -1,5 +1,6 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
+using PrintUtilities;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
@@ -50,13 +51,14 @@ namespace Histograms.Managers
         public async Task AddHistogramsFromDB()
         {
             ClearHistograms();
-            DataRowCollection allTables = (await GetTablesInSchema()).Rows;
-            foreach (DataRow tables in allTables)
+            IEnumerable<DataRow> allTables = (await GetTablesInSchema()).Rows.Cast<DataRow>();
+            foreach (var table in ProgressBar.PrintProgress(allTables, indent: 1))
             {
-                string tableName = $"{tables["TABLE_NAME"]}".ToLower();
+                string tableName = $"{table["TABLE_NAME"]}".ToLower();
                 foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
                     await AddHistogramForAttribute(row, tableName);
             }
+            ProgressBar.Finish(allTables.Count(), indent: 1);
         }
 
         private async Task<DataTable> GetTablesInSchema()

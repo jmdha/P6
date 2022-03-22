@@ -84,11 +84,10 @@ namespace QueryTestSuite.TestRunners
             var testCases = new List<TestCaseResult>();
             int count = 0;
             int max = CaseFiles.Count();
-            foreach (FileInfo queryFile in CaseFiles)
+            foreach (var queryFile in ProgressBar.PrintProgress(CaseFiles, indent: 2))
             {
                 try
                 {
-                    PrintUtil.PrintProgressBar(count, max, 50, true, 2);
                     PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
                     PrintUtil.Print($"\t Executing SQL statement...             ", 0);
                     DataSet dbResult = await Case.Connector.AnalyseQuery(queryFile);
@@ -112,8 +111,7 @@ namespace QueryTestSuite.TestRunners
                 }
                 count++;
             }
-            PrintUtil.PrintProgressBar(max, max, 50, true, 2);
-            PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
+            ProgressBar.Finish(CaseFiles.Count(), indent: 2);
             return testCases;
         }
 

@@ -34,20 +34,11 @@
             Console.ResetColor();
         }
 
-        public static void PrintProgressBar(int current, int max, int width, bool inline, int indent = 0)
+        public static void ClearLine()
         {
-            int value = (int)(((float)current / (float)max) * width);
-            if (inline)
-                PrintInLine("");
-            Print("[", indent, ConsoleColor.DarkGray);
-            for (int i = 0; i < width; i++)
-            {
-                if (i < value)
-                    Print("X", 0, ConsoleColor.White);
-                else
-                    Print(" ", 0);
-            }
-            Print($"] ({current}/{max})", 0, ConsoleColor.DarkGray);
+            Console.SetCursorPosition(0, Console.CursorTop);
+            Console.Write(new String(' ', Console.BufferWidth));
+            Console.SetCursorPosition(0, Console.CursorTop);
         }
 
         private static string GetIndent(int indent)
