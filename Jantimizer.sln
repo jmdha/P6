@@ -24,9 +24,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "QueryParserTest\QueryParserTest.csproj", "{99113765-9490-4A5F-B7F8-96632015C7FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7D528A4C-B8C6-4161-82C0-C19C776FBB23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IMDB Install", "IMDB Install", "{6F3A9E67-AA9C-4659-B71C-97BDF60A8C02}"
+	ProjectSection(SolutionItems) = preProject
+		Queries\IMDB Install\imdb_data.sql = Queries\IMDB Install\imdb_data.sql
+		Queries\IMDB Install\imdb_schema.sql = Queries\IMDB Install\imdb_schema.sql
+		Queries\IMDB Install\README.md = Queries\IMDB Install\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +98,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F3A9E67-AA9C-4659-B71C-97BDF60A8C02} = {7D528A4C-B8C6-4161-82C0-C19C776FBB23}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AB10EC97-99DE-4B29-9207-48DAEF3A4390}
