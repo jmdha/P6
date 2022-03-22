@@ -26,7 +26,7 @@
     <Content Include="Tests\ConstantNumberBlocks\testSettings.postgre.json" />
     <Content Include="Tests\RandomNumberBlocks\testSettings.mysql.json" />
     <Content Include="Tests\RandomNumberBlocks\testSettings.postgre.json" />
-    <Content Include="Tests\testorders.json" />
+    <Content Include="Tests\testorder.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.2.1" />
