@@ -3,6 +3,8 @@
   "DoSetup": true,
   "DoPostCleanup": true,
   "DoMakeHistograms": true,
+  "DoRunTests": true,
+  "DoMakeReport": true,
   "Properties": {
     "Server": "localhost",
     "Port": 5432,

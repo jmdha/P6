@@ -62,7 +62,11 @@ namespace QueryTestSuite.TestRunners
                 await Case.HistoManager.AddHistogramsFromDB();
             }
 
-            Results = await RunQueriesSerial();
+            if (Case.Settings.DoRunTests != null && (bool)Case.Settings.DoRunTests)
+            {
+                PrintUtil.PrintLine($"Begining test run", 1, ConsoleColor.Blue);
+                Results = await RunQueriesSerial();
+            }
 
             if (Case.Settings.DoPostCleanup != null && (bool)Case.Settings.DoPostCleanup)
             {
@@ -70,10 +74,14 @@ namespace QueryTestSuite.TestRunners
                 await Case.Connector.CallQuery(CleanupFile);
             }
 
-            if (consoleOutput)
-                WriteResultToConsole();
-            if (saveResult)
-                SaveResult();
+            if (Case.Settings.DoMakeReport != null && (bool)Case.Settings.DoMakeReport)
+            {
+                PrintUtil.PrintLine($"Making Report", 1, ConsoleColor.Blue);
+                if (consoleOutput)
+                    WriteResultToConsole();
+                if (saveResult)
+                    SaveResult();
+            }
 
             return Results;
         }
