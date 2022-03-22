@@ -31,9 +31,7 @@ namespace QueryTestSuite
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
             foreach(DirectoryInfo dirInfo in TestOrderSorter.GetTestRunOrder(testBaseDirPath, Path.Join(testBaseDirPath, "testorder.json")))
-            {
                 await RunTestSuite(connectorSet, dirInfo);
-            }
         }
 
         private static async Task RunTestSuite(List<SuiteData> connectorSet, DirectoryInfo info) 

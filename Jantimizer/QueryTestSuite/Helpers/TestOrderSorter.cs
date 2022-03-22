@@ -34,7 +34,7 @@ namespace QueryTestSuite.Helpers
                     {
                         foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
                             if (!order.Order.Contains(testDir.Name))
-                                result.Add(new DirectoryInfo(Path.Combine(testBaseDirPath, testFolder)));
+                                result.Add(testDir);
                     }
                 }
             }
