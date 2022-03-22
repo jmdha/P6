@@ -15,7 +15,7 @@ namespace QueryTestSuite.TestRunners
         {
             SuiteDataItems = suiteDataItems;
             TimeStamp = timeStamp;
-            PrimaryConsole = Window.OpenBox(name, 220, 48);
+            PrimaryConsole = Window.OpenBox(name, 220, 50);
             List<SuiteData> data = SuiteDataItems.ToList();
             Consoles.Add(data[0].Name, PrimaryConsole.SplitLeft(data[0].Name));
             Consoles.Add(data[1].Name, PrimaryConsole.SplitRight(data[1].Name));

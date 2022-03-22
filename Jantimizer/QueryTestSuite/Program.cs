@@ -38,9 +38,7 @@ namespace QueryTestSuite
         {
             TestSuite suite = new TestSuite(connectorSet, DateTime.Now, info.Name);
 
-            //PrintUtil.PrintLine($"Running test collection [{info.Name}]", 0, ConsoleColor.Magenta);
             await suite.RunTests(info);
-            //PrintUtil.PrintLine($"Test collection [{info.Name}] finished!", 0, ConsoleColor.Magenta);
         }
     }
 }

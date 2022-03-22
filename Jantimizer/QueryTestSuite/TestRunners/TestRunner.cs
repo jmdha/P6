@@ -21,6 +21,15 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
+        private enum PrinterType
+        {
+            None,
+            Primary,
+            Status,
+            Progress,
+            Report
+        };
+
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
@@ -28,7 +37,7 @@ namespace QueryTestSuite.TestRunners
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
-        private PrintUtil Printer;
+        private Dictionary<PrinterType, PrintUtil> Printers = new Dictionary<PrinterType, PrintUtil>();
 
         public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp, IConsole console)
         {
@@ -39,7 +48,15 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            Printer = new PrintUtil(console);
+            Printers.Add(PrinterType.Primary, new PrintUtil(console));
+            var consolas = console.SplitRows(
+                new Split(10, "Status"),
+                new Split(3, "Progress"),
+                new Split(0, "Report")
+            );
+            Printers.Add(PrinterType.Status, new PrintUtil(consolas[0]));
+            Printers.Add(PrinterType.Progress, new PrintUtil(consolas[1]));
+            Printers.Add(PrinterType.Report, new PrintUtil(consolas[2]));
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -65,13 +82,13 @@ namespace QueryTestSuite.TestRunners
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 int i = 0;
                 int max = tasks.Count;
-                int pbID = Printer.AddProgressBar(max);
+                int pbID = Printers[PrinterType.Progress].AddProgressBar(max);
 
                 foreach (var t in tasks)
                 {
                     t.Wait();
                     i++;
-                    Printer.UpdateProgreesBar(pbID, i, $"Item {i} of {max}");
+                    Printers[PrinterType.Progress].UpdateProgreesBar(pbID, i, $"Item {i} of {max}");
                 }
             }
 
@@ -102,16 +119,15 @@ namespace QueryTestSuite.TestRunners
 
         private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            Printer.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
             int count = 1;
             int max = CaseFiles.Count();
-            int pbID = Printer.AddProgressBar(max);
+            int pbID = Printers[PrinterType.Progress].AddProgressBar(max);
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
-                    Printer.UpdateProgreesBar(pbID, count, queryFile.Name);
+                    Printers[PrinterType.Progress].UpdateProgreesBar(pbID, count, queryFile.Name);
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
@@ -138,15 +154,13 @@ namespace QueryTestSuite.TestRunners
 
         private void WriteResultToConsole()
         {
-            Printer.PrintLine($"Displaying report...", 2, ConsoleColor.Green);
-            Printer.PrintLine(new List<string>()
+            Printers[PrinterType.Report].PrintLine(new List<string>()
             {
-                "Category",
                 "Case Name",
                 "P. Db Rows",
                 "P. Jan Rows",
                 "Actual Rows",
-                "DB Acc (%)",
+                "DB Acc  (%)",
                 "Jan Acc (%)"
             },
             GetFormatStrings(),
@@ -163,7 +177,6 @@ namespace QueryTestSuite.TestRunners
                     ConsoleColor.Blue,
                     ConsoleColor.Blue,
                     ConsoleColor.Blue,
-                    ConsoleColor.Blue,
                     ConsoleColor.Blue
                 };
 
@@ -174,8 +187,7 @@ namespace QueryTestSuite.TestRunners
                 else
                     colors.Add(ConsoleColor.Yellow);
 
-                Printer.PrintLine(new List<string>() {
-                    testCase.Category,
+                Printers[PrinterType.Report].PrintLine(new List<string>() {
                     testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
@@ -192,11 +204,11 @@ namespace QueryTestSuite.TestRunners
         private string GetAccuracyAsString(decimal accuracy)
         {
             if (accuracy == 100)
-                return "100   %";
+                return "100      %";
             else if (accuracy == -1)
-                return "inf   %";
+                return "inf      %";
             else
-                return string.Format("{0, -5} %", accuracy);
+                return string.Format("{0, -8} %", accuracy);
         }
 
         private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
@@ -210,12 +222,12 @@ namespace QueryTestSuite.TestRunners
             if (actualValue < predictedValue)
             {
                 decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
-                return Math.Round(value);
+                return Math.Round(value, 2);
             }
             if (actualValue > predictedValue)
             {
                 decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
-                return Math.Round(value);
+                return Math.Round(value, 2);
             }
             return 100;
         }
@@ -223,13 +235,12 @@ namespace QueryTestSuite.TestRunners
         private List<string> GetFormatStrings()
         {
             return new List<string>() {
-                    "{0, -20}",
+                    "{0, -18}",
+                    "{0, -18}",
+                    "{0, -18}",
+                    "{0, -18}",
                     "{0, -15}",
-                    "{0, -15}",
-                    "{0, -15}",
-                    "{0, -15}",
-                    "{0, -12}",
-                    "{0, -8}"
+                    "{0, -15    }"
                 };
         }
 
@@ -249,7 +260,7 @@ namespace QueryTestSuite.TestRunners
 
         private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
         {
-            Printer.PrintLine(
+            Printers[PrinterType.Status].PrintLine(
                     new List<string>() { left, right },
                     new List<string>() { "{0,-30}", "{0,-30}" },
                     new List<ConsoleColor>() { leftColor, rightColor }, 1);
