@@ -20,7 +20,7 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        public SuiteData Case { get; }
+        public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
@@ -28,9 +28,9 @@ namespace QueryTestSuite.TestRunners
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(SuiteData @case, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            Case = @case;
+            RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
@@ -41,54 +41,56 @@ namespace QueryTestSuite.TestRunners
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            PrintUtil.PrintLine($"Parsing settings", 1, ConsoleColor.Blue);
+            PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
             ParseTestSettings(SettingsFile);
 
-            if (Case.Settings.DoPreCleanup != null && (bool)Case.Settings.DoPreCleanup)
+            if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
-                PrintUtil.PrintLine($"Running Pre Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-                await Case.Connector.CallQuery(CleanupFile);
+                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                await RunData.Connector.CallQuery(CleanupFile);
             }
 
-            if (Case.Settings.DoSetup != null && (bool)Case.Settings.DoSetup)
+            if (RunData.Settings.DoSetup != null && (bool)RunData.Settings.DoSetup)
             {
-                PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
-                await Case.Connector.CallQuery(SetupFile);
+                PrintTestUpdate("Running Setup", SetupFile.Name);
+                await RunData.Connector.CallQuery(SetupFile);
             }
 
-            if (Case.Settings.DoMakeHistograms != null && (bool)Case.Settings.DoMakeHistograms)
+            if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
-                PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
-                await Case.HistoManager.AddHistogramsFromDB();
+                PrintTestUpdate("Generating Histograms for:", RunData.Name);
+                await RunData.HistoManager.AddHistogramsFromDB();
             }
 
-            if (Case.Settings.DoRunTests != null && (bool)Case.Settings.DoRunTests)
+            if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
             {
-                PrintUtil.PrintLine($"Begining test run", 1, ConsoleColor.Blue);
+                PrintTestUpdate("Begining Test Run for:", RunData.Name);
                 Results = await RunQueriesSerial();
             }
 
-            if (Case.Settings.DoPostCleanup != null && (bool)Case.Settings.DoPostCleanup)
+            if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
             {
-                PrintUtil.PrintLine($"Running Post Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
-                await Case.Connector.CallQuery(CleanupFile);
+                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                await RunData.Connector.CallQuery(CleanupFile);
             }
 
-            if (Case.Settings.DoMakeReport != null && (bool)Case.Settings.DoMakeReport)
+            if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
             {
-                PrintUtil.PrintLine($"Making Report", 1, ConsoleColor.Blue);
+                PrintTestUpdate("Making Report", RunData.Name);
                 if (consoleOutput)
                     WriteResultToConsole();
                 if (saveResult)
                     SaveResult();
             }
 
+            PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
+
             return Results;
         }
 
         private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            PrintUtil.PrintLine($"Running tests for [{Case.Name}] connector", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Running tests for [{RunData.Name}] connector", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
             int count = 0;
             int max = CaseFiles.Count();
@@ -99,14 +101,14 @@ namespace QueryTestSuite.TestRunners
                     PrintUtil.PrintProgressBar(count, max, 50, true, 2);
                     PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
                     PrintUtil.Print($"\t Executing SQL statement...             ", 0);
-                    DataSet dbResult = await Case.Connector.AnalyseQuery(queryFile);
-                    AnalysisResult analysisResult = Case.Parser.ParsePlan(dbResult);
+                    DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
+                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
-                    List<INode> nodes = Case.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
+                    List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
                     AnalysisResult jantimiserResult = new AnalysisResult(
                         "Jantimiser",
                         0,
-                        Case.Optimiser.OptimiseQueryCardinality(nodes),
+                        RunData.Optimiser.OptimiseQueryCardinality(nodes),
                         0,
                         new TimeSpan());
                     
@@ -127,7 +129,7 @@ namespace QueryTestSuite.TestRunners
 
         private void WriteResultToConsole()
         {
-            PrintUtil.PrintLine($"Displaying report for [{Case.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Displaying report for [{RunData.Name}] analysis", 2, ConsoleColor.Green);
             PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
 
             foreach (var testCase in Results)
@@ -221,7 +223,15 @@ namespace QueryTestSuite.TestRunners
                 throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
             var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
             if (res is TestSettings set)
-                Case.Settings.Update(set);
+                RunData.Settings.Update(set);
+        }
+
+        private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
+        {
+            PrintUtil.PrintLine(
+                    new List<string>() { left, right },
+                    new List<string>() { "{0,-30}", "{0,-30}" },
+                    new List<ConsoleColor>() { leftColor, rightColor }, 1);
         }
     }
 }
