@@ -59,14 +59,13 @@ namespace QueryTestSuite.TestRunners
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
-                List<Task> tasks = await Case.HistoManager.AddHistogramsFromDB();
+                List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 
                 foreach(var t in ProgressBar.PrintProgress(tasks, indent: 1))
                 {
                     t.Wait();
                 }
                 ProgressBar.Finish(tasks.Count, indent: 1);
-             }
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
