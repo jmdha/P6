@@ -129,32 +129,32 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             return leftBucketCount * rightBucketCount;
         }
 
-        private static bool CheckEqualBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
         {
-            return ((rightValueStart >= leftValueStart &&
-                         rightValueStart <= leftValueEnd) ||
-                        (rightValueEnd <= leftValueEnd &&
-                         rightValueEnd >= leftValueStart));
+            return ((rightValueStart.CompareTo(leftValueStart) >= 0 &&
+                         rightValueStart.CompareTo(leftValueEnd) <= 0) ||
+                        (rightValueEnd.CompareTo(leftValueEnd) <= 0 &&
+                         rightValueEnd.CompareTo(leftValueStart) >= 0));
         }
 
-        private static bool CheckLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckLessBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
         {
-            return leftValueStart < rightValueEnd;
+            return leftValueStart.CompareTo(rightValueEnd) < 0;
         }
 
-        private static bool CheckMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckMoreBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
         {
-            return leftValueEnd > rightValueStart;
+            return leftValueEnd.CompareTo(rightValueStart) > 0;
         }
 
-        private static bool CheckEqualOrLessBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualOrLessBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
         {
             return (
                 CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
                 CheckLessBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd));
         }
 
-        private static bool CheckEqualOrMoreBounds(int leftValueStart, int rightValueStart, int leftValueEnd, int rightValueEnd)
+        private static bool CheckEqualOrMoreBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
         {
             return (
                 CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||

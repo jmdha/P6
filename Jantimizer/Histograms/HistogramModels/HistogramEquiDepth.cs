@@ -24,22 +24,22 @@ namespace Histograms
 
         public void GenerateHistogram(DataTable table, string key)
         {
-            List<int> sorted = table.AsEnumerable().Select(x => (int)x[key]).OrderByDescending(x => -x).ToList();
+            List<IComparable> sorted = table.AsEnumerable().Select(x => (IComparable)x[key]).OrderBy(x => x).ToList();
             GenerateHistogramFromSorted(sorted);
         }
 
-        public void GenerateHistogram(List<int> column)
+        public void GenerateHistogram(List<IComparable> column)
         {
-            List<int> sorted = column.OrderByDescending(x => -x).ToList();
+            List<IComparable> sorted = column.OrderBy(x => x).ToList();
             GenerateHistogramFromSorted(sorted);
         }
 
-        private void GenerateHistogramFromSorted(List<int> sorted)
+        private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
             for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
-                int startValue = sorted[bStart];
-                int endValue = sorted[bStart];
+                IComparable startValue = sorted[bStart];
+                IComparable endValue = sorted[bStart];
                 int countValue = 1;
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
