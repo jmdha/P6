@@ -42,8 +42,6 @@ Each test can have settings to run, named `testSettings.json` or `testSettings.[
   "DoSetup": <bool>,
   "DoMakeHistograms": <bool>,
   "Properties": {
-    "Server": <string>,
-    "Port": <number>,
     "Database": <string>,
     "Schema": <string>
   }
@@ -70,10 +68,14 @@ To add a secrets file to the project:
 {
   "ConnectionProperties": {
     "POSGRESQL": {
+      "Server": "localhost",
+      "Port": 5432,
       "Username": "postgres",
       "Password": "password"
     },
     "MYSQL": {
+      "Server": "localhost",
+      "Port": 3306,
       "Username": "root",
       "Password": "password"
     }

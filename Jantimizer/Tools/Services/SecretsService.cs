@@ -23,7 +23,9 @@ namespace Tools.Services
         {
             return new SecretsItem(
                 configuration.GetSection("ConnectionProperties").GetSection(key)["Username"],
-                configuration.GetSection("ConnectionProperties").GetSection(key)["Password"]);
+                configuration.GetSection("ConnectionProperties").GetSection(key)["Password"],
+                configuration.GetSection("ConnectionProperties").GetSection(key)["Server"],
+                int.Parse(configuration.GetSection("ConnectionProperties").GetSection(key)["Port"]));
         }
 
         public bool GetLaunchOption(string key)
