@@ -9,29 +9,20 @@ namespace Tools.Models
 {
     public class ConnectionProperties
     {
-        public string Server { get; set; }
-        public int Port { get; set; }
+        public string? Server { get; set; }
+        public int? Port { get; set; }
         [JsonIgnore]
-        public SecretsItem Secrets { get; set; }
-        public string Database { get; set; }
-        public string Schema { get; set; }
+        public SecretsItem? Secrets { get; set; }
+        public string? Database { get; set; }
+        public string? Schema { get; set; }
 
         public ConnectionProperties()
         {
-            Server = "";
-            Port = -1;
-            Secrets = new SecretsItem();
-            Database = "";
-            Schema = "";
         }
 
         public ConnectionProperties(SecretsItem secrets)
         {
-            Server = "";
-            Port = -1;
             Secrets = secrets;
-            Database = "";
-            Schema = "";
         }
 
         public ConnectionProperties(string server, int port, SecretsItem secrets, string database, string schema)

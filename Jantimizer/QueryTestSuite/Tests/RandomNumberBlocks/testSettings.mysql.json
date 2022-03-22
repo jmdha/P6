@@ -1,6 +1,7 @@
 ﻿{
-  "DoCleanup": true,
+  "DoPreCleanup": true,
   "DoSetup": true,
+  "DoPostCleanup": true,
   "DoMakeHistograms": true,
   "Properties": {
     "Server": "localhost",

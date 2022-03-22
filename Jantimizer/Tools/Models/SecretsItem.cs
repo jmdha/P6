@@ -11,11 +11,6 @@ namespace Tools.Models
         public string Username { get; set; }
         public string Password { get; set; }
 
-        public SecretsItem()
-        {
-
-        }
-
         public SecretsItem(string username, string password)
         {
             Username = username;

@@ -44,19 +44,19 @@ namespace QueryTestSuite.TestRunners
             PrintUtil.PrintLine($"Parsing settings", 1, ConsoleColor.Blue);
             ParseTestSettings(SettingsFile);
 
-            if (Case.Settings.DoCleanup)
+            if (Case.Settings.DoPreCleanup != null && (bool)Case.Settings.DoPreCleanup)
             {
-                PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+                PrintUtil.PrintLine($"Running Pre Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
                 await Case.Connector.CallQuery(CleanupFile);
             }
 
-            if (Case.Settings.DoSetup)
+            if (Case.Settings.DoSetup != null && (bool)Case.Settings.DoSetup)
             {
                 PrintUtil.PrintLine($"Running Setup: {SetupFile.Name}", 1, ConsoleColor.Blue);
                 await Case.Connector.CallQuery(SetupFile);
             }
 
-            if (Case.Settings.DoMakeHistograms)
+            if (Case.Settings.DoMakeHistograms != null && (bool)Case.Settings.DoMakeHistograms)
             {
                 PrintUtil.PrintLine($"Generating histograms", 1, ConsoleColor.Blue);
                 await Case.HistoManager.AddHistogramsFromDB();
@@ -64,9 +64,9 @@ namespace QueryTestSuite.TestRunners
 
             Results = await RunQueriesSerial();
 
-            if (Case.Settings.DoCleanup)
+            if (Case.Settings.DoPostCleanup != null && (bool)Case.Settings.DoPostCleanup)
             {
-                PrintUtil.PrintLine($"Running Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
+                PrintUtil.PrintLine($"Running Post Cleanup: {CleanupFile.Name}", 1, ConsoleColor.Red);
                 await Case.Connector.CallQuery(CleanupFile);
             }
 
@@ -166,17 +166,6 @@ namespace QueryTestSuite.TestRunners
             }
         }
 
-        private string GetAccuracyAsString(ulong actualValue, ulong predictedValue)
-        {
-            decimal acc = GetAccuracy(actualValue, predictedValue);
-            if (acc == 100)
-                return "100   %";
-            else if (acc == -1)
-                return "inf   %";
-            else 
-                return string.Format("{0, -5} %", acc);
-        }
-
         private string GetAccuracyAsString(decimal accuracy)
         {
             if (accuracy == 100)
@@ -220,6 +209,8 @@ namespace QueryTestSuite.TestRunners
 
         private void ParseTestSettings(FileInfo file)
         {
+            if (!file.Exists)
+                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
             var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
             if (res is TestSettings set)
                 Case.Settings.Update(set);
