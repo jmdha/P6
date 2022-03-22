@@ -82,7 +82,7 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
             HistogramEquiDepth histogram = new HistogramEquiDepth("A", columnName, depth);
 
             // ACT
-            histogram.GenerateHistogram(rows.ToList());
+            histogram.GenerateHistogram(rows.Cast<IComparable>().ToList());
 
             // ASSERT
             Assert.AreEqual(expBucketCount, histogram.Buckets.Count);
