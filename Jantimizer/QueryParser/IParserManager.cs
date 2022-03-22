@@ -13,7 +13,7 @@ namespace QueryParser
         /// <summary>
         /// List of active query parsers the manager can use.
         /// </summary>
-        public List<IQueryParser> QueryParsers { get; }
+        public List<IQueryParser> QueryParsers { get; set; }
 
         /// <summary>
         /// Parse a query, by finding the first parser that:

@@ -29,6 +29,7 @@ namespace QueryTestSuite.TestRunners
 
                     TestRunner runner = new TestRunner(
                         suitData,
+                        GetVariant(dir, "testSettings", suitData.Name, "json"),
                         GetVariant(dir, "setup", suitData.Name),
                         GetVariant(dir, "cleanup", suitData.Name),
                         GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, suitData.Name)),
@@ -42,19 +43,19 @@ namespace QueryTestSuite.TestRunners
             }
         }
 
-        private FileInfo GetVariant(DirectoryInfo dir, string name, string type)
+        private FileInfo GetVariant(DirectoryInfo dir, string name, string type, string ext = "sql")
         {
-            var specific = new FileInfo(Path.Combine(dir.FullName, $"{name}.{type}.sql"));
+            var specific = new FileInfo(Path.Combine(dir.FullName, $"{name}.{type}.{ext}"));
 
             if(specific.Exists)
                 return specific;
 
-            var generic = new FileInfo(Path.Combine(dir.FullName, $"{name}.sql"));
+            var generic = new FileInfo(Path.Combine(dir.FullName, $"{name}.{ext}"));
 
             if(generic.Exists)
                 return generic;
 
-            throw new FileNotFoundException($"Could not find '{name}' of type '{type}' in '{dir.FullName}'");
+            return new FileInfo("None");
         }
 
         List<string> GetInvariantsInDir(DirectoryInfo dir)

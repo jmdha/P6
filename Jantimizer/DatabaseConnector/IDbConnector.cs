@@ -12,9 +12,9 @@ namespace DatabaseConnector
     {
         public ConnectionProperties ConnectionProperties { get; set; }
 
-        public Task<bool> StartServer();
-        public bool StopServer();
         public bool CheckConnection();
+
+        public string BuildConnectionString();
 
         public Task<DataSet> CallQuery(FileInfo sqlFile);
         public Task<DataSet> CallQuery(string query);

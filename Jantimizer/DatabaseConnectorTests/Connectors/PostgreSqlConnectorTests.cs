@@ -21,7 +21,7 @@ namespace DatabaseConnectorTests.Connectors
         public void Can_Set_Constructor(string connectionString, string server, int port, string username, string password, string database, string schema)
         {
             // ARRANGE
-            var properties = new ConnectionProperties(connectionString, server, port, username, password, database, schema);
+            var properties = new ConnectionProperties(server, port, new SecretsItem(username, password), database, schema);
 
             // ACT
             IDbConnector connector = new DatabaseConnector.Connectors.PostgreSqlConnector(properties);
@@ -38,7 +38,7 @@ namespace DatabaseConnectorTests.Connectors
         public void Cant_CheckConnection_IfNotPossible()
         {
             // ARRANGE
-            var properties = new ConnectionProperties("SomeIncorrectConnectionString", "", 1, "", "", "", "");
+            var properties = new ConnectionProperties("-1", -1, new SecretsItem("a", "b"), "-1", "-1");
             IDbConnector connector = new DatabaseConnector.Connectors.PostgreSqlConnector(properties);
 
             // ACT
@@ -46,22 +46,6 @@ namespace DatabaseConnectorTests.Connectors
 
             // ASSERT
             Assert.IsFalse(result);
-        }
-
-        #endregion
-
-        #region CallQuery
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public async Task Cant_CallQuery_IfConnectionStringIncorrect()
-        {
-            // ARRANGE
-            var properties = new ConnectionProperties("SomeIncorrectConnectionString", "", 1, "", "", "", "");
-            IDbConnector connector = new DatabaseConnector.Connectors.PostgreSqlConnector(properties);
-
-            // ACT
-            var result = await connector.CallQuery("abc");
         }
 
         #endregion

@@ -31,57 +31,22 @@ To add a secrets file to the project:
 * Right click on the project file.
 * Click "Manage User Secrets".
 * Paste the following structure and insert your connection strings instead.
-* Optional to disable some of the database connectors if needed.
-* Optional to start the database systems if they are not online (and is set to run).
 
 ```
 {
-  "ConnectionStrings": {
-    "POSGRESQL": "connection string here",
-    "MYSQL": "connection string here"
+  "ConnectionProperties": {
+    "POSGRESQL": {
+      "Username": "postgres",
+      "Password": "password"
+    },
+    "MYSQL": {
+      "Username": "root",
+      "Password": "password"
+    }
   },
   "LaunchSystem": {
-    "POSGRESQL": "True",
-    "MYSQL": "True"
-  },
-  "AutoStart": {
     "POSGRESQL": "True",
     "MYSQL": "True"
   }
 }
 ```
-
-# Connection Strings
-All connectors in this project use standard ADO.NET style connection strings. A list of structures for the local connection strings can be seen below.
-### PostgreSQL
-Postgres requires a `Host`, `Port`, `Username`, `Password`, `Database` and `SearchPath` (Schema). The default for a local database are the following:
-
-| Property Name  | Default value (Local) |
-| -------------- | --------------------- |
-| `Host`         | `localhost`           |
-| `Port`         | `5432`                |
-| `Username`     | `postgres`            |
-| `Password`     | `password`            |
-| `Database`     | `postgres`            |
-| `SearchPath`	 | `public`	            |
-
-**Example string**:
- `Host=localhost;Port=5432;Username=postgres;Password=password;Database=postgres;SearchPath=public`
-
-### MySQL
-MySQL requires a `Server`, `Port`, `Uid`, `Pwd`, `Database` and `Schema`. The default for a local database are the following:
-
-| Property Name  | Default value (Local) |
-| -------------- | --------------------- |
-| `Host`         | `localhost`           |
-| `Port`         | `3306`                |
-| `Uid`          | `root`                |
-| `Pwd`          | `myPassword`          |
-| `Database`     | `public`              |
-
-**Example string**:
- `Server=localhost;Port=3306;Uid=root;Pwd=password;Database=public`
-	
-		
-		
-	
