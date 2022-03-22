@@ -20,7 +20,7 @@ namespace DatabaseConnectorTests.Connectors
         public void Can_Set_Constructor(string connectionString, string server, int port, string username, string password, string database, string schema)
         {
             // ARRANGE
-            var properties = new ConnectionProperties(server, port, new SecretsItem(username, password), database, schema);
+            var properties = new ConnectionProperties(new SecretsItem(username, password, server, port), database, schema);
 
             // ACT
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
@@ -37,7 +37,7 @@ namespace DatabaseConnectorTests.Connectors
         public void Cant_CheckConnection_IfNotPossible()
         {
             // ARRANGE
-            var properties = new ConnectionProperties("-1", -1, new SecretsItem("a", "b"), "-1", "-1");
+            var properties = new ConnectionProperties(new SecretsItem("a", "b", "-1", -1), "-1", "-1");
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
@@ -56,7 +56,7 @@ namespace DatabaseConnectorTests.Connectors
         public async Task Cant_CallQuery_IfConnectionStringIncorrect()
         {
             // ARRANGE
-            var properties = new ConnectionProperties("-1",-1,new SecretsItem("a","b"),"-1","-1");
+            var properties = new ConnectionProperties(new SecretsItem("a","b", "-1", -1),"-1","-1");
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
@@ -68,7 +68,7 @@ namespace DatabaseConnectorTests.Connectors
         public async Task Cant_CallQuery_IfServerNotExist()
         {
             // ARRANGE
-            var properties = new ConnectionProperties("nonexistinghost", 3306, new SecretsItem("a","b"), "aaa", "bbb");
+            var properties = new ConnectionProperties(new SecretsItem("a", "b", "nonexistinghost", 3306), "aaa", "bbb");
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT

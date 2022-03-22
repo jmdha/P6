@@ -36,10 +36,14 @@ To add a secrets file to the project:
 {
   "ConnectionProperties": {
     "POSGRESQL": {
+      "Server": "localhost",
+      "Port": 5432,
       "Username": "postgres",
       "Password": "password"
     },
     "MYSQL": {
+      "Server": "localhost",
+      "Port": 3306,
       "Username": "root",
       "Password": "password"
     }

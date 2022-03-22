@@ -14,6 +14,8 @@ namespace DatabaseConnector.Connectors
 
         public override string BuildConnectionString()
         {
+            if (ConnectionProperties.Secrets == null)
+                throw new ArgumentNullException("Error, base connection properties was not set!");
             return $"Host={ConnectionProperties.Secrets.Server};Port={ConnectionProperties.Secrets.Port};Username={ConnectionProperties.Secrets.Username};Password={ConnectionProperties.Secrets.Password};Database={ConnectionProperties.Database};SearchPath={ConnectionProperties.Schema}";
         }
 
