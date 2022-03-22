@@ -3,6 +3,7 @@ using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;
 using QueryTestSuite.TestRunners;
+using System.Text.Json;
 using Tools.Models;
 using Tools.Services;
 
@@ -29,14 +30,38 @@ namespace QueryTestSuite
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
             DateTime timeStamp = DateTime.Now;
 
-            foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
-            {
-                TestSuite suite = new TestSuite(connectorSet, timeStamp);
+            if (!File.Exists(Path.Join(testBaseDirPath, "testorder.json")))
+                throw new IOException("Error! Order file 'testorder.json' was not found!");
 
-                PrintUtil.PrintLine($"Running test collection [{testDir.Name}]", 0, ConsoleColor.Magenta);
-                await suite.RunTests(testDir);
-                PrintUtil.PrintLine($"Test collection [{testDir.Name}] finished!", 0, ConsoleColor.Magenta);
+            var parseOrder = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(testBaseDirPath, "testorder.json")), typeof(TestOrder));
+            if (parseOrder is TestOrder order)
+            {
+                foreach (var testFolder in order.Order)
+                {
+                    if (testFolder != "*")
+                    {
+                        if (Directory.Exists(Path.Join(testBaseDirPath, testFolder)))
+                            await RunTestSuite(connectorSet, new DirectoryInfo(Path.Combine(testBaseDirPath, testFolder)));
+                        else
+                            PrintUtil.PrintLine($"Error, Test folder [{testFolder}] was not found!", 0, ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
+                            if (!order.Order.Contains(testDir.Name))
+                                await RunTestSuite(connectorSet, testDir);
+                    }
+                }
             }
+        }
+
+        private static async Task RunTestSuite(List<SuiteData> connectorSet, DirectoryInfo info) 
+        {
+            TestSuite suite = new TestSuite(connectorSet, DateTime.Now);
+
+            PrintUtil.PrintLine($"Running test collection [{info.Name}]", 0, ConsoleColor.Magenta);
+            await suite.RunTests(info);
+            PrintUtil.PrintLine($"Test collection [{info.Name}] finished!", 0, ConsoleColor.Magenta);
         }
     }
 }
