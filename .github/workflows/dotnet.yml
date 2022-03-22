@@ -18,8 +18,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore Jantimizer
+      run: dotnet restore
     - name: Build
-      run: dotnet build Jantimizer --no-restore
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test Jantimizer --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
