@@ -1,4 +1,5 @@
 ﻿using PrintUtilities;
+using QueryTestSuite.Helpers;
 using QueryTestSuite.Models;
 using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;
@@ -28,30 +29,10 @@ namespace QueryTestSuite
             var connectorSet = new List<SuiteData>() {pgData, myData };
 
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
-            DateTime timeStamp = DateTime.Now;
 
-            if (!File.Exists(Path.Join(testBaseDirPath, "testorder.json")))
-                throw new IOException("Error! Order file 'testorder.json' was not found!");
-
-            var parseOrder = JsonSerializer.Deserialize(File.ReadAllText(Path.Join(testBaseDirPath, "testorder.json")), typeof(TestOrder));
-            if (parseOrder is TestOrder order)
+            foreach(DirectoryInfo dirInfo in TestOrderSorter.GetTestRunOrder(testBaseDirPath, Path.Join(testBaseDirPath, "testorder.json")))
             {
-                foreach (var testFolder in order.Order)
-                {
-                    if (testFolder != "*")
-                    {
-                        if (Directory.Exists(Path.Join(testBaseDirPath, testFolder)))
-                            await RunTestSuite(connectorSet, new DirectoryInfo(Path.Combine(testBaseDirPath, testFolder)));
-                        else
-                            PrintUtil.PrintLine($"Error, Test folder [{testFolder}] was not found!", 0, ConsoleColor.Red);
-                    }
-                    else
-                    {
-                        foreach (DirectoryInfo testDir in new DirectoryInfo(testBaseDirPath).GetDirectories())
-                            if (!order.Order.Contains(testDir.Name))
-                                await RunTestSuite(connectorSet, testDir);
-                    }
-                }
+                await RunTestSuite(connectorSet, dirInfo);
             }
         }
 
