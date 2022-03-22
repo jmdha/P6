@@ -7,6 +7,7 @@ using QueryOptimiserTest;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
+using System;
 using System.Collections.Generic;
 using Tools.Models;
 
@@ -23,7 +24,12 @@ public class JoinCostTest
     [DataRow(10, 10, 100, 1000, 10)]
     [DataRow(10, 100, 100, 10000, 20)]
     [DataRow(100, 1, 1, 1, 10)]
-    public void EqualitySameValue(int value, int aAmount, int bAmount, int expectedHits, int depth)
+    [DataRow("Jan", 100, 100, 10000, 10)]
+    [DataRow("Jan", 100, 100, 10000, 10)]
+    [DataRow("Jan", 10, 100, 1000, 10)]
+    [DataRow("Jan", 100, 100, 10000, 20)]
+    [DataRow("Jan", 1, 1, 1, 10)]
+    public void EqualitySameValue(IComparable value, int aAmount, int bAmount, int expectedHits, int depth)
     {
         IHistogramManager<IHistogram, IDbConnector> histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
         var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, value);
@@ -78,7 +84,20 @@ public class JoinCostTest
     [DataRow(10, 20, 100, 100, 20, 100 * 100)]
     [DataRow(20, 20, 100, 100, 20, 0)]
     [DataRow(30, 20, 100, 100, 20, 0)]
-    public void LessConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
+
+    [DataRow("Jan", "Land!", 100, 100, 10, 100 * 100)]
+    [DataRow("Jan", "And!", 100, 100, 10, 0)]
+    [DataRow("Jan", "And!", 100, 100, 10, 0)]
+    [DataRow("Jan", "Land!", 50, 100, 10, 50 * 100)]
+    [DataRow("Jan", "And!", 50, 100, 10, 0)]
+    [DataRow("Jan", "And!", 50, 100, 10, 0)]
+    [DataRow("Jan", "Land!", 100, 50, 10, 50 * 100)]
+    [DataRow("Jan", "And!", 100, 50, 10, 0)]
+    [DataRow("Jan", "And!", 100, 50, 10, 0)]
+    [DataRow("Jan", "Land!", 100, 100, 20, 100 * 100)]
+    [DataRow("Jan", "And!", 100, 100, 20, 0)]
+    [DataRow("Jan", "And!", 100, 100, 20, 0)]
+    public void LessConstantValue(IComparable aValue, IComparable bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
         var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
@@ -129,7 +148,20 @@ public class JoinCostTest
     [DataRow(10, 20, 100, 100, 20, 0)]
     [DataRow(20, 20, 100, 100, 20, 0)]
     [DataRow(30, 20, 100, 100, 20, 100 * 100)]
-    public void MoreConstantValue(int aValue, int bValue, int aAmount, int bAmount, int depth, int expectedHits)
+
+    [DataRow("Jan", "And!", 100, 100, 10, 100 * 100)]
+    [DataRow("Jan", "Land!", 100, 100, 10, 0)]
+    [DataRow("Jan", "Land!", 100, 100, 10, 0)]
+    [DataRow("Jan", "And!", 50, 100, 10, 50 * 100)]
+    [DataRow("Jan", "Land!", 50, 100, 10, 0)]
+    [DataRow("Jan", "Land!", 50, 100, 10, 0)]
+    [DataRow("Jan", "And!", 100, 50, 10, 50 * 100)]
+    [DataRow("Jan", "Land!", 100, 50, 10, 0)]
+    [DataRow("Jan", "Land!", 100, 50, 10, 0)]
+    [DataRow("Jan", "And!", 100, 100, 20, 100 * 100)]
+    [DataRow("Jan", "Land!", 100, 100, 20, 0)]
+    [DataRow("Jan", "Land!", 100, 100, 20, 0)]
+    public void MoreConstantValue(IComparable aValue, IComparable bValue, int aAmount, int bAmount, int depth, int expectedHits)
     {
         var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
         var aGram = Utilities.CreateConstHistogram(Utilities.GetTableName(0), "ID", depth, aAmount, aValue);
