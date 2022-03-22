@@ -9,6 +9,6 @@ namespace Histograms
         public List<IHistogramBucket> Buckets { get; }
 
         public void GenerateHistogram(DataTable table, string key);
-        public void GenerateHistogram(List<int> column);
+        public void GenerateHistogram(List<IComparable> column);
     }
 }
