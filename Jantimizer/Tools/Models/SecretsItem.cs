@@ -10,16 +10,15 @@ namespace Tools.Models
     {
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Server { get; set; }
+        public int Port { get; set; }
 
-        public SecretsItem()
-        {
-
-        }
-
-        public SecretsItem(string username, string password)
+        public SecretsItem(string username, string password, string server, int port)
         {
             Username = username;
             Password = password;
+            Server = server;
+            Port = port;
         }
     }
 }

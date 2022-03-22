@@ -1,11 +1,12 @@
 ﻿{
-  "DoCleanup": false,
+  "DoPreCleanup": false,
   "DoSetup": true,
+  "DoPostCleanup": false,
   "DoMakeHistograms": false,
+  "DoRunTests": false,
+  "DoMakeReport": false,
   "Properties": {
-    "Server": "localhost",
-    "Port": 5432,
-    "Database": "postgres",
-    "Schema": "basictests"
+    "Database": null,
+    "Schema": null
   }
 }
