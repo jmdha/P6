@@ -28,7 +28,7 @@ namespace QueryTestSuite.Helpers
                         if (Directory.Exists(Path.Join(testBaseDirPath, testFolder)))
                             result.Add(new DirectoryInfo(Path.Combine(testBaseDirPath, testFolder)));
                         else
-                            PrintUtil.PrintLine($"Error, Test folder [{testFolder}] was not found!", 0, ConsoleColor.Red);
+                            Console.WriteLine($"Error, Test folder [{testFolder}] was not found!");
                     }
                     else
                     {

@@ -4,6 +4,7 @@ using DatabaseConnector;
 using DatabaseConnector.Connectors;
 using Histograms;
 using Histograms.Managers;
+using Konsole;
 using PrintUtilities;
 using QueryOptimiser;
 using QueryParser;
@@ -27,8 +28,9 @@ namespace QueryTestSuite.TestRunners
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
+        private PrintUtil Printer;
 
-        public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp, IConsole console)
         {
             RunData = runData;
             SettingsFile = settingsFile;
@@ -37,6 +39,7 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
+            Printer = new PrintUtil(console);
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -60,12 +63,16 @@ namespace QueryTestSuite.TestRunners
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
-                
-                foreach(var t in ProgressBar.PrintProgress(tasks, indent: 1))
+                int i = 0;
+                int max = tasks.Count;
+                int pbID = Printer.AddProgressBar(max);
+
+                foreach (var t in tasks)
                 {
                     t.Wait();
+                    i++;
+                    Printer.UpdateProgreesBar(pbID, i, $"Item {i} of {max}");
                 }
-                ProgressBar.Finish(tasks.Count, indent: 1);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -88,25 +95,23 @@ namespace QueryTestSuite.TestRunners
                 if (saveResult)
                     SaveResult();
             }
-
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
-            Console.WriteLine();
 
             return Results;
         }
 
         private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
+            Printer.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
-            int count = 0;
+            int count = 1;
             int max = CaseFiles.Count();
-            foreach (var queryFile in ProgressBar.PrintProgress(CaseFiles, indent: 2))
+            int pbID = Printer.AddProgressBar(max);
+            foreach (var queryFile in CaseFiles)
             {
                 try
                 {
-                    PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
-                    PrintUtil.Print($"\t Executing SQL statement...             ", 0);
+                    Printer.UpdateProgreesBar(pbID, count, queryFile.Name);
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
@@ -117,25 +122,36 @@ namespace QueryTestSuite.TestRunners
                         RunData.Optimiser.OptimiseQueryCardinality(nodes),
                         0,
                         new TimeSpan());
-                    
+
                     TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
                 {
-                    PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
-                    PrintUtil.PrintLine(ex.ToString(), 1);
+                    //PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
+                    //PrintUtil.PrintLine(ex.ToString(), 1);
                 }
                 count++;
             }
-            ProgressBar.Finish(CaseFiles.Count(), indent: 2);
             return testCases;
         }
 
         private void WriteResultToConsole()
         {
-            PrintUtil.PrintLine($"Displaying report...", 2, ConsoleColor.Green);
-            PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
+            Printer.PrintLine($"Displaying report...", 2, ConsoleColor.Green);
+            Printer.PrintLine(new List<string>()
+            {
+                "Category",
+                "Case Name",
+                "P. Db Rows",
+                "P. Jan Rows",
+                "Actual Rows",
+                "DB Acc (%)",
+                "Jan Acc (%)"
+            },
+            GetFormatStrings(),
+            ConsoleColor.Blue,
+            2);
 
             foreach (var testCase in Results)
             {
@@ -158,7 +174,7 @@ namespace QueryTestSuite.TestRunners
                 else
                     colors.Add(ConsoleColor.Yellow);
 
-                PrintUtil.PrintLine(new List<string>() {
+                Printer.PrintLine(new List<string>() {
                     testCase.Category,
                     testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
@@ -166,16 +182,8 @@ namespace QueryTestSuite.TestRunners
                     testCase.DbAnalysisResult.ActualCardinality.ToString(),
                     GetAccuracyAsString(DbAnalysisAccuracy),
                     GetAccuracyAsString(JantimiserEstimateAccuracy)
-                }, 
-                new List<string>() {
-                    "{0, -30}",
-                    "{0, -20}",
-                    "{0, -20}", 
-                    "{0, -20}", 
-                    "{0, -20}", 
-                    "{0, -10}", 
-                    "{0, -10}"
                 },
+                GetFormatStrings(),
                 colors,
                 2);
             }
@@ -187,7 +195,7 @@ namespace QueryTestSuite.TestRunners
                 return "100   %";
             else if (accuracy == -1)
                 return "inf   %";
-            else 
+            else
                 return string.Format("{0, -5} %", accuracy);
         }
 
@@ -202,19 +210,27 @@ namespace QueryTestSuite.TestRunners
             if (actualValue < predictedValue)
             {
                 decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
-                return Math.Round(value, 2);
+                return Math.Round(value);
             }
             if (actualValue > predictedValue)
             {
                 decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
-                return Math.Round(value, 2);
+                return Math.Round(value);
             }
             return 100;
         }
 
-        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
+        private List<string> GetFormatStrings()
         {
-            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20} {5,-10} {6,-10}", category, caseName, predicted, actual, jantimiser, dBAccuracy, jantimiserAccuracy);
+            return new List<string>() {
+                    "{0, -20}",
+                    "{0, -15}",
+                    "{0, -15}",
+                    "{0, -15}",
+                    "{0, -15}",
+                    "{0, -12}",
+                    "{0, -8}"
+                };
         }
 
         private void SaveResult()
@@ -233,7 +249,7 @@ namespace QueryTestSuite.TestRunners
 
         private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
         {
-            PrintUtil.PrintLine(
+            Printer.PrintLine(
                     new List<string>() { left, right },
                     new List<string>() { "{0,-30}", "{0,-30}" },
                     new List<ConsoleColor>() { leftColor, rightColor }, 1);

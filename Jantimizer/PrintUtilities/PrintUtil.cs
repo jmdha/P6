@@ -1,47 +1,72 @@
-﻿namespace PrintUtilities
+﻿using Konsole;
+
+namespace PrintUtilities
 {
-    public static class PrintUtil
+    public class PrintUtil
     {
         public const ConsoleColor DefaultColor = ConsoleColor.White;
-        public static void Print(string text, int indent = 0, ConsoleColor color = DefaultColor)
+        private IConsole KConsole;
+        private Dictionary<int, ProgressBar> progressbars = new Dictionary<int, ProgressBar>();
+
+        public PrintUtil(IConsole console)
         {
-            Console.ForegroundColor = color;
-            Console.Write($"{GetIndent(indent)}{text}");
-            Console.ResetColor();
+            KConsole = console;
         }
 
-        public static void PrintLine(string text, int indent = 0, ConsoleColor color = DefaultColor)
+
+        public void Print(string text, int indent = 0, ConsoleColor color = DefaultColor)
         {
-            Console.ForegroundColor = color;
-            Console.WriteLine($"{GetIndent(indent)}{text}");
-            Console.ResetColor();
+            KConsole.WriteLine(color, $"{GetIndent(indent)}{text}");
         }
 
-        public static void PrintLine(List<string> text, List<string> format, List<ConsoleColor> colorsConsole, int indent = 0)
+        public void PrintLine(string text, int indent = 0, ConsoleColor color = DefaultColor)
         {
-            Console.Write($"{GetIndent(indent)}");
+            KConsole.WriteLine(color, $"{GetIndent(indent)}{text}");
+        }
+
+        public void PrintLine(List<string> text, List<string> format, List<ConsoleColor> colorsConsole, int indent = 0)
+        {
+            KConsole.Write($"{GetIndent(indent)}");
             for (int i = 0; i < text.Count; i++) {
-                Print(String.Format(format[i], text[i]) + " ", 0, colorsConsole[i]);
+                KConsole.Write(colorsConsole[i], format[i], text[i] + " ");
             }
-            Console.WriteLine();
-            Console.ResetColor();
+            KConsole.WriteLine("");
         }
 
-        public static void PrintInLine(string text, int indent = 0, ConsoleColor color = DefaultColor)
+        public void PrintLine(List<string> text, List<string> format, ConsoleColor colorConsole, int indent = 0)
         {
-            Console.ForegroundColor = color;
-            Console.Write($"\r{GetIndent(indent)}{text}");
-            Console.ResetColor();
+            KConsole.Write($"{GetIndent(indent)}");
+            for (int i = 0; i < text.Count; i++)
+            {
+                KConsole.Write(colorConsole, format[i], text[i] + " ");
+            }
+            KConsole.WriteLine("");
         }
 
-        public static void ClearLine()
+        public void PrintInLine(string text, int indent = 0, ConsoleColor color = DefaultColor)
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new String(' ', Console.BufferWidth));
-            Console.SetCursorPosition(0, Console.CursorTop);
+            KConsole.Write(color, $"\r{GetIndent(indent)}{text}");
         }
 
-        private static string GetIndent(int indent)
+        public void ClearLine()
+        {
+            //Console.SetCursorPosition(0, Console.CursorTop);
+            //Console.Write(new String(' ', Console.BufferWidth));
+            //Console.SetCursorPosition(0, Console.CursorTop);
+        }
+
+        public int AddProgressBar(int max)
+        {
+            progressbars.Add(progressbars.Count + 1, new ProgressBar(KConsole, max));
+            return progressbars.Count;
+        }
+
+        public void UpdateProgreesBar(int id, int current, string text)
+        {
+            progressbars[id].Refresh(current, text);
+        }
+
+        private string GetIndent(int indent)
         {
             return new string('\t', indent);
         }
