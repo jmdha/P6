@@ -6,8 +6,6 @@
   "DoRunTests": true,
   "DoMakeReport": true,
   "Properties": {
-    "Server": "localhost",
-    "Port": 3306,
     "Database": "basictests",
     "Schema": "basictests"
   }

@@ -13,7 +13,7 @@ namespace DatabaseConnector.Connectors
 
         public override string BuildConnectionString()
         {
-            return $"Server={ConnectionProperties.Server};Port={ConnectionProperties.Port};Uid={ConnectionProperties.Secrets.Username};Pwd={ConnectionProperties.Secrets.Password};Database={ConnectionProperties.Database};";
+            return $"Server={ConnectionProperties.Secrets.Server};Port={ConnectionProperties.Secrets.Port};Uid={ConnectionProperties.Secrets.Username};Pwd={ConnectionProperties.Secrets.Password};Database={ConnectionProperties.Database};";
         }
 
         public override async Task<DataSet> AnalyseQuery(string query)

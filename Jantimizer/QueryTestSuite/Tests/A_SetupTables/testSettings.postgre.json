@@ -6,8 +6,6 @@
   "DoRunTests": false,
   "DoMakeReport": false,
   "Properties": {
-    "Server": "localhost",
-    "Port": 5432,
     "Database": "postgres",
     "Schema": "basictests"
   }

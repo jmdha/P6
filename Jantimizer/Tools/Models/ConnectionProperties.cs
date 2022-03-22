@@ -9,8 +9,6 @@ namespace Tools.Models
 {
     public class ConnectionProperties
     {
-        public string? Server { get; set; }
-        public int? Port { get; set; }
         [JsonIgnore]
         public SecretsItem? Secrets { get; set; }
         public string? Database { get; set; }
@@ -25,10 +23,8 @@ namespace Tools.Models
             Secrets = secrets;
         }
 
-        public ConnectionProperties(string server, int port, SecretsItem secrets, string database, string schema)
+        public ConnectionProperties(SecretsItem secrets, string database, string schema)
         {
-            Server = server;
-            Port = port;
             Secrets = secrets;
             Database = database;
             Schema = schema;
@@ -36,8 +32,6 @@ namespace Tools.Models
 
         public void Update(ConnectionProperties settings)
         {
-            Server = settings.Server;
-            Port = settings.Port;
             Database = settings.Database;
             Schema = settings.Schema;
         }

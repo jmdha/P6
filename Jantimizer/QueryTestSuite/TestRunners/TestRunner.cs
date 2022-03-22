@@ -84,13 +84,14 @@ namespace QueryTestSuite.TestRunners
             }
 
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
+            Console.WriteLine();
 
             return Results;
         }
 
         private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            PrintUtil.PrintLine($"Running tests for [{RunData.Name}] connector", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
             int count = 0;
             int max = CaseFiles.Count();
@@ -129,7 +130,7 @@ namespace QueryTestSuite.TestRunners
 
         private void WriteResultToConsole()
         {
-            PrintUtil.PrintLine($"Displaying report for [{RunData.Name}] analysis", 2, ConsoleColor.Green);
+            PrintUtil.PrintLine($"Displaying report...", 2, ConsoleColor.Green);
             PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
 
             foreach (var testCase in Results)
