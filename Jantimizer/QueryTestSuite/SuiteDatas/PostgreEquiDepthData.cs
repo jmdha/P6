@@ -26,7 +26,7 @@ namespace QueryTestSuite.SuiteDatas
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             var postgresModel = new SuiteData(
-                new TestSettings(true, true, true, postConnectionProperties),
+                new TestSettings(true, true, true, true, postConnectionProperties),
                 secrets.GetLaunchOption("POSGRESQL"),
                 "postgre",
                 postConnector,

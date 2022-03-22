@@ -27,7 +27,7 @@ namespace QueryTestSuite.SuiteDatas
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() {});
             var mySQLModel = new SuiteData(
-                new TestSettings(true, true, true, mySQLConnectionProperties),
+                new TestSettings(true, true, true, true, mySQLConnectionProperties),
                 secrets.GetLaunchOption("MYSQL"),
                 "mysql",
                 mySQLConnector,
