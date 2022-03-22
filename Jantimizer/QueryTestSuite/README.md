@@ -42,8 +42,6 @@ Each test can have settings to run, named `testSettings.json` or `testSettings.[
   "DoSetup": <bool>,
   "DoMakeHistograms": <bool>,
   "Properties": {
-    "Server": <string>,
-    "Port": <number>,
     "Database": <string>,
     "Schema": <string>
   }
