@@ -2,10 +2,10 @@
 {
     public class HistogramBucket : IHistogramBucket
     {
-        public int ValueStart { get; }
-        private int _valueEnd;
-        public int ValueEnd { get => _valueEnd; internal set {
-                if (value < ValueStart)
+        public IComparable ValueStart { get; }
+        private IComparable _valueEnd;
+        public IComparable ValueEnd { get => _valueEnd; internal set {
+                if (value.CompareTo(ValueStart) < 0)
                     throw new IndexOutOfRangeException("Bucket end value cannot be lower than start value!");
                 _valueEnd = value;
             } }
@@ -17,8 +17,16 @@
                 count = value;
             } }
 
-        public HistogramBucket(int valueStart, int valueEnd, int count)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        // Suppress warning for _valueEnd "not being set"
+        public HistogramBucket(IComparable valueStart, IComparable valueEnd, int count)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
+            if(valueStart is null)
+                throw new ArgumentNullException(nameof(valueStart));
+            if(valueEnd is null)
+                throw new ArgumentNullException(nameof(valueEnd));
+
             ValueStart = valueStart;
             ValueEnd = valueEnd;
             Count = count;

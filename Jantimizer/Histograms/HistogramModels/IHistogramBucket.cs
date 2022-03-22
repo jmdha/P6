@@ -2,8 +2,8 @@
 {
     public interface IHistogramBucket
     {
-        public int ValueStart { get; }
-        public int ValueEnd { get; }
+        public IComparable ValueStart { get; }
+        public IComparable ValueEnd { get; }
         public int Count { get; }
     }
 }
