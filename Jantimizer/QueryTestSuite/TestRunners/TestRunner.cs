@@ -21,7 +21,7 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
-        private enum PrinterType
+        private enum PrinterCategory
         {
             None,
             Primary,
@@ -37,7 +37,7 @@ namespace QueryTestSuite.TestRunners
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
-        private Dictionary<PrinterType, PrintUtil> Printers = new Dictionary<PrinterType, PrintUtil>();
+        private Dictionary<PrinterCategory, PrintUtil> Printers = new Dictionary<PrinterCategory, PrintUtil>();
 
         public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp, IConsole console)
         {
@@ -48,15 +48,15 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
-            Printers.Add(PrinterType.Primary, new PrintUtil(console));
-            var consolas = console.SplitRows(
+            Printers.Add(PrinterCategory.Primary, new PrintUtil(console));
+            var consoles = console.SplitRows(
                 new Split(10, "Status"),
                 new Split(3, "Progress"),
                 new Split(0, "Report")
             );
-            Printers.Add(PrinterType.Status, new PrintUtil(consolas[0]));
-            Printers.Add(PrinterType.Progress, new PrintUtil(consolas[1]));
-            Printers.Add(PrinterType.Report, new PrintUtil(consolas[2]));
+            Printers.Add(PrinterCategory.Status, new PrintUtil(consoles[0]));
+            Printers.Add(PrinterCategory.Progress, new PrintUtil(consoles[1]));
+            Printers.Add(PrinterCategory.Report, new PrintUtil(consoles[2]));
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -82,13 +82,13 @@ namespace QueryTestSuite.TestRunners
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 int i = 0;
                 int max = tasks.Count;
-                int pbID = Printers[PrinterType.Progress].AddProgressBar(max);
+                int pbID = Printers[PrinterCategory.Progress].AddProgressBar(max);
 
                 foreach (var t in tasks)
                 {
                     t.Wait();
                     i++;
-                    Printers[PrinterType.Progress].UpdateProgreesBar(pbID, i, $"Item {i} of {max}");
+                    Printers[PrinterCategory.Progress].UpdateProgreesBar(pbID, i, $"Item {i} of {max}");
                 }
             }
 
@@ -122,12 +122,12 @@ namespace QueryTestSuite.TestRunners
             var testCases = new List<TestCaseResult>();
             int count = 1;
             int max = CaseFiles.Count();
-            int pbID = Printers[PrinterType.Progress].AddProgressBar(max);
+            int pbID = Printers[PrinterCategory.Progress].AddProgressBar(max);
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
-                    Printers[PrinterType.Progress].UpdateProgreesBar(pbID, count, queryFile.Name);
+                    Printers[PrinterCategory.Progress].UpdateProgreesBar(pbID, count, queryFile.Name);
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
@@ -154,7 +154,7 @@ namespace QueryTestSuite.TestRunners
 
         private void WriteResultToConsole()
         {
-            Printers[PrinterType.Report].PrintLine(new List<string>()
+            Printers[PrinterCategory.Report].PrintLine(new List<string>()
             {
                 "Case Name",
                 "P. Db Rows",
@@ -187,7 +187,7 @@ namespace QueryTestSuite.TestRunners
                 else
                     colors.Add(ConsoleColor.Yellow);
 
-                Printers[PrinterType.Report].PrintLine(new List<string>() {
+                Printers[PrinterCategory.Report].PrintLine(new List<string>() {
                     testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
                     testCase.JantimiserResult.EstimatedCardinality.ToString(),
@@ -240,7 +240,7 @@ namespace QueryTestSuite.TestRunners
                     "{0, -18}",
                     "{0, -18}",
                     "{0, -15}",
-                    "{0, -15    }"
+                    "{0, -15}"
                 };
         }
 
@@ -260,7 +260,7 @@ namespace QueryTestSuite.TestRunners
 
         private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
         {
-            Printers[PrinterType.Status].PrintLine(
+            Printers[PrinterCategory.Status].PrintLine(
                     new List<string>() { left, right },
                     new List<string>() { "{0,-30}", "{0,-30}" },
                     new List<ConsoleColor>() { leftColor, rightColor }, 1);
