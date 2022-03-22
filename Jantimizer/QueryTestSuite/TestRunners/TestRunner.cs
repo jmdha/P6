@@ -59,7 +59,13 @@ namespace QueryTestSuite.TestRunners
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
-                await RunData.HistoManager.AddHistogramsFromDB();
+                List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
+                
+                foreach(var t in ProgressBar.PrintProgress(tasks, indent: 1))
+                {
+                    t.Wait();
+                }
+                ProgressBar.Finish(tasks.Count, indent: 1);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -95,11 +101,10 @@ namespace QueryTestSuite.TestRunners
             var testCases = new List<TestCaseResult>();
             int count = 0;
             int max = CaseFiles.Count();
-            foreach (FileInfo queryFile in CaseFiles)
+            foreach (var queryFile in ProgressBar.PrintProgress(CaseFiles, indent: 2))
             {
                 try
                 {
-                    PrintUtil.PrintProgressBar(count, max, 50, true, 2);
                     PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
                     PrintUtil.Print($"\t Executing SQL statement...             ", 0);
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
@@ -123,8 +128,7 @@ namespace QueryTestSuite.TestRunners
                 }
                 count++;
             }
-            PrintUtil.PrintProgressBar(max, max, 50, true, 2);
-            PrintUtil.PrintLine(" Finished!                                                             ", 0, ConsoleColor.Green);
+            ProgressBar.Finish(CaseFiles.Count(), indent: 2);
             return testCases;
         }
 

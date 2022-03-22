@@ -16,7 +16,7 @@ namespace Histograms
         public List<string> Tables { get; }
         public List<string> Attributes { get; }
 
-        public Task AddHistogramsFromDB();
+        public Task<List<Task>> AddHistogramsFromDB();
         public void AddHistogram(IHistogram histogram);
         public void ClearHistograms();
 
