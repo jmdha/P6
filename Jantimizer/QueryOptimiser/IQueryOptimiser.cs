@@ -10,6 +10,7 @@ namespace QueryOptimiser
         where HistogramType : IHistogram
         where ConnectorType : IDbConnector
     {
+        public string Name { get; }
         public string Version { get; }
 
         public IHistogramManager<HistogramType, ConnectorType> HistogramManager { get; }

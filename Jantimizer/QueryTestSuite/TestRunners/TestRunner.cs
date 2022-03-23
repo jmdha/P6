@@ -114,13 +114,13 @@ namespace QueryTestSuite.TestRunners
 
                     List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
                     AnalysisResult jantimiserResult = new AnalysisResult(
-                        RunData.Optimiser.Version,
+                        $"{RunData.Optimiser.Name} {RunData.Optimiser.Version}",
                         0,
                         RunData.Optimiser.OptimiseQueryCardinality(nodes),
                         0,
                         new TimeSpan());
                     
-                    TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
+                    TestCaseResult testCase = new TestCaseResult(RunData.Name, queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)

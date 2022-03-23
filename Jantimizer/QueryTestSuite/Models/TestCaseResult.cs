@@ -6,6 +6,7 @@ namespace QueryTestSuite.Models
 {
     internal class TestCaseResult
     {
+        public string Database { get; private set; } = "N/A";
         public string Name { get; private set; } = "N/A";
         public string Category { get; private set; } = "N/A";
 
@@ -16,8 +17,9 @@ namespace QueryTestSuite.Models
         /// <summary> Result from our optimiser estimates. </summary>
         public AnalysisResult JantimiserResult { get; private set; }
 
-        public TestCaseResult (FileInfo fileInfo, AnalysisResult dbAnalysisResult, AnalysisResult jantimiserResult)
+        public TestCaseResult (string database, FileInfo fileInfo, AnalysisResult dbAnalysisResult, AnalysisResult jantimiserResult)
         {
+            Database = database;
             DbAnalysisResult = dbAnalysisResult;
             JantimiserResult = jantimiserResult;
             Name = fileInfo.Name;

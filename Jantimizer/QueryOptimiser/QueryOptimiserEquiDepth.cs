@@ -8,6 +8,7 @@ namespace QueryOptimiser
 {
     public class QueryOptimiserEquiDepth : IQueryOptimiser<IHistogram, IDbConnector>
     {
+        public string Name { get; } = "Jantimiser";
         public string Version { get; } = "1.0";
 
         public IHistogramManager<IHistogram, IDbConnector> HistogramManager { get; set; }
