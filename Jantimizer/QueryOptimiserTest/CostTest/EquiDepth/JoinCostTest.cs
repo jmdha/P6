@@ -41,7 +41,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -65,7 +65,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -109,7 +109,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -129,7 +129,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -173,7 +173,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -193,7 +193,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -224,7 +224,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -244,7 +244,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -275,7 +275,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -295,7 +295,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCost();
 
-        int cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
         Assert.AreEqual(expectedHits, cost);
     }

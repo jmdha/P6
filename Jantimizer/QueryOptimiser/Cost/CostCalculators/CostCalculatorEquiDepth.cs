@@ -15,7 +15,7 @@ namespace QueryOptimiser.Cost.CostCalculators
             HistogramManager = histogramManager;
         }
 
-        public int CalculateCost(INode node)
+        public long CalculateCost(INode node)
         {
             if (node is JoinNode joinNode)
             {

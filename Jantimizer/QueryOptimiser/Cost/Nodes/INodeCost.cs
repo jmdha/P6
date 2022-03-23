@@ -19,6 +19,6 @@ namespace QueryOptimiser.Cost.Nodes
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        internal int CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
+        internal long CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
     }
 }

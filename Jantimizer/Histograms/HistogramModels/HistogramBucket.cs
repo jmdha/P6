@@ -9,15 +9,15 @@
                     throw new IndexOutOfRangeException("Bucket end value cannot be lower than start value!");
                 _valueEnd = value;
             } }
-        private int count;
-        public int Count { get => count; internal set
+        private long count;
+        public long Count { get => count; internal set
             { 
                 if (value < 0)
                     throw new IndexOutOfRangeException("Count for a bucket cannot be less than 0!");
                 count = value;
             } }
 
-        public HistogramBucket(IComparable valueStart, IComparable valueEnd, int count)
+        public HistogramBucket(IComparable valueStart, IComparable valueEnd, long count)
         {
             if(valueStart is null)
                 throw new ArgumentNullException(nameof(valueStart));

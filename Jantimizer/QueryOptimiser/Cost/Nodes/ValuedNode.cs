@@ -4,10 +4,10 @@ namespace QueryOptimiser.Cost.Nodes
 {
     public class ValuedNode
     {
-        public int Cost { get; }
+        public long Cost { get; }
         public INode Node { get; }
 
-        public ValuedNode(int cost, INode node)
+        public ValuedNode(long cost, INode node)
         {
             Cost = cost;
             Node = node;
