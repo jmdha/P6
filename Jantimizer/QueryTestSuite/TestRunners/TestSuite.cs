@@ -1,6 +1,8 @@
 ﻿using DatabaseConnector;
 using Konsole;
 using QueryTestSuite.Models;
+using QueryTestSuite.Exceptions;
+using QueryTestSuite.Services;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -8,17 +10,39 @@ namespace QueryTestSuite.TestRunners
     {
         public IEnumerable<SuiteData> SuiteDataItems { get; }
         private DateTime TimeStamp;
-        private IConsole PrimaryConsole;
-        private Dictionary<string, IConsole> Consoles = new Dictionary<string, IConsole>();
+        private WindowManager WindowManager { get; set;}
 
         public TestSuite(IEnumerable<SuiteData> suiteDataItems, DateTime timeStamp, string name)
         {
             SuiteDataItems = suiteDataItems;
             TimeStamp = timeStamp;
-            PrimaryConsole = Window.OpenBox(name, 220, 50);
-            List<SuiteData> data = SuiteDataItems.ToList();
-            Consoles.Add(data[0].Name, PrimaryConsole.SplitLeft(data[0].Name));
-            Consoles.Add(data[1].Name, PrimaryConsole.SplitRight(data[1].Name));
+            WindowManager = new WindowManager();
+            WindowManager.GenerateConsoleLayout(name, suiteDataItems.ToList());
+        }
+
+        private void GenerateStatusWindow(IConsole parent, List<SuiteData> suites, int suitesToRun) {
+            if (suitesToRun == 1) {
+                Consoles.Add(suites[0].Name, parent.OpenBox(suites[0].Name));
+            } else if (suitesToRun > 2) {
+                Consoles.Add(suites[0].Name, parent.SplitLeft(suites[0].Name));
+                Consoles.Add(suites[1].Name, parent.SplitRight(suites[1].Name));
+            }
+        }
+
+        private void GenerateReportsWindow(IConsole parent, List<SuiteData> suites, int reportSize) {
+            List<Split> splits = new List<Split>();
+            List<string> splitNames = new List<string>();
+            foreach (var suite in suites) {
+                if (suite.ShouldRun) {
+                    splits.Add(new Split(reportSize, suite.Name));
+                    splitNames.Add(suite.Name);
+                }
+                    
+            }
+            var reports = parent.SplitRows(splits.ToArray());
+            for (int i = 0; i < reports.Count(); i++) {
+                Consoles.Add(splitNames[i], reports[i]);
+            }
         }
 
         public async Task RunTests(DirectoryInfo dir)

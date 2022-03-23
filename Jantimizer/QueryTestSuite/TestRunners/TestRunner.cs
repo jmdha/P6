@@ -50,13 +50,12 @@ namespace QueryTestSuite.TestRunners
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
             Printers.Add(PrinterCategory.Primary, new PrintUtil(console));
             var consoles = console.SplitRows(
-                new Split(10, "Status"),
-                new Split(3, "Progress"),
-                new Split(0, "Report")
+                new Split(0, "Status"),
+                new Split(3, "Progress")
             );
             Printers.Add(PrinterCategory.Status, new PrintUtil(consoles[0]));
             Printers.Add(PrinterCategory.Progress, new PrintUtil(consoles[1]));
-            Printers.Add(PrinterCategory.Report, new PrintUtil(consoles[2]));
+            //Printers.Add(PrinterCategory.Report, new PrintUtil(consoles[2]));
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -149,8 +148,8 @@ namespace QueryTestSuite.TestRunners
 
                     TestCaseResult testCase = new TestCaseResult(queryFile, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
-                    if (consoleOutput)
-                        WriteResultToConsole(testCase);
+                    //if (consoleOutput)
+                        //WriteResultToConsole(testCase);
                 }
                 catch (Exception ex)
                 {
