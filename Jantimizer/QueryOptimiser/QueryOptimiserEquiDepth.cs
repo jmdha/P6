@@ -24,7 +24,9 @@ namespace QueryOptimiser
         /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList(); ;
+            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
+            if (valuedNodes.Count == 0)
+                return new OptimiserResult(0, new List<ValuedNode>());
             ulong expCardinality = 1;
             foreach (ValuedNode node in valuedNodes)
                 expCardinality *= (ulong)node.Cost;
