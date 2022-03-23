@@ -48,13 +48,6 @@ namespace PrintUtilities
             KConsole.Write(color, $"\r{GetIndent(indent)}{text}");
         }
 
-        public void ClearLine()
-        {
-            //Console.SetCursorPosition(0, Console.CursorTop);
-            //Console.Write(new String(' ', Console.BufferWidth));
-            //Console.SetCursorPosition(0, Console.CursorTop);
-        }
-
         public int AddProgressBar(int max)
         {
             progressbars.Add(progressbars.Count + 1, new ProgressBar(KConsole, max));
