@@ -28,6 +28,7 @@ namespace QueryTestSuite.TestRunners
                     var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
                     TestRunner runner = new TestRunner(
+                        dir.Name,
                         suitData,
                         GetVariant(dir, "testSettings", suitData.Name, "json"),
                         GetVariant(dir, "setup", suitData.Name),

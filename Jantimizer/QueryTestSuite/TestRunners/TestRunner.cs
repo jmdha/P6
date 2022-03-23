@@ -20,6 +20,7 @@ namespace QueryTestSuite.TestRunners
 {
     internal class TestRunner
     {
+        public string Name { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
@@ -28,15 +29,16 @@ namespace QueryTestSuite.TestRunners
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
+            Name = name;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
-            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy/MM/dd/HH.mm.ss")}", "result.csv");
+            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{Name}.csv");
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -112,7 +114,7 @@ namespace QueryTestSuite.TestRunners
 
                     List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
                     AnalysisResult jantimiserResult = new AnalysisResult(
-                        "Jantimiser",
+                        RunData.Optimiser.Version,
                         0,
                         RunData.Optimiser.OptimiseQueryCardinality(nodes),
                         0,
