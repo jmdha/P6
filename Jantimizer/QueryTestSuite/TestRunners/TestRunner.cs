@@ -53,7 +53,7 @@ namespace QueryTestSuite.TestRunners
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
-            PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Parsing Settings", SettingsFile.Name, ConsoleColor.Yellow);
             ParseTestSettings(SettingsFile);
 
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
@@ -70,7 +70,7 @@ namespace QueryTestSuite.TestRunners
 
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
-                PrintTestUpdate("Generating Histograms for:", RunData.Name);
+                PrintTestUpdate("Generating Histograms", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 int i = 0;
                 int max = tasks.Count;
@@ -86,14 +86,14 @@ namespace QueryTestSuite.TestRunners
 
             if (consoleOutput && Printer.SplitWindow)
             {
-                PrintTestUpdate("Writing Console Header For: ", RunData.Name);
+                PrintTestUpdate("Writing Console Header", RunData.Name);
                 WriteHeaderToConsole();
             }
                 
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
             {
-                PrintTestUpdate("Begining Test Run for:", RunData.Name);
+                PrintTestUpdate("Begining Test Run", RunData.Name);
                 Results = await RunQueriesSerial(true);
             }
 
@@ -109,19 +109,19 @@ namespace QueryTestSuite.TestRunners
                 {
                     if (!Printer.SplitWindow)
                     {
-                        PrintTestUpdate("Making report", RunData.Name);
+                        PrintTestUpdate("Making Report", RunData.Name);
                         WriteHeaderToConsole();
                         WriteResultToConsole();
                     }
                 }
                 if (saveResult)
                 {
-                    PrintTestUpdate("Saving result to file", RunData.Name);
+                    PrintTestUpdate("Saving Result To File", RunData.Name);
                     SaveResult();
                 }
                     
             }
-            PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Tests Finished", RunData.Name, ConsoleColor.Yellow);
 
             return Results;
         }
