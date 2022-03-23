@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using QueryParser;
+using Histograms.Models;
 
 namespace QueryOptimiserTest
 {
     static internal class Utilities
     {
-        static internal Histograms.HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, IComparable value)
+        static internal HistogramEquiDepth CreateConstHistogram(string tableName, string attibuteName, int depth, int tableSize, IComparable value)
         {
-            var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
+            var tempGram = new HistogramEquiDepth(tableName, attibuteName, depth);
             List<IComparable> values = new List<IComparable>();
             for (int i = 0; i < tableSize; i++)
                 values.Add(value);
@@ -20,9 +21,9 @@ namespace QueryOptimiserTest
             return tempGram;
         }
 
-        static internal Histograms.HistogramEquiDepth CreateIncreasingHistogram(string tableName, string attibuteName, int depth, int minValue, int maxValue)
+        static internal HistogramEquiDepth CreateIncreasingHistogram(string tableName, string attibuteName, int depth, int minValue, int maxValue)
         {
-            var tempGram = new Histograms.HistogramEquiDepth(tableName, attibuteName, depth);
+            var tempGram = new HistogramEquiDepth(tableName, attibuteName, depth);
             List<IComparable> values = new List<IComparable>();
             for (int i = minValue; i < maxValue; i++)
                 values.Add(i);
@@ -30,9 +31,9 @@ namespace QueryOptimiserTest
             return tempGram;
         }
 
-        static internal List<Histograms.HistogramEquiDepth> CreateIncreasingHistograms(int count, int[] depths, int[] minValues, int[] maxValues)
+        static internal List<HistogramEquiDepth> CreateIncreasingHistograms(int count, int[] depths, int[] minValues, int[] maxValues)
         {
-            List<Histograms.HistogramEquiDepth> histograms = new List<Histograms.HistogramEquiDepth>();
+            List<HistogramEquiDepth> histograms = new List<HistogramEquiDepth>();
             for (int i = 0; i < count; i++) {
                 histograms.Add(CreateIncreasingHistogram(
                     GetTableName(i),

@@ -1,6 +1,7 @@
 ﻿using DatabaseConnector;
 using DatabaseConnector.Connectors;
 using Histograms;
+using Histograms.Models;
 using Histograms.Managers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;

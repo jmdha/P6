@@ -1,5 +1,6 @@
 ﻿using DatabaseConnector;
 using Histograms;
+using Histograms.Models;
 using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryParser.Models;

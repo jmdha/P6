@@ -1,40 +1,19 @@
 ﻿using System.Data;
 using System.Text;
 
-namespace Histograms
+namespace Histograms.Models
 {
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
-    public class HistogramEquiDepth : IHistogram
+    public class HistogramEquiDepth : Histogram
     {
-        public List<IHistogramBucket> Buckets { get; }
-        public string TableName { get; }
-        public string AttributeName { get; }
-
-        public int Depth { get; }
-
-        public HistogramEquiDepth(string tableName, string attributeName, int depth)
+        public HistogramEquiDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
         {
-            TableName = tableName;
-            AttributeName = attributeName;
-            Depth = depth;
-            Buckets = new List<IHistogramBucket>();
         }
 
-        public void GenerateHistogram(DataTable table, string key)
-        {
-            List<IComparable> sorted = table.AsEnumerable().Select(x => (IComparable)x[key]).OrderBy(x => x).ToList();
-            GenerateHistogramFromSorted(sorted);
-        }
 
-        public void GenerateHistogram(List<IComparable> column)
-        {
-            List<IComparable> sorted = column.OrderBy(x => x).ToList();
-            GenerateHistogramFromSorted(sorted);
-        }
-
-        private void GenerateHistogramFromSorted(List<IComparable> sorted)
+        protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
             for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
@@ -42,7 +21,8 @@ namespace Histograms
                 IComparable endValue = sorted[bStart];
                 int countValue = 1;
 
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
+                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                {
                     countValue++;
                     endValue = sorted[bIter];
                 }
@@ -50,15 +30,16 @@ namespace Histograms
             }
         }
 
-        public override string? ToString()
+        public override void GenerateHistogram(IEnumerable<ValueCount> sortedGroups)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"\t Data for attribute {TableName}.{AttributeName}:");
-            foreach(var bucket in Buckets)
-            {
-                sb.AppendLine($"\t\t{bucket}");
-            }
-            return sb.ToString();
+            GenerateHistogramFromSorted(SplitValues(sortedGroups).ToList());
+        }
+
+        private IEnumerable<IComparable> SplitValues(IEnumerable<ValueCount> sortedGroups)
+        {
+            foreach(var grp in sortedGroups)
+                for(int i = 0; i < grp.Count; i++)
+                    yield return grp.Value;
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Data;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
+using Histograms.Models;
 
 namespace Histograms.Managers
 {
@@ -85,11 +86,13 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["column_name"]}".ToLower();
-            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
-            if (attributeValues.Tables.Count > 0)
+            DataSet sortedGroupsDs = await DbConnector.CallQuery($"SELECT {attributeName} AS val, count({attributeName}) FROM {tableName} WHERE {attributeName} IS NOT NULL GROUP BY {attributeName} ORDER BY {attributeName} ASC");
+            List<ValueCount> sortedGroups = sortedGroupsDs.Tables[0].AsEnumerable().Select(r => new ValueCount((IComparable)r["val"], (long)r["count"])).ToList();
+
+            if (sortedGroupsDs.Tables.Count > 0)
             {
                 IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
+                newHistogram.GenerateHistogram(sortedGroups);
                 Histograms.Add(newHistogram);
             }
         }

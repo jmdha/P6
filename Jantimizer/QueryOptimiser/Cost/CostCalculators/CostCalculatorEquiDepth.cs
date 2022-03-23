@@ -1,6 +1,7 @@
 ﻿
 using DatabaseConnector;
 using Histograms;
+using Histograms.Models;
 using QueryOptimiser.Cost.Nodes.EquiDepth;
 using QueryParser.Models;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using QueryOptimiser;
-using Histograms;
+using Histograms.Models;
 using Histograms.Managers;
 using QueryParser;
 using QueryParser.QueryParsers;

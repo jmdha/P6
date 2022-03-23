@@ -1,5 +1,6 @@
 ﻿using DatabaseConnector;
 using Histograms;
+using Histograms.Models;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;

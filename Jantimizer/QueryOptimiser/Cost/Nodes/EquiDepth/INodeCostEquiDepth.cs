@@ -1,6 +1,6 @@
 ﻿
 using DatabaseConnector;
-using Histograms;
+using Histograms.Models;
 using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.Nodes.EquiDepth

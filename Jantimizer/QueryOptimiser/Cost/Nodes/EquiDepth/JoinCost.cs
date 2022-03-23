@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QueryParser.Models;
 using Histograms;
+using Histograms.Models;
 using DatabaseConnector;
 
 namespace QueryOptimiser.Cost.Nodes.EquiDepth
