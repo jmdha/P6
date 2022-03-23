@@ -16,6 +16,6 @@ namespace QueryOptimiser.Cost.CostCalculators
     {
         public IHistogramManager<HistogramType, DbConnectorType> HistogramManager { get; set; }
 
-        public int CalculateCost(INode node);
+        public long CalculateCost(INode node);
     }
 }

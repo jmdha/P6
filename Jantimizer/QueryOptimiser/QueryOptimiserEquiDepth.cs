@@ -47,7 +47,7 @@ namespace QueryOptimiser
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             foreach (var node in nodes)
             {
-                int cost = CostCalculator.CalculateCost(node);
+                long cost = CostCalculator.CalculateCost(node);
                 valuedNodes.Add(new ValuedNode(cost, node));
             }
             return valuedNodes;

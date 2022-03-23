@@ -11,7 +11,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
     public class JoinCost : INodeCostEquiDepth<JoinNode, IDbConnector>
     {
-        public int CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        public long CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
         {
             if (node.Relation != null) {
                 if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate && node.Relation.LeafPredicate != null)
@@ -25,7 +25,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                 
         }
 
-        public int CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public long CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
             JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
             JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
 
@@ -44,7 +44,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                 throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());            
         }
 
-        public int CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public long CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
             IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
             int leftBucketStart = -1;
@@ -118,8 +118,8 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             if (leftBucketStart == -1 || leftBucketEnd == -1 || rightBucketEnd == -1 || rightBucketEnd == -1)
                 return 0;
 
-            int leftBucketCount = 0;
-            int rightBucketCount = 0;
+            long leftBucketCount = 0;
+            long rightBucketCount = 0;
 
             for (int i = leftBucketStart; i <= leftBucketEnd; i++)
                 leftBucketCount += leftGram.Buckets[i].Count;
