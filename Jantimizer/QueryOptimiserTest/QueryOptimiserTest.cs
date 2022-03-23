@@ -97,11 +97,11 @@ public class QueryOptimiserTest
         var queryOptimiser = new QueryOptimiserEquiDepth(histogramManager);
 
         // Act
-        var resultNodes = queryOptimiser.OptimiseQuery(nodes);
+        var optimiserResult = queryOptimiser.OptimiseQuery(nodes);
 
         // Assert
         for (int i = 0; i < expectedOrder.Length; i++) {
-            Assert.AreEqual(expectedOrder[i], resultNodes[i].Node.Id);
+            Assert.AreEqual(expectedOrder[i], optimiserResult.EstCardinalities[i].Node.Id);
         }
     }
 }
