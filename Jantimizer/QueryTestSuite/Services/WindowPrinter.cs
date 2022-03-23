@@ -10,18 +10,24 @@ namespace QueryTestSuite.Services
 {
     internal class WindowPrinter
     {
-        internal PrintUtil? StatusPrinter { get; private set; }
-        internal PrintUtil? ProgressPrinter { get; private set; }
-        internal PrintUtil? ReportPrinter { get; private set; }
+        private IWindowManager ParentWindowManager { get; }
+        internal bool SplitWindow { get; private set; }
+        internal PrintUtil? StatusPrinter { get; set; }
+        internal PrintUtil? ProgressPrinter { get; set; }
+        internal PrintUtil? ReportPrinter { private get; set; }
 
-        internal WindowPrinter() {
-
+        internal WindowPrinter(IWindowManager parentWindowManager, bool splitWindow) {
+            ParentWindowManager = parentWindowManager;
+            SplitWindow = splitWindow;
         }
 
-        internal WindowPrinter(IConsole statusWindow, IConsole progressWindow, IConsole reportWindow) {
-            StatusPrinter = new PrintUtil(statusWindow);
-            ProgressPrinter = new PrintUtil(progressWindow);
-            ReportPrinter = new PrintUtil(reportWindow);
+        internal PrintUtil GetReportPrinter(string name)
+        {
+            if (ReportPrinter == null)
+                return new PrintUtil(ParentWindowManager.GenerateReportWindow(name));
+            else
+                return ReportPrinter;
         }
+
     }
 }

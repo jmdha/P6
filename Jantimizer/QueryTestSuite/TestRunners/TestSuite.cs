@@ -10,39 +10,13 @@ namespace QueryTestSuite.TestRunners
     {
         public IEnumerable<SuiteData> SuiteDataItems { get; }
         private DateTime TimeStamp;
-        private WindowManager WindowManager { get; set;}
+        private IWindowManager WManager { get; set;}
 
         public TestSuite(IEnumerable<SuiteData> suiteDataItems, DateTime timeStamp, string name)
         {
             SuiteDataItems = suiteDataItems;
             TimeStamp = timeStamp;
-            WindowManager = new WindowManager();
-            WindowManager.GenerateConsoleLayout(name, suiteDataItems.ToList());
-        }
-
-        private void GenerateStatusWindow(IConsole parent, List<SuiteData> suites, int suitesToRun) {
-            if (suitesToRun == 1) {
-                Consoles.Add(suites[0].Name, parent.OpenBox(suites[0].Name));
-            } else if (suitesToRun > 2) {
-                Consoles.Add(suites[0].Name, parent.SplitLeft(suites[0].Name));
-                Consoles.Add(suites[1].Name, parent.SplitRight(suites[1].Name));
-            }
-        }
-
-        private void GenerateReportsWindow(IConsole parent, List<SuiteData> suites, int reportSize) {
-            List<Split> splits = new List<Split>();
-            List<string> splitNames = new List<string>();
-            foreach (var suite in suites) {
-                if (suite.ShouldRun) {
-                    splits.Add(new Split(reportSize, suite.Name));
-                    splitNames.Add(suite.Name);
-                }
-                    
-            }
-            var reports = parent.SplitRows(splits.ToArray());
-            for (int i = 0; i < reports.Count(); i++) {
-                Consoles.Add(splitNames[i], reports[i]);
-            }
+            WManager = WindowManager.GetWindowManager(name, suiteDataItems.ToList());
         }
 
         public async Task RunTests(DirectoryInfo dir)
@@ -61,14 +35,14 @@ namespace QueryTestSuite.TestRunners
                             Directory.CreateDirectory(Path.Join(dir.FullName, "Cases/"));
                         var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
 
-                        TestRunner runner = new TestRunner(
+                            TestRunner runner = new TestRunner(
                             suitData,
                             GetVariant(dir, "testSettings", suitData.Name, "json"),
                             GetVariant(dir, "setup", suitData.Name),
                             GetVariant(dir, "cleanup", suitData.Name),
                             GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, suitData.Name)),
                             TimeStamp,
-                            Consoles[suitData.Name]
+                            WManager.WindowPrinters[suitData.Name]
                         );
                         testRunners.Add(runner);
                         testRuns.Add(runner.Run(true));

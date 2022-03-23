@@ -1,41 +1,36 @@
-using CsvHelper;
-using CsvHelper.Configuration;
-using System;
-using System.Globalization;
-using System.IO;
-using Konsole;
+﻿using Konsole;
 using QueryTestSuite.Models;
-using QueryTestSuite.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace QueryTestSuite.Services
 {
-    internal class WindowManager
+    internal abstract class WindowManager : IWindowManager
     {
-        internal IConsole ParentWindow { get; private set; }
-        internal Dictionary<string, WindowPrinter> windowPrinters = new Dictionary<string, WindowPrinter>();
+        protected const int MinWindowHeight = 0;
+        protected const int MinWindowWidth = 120;
+        protected const int MinSplitWindowWidth = 215;
+        protected const int RunWindowHeight = 15;
+        protected const int ReportWindowHeight = 25;
 
-        internal void GenerateConsoleLayout(string title, List<SuiteData> data) {
-            if (Console.BufferWidth < 100)
-                throw new WindowSizeException("Need bigger window");
+        public Dictionary<string, WindowPrinter> WindowPrinters { get; set; }
 
-            int suitesToRun = 0;
-            foreach (var dat in data) {
-                if (dat.ShouldRun)
-                    suitesToRun++;
-            }
-            ParentWindow = Window.OpenBox(title, 100, 15 + (25 * suitesToRun));
-            var consoles = ParentWindow.SplitRows(
-                new Split(15, "Statuses"),
-                new Split(0, "Reports")
-            );
-            IConsole statusWindow = consoles[0];
-            IConsole reportsWindow = consoles[1];
-
-            GenerateStatusWindow(statusWindow, data, suitesToRun);
-            GenerateReportsWindow(reportsWindow, data, 25);
-            
-            Consoles.Add("Reports", reportsWindow);
-            Consoles.Add("Statuses", statusWindow);
+        public WindowManager()
+        {
+            WindowPrinters = new Dictionary<string, WindowPrinter>();
         }
+
+        public static IWindowManager GetWindowManager(string title, List<SuiteData> data)
+        {
+            if (Console.BufferWidth > MinSplitWindowWidth)
+                return new WindowManagerSplit(title, data);
+            else
+                return new WindowManagerSingle(title, data);
+        }
+
+        public abstract IConsole GenerateReportWindow(string name);
     }
 }
