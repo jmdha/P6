@@ -6,6 +6,7 @@ using Histograms;
 using Histograms.Managers;
 using PrintUtilities;
 using QueryOptimiser;
+using QueryOptimiser.Models;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
@@ -113,14 +114,9 @@ namespace QueryTestSuite.TestRunners
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
                     List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
-                    AnalysisResult jantimiserResult = new AnalysisResult(
-                        $"{RunData.Optimiser.Name} {RunData.Optimiser.Version}",
-                        0,
-                        RunData.Optimiser.OptimiseQueryCardinality(nodes),
-                        0,
-                        new TimeSpan());
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
                     
-                    TestCaseResult testCase = new TestCaseResult(RunData.Name, queryFile, analysisResult, jantimiserResult);
+                    TestCaseResult testCase = new TestCaseResult(RunData.Name, Name, queryFile, RunData, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
@@ -142,7 +138,7 @@ namespace QueryTestSuite.TestRunners
             foreach (var testCase in Results)
             {
                 var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
-                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstimatedCardinality);
+                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstTotalCardinality);
 
                 var colors = new List<ConsoleColor>() {
                     ConsoleColor.Blue,
@@ -164,7 +160,7 @@ namespace QueryTestSuite.TestRunners
                     testCase.Category,
                     testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
-                    testCase.JantimiserResult.EstimatedCardinality.ToString(),
+                    testCase.JantimiserResult.EstTotalCardinality.ToString(),
                     testCase.DbAnalysisResult.ActualCardinality.ToString(),
                     GetAccuracyAsString(DbAnalysisAccuracy),
                     GetAccuracyAsString(JantimiserEstimateAccuracy)
