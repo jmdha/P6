@@ -33,7 +33,7 @@ namespace Histograms.Models
             }
         }
 
-        public override void GenerateHistogram(IEnumerable<ValueCount> sortedGroups)
+        public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
             GenerateHistogramFromSorted(SplitValues(sortedGroups).ToList());
         }

@@ -18,12 +18,12 @@ namespace Histograms.Models
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
-            GenerateHistogram(
+            GenerateHistogramFromSortedGroups(
                 sorted.GroupBy(x => x).Select(grp => new ValueCount(grp.Key, grp.Count())).ToList()
             );
         }
 
-        public override void GenerateHistogram(IEnumerable<ValueCount> sortedGroups)
+        public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
             IComparable? minValue = null;
             IComparable? maxValue = null;

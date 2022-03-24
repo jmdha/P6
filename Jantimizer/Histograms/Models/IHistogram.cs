@@ -10,6 +10,6 @@ namespace Histograms.Models
 
         public void GenerateHistogram(DataTable table, string key);
         public void GenerateHistogram(List<IComparable> column);
-        public void GenerateHistogram(IEnumerable<ValueCount> column);
+        public void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
     }
 }

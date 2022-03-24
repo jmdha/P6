@@ -30,7 +30,7 @@ namespace Histograms.Models
 
         protected abstract void GenerateHistogramFromSorted(List<IComparable> sorted);
 
-        public abstract void GenerateHistogram(IEnumerable<ValueCount> sortedGroups);
+        public abstract void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
 
         public override string? ToString()
         {

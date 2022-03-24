@@ -99,7 +99,7 @@ namespace Histograms.Managers
             List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
 
             IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-            newHistogram.GenerateHistogram(sortedGroups);
+            newHistogram.GenerateHistogramFromSortedGroups(sortedGroups);
             Histograms.Add(newHistogram);
         }
 
