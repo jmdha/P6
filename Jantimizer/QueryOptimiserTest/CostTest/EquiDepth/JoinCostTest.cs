@@ -1,5 +1,6 @@
 using DatabaseConnector;
 using Histograms;
+using Histograms.Models;
 using Histograms.Managers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryOptimiser.Cost.Nodes.EquiDepth;

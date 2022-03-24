@@ -6,6 +6,7 @@ using QueryParser.QueryParsers;
 using System.Data;
 using System.Text;
 using Tools.Models;
+using Histograms.Models;
 
 namespace Histograms.Managers
 {

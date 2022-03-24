@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Histograms
+namespace Histograms.Models
 {
     public interface IHistogram
     {
@@ -10,5 +10,6 @@ namespace Histograms
 
         public void GenerateHistogram(DataTable table, string key);
         public void GenerateHistogram(List<IComparable> column);
+        public void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
     }
 }

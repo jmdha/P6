@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using QueryParser.Models;
 using Histograms;
 using Histograms.Managers;
+using Histograms.Models;
 using DatabaseConnector;
 
 namespace QueryOptimiser.Cost.CostCalculators

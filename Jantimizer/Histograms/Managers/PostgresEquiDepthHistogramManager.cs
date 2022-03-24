@@ -7,6 +7,7 @@ using System.Data;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
+using Histograms.Models;
 
 namespace Histograms.Managers
 {
@@ -85,15 +86,32 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["column_name"]}".ToLower();
-            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
-            if (attributeValues.Tables.Count > 0)
-            {
-                IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
-                Histograms.Add(newHistogram);
-            }
+            DataSet sortedGroupsDs = await DbConnector.CallQuery(@$"
+                SELECT
+                    {attributeName} AS val,
+                    COUNT({attributeName})
+                FROM {tableName} WHERE
+                    {attributeName} IS NOT NULL
+                GROUP BY {attributeName}
+                ORDER BY {attributeName} ASC
+            ");
+
+            List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
+
+            IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            newHistogram.GenerateHistogramFromSortedGroups(sortedGroups);
+            Histograms.Add(newHistogram);
         }
 
+        private IEnumerable<ValueCount> GetValueCounts(DataSet dataSet, string valueColumnName, string countColumnName)
+        {
+            return dataSet.Tables[0].AsEnumerable().Select(r =>
+                new ValueCount(
+                    (IComparable)r[valueColumnName],
+                    (long)r[countColumnName]
+                )
+            );
+        }
         public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();

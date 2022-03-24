@@ -1,4 +1,4 @@
-﻿namespace Histograms
+﻿namespace Histograms.Models
 {
     public interface IHistogramBucket
     {

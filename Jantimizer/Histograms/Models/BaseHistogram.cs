@@ -1,24 +1,18 @@
 ﻿using System.Data;
 using System.Text;
 
-namespace Histograms
+namespace Histograms.Models
 {
-    /// <summary>
-    /// Contains n buckets, which each represent the same m number of elements.
-    /// </summary>
-    public class HistogramEquiDepth : IHistogram
+    public abstract class BaseHistogram : IHistogram
     {
         public List<IHistogramBucket> Buckets { get; }
         public string TableName { get; }
         public string AttributeName { get; }
 
-        public int Depth { get; }
-
-        public HistogramEquiDepth(string tableName, string attributeName, int depth)
+        public BaseHistogram(string tableName, string attributeName)
         {
             TableName = tableName;
             AttributeName = attributeName;
-            Depth = depth;
             Buckets = new List<IHistogramBucket>();
         }
 
@@ -34,27 +28,15 @@ namespace Histograms
             GenerateHistogramFromSorted(sorted);
         }
 
-        private void GenerateHistogramFromSorted(List<IComparable> sorted)
-        {
-            for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
-            {
-                IComparable startValue = sorted[bStart];
-                IComparable endValue = sorted[bStart];
-                int countValue = 1;
+        protected abstract void GenerateHistogramFromSorted(List<IComparable> sorted);
 
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++) {
-                    countValue++;
-                    endValue = sorted[bIter];
-                }
-                Buckets.Add(new HistogramBucket(startValue, endValue, countValue));
-            }
-        }
+        public abstract void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
 
         public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"\t Data for attribute {TableName}.{AttributeName}:");
-            foreach(var bucket in Buckets)
+            foreach (var bucket in Buckets)
             {
                 sb.AppendLine($"\t\t{bucket}");
             }
