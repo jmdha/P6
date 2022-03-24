@@ -5,6 +5,7 @@ using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;
 using QueryTestSuite.TestRunners;
 using System.Text.Json;
+using Tools.Helpers;
 using Tools.Models;
 using Tools.Services;
 
@@ -12,27 +13,19 @@ namespace QueryTestSuite
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            Task.WaitAll(AsyncMain(args));
-        }
+            // Setup suite datas
+            var pgData = SuiteDataSets.GetPostgresSD();
+            var myData = SuiteDataSets.GetMySQLSD(pgData.QueryParserManager.QueryParsers[0]);
+            var connectorSet = new List<SuiteData>() { pgData, myData };
 
-        async static Task AsyncMain(string[] args)
-        {
+            // Get the order file and run each test case
             DateTime runTime = DateTime.UtcNow;
-
-            SecretsService<Program> secrets = new SecretsService<Program>();
-
-            var pgData = PostgreEquiDepthData.GetData(secrets);
-            var myData = MySQLEquiDepthData.GetData(secrets);
-
-            myData.QueryParserManager.QueryParsers.Add(pgData.QueryParserManager.QueryParsers[0]);
-
-            var connectorSet = new List<SuiteData>() {pgData, myData };
-
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-
-            foreach(DirectoryInfo dirInfo in TestOrderSorter.GetTestRunOrder(testBaseDirPath, Path.Join(testBaseDirPath, "testorder.json")))
+            var testBaseDirPath = IOHelper.GetDirectory("../../../Tests");
+            var orderFile = IOHelper.GetFile(testBaseDirPath, "testorder.json");
+            List<DirectoryInfo> runOrder = TestOrderSorter.GetTestRunOrder(testBaseDirPath, orderFile);
+            foreach (DirectoryInfo dirInfo in runOrder)
                 await RunTestSuite(connectorSet, dirInfo, runTime);
         }
 
