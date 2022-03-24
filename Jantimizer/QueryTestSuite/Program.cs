@@ -5,6 +5,7 @@ using QueryTestSuite.Services;
 using QueryTestSuite.SuiteDatas;
 using QueryTestSuite.TestRunners;
 using System.Text.Json;
+using Tools.Helpers;
 using Tools.Models;
 using Tools.Services;
 
@@ -21,8 +22,8 @@ namespace QueryTestSuite
 
             // Get the order file and run each test case
             DateTime runTime = DateTime.UtcNow;
-            string testBaseDirPath = Path.GetFullPath("../../../Tests");
-            string orderFile = Path.Join(testBaseDirPath, "testorder.json");
+            var testBaseDirPath = IOHelper.GetDirectory("../../../Tests");
+            var orderFile = IOHelper.GetFile(testBaseDirPath, "testorder.json");
             List<DirectoryInfo> runOrder = TestOrderSorter.GetTestRunOrder(testBaseDirPath, orderFile);
             foreach (DirectoryInfo dirInfo in runOrder)
                 await RunTestSuite(connectorSet, dirInfo, runTime);

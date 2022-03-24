@@ -1,5 +1,6 @@
 ﻿using DatabaseConnector;
 using QueryTestSuite.Models;
+using Tools.Helpers;
 
 namespace QueryTestSuite.TestRunners
 {
@@ -20,53 +21,22 @@ namespace QueryTestSuite.TestRunners
             {
                 if (suitData.ShouldRun)
                 {
-                    var testRunners = new List<TestRunner>();
-                    var testRuns = new List<Task<List<TestCaseResult>>>();
-
-                    if (!Directory.Exists(Path.Join(dir.FullName, "Cases/")))
-                        Directory.CreateDirectory(Path.Join(dir.FullName, "Cases/"));
-                    var caseDir = new DirectoryInfo(Path.Join(dir.FullName, "Cases/"));
+                    IOHelper.CreateDirIfNotExist(dir.FullName, "Cases/");
+                    var caseDir = IOHelper.GetDirectory(dir.FullName, "Cases/");
 
                     TestRunner runner = new TestRunner(
                         dir.Name,
                         suitData,
-                        GetVariant(dir, "testSettings", suitData.Name, "json"),
-                        GetVariant(dir, "setup", suitData.Name),
-                        GetVariant(dir, "cleanup", suitData.Name),
-                        GetInvariantsInDir(caseDir).Select(invariant => GetVariant(caseDir, invariant, suitData.Name)),
+                        IOHelper.GetFileVariant(dir, "testSettings", suitData.Name, "json"),
+                        IOHelper.GetFileVariantOrNone(dir, "setup", suitData.Name, "sql"),
+                        IOHelper.GetFileVariantOrNone(dir, "cleanup", suitData.Name, "sql"),
+                        IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name, "sql")),
                         TimeStamp
                     );
-                    testRunners.Add(runner);
-                    testRuns.Add(runner.Run(true));
 
-                    await Task.WhenAll(testRuns);
+                    await runner.Run(true);
                 }
             }
-        }
-
-        private FileInfo GetVariant(DirectoryInfo dir, string name, string type, string ext = "sql")
-        {
-            var specific = new FileInfo(Path.Combine(dir.FullName, $"{name}.{type}.{ext}"));
-
-            if(specific.Exists)
-                return specific;
-
-            var generic = new FileInfo(Path.Combine(dir.FullName, $"{name}.{ext}"));
-
-            if(generic.Exists)
-                return generic;
-
-            return new FileInfo("None");
-        }
-
-        List<string> GetInvariantsInDir(DirectoryInfo dir)
-        {
-            // Every filename, until first '.', unique
-            return dir.GetFiles()
-                .Select(x => x.Name.Split('.')[0])
-                .GroupBy(x => x)
-                .Select(x => x.First())
-                .ToList();
         }
     }
 }
