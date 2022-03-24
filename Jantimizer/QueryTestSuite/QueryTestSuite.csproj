@@ -20,59 +20,71 @@
     <None Remove="Tests\**" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tests\A_SetupTables\testSettings.postgre.json" />
-    <Content Include="Tests\A_SetupTables\testSettings.mysql.json" />
-    <Content Include="Tests\ConstantNumberBlocks\testSettings.mysql.json" />
-    <Content Include="Tests\ConstantNumberBlocks\testSettings.postgre.json" />
-    <Content Include="Tests\RandomNumberBlocks\testSettings.mysql.json" />
-    <Content Include="Tests\RandomNumberBlocks\testSettings.postgre.json" />
+    <Content Include="Tests\BasicTests_ConstantNumberBlocks\testSettings.mysql.json" />
+    <Content Include="Tests\BasicTests_ConstantNumberBlocks\testSettings.postgre.json" />
+    <Content Include="Tests\BasicTests_RandomNumberBlocks\testSettings.mysql.json" />
+    <Content Include="Tests\BasicTests_RandomNumberBlocks\testSettings.postgre.json" />
+    <Content Include="Tests\BasicTests_SetupTables\testSettings.mysql.json" />
+    <Content Include="Tests\BasicTests_SetupTables\testSettings.postgre.json" />
     <Content Include="Tests\testorder.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_And2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_And3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_And4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_B2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_B3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_B4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_BE2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_BE3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_BE4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_E2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_E3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_E4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_Or2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_Or3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_Or4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_S2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_S3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_S4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_SE2.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_SE3.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\cleanup.mysql.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\setup.mysql.sql" />
+    <None Include="Tests\BasicTests_ConstantNumberBlocks\setup.postgre.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_And2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_And3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_And4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_B2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_B3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_B4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_BE2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_BE3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_BE4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_E2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_E3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_E4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_Or2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_Or3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_Or4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_S2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_S3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_S4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_SE2.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_SE3.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\Cases\NJ_SE4.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\cleanup.mysql.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\cleanup.postgre.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\setup.mysql.sql" />
+    <None Include="Tests\BasicTests_RandomNumberBlocks\setup.postgre.sql" />
+    <None Include="Tests\BasicTests_SetupTables\setup.mysql.sql" />
+    <None Include="Tests\BasicTests_SetupTables\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_B4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_BE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_BE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_BE4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_E2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_E3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_E4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_S2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_S3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_S4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE2.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE3.sql" />
-    <None Include="Tests\ConstantNumberBlocks\Cases\NJ_SE4.sql" />
-    <None Include="Tests\ConstantNumberBlocks\cleanup.mysql.sql" />
-    <None Include="Tests\ConstantNumberBlocks\cleanup.postgre.sql" />
-    <None Include="Tests\ConstantNumberBlocks\setup.mysql.sql" />
-    <None Include="Tests\ConstantNumberBlocks\setup.postgre.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_B2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_B3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_B4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_BE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_BE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_BE4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_E2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_E3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_E4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_S2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_S3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_S4.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE2.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE3.sql" />
-    <None Include="Tests\RandomNumberBlocks\Cases\NJ_SE4.sql" />
-    <None Include="Tests\RandomNumberBlocks\cleanup.mysql.sql" />
-    <None Include="Tests\RandomNumberBlocks\cleanup.postgre.sql" />
-    <None Include="Tests\RandomNumberBlocks\setup.mysql.sql" />
-    <None Include="Tests\RandomNumberBlocks\setup.postgre.sql" />
-    <None Include="Tests\A_SetupTables\setup.mysql.sql" />
-    <None Include="Tests\A_SetupTables\setup.postgre.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
@@ -83,6 +95,9 @@
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
     
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tests\BasicTests_SetupTables\Cases\" />
   </ItemGroup>
   <PropertyGroup>
     <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
