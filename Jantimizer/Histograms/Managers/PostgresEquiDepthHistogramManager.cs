@@ -86,17 +86,32 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["column_name"]}".ToLower();
-            DataSet sortedGroupsDs = await DbConnector.CallQuery($"SELECT {attributeName} AS val, count({attributeName}) FROM {tableName} WHERE {attributeName} IS NOT NULL GROUP BY {attributeName} ORDER BY {attributeName} ASC");
-            List<ValueCount> sortedGroups = sortedGroupsDs.Tables[0].AsEnumerable().Select(r => new ValueCount((IComparable)r["val"], (long)r["count"])).ToList();
+            DataSet sortedGroupsDs = await DbConnector.CallQuery(@$"
+                SELECT
+                    {attributeName} AS val,
+                    COUNT({attributeName})
+                FROM {tableName} WHERE
+                    {attributeName} IS NOT NULL
+                GROUP BY {attributeName}
+                ORDER BY {attributeName} ASC
+            ");
 
-            if (sortedGroupsDs.Tables.Count > 0)
-            {
-                IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogram(sortedGroups);
-                Histograms.Add(newHistogram);
-            }
+            List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
+
+            IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            newHistogram.GenerateHistogram(sortedGroups);
+            Histograms.Add(newHistogram);
         }
 
+        private IEnumerable<ValueCount> GetValueCounts(DataSet dataSet, string valueColumnName, string countColumnName)
+        {
+            return dataSet.Tables[0].AsEnumerable().Select(r =>
+                new ValueCount(
+                    (IComparable)r[valueColumnName],
+                    (long)r[countColumnName]
+                )
+            );
+        }
         public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();
