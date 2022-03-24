@@ -19,6 +19,8 @@ namespace QueryTestSuite
 
         async static Task AsyncMain(string[] args)
         {
+            DateTime runTime = DateTime.UtcNow;
+
             SecretsService<Program> secrets = new SecretsService<Program>();
 
             var pgData = PostgreEquiDepthData.GetData(secrets);
@@ -31,12 +33,12 @@ namespace QueryTestSuite
             string testBaseDirPath = Path.GetFullPath("../../../Tests");
 
             foreach(DirectoryInfo dirInfo in TestOrderSorter.GetTestRunOrder(testBaseDirPath, Path.Join(testBaseDirPath, "testorder.json")))
-                await RunTestSuite(connectorSet, dirInfo);
+                await RunTestSuite(connectorSet, dirInfo, runTime);
         }
 
-        private static async Task RunTestSuite(List<SuiteData> connectorSet, DirectoryInfo info) 
+        private static async Task RunTestSuite(List<SuiteData> connectorSet, DirectoryInfo info, DateTime time) 
         {
-            TestSuite suite = new TestSuite(connectorSet, DateTime.Now);
+            TestSuite suite = new TestSuite(connectorSet, time);
 
             PrintUtil.PrintLine($"Running test collection [{info.Name}]", 0, ConsoleColor.Magenta);
             await suite.RunTests(info);

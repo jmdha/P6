@@ -2,6 +2,7 @@
 using Histograms;
 using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.Models;
 using QueryParser.Models;
 
 namespace QueryOptimiser
@@ -21,28 +22,23 @@ namespace QueryOptimiser
         /// Reorders a querys join order according to the cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public List<ValuedNode> OptimiseQuery(List<INode> nodes)
+        public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            return CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
-        }
-
-        public ulong OptimiseQueryCardinality(List<INode> nodes)
-        {
-            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes);
+            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
             if (valuedNodes.Count == 0)
-                return 0;
+                return new OptimiserResult(0, new List<ValuedNode>());
             ulong expCardinality = 1;
             foreach (ValuedNode node in valuedNodes)
                 expCardinality *= (ulong)node.Cost;
 
-            return expCardinality;
+            return new OptimiserResult(expCardinality, valuedNodes);
         }
 
         /// <summary>
         /// Calculates worst case cost of each join operation
         /// </summary>
         /// <returns></returns>
-        public List<ValuedNode> CalculateNodeCost(List<INode> nodes)
+        internal List<ValuedNode> CalculateNodeCost(List<INode> nodes)
         {
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             foreach (var node in nodes)
@@ -52,7 +48,5 @@ namespace QueryOptimiser
             }
             return valuedNodes;
         }
-
-
     }
 }

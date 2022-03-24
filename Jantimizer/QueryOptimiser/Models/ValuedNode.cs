@@ -1,6 +1,6 @@
 ﻿using QueryParser.Models;
 
-namespace QueryOptimiser.Cost.Nodes
+namespace QueryOptimiser.Models
 {
     public class ValuedNode
     {

@@ -1,6 +1,7 @@
 ﻿using CsvHelper;
 using QueryPlanParser.Models;
 using CsvHelper.Configuration.Attributes;
+using QueryOptimiser.Models;
 
 namespace QueryTestSuite.Models
 {
@@ -9,21 +10,23 @@ namespace QueryTestSuite.Models
         public string Name { get; private set; } = "N/A";
         public string Category { get; private set; } = "N/A";
 
+        public SuiteData RunData { get; private set; }
+
         [Name("Db")]
         /// <summary> Result from the analysis query to the database system. </summary>
         public AnalysisResult DbAnalysisResult { get; private set; }
         [Name("Jantimiser")]
         /// <summary> Result from our optimiser estimates. </summary>
-        public AnalysisResult JantimiserResult { get; private set; }
+        public OptimiserResult JantimiserResult { get; private set; }
 
-        public TestCaseResult (FileInfo fileInfo, AnalysisResult dbAnalysisResult, AnalysisResult jantimiserResult)
+        public TestCaseResult(string name, string category, FileInfo caseInfo, SuiteData runData, AnalysisResult dbAnalysisResult, OptimiserResult jantimiserResult)
         {
+            Name = name;
+            Category = category;
+            RunData = runData;
             DbAnalysisResult = dbAnalysisResult;
             JantimiserResult = jantimiserResult;
-            Name = fileInfo.Name;
-            if (fileInfo.Directory != null)
-                if (fileInfo.Directory.Parent != null)
-                    Category = fileInfo.Directory.Parent.Name;
+            Name = caseInfo.Name;
         }
     }
 }
