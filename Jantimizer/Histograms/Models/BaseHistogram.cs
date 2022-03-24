@@ -3,19 +3,16 @@ using System.Text;
 
 namespace Histograms.Models
 {
-    public abstract class Histogram : IHistogram
+    public abstract class BaseHistogram : IHistogram
     {
         public List<IHistogramBucket> Buckets { get; }
         public string TableName { get; }
         public string AttributeName { get; }
 
-        public int Depth { get; }
-
-        public Histogram(string tableName, string attributeName, int depth)
+        public BaseHistogram(string tableName, string attributeName)
         {
             TableName = tableName;
             AttributeName = attributeName;
-            Depth = depth;
             Buckets = new List<IHistogramBucket>();
         }
 
