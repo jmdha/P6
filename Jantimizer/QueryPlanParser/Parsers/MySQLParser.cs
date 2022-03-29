@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Tools.Regex;
 
 namespace QueryPlanParser.Parsers
 {
@@ -23,10 +24,10 @@ namespace QueryPlanParser.Parsers
             if (resultQueue.Count == 0)
                 throw new BadQueryPlanInputException("Analysis got no rows!");
 
-            return RunAnalysis(resultQueue);
+            return new AnalysisResult(RunAnalysis(resultQueue));
         }
 
-        internal AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
+        internal AnalysisResultQueryTree RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
             var analysisRes = row.AnalysisResult;
@@ -66,7 +67,28 @@ namespace QueryPlanParser.Parsers
             throw new BadQueryPlanInputException("Database did not return a correct query plan!");
         }
 
-        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)(?:\((?<predicate>[^)]+)?\) *)?\(cost=(?<cost>\d+.\d+) rows=(?<estimatedRows>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
+        private static Regex RowParserRegex = new Regex(@"  # E.g. -> Filter: ((a.V >= b.V) and (a.V <= b.V))  (cost=0.70 rows=1) (actual time=0.016..0.016 rows=0 loops=1)
+            ^(?<indentation>\ *(?:->)\ *)                  #  -> 
+            (?<name>(?:$|[^(])+)               # Filter: 
+            (?:
+                (?:\((?<predicate>.*)?\) \ +)? # ((a.V >= b.V) and (a.V <= b.V))
+
+                (?:\(
+                    cost=(?<cost>\d+.\d+)\      # cost=0.70
+                    rows=(?<estimatedRows>\d+)  # rows=1
+                \))
+                \ 
+                (?:
+                    \(
+                        actual\ time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+)\  # actual time=0.016..0.016
+                        rows=(?<actualRows>\d+)\                                  # rows=0
+                        loops=(?<loops>\d+)                                       # loops=1
+                    \)
+                |
+                    \(never\ executed\)
+                )
+            )?
+        ", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 
         /// <summary>
         /// Returns null if the row isn't a new subquery, e.g. if the row is the condition on a join.
@@ -86,13 +108,18 @@ namespace QueryPlanParser.Parsers
             // Data Parsing
             int indentation = rowData["indentation"].ToString().Length;
 
+            decimal? timeMax = RegexHelperFunctions.GetRegexVal<decimal?>(match, "timeMax");
+            TimeSpan? timeCost = null;
+            if (timeMax != null)
+                timeCost = TimeSpanFromMs((decimal)timeMax);
+
             // Create Result
-            var analysisResult = new AnalysisResult(
-                rowData["name"].Value.Trim(),
-                decimal.Parse(rowData["cost"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                ulong.Parse(rowData["estimatedRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                ulong.Parse(rowData["actualRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value, System.Globalization.CultureInfo.InvariantCulture))
+            var analysisResult = new AnalysisResultQueryTree(
+                RegexHelperFunctions.GetRegexVal<string>(match, "name").Trim(),
+                RegexHelperFunctions.GetRegexVal<decimal?>(match, "cost"),
+                RegexHelperFunctions.GetRegexVal<ulong?>(match, "estimatedRows"),
+                RegexHelperFunctions.GetRegexVal<ulong?>(match, "actualRows"),
+                timeCost
             );
 
             // Return

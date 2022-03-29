@@ -91,7 +91,7 @@ namespace QueryPlanParserTests.SystemTests.Parsers
             "            -> Table scan on a  (cost=0.35 rows=1) (actual time=0.011..0.011 rows=0 loops=1)\n"
         , new string[] {
             "Filter:",
-            "Inner hash join (no condition)",
+            "Inner hash join",
             "Table scan on b",
             "Hash",
             "Table scan on a"
@@ -118,7 +118,7 @@ namespace QueryPlanParserTests.SystemTests.Parsers
 
             // Assert
             for (int i = 0; i < nameDepth.Length; i++)
-                Assert.AreEqual(nameDepth[i], GetNameDepth(result, 0, eNameOrder[i]));
+                Assert.AreEqual(nameDepth[i], GetNameDepth(result.QueryTree, 0, eNameOrder[i]));
         }
 
         [TestMethod()]
@@ -140,14 +140,14 @@ namespace QueryPlanParserTests.SystemTests.Parsers
 
         #region Private Test Methods
 
-        private int? GetNameDepth(AnalysisResult res, int curDepth, string targetName)
+        private int? GetNameDepth(AnalysisResultQueryTree res, int curDepth, string targetName)
         {
             if (res.Name == targetName)
             {
                 return curDepth;
             }
             curDepth++;
-            foreach (AnalysisResult innerRes in res.SubQueries)
+            foreach (AnalysisResultQueryTree innerRes in res.SubQueries)
             {
                 var ret = GetNameDepth(innerRes, curDepth, targetName);
                 if (ret != null)

@@ -66,10 +66,10 @@ namespace QueryPlanParserTests.UnitTests.Parsers
         #region ParseQueryAnalysisRow
 
         [TestMethod]
-        [DataRow("-> Nested loop inner join  (cost=1.10 rows=2) (actual time=0.059..0.100 rows=3 loops=1)", "Nested loop inner join", "1.10", (ulong)2, (ulong)3, "00:00:00.0001000")]
-        [DataRow("    -> Table scan on jan_table  (cost=0.45 rows=2) (actual time=0.023..0.025 rows=2 loops=1)", "Table scan on jan_table", "0.45", (ulong)2, (ulong)2, "00:00:00.0000250")]
-        [DataRow("    -> Filter: (jan_table.Id <= jano_table.Id)  (cost=0.18 rows=1) (actual time=0.032..0.036 rows=2 loops=2)", "Filter:", "0.18", (ulong)1, (ulong)2, "00:00:00.0000360")]
-        public void Can_ParseQueryAnalysisRow_WithCorrectData(string line, string eName, string eCost, ulong eRows, ulong aRows, string aTime)
+        [DataRow("-> Nested loop inner join  (cost=1.10 rows=2) (actual time=0.059..0.100 rows=3 loops=1)", "Nested loop inner join", 1.10d, (ulong)2, (ulong)3, "00:00:00.0001000")]
+        [DataRow("    -> Table scan on jan_table  (cost=0.45 rows=2) (actual time=0.023..0.025 rows=2 loops=1)", "Table scan on jan_table", 0.45d, (ulong)2, (ulong)2, "00:00:00.0000250")]
+        [DataRow("    -> Filter: (jan_table.Id <= jano_table.Id)  (cost=0.18 rows=1) (actual time=0.032..0.036 rows=2 loops=2)", "Filter:", 0.18d, (ulong)1, (ulong)2, "00:00:00.0000360")]
+        public void Can_ParseQueryAnalysisRow_WithCorrectData(string line, string eName, double eCost, ulong eRows, ulong aRows, string aTime)
         {
             // Arrange
             MySQLParser parser = new MySQLParser();
@@ -80,9 +80,18 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(eName, result.AnalysisResult.Name);
-            Assert.AreEqual(eCost, result.AnalysisResult.EstimatedCost.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            Assert.AreEqual(eRows, result.AnalysisResult.EstimatedCardinality);
-            Assert.AreEqual(aRows, result.AnalysisResult.ActualCardinality);
+
+            Assert.IsNotNull(result.AnalysisResult.EstimatedCost);
+            /* Decimal cannot be used in DataRows */
+            Assert.AreEqual((decimal)eCost, (decimal)result.AnalysisResult.EstimatedCost);
+
+            Assert.IsNotNull(result.AnalysisResult.EstimatedCardinality);
+            Assert.AreEqual(eRows, (ulong)result.AnalysisResult.EstimatedCardinality);
+
+            Assert.IsNotNull(result.AnalysisResult.ActualCardinality);
+            Assert.AreEqual(aRows, (ulong)result.AnalysisResult.ActualCardinality);
+
+            Assert.IsNotNull(result.AnalysisResult.ActualTime);
             Assert.AreEqual(aTime, result.AnalysisResult.ActualTime.ToString());
         }
 
@@ -90,22 +99,6 @@ namespace QueryPlanParserTests.UnitTests.Parsers
         [DataRow("  Join Filter: (a.s > b.s)")]
         [DataRow("Planning Time: 0.440 ms")]
         public void Can_ParseQueryAnalysisRow_IgnoreNonCostRows(string line)
-        {
-            // Arrange
-            MySQLParser parser = new MySQLParser();
-
-            // Act
-            var result = parser.ParseQueryAnalysisRow(line);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
-        [DataRow("-> Nested loop inner join  (cost=1.10 rows=2)")]
-        [DataRow("    -> Table scan on jan_table  (cost=0.45 rows=2)")]
-        [DataRow("    -> Filter: (jan_table.Id <= jano_table.Id)  (cost=0.18 rows=1)")]
-        public void Can_ParseQueryAnalysisRow_IgnoreRowsWithNoActuals(string line)
         {
             // Arrange
             MySQLParser parser = new MySQLParser();
@@ -147,7 +140,11 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             var result = parser.ParseQueryAnalysisRow(line);
 
             // Assert
-            Assert.IsNull(result);
+            if (result?.AnalysisResult.EstimatedCost != null)
+                Assert.IsNull(result?.AnalysisResult.ActualCardinality);
+
+            if (result?.AnalysisResult.ActualCardinality != null)
+                Assert.IsNull(result?.AnalysisResult.EstimatedCost);
         }
 
         #endregion
@@ -205,7 +202,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             MySQLParser parser = new MySQLParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
             list.Add(new AnalysisResultWithIndent(eResult, 0));
 
             // Act
@@ -221,9 +218,9 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             MySQLParser parser = new MySQLParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult1 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult2 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult3 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
 
             list.Add(new AnalysisResultWithIndent(eResult1, 0));
             list.Add(new AnalysisResultWithIndent(eResult2, 6));
@@ -244,9 +241,9 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             MySQLParser parser = new MySQLParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult1 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult2 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult3 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
 
             list.Add(new AnalysisResultWithIndent(eResult1, 0));
             list.Add(new AnalysisResultWithIndent(eResult2, 6));

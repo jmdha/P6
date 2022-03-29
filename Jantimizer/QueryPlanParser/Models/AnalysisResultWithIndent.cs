@@ -8,10 +8,10 @@ namespace QueryPlanParser.Models
 {
     internal class AnalysisResultWithIndent
     {
-        public AnalysisResult AnalysisResult { get; }
+        public AnalysisResultQueryTree AnalysisResult { get; }
         public int Indentation { get; }
 
-        public AnalysisResultWithIndent(AnalysisResult analysisResult, int indentation)
+        public AnalysisResultWithIndent(AnalysisResultQueryTree analysisResult, int indentation)
         {
             AnalysisResult = analysisResult;
             Indentation = indentation;
