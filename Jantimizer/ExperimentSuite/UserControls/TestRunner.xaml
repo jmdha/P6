@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ExperimentSuite.Models"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid x:Name="RunnerGrid">
+    <Grid x:Name="RunnerGrid" Background="Gray" Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
@@ -19,11 +19,11 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Label x:Name="TestNameLabel"/>
-        <Button x:Name="Collapse" Width="100" Grid.Column="1" Click="Collapse_Click"/>
+        <Label x:Name="TestNameLabel" Foreground="Red"/>
+        <Button x:Name="CollapseButton" Content="Collapse" Width="100" Grid.Column="1" Click="CollapseButton_Click"/>
 
         <Label Content="Status" Grid.Row="1" Grid.Column="0"/>
-        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" IsEnabled="False"/>
+        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" IsEnabled="False" VerticalScrollBarVisibility="Visible"/>
 
         <Label Content="Progress" Grid.Row="1" Grid.Column="1"/>
         <StackPanel Grid.Row="2" Grid.Column="1">
@@ -35,6 +35,6 @@
         </StackPanel>
 
         <Label Content="Report" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
-        <TextBox x:Name="ReportTextBox" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="False"/>
+        <TextBox x:Name="ReportTextBox" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="False" VerticalScrollBarVisibility="Visible"/>
     </Grid>
 </UserControl>

@@ -62,6 +62,7 @@ namespace ExperimentSuite.UserControls
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
+            TestNameLabel.Foreground = Brushes.Yellow;
             RunnerGrid.Height = double.NaN;
 
             PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
@@ -117,7 +118,7 @@ namespace ExperimentSuite.UserControls
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
 
             RunnerGrid.Height = collapesedHeight;
-
+            TestNameLabel.Foreground = Brushes.Green;
             return Results;
         }
 
@@ -244,7 +245,7 @@ namespace ExperimentSuite.UserControls
                     new List<string>() { "{0,-30}", "{0,-30}" }, 1);
         }
 
-        private void Collapse_Click(object sender, RoutedEventArgs e)
+        private void CollapseButton_Click(object sender, RoutedEventArgs e)
         {
             if (RunnerGrid.Height == collapesedHeight)
                 RunnerGrid.Height = double.NaN;

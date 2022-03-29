@@ -3,6 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
+      "RunExperiment" : true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

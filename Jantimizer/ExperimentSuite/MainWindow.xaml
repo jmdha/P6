@@ -5,15 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExperimentSuite"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1500" Width="800" Loaded="Window_Loaded">
+        Title="Jantimiser" Height="750" Width="1000" Loaded="Window_Loaded">
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="StatusTextbox"/>
+        <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible"/>
 
-        <StackPanel x:Name="TestsPanel" Grid.Row="1"/>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
+            <StackPanel x:Name="TestsPanel"/>
+        </ScrollViewer>
     </Grid>
 </Window>

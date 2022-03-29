@@ -10,13 +10,15 @@ namespace ExperimentSuite.Models.ExperimentParsing
     {
         public string ExperimentName { get; set; }
         public bool RunParallel { get; set; }
+        public bool RunExperiment { get; set; }
         public List<TestRunData> RunData { get; set; }
         public List<TestRunData> PreRunData { get; set; }
 
-        public ExperimentData(string experimentName, bool runParallel, List<TestRunData> runData, List<TestRunData> preRunData)
+        public ExperimentData(string experimentName, bool runParallel, bool runExperiment, List<TestRunData> runData, List<TestRunData> preRunData)
         {
             ExperimentName = experimentName;
             RunParallel = runParallel;
+            RunExperiment = runExperiment;
             RunData = runData;
             PreRunData = preRunData;
         }
