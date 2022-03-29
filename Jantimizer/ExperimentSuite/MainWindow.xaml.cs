@@ -52,10 +52,10 @@ namespace ExperimentSuite
                     {
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
                         await RunExperimentQueue(
-                            GetRunDataFromList(experiment, experiment.PreRunData, connectorSet, testsPath, runTime),
+                            GetRunDataFromList(experiment.PreRunData, connectorSet, testsPath, runTime),
                             experiment.RunParallel);
                         await RunExperimentQueue(
-                            GetRunDataFromList(experiment, experiment.RunData, connectorSet, testsPath, runTime),
+                            GetRunDataFromList(experiment.RunData, connectorSet, testsPath, runTime),
                             experiment.RunParallel);
 
                         TestsPanel.Children.Add(new Separator());
@@ -70,7 +70,7 @@ namespace ExperimentSuite
             StatusTextbox.Text += $"{text}{Environment.NewLine}";
         }
 
-        private Dictionary<string, List<Func<Task>>> GetRunDataFromList(ExperimentData experiment, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
+        private Dictionary<string, List<Func<Task>>> GetRunDataFromList(List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
         {
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
             foreach (TestRunData data in runData)
