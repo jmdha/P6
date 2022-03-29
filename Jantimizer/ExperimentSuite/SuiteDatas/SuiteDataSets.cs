@@ -1,10 +1,10 @@
 ﻿using DatabaseConnector.Connectors;
+using ExperimentSuite.Models;
 using Histograms.Managers;
 using QueryOptimiser;
 using QueryParser;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Parsers;
-using QueryTestSuite.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using Tools.Models;
 using Tools.Services;
 
-namespace QueryTestSuite.SuiteDatas
+namespace ExperimentSuite.SuiteDatas
 {
     internal static class SuiteDataSets
     {
-        internal static SecretsService<Program> secrets = new SecretsService<Program>();
+        internal static SecretsService<MainWindow> secrets = new SecretsService<MainWindow>();
         public static SuiteData GetMySQLSD(IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
@@ -30,8 +30,7 @@ namespace QueryTestSuite.SuiteDatas
                 mySQLParserManager.QueryParsers.Add(additionalParser);
             var mySQLModel = new SuiteData(
                 new TestSettings(true, true, true, true, true, true, mySQLConnectionProperties),
-                secrets.GetLaunchOption("MYSQL"),
-                "mysql",
+                "MYSQL",
                 mySQLConnector,
                 mySQLPlanParser,
                 mySQLHistoManager,
@@ -52,8 +51,7 @@ namespace QueryTestSuite.SuiteDatas
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
                 new TestSettings(true, true, true, true, true, true, postConnectionProperties),
-                secrets.GetLaunchOption("POSGRESQL"),
-                "postgre",
+                "POSGRESQL",
                 postConnector,
                 postPlanParser,
                 postHistoManager,

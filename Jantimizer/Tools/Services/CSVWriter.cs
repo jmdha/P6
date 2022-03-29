@@ -4,7 +4,7 @@ using System;
 using System.Globalization;
 using System.IO;
 
-namespace QueryTestSuite.Services
+namespace Tools.Services
 {
     public class CSVWriter
     {
