@@ -108,7 +108,7 @@ namespace QueryPlanParser.Parsers
             // Data Parsing
             int indentation = rowData["indentation"].ToString().Length;
 
-            decimal? timeMax = RegexHelperFunctions.GetRegexVal<decimal?>(match, "timeMax");
+            decimal? timeMax = RegexHelperFunctions.GetRegexValNullable<decimal>(match, "timeMax");
             TimeSpan? timeCost = null;
             if (timeMax != null)
                 timeCost = TimeSpanFromMs((decimal)timeMax);
@@ -116,9 +116,9 @@ namespace QueryPlanParser.Parsers
             // Create Result
             var analysisResult = new AnalysisResultQueryTree(
                 RegexHelperFunctions.GetRegexVal<string>(match, "name").Trim(),
-                RegexHelperFunctions.GetRegexVal<decimal?>(match, "cost"),
-                RegexHelperFunctions.GetRegexVal<ulong?>(match, "estimatedRows"),
-                RegexHelperFunctions.GetRegexVal<ulong?>(match, "actualRows"),
+                RegexHelperFunctions.GetRegexValNullable<decimal>(match, "cost"),
+                RegexHelperFunctions.GetRegexValNullable<ulong>(match, "estimatedRows"),
+                RegexHelperFunctions.GetRegexValNullable<ulong>(match, "actualRows"),
                 timeCost
             );
 

@@ -49,6 +49,20 @@ namespace ToolsTests
 
         [TestMethod]
         [DataRow("startend")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Can_GetRegexVal_NonNullableNull(string str)
+        {
+            // Arrange
+            Regex regex = new Regex("start(?<groupName>.+)?end$");
+
+            // Act
+            var match = regex.Match(str);
+
+            int actual = RegexHelperFunctions.GetRegexVal<int>(match, "groupName");
+        }
+        
+        [TestMethod]
+        [DataRow("startend")]
         public void Can_GetRegexVal_Nullable(string str)
         {
             // Arrange
@@ -57,7 +71,7 @@ namespace ToolsTests
             // Act
             var match = regex.Match(str);
 
-            int? actual = RegexHelperFunctions.GetRegexVal<int?>(match, "groupName");
+            int? actual = RegexHelperFunctions.GetRegexValNullable<int>(match, "groupName");
 
             // Assert
             Assert.IsNull(actual);
