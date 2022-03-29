@@ -1,11 +1,12 @@
 ﻿using CsvHelper;
-using QueryPlanParser.Models;
 using CsvHelper.Configuration.Attributes;
 using QueryOptimiser.Models;
+using QueryPlanParser.Models;
+using System.IO;
 
-namespace QueryTestSuite.Models
+namespace ExperimentSuite.Models
 {
-    internal class TestCaseResult
+    public class TestCaseResult
     {
         public string Name { get; private set; } = "N/A";
         public string Category { get; private set; } = "N/A";

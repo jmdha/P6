@@ -1,10 +1,7 @@
-using CsvHelper;
-using QueryPlanParser.Models;
-using CsvHelper.Configuration.Attributes;
 using CsvHelper.Configuration;
 
-namespace QueryTestSuite.Models {
-    internal sealed class TestCaseResultMap : ClassMap<TestCaseResult>
+namespace ExperimentSuite.Models {
+    public sealed class TestCaseResultMap : ClassMap<TestCaseResult>
     {
         public TestCaseResultMap()
         {

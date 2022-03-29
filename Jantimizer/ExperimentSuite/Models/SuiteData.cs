@@ -11,13 +11,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryTestSuite.Models
+namespace ExperimentSuite.Models
 {
-    internal class SuiteData
+    public class SuiteData
     {
         public TestSettings Settings { get; set; }
 
-        public bool ShouldRun { get; set; }
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
@@ -29,7 +28,6 @@ namespace QueryTestSuite.Models
 
         public SuiteData(
             TestSettings settings,
-            bool run,
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
@@ -38,7 +36,6 @@ namespace QueryTestSuite.Models
             IParserManager queryParserManager)
         {
             Settings = settings;
-            ShouldRun = run;
             Name = name;
             Connector = connector;
             Parser = parser;

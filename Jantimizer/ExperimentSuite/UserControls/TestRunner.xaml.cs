@@ -1,26 +1,35 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
-using DatabaseConnector;
-using DatabaseConnector.Connectors;
-using Histograms;
-using Histograms.Managers;
-using PrintUtilities;
-using QueryOptimiser;
+﻿using ExperimentSuite.Models;
 using QueryOptimiser.Models;
-using QueryParser;
 using QueryParser.Models;
-using QueryParser.QueryParsers;
 using QueryPlanParser.Models;
-using QueryTestSuite.Models;
-using QueryTestSuite.Services;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
-using Tools.Models;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Tools.Services;
 
-namespace QueryTestSuite.TestRunners
+namespace ExperimentSuite.UserControls
 {
-    internal class TestRunner
+    /// <summary>
+    /// Interaction logic for TestRunner.xaml
+    /// </summary>
+    public partial class TestRunner : UserControl
     {
+        private int collapesedHeight = 40;
+
         public string Name { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
@@ -29,6 +38,11 @@ namespace QueryTestSuite.TestRunners
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
+
+        public TestRunner()
+        {
+            InitializeComponent();
+        }
 
         public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
@@ -40,10 +54,17 @@ namespace QueryTestSuite.TestRunners
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{Name}.csv");
+            InitializeComponent();
+
+            RunnerGrid.Height = collapesedHeight;
+            TestNameLabel.Content = Name;
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
+            TestNameLabel.Foreground = Brushes.Yellow;
+            RunnerGrid.Height = double.NaN;
+
             PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
             ParseTestSettings(SettingsFile);
 
@@ -63,12 +84,14 @@ namespace QueryTestSuite.TestRunners
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
-                
-                foreach(var t in ProgressBar.PrintProgress(tasks, indent: 1))
+                HistogramProgressBar.Maximum = tasks.Count;
+
+                foreach (var t in tasks)
                 {
-                    t.Wait();
+                    await t;
+                    HistogramProgressBar.Value++;
                 }
-                ProgressBar.Finish(tasks.Count, indent: 1);
+                HistogramProgressBar.Value = HistogramProgressBar.Maximum;
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -93,70 +116,57 @@ namespace QueryTestSuite.TestRunners
             }
 
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
-            Console.WriteLine();
 
+            RunnerGrid.Height = collapesedHeight;
+            TestNameLabel.Foreground = Brushes.Green;
             return Results;
         }
 
         private async Task<List<TestCaseResult>> RunQueriesSerial()
         {
-            PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
+            PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
             int count = 0;
-            int max = CaseFiles.Count();
-            foreach (var queryFile in ProgressBar.PrintProgress(CaseFiles, indent: 2))
+            SQLProgressBar.Maximum = CaseFiles.Count();
+            foreach (var queryFile in CaseFiles)
             {
                 try
                 {
-                    PrintUtil.Print($"\t [File: {queryFile.Name}]    ", 0, ConsoleColor.Blue);
-                    PrintUtil.Print($"\t Executing SQL statement...             ", 0);
+                    await Task.Delay(1);
+                    CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
+                    SQLProgressBar.Value++;
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
-                    List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
+                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                    
+
                     TestCaseResult testCase = new TestCaseResult(RunData.Name, Name, queryFile, RunData, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
                 {
-                    PrintUtil.PrintLine($"Error! The query file [{queryFile}] failed with the following error:", 1);
-                    PrintUtil.PrintLine(ex.ToString(), 1);
+                    MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
                 }
                 count++;
             }
-            ProgressBar.Finish(CaseFiles.Count(), indent: 2);
+            SQLProgressBar.Value = SQLProgressBar.Maximum;
             return testCases;
         }
 
         private void WriteResultToConsole()
         {
-            PrintUtil.PrintLine($"Displaying report...", 2, ConsoleColor.Green);
-            PrintUtil.PrintLine(FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2, ConsoleColor.DarkGray);
+            PrintTestUpdate("Displaying report...", RunData.Name);
+
+            ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
+                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2);
 
             foreach (var testCase in Results)
             {
                 var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
                 var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstTotalCardinality);
 
-                var colors = new List<ConsoleColor>() {
-                    ConsoleColor.Blue,
-                    ConsoleColor.Blue,
-                    ConsoleColor.Blue,
-                    ConsoleColor.Blue,
-                    ConsoleColor.Blue,
-                    ConsoleColor.Blue
-                };
-
-                if (DbAnalysisAccuracy > JantimiserEstimateAccuracy)
-                    colors.Add(ConsoleColor.Red);
-                else if (DbAnalysisAccuracy < JantimiserEstimateAccuracy)
-                    colors.Add(ConsoleColor.Green);
-                else
-                    colors.Add(ConsoleColor.Yellow);
-
-                PrintUtil.PrintLine(new List<string>() {
+                ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(new List<string>() {
                     testCase.Category,
                     testCase.Name,
                     testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
@@ -164,17 +174,16 @@ namespace QueryTestSuite.TestRunners
                     testCase.DbAnalysisResult.ActualCardinality.ToString(),
                     GetAccuracyAsString(DbAnalysisAccuracy),
                     GetAccuracyAsString(JantimiserEstimateAccuracy)
-                }, 
+                },
                 new List<string>() {
                     "{0, -30}",
                     "{0, -20}",
-                    "{0, -20}", 
-                    "{0, -20}", 
-                    "{0, -20}", 
-                    "{0, -10}", 
+                    "{0, -20}",
+                    "{0, -20}",
+                    "{0, -20}",
+                    "{0, -10}",
                     "{0, -10}"
                 },
-                colors,
                 2);
             }
         }
@@ -185,7 +194,7 @@ namespace QueryTestSuite.TestRunners
                 return "100   %";
             else if (accuracy == -1)
                 return "inf   %";
-            else 
+            else
                 return string.Format("{0, -5} %", accuracy);
         }
 
@@ -231,10 +240,17 @@ namespace QueryTestSuite.TestRunners
 
         private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
         {
-            PrintUtil.PrintLine(
+            StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
                     new List<string>() { left, right },
-                    new List<string>() { "{0,-30}", "{0,-30}" },
-                    new List<ConsoleColor>() { leftColor, rightColor }, 1);
+                    new List<string>() { "{0,-30}", "{0,-30}" }, 1);
+        }
+
+        private void CollapseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (RunnerGrid.Height == collapesedHeight)
+                RunnerGrid.Height = double.NaN;
+            else
+                RunnerGrid.Height = collapesedHeight;
         }
     }
 }

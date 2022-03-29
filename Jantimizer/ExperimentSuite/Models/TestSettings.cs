@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
 
-namespace QueryTestSuite.Models
+namespace ExperimentSuite.Models
 {
     public class TestSettings
     {

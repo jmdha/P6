@@ -25,6 +25,7 @@ namespace QueryParser
         /// <param name="query"></param>
         /// <returns></returns>
         public List<INode> ParseQuery(string query, bool throwIfNotFound = true);
+        public Task<List<INode>> ParseQueryAsync(string query, bool throwIfNotFound = true);
 
         /// <summary>
         /// Forces a query to be parsed by a certain <see cref="IQueryParser"/>.
@@ -34,5 +35,6 @@ namespace QueryParser
         /// <param name="parser"></param>
         /// <returns></returns>
         public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser;
+        public Task<List<INode>>? ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser;
     }
 }

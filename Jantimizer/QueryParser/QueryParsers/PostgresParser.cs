@@ -31,12 +31,18 @@ namespace QueryParser.QueryParsers
 
         public List<INode> ParseQuery(string query)
         {
-            var parsed = ParseQueryAsync(query);
+            var parsed = GetParserResult(query);
             parsed.Wait();
             return parsed.Result.Joins.Select(j => j as INode).ToList();
         }
 
-        public async Task<ParserResult> ParseQueryAsync(string query)
+        public async Task<List<INode>> ParseQueryAsync(string query)
+        {
+            var parsed = await GetParserResult(query);
+            return parsed.Joins.Select(j => j as INode).ToList();
+        }
+
+        public async Task<ParserResult> GetParserResult(string query)
         {
             string explanationTextBlock = await GetPGExplainationTextBlock(query);
 

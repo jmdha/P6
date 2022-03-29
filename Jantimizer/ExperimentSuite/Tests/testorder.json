@@ -1,0 +1,3 @@
+﻿{
+  "Order": [ "BasicTests_SetupTables", "BasicTests_RandomNumberBlocks", "BasicTests_ConstantNumberBlocks", "*" ]
+}
