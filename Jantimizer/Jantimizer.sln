@@ -24,9 +24,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "QueryParserTest\QueryParserTest.csproj", "{99113765-9490-4A5F-B7F8-96632015C7FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolsTests", "ToolsTests\ToolsTests.csproj", "{1D7B992B-10E6-4D59-88AC-776DE1F683C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -86,6 +88,10 @@ Global
 		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
