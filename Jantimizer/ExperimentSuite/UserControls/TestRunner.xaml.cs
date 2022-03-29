@@ -76,12 +76,14 @@ namespace ExperimentSuite.UserControls
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
+                HistogramProgressBar.Maximum = tasks.Count;
 
-                foreach (var t in PrintUtilities.ProgressBar.PrintProgress(tasks, indent: 1))
+                foreach (var t in tasks)
                 {
-                    t.Wait();
+                    await t;
+                    HistogramProgressBar.Value++;
                 }
-                PrintUtilities.ProgressBar.Finish(tasks.Count, indent: 1);
+                HistogramProgressBar.Value = HistogramProgressBar.Maximum;
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -116,17 +118,18 @@ namespace ExperimentSuite.UserControls
             PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
             int count = 0;
-            int max = CaseFiles.Count();
-            foreach (var queryFile in PrintUtilities.ProgressBar.PrintProgress(CaseFiles, indent: 2))
+            SQLProgressBar.Maximum = CaseFiles.Count();
+            foreach (var queryFile in CaseFiles)
             {
                 try
                 {
-                    ProgressTextBox.Text += PrintUtilities.FormatUtil.Print($"\t [File: {queryFile.Name}]    ", 0);
-                    ProgressTextBox.Text += PrintUtilities.FormatUtil.Print($"\t Executing SQL statement...             ", 0);
+                    await Task.Delay(1);
+                    CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
+                    SQLProgressBar.Value++;
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
-                    List<INode> nodes = RunData.QueryParserManager.ParseQuery(File.ReadAllText(queryFile.FullName), false);
+                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
                     TestCaseResult testCase = new TestCaseResult(RunData.Name, Name, queryFile, RunData, analysisResult, jantimiserResult);
@@ -138,7 +141,7 @@ namespace ExperimentSuite.UserControls
                 }
                 count++;
             }
-            PrintUtilities.ProgressBar.Finish(CaseFiles.Count(), indent: 2);
+            SQLProgressBar.Value = SQLProgressBar.Maximum;
             return testCases;
         }
 

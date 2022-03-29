@@ -17,7 +17,6 @@ namespace ExperimentSuite.Models
     {
         public TestSettings Settings { get; set; }
 
-        public bool ShouldRun { get; set; }
         public string Name { get; set; }
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
@@ -29,7 +28,6 @@ namespace ExperimentSuite.Models
 
         public SuiteData(
             TestSettings settings,
-            bool run,
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
@@ -38,7 +36,6 @@ namespace ExperimentSuite.Models
             IParserManager queryParserManager)
         {
             Settings = settings;
-            ShouldRun = run;
             Name = name;
             Connector = connector;
             Parser = parser;

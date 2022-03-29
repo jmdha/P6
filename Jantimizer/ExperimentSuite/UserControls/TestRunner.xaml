@@ -12,8 +12,8 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="120"/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -22,7 +22,13 @@
         <TextBox x:Name="StatusTextBox" Grid.Row="1" Grid.Column="0" IsEnabled="False"/>
 
         <Label Content="Progress" Grid.Row="0" Grid.Column="1"/>
-        <TextBox x:Name="ProgressTextBox" Grid.Row="1" Grid.Column="1" IsEnabled="False"/>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <Label Content="Histogram Progress"/>
+            <ProgressBar x:Name="HistogramProgressBar" Height="20"/>
+            <Label Content="SQL Progress"/>
+            <Label x:Name="CurrentSqlFileLabels" Content="File: "/>
+            <ProgressBar x:Name="SQLProgressBar" Height="20"/>
+        </StackPanel>
 
         <Label Content="Report" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"/>
         <TextBox x:Name="ReportTextBox" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" IsEnabled="False"/>

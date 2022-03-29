@@ -2,12 +2,25 @@
   "Experiments": [
     {
       "ExperimentName": "Experiment One",
-      "RunParallel" : true,
+      "RunParallel": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        }
+      ],
       "RunData": [
         {
-          "ConnectorName": "POSTGRE",
+          "ConnectorName": "POSGRESQL",
           "TestFiles": [
-            "BasicTests_SetupTables",
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
           ]
@@ -15,7 +28,6 @@
         {
           "ConnectorName": "MYSQL",
           "TestFiles": [
-            "BasicTests_SetupTables",
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
           ]
