@@ -83,20 +83,20 @@ namespace QueryPlanParserTests.UnitTests.Parsers
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(eName, result.AnalysisResult.Name);
+            Assert.AreEqual(eName, result.AnalysisQueryTree.Name);
 
-            Assert.IsNotNull(result.AnalysisResult.EstimatedCost);
+            Assert.IsNotNull(result.AnalysisQueryTree.EstimatedCost);
             /* Decimal cannot be used in DataRows */
-            Assert.AreEqual((decimal)eCost, (decimal)result.AnalysisResult.EstimatedCost);
+            Assert.AreEqual((decimal)eCost, (decimal)result.AnalysisQueryTree.EstimatedCost);
 
-            Assert.IsNotNull(result.AnalysisResult.EstimatedCardinality);
-            Assert.AreEqual(eRows, (ulong)result.AnalysisResult.EstimatedCardinality);
+            Assert.IsNotNull(result.AnalysisQueryTree.EstimatedCardinality);
+            Assert.AreEqual(eRows, (ulong)result.AnalysisQueryTree.EstimatedCardinality);
 
-            Assert.IsNotNull(result.AnalysisResult.ActualCardinality);
-            Assert.AreEqual(aRows, (ulong)result.AnalysisResult.ActualCardinality);
+            Assert.IsNotNull(result.AnalysisQueryTree.ActualCardinality);
+            Assert.AreEqual(aRows, (ulong)result.AnalysisQueryTree.ActualCardinality);
 
-            Assert.IsNotNull(result.AnalysisResult.ActualTime);
-            Assert.AreEqual(aTime, result.AnalysisResult.ActualTime.ToString());
+            Assert.IsNotNull(result.AnalysisQueryTree.ActualTime);
+            Assert.AreEqual(aTime, result.AnalysisQueryTree.ActualTime.ToString());
         }
 
         [TestMethod]

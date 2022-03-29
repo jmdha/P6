@@ -30,7 +30,7 @@ namespace QueryPlanParser.Parsers
         internal AnalysisResultQueryTree RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
-            var analysisRes = row.AnalysisResult;
+            var analysisRes = row.AnalysisQueryTree;
 
             // Recursively add subqueries
             while (rows.Count > 0)
