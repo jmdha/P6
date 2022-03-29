@@ -23,7 +23,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.DbConnector);
@@ -35,7 +35,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.Histograms);
@@ -48,7 +48,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            PostgresEquiDepthHistogramManager manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), depth);
+            PostgresHistogramManager manager = new PostgresHistogramManager(new ConnectionProperties(), depth);
 
             // ASSERT
             Assert.AreEqual(depth, manager.Depth);
@@ -65,7 +65,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Tables(string[] tableNames, string attribute, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
             foreach (string tableName in tableNames)
                 manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
 
@@ -85,7 +85,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Attributes(string[] attributeName, string tableName, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
             foreach (string attribute in attributeName)
                 manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
 
@@ -109,7 +109,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_AddHistogram(string tableName, string attributeName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth(tableName, attributeName, 10);
 
             // ACT
@@ -127,7 +127,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfTableNameEmpty(string tableName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth(tableName, "a", 10);
 
             // ACT
@@ -142,13 +142,53 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfAttributeNameEmpty(string attributeName)
         {
             // ARRANGE
-            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
             IHistogram histogram = new HistogramEquiDepth("A", attributeName, 10);
 
             // ACT
             manager.AddHistogram(histogram);
         }
 
+        #endregion
+
+        #region ClearHistogram
+        [TestMethod]
+        public void ClearHistogram()
+        {
+            // ARRANGE
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
+            manager.Histograms.Add(
+                new Histograms.Models.HistogramEquiDepth("", "", 10)
+            );
+
+            if (manager.Histograms.Count == 0)
+                throw new AssertFailedException("Histogram not added before clear");
+
+            // ACT
+            manager.ClearHistograms();
+
+            // ASSERT
+            Assert.AreEqual(0, manager.Histograms.Count);
+        }
+        #endregion
+
+        #region GetHistogram
+        [TestMethod]
+        [DataRow("A", "B")]
+        public void GetHistogram(string table, string attribute)
+        {
+            // ARRANGE
+            IHistogramManager<IHistogram, IDbConnector> manager = new PostgresHistogramManager(new ConnectionProperties(), 10);
+            manager.Histograms.Add(
+                new HistogramEquiDepth(table, attribute, 10)
+            );
+
+            // ACT
+            IHistogram actualHistogram = manager.GetHistogram(table, attribute);
+
+            // ASSERT
+            Assert.AreEqual(manager.Histograms[0], actualHistogram);
+        }
         #endregion
     }
 }
