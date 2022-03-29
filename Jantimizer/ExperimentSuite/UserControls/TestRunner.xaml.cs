@@ -28,6 +28,8 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class TestRunner : UserControl
     {
+        private int collapesedHeight = 40;
+
         public string Name { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
@@ -53,10 +55,15 @@ namespace ExperimentSuite.UserControls
             Results = new List<TestCaseResult>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{Name}.csv");
             InitializeComponent();
+
+            RunnerGrid.Height = collapesedHeight;
+            TestNameLabel.Content = Name;
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
         {
+            RunnerGrid.Height = double.NaN;
+
             PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
             ParseTestSettings(SettingsFile);
 
@@ -108,7 +115,8 @@ namespace ExperimentSuite.UserControls
             }
 
             PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
-            Console.WriteLine();
+
+            RunnerGrid.Height = collapesedHeight;
 
             return Results;
         }
@@ -234,6 +242,14 @@ namespace ExperimentSuite.UserControls
             StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
                     new List<string>() { left, right },
                     new List<string>() { "{0,-30}", "{0,-30}" }, 1);
+        }
+
+        private void Collapse_Click(object sender, RoutedEventArgs e)
+        {
+            if (RunnerGrid.Height == collapesedHeight)
+                RunnerGrid.Height = double.NaN;
+            else
+                RunnerGrid.Height = collapesedHeight;
         }
     }
 }

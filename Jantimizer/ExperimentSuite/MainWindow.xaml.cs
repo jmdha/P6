@@ -27,9 +27,12 @@ namespace ExperimentSuite
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Dictionary<string, List<Func<Task>>> ExecutionTasks;
+
         public MainWindow()
         {
             InitializeComponent();
+            ExecutionTasks = new Dictionary<string, List<Func<Task>>>();
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -46,20 +49,19 @@ namespace ExperimentSuite
             if (res is ExperimentList expList) {
                 foreach (var experiment in expList.Experiments)
                 {
-                    await RunPreData(experiment, connectorSet, testsPath, runTime);
-                }
-                foreach (var experiment in expList.Experiments)
-                {
-                    await RunData(experiment, connectorSet, testsPath, runTime);
+                    SetupPreData(experiment, connectorSet, testsPath, runTime);
+                    await RunExperimentQueue(experiment.RunParallel);
+                    SetupRunData(experiment, connectorSet, testsPath, runTime);
+                    await RunExperimentQueue(experiment.RunParallel);
                 }
             }
         }
 
-        private async Task RunData(ExperimentData experiment, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
+        private void SetupRunData(ExperimentData experiment, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
         {
-            foreach (SuiteData suitData in connectorSet)
+            foreach (TestRunData data in experiment.RunData)
             {
-                foreach (TestRunData data in experiment.RunData)
+                foreach (SuiteData suitData in connectorSet)
                 {
                     if (data.ConnectorName == suitData.Name)
                     {
@@ -81,19 +83,23 @@ namespace ExperimentSuite
                             );
                             TestsPanel.Children.Add(runner);
 
-                            await runner.Run(true);
+                            Func<Task> runFunc = async () => await runner.Run(true);
+
+                            if (ExecutionTasks.ContainsKey(testFile))
+                                ExecutionTasks[testFile].Add(runFunc);
+                            else
+                                ExecutionTasks.Add(testFile, new List<Func<Task>>() { runFunc });
                         }
-                        break;
                     }
                 }
             }
         }
 
-        private async Task RunPreData(ExperimentData experiment, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
+        private void SetupPreData(ExperimentData experiment, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
         {
-            foreach (SuiteData suitData in connectorSet)
+            foreach (TestRunData data in experiment.PreRunData)
             {
-                foreach (TestRunData data in experiment.PreRunData)
+                foreach (SuiteData suitData in connectorSet)
                 {
                     if (data.ConnectorName == suitData.Name)
                     {
@@ -115,12 +121,37 @@ namespace ExperimentSuite
                             );
                             TestsPanel.Children.Add(runner);
 
-                            await runner.Run(true);
+                            Func<Task> runFunc = async () => await runner.Run(true);
+
+                            if (ExecutionTasks.ContainsKey(testFile))
+                                ExecutionTasks[testFile].Add(runFunc);
+                            else
+                                ExecutionTasks.Add(testFile, new List<Func<Task>>() { runFunc });
                         }
-                        break;
                     }
                 }
             }
+        }
+
+        private async Task RunExperimentQueue(bool runParallel)
+        {
+            if (runParallel)
+            {
+                foreach (string key in ExecutionTasks.Keys)
+                {
+                    List<Task> results = new List<Task>();
+                    foreach (Func<Task> funcs in ExecutionTasks[key])
+                    {
+                        results.Add(funcs.Invoke());
+                    }
+                    await Task.WhenAll(results.ToArray());
+                }
+            }
+            else
+                foreach (string key in ExecutionTasks.Keys)
+                    foreach (Func<Task> funcs in ExecutionTasks[key])
+                        await funcs.Invoke();
+            ExecutionTasks.Clear();
         }
     }
 }
