@@ -70,10 +70,10 @@ namespace QueryPlanParserTests.UnitTests.Parsers
         #region ParseQueryAnalysisRow
 
         [TestMethod]
-        [DataRow("Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "Nested Loop", "0.00", (ulong)167, (ulong)45, "00:00:00.0000720")]
-        [DataRow("  ->  Materialize  (cost=0.00..1.15 rows=10 width=8) (actual time=0.000..0.001 rows=10 loops=50)", "Materialize", "0.00", (ulong)10, (ulong)10, "00:00:00.0000010")]
-        [DataRow("        ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8) (actual time=0.009..0.010 rows=10 loops=1)", "Seq Scan on a", "0.00", (ulong)10, (ulong)10, "00:00:00.0000100")]
-        public void Can_ParseQueryAnalysisRow_WithCorrectData(string line, string eName, string eCost, ulong eRows, ulong aRows, string aTime)
+        [DataRow("Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", "Nested Loop", 0.00d, (ulong)167, (ulong)45, "00:00:00.0000720")]
+        [DataRow("  ->  Materialize  (cost=0.00..1.15 rows=10 width=8) (actual time=0.000..0.001 rows=10 loops=50)", "Materialize", 0.00d, (ulong)10, (ulong)10, "00:00:00.0000010")]
+        [DataRow("        ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8) (actual time=0.009..0.010 rows=10 loops=1)", "Seq Scan on a", 0.00d, (ulong)10, (ulong)10, "00:00:00.0000100")]
+        public void Can_ParseQueryAnalysisRow_WithCorrectData(string line, string eName, double eCost, ulong eRows, ulong aRows, string aTime)
         {
             // Arrange
             PostgreSqlParser parser = new PostgreSqlParser();
@@ -83,11 +83,20 @@ namespace QueryPlanParserTests.UnitTests.Parsers
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(eName, result.AnalysisResult.Name);
-            Assert.AreEqual(eCost, result.AnalysisResult.EstimatedCost.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            Assert.AreEqual(eRows, result.AnalysisResult.EstimatedCardinality);
-            Assert.AreEqual(aRows, result.AnalysisResult.ActualCardinality);
-            Assert.AreEqual(aTime, result.AnalysisResult.ActualTime.ToString());
+            Assert.AreEqual(eName, result.AnalysisQueryTree.Name);
+
+            Assert.IsNotNull(result.AnalysisQueryTree.EstimatedCost);
+            /* Decimal cannot be used in DataRows */
+            Assert.AreEqual((decimal)eCost, (decimal)result.AnalysisQueryTree.EstimatedCost);
+
+            Assert.IsNotNull(result.AnalysisQueryTree.EstimatedCardinality);
+            Assert.AreEqual(eRows, (ulong)result.AnalysisQueryTree.EstimatedCardinality);
+
+            Assert.IsNotNull(result.AnalysisQueryTree.ActualCardinality);
+            Assert.AreEqual(aRows, (ulong)result.AnalysisQueryTree.ActualCardinality);
+
+            Assert.IsNotNull(result.AnalysisQueryTree.ActualTime);
+            Assert.AreEqual(aTime, result.AnalysisQueryTree.ActualTime.ToString());
         }
 
         [TestMethod]
@@ -209,7 +218,7 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             PostgreSqlParser parser = new PostgreSqlParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
             list.Add(new AnalysisResultWithIndent(eResult, 0));
 
             // Act
@@ -225,9 +234,9 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             PostgreSqlParser parser = new PostgreSqlParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult1 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult2 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult3 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
 
             list.Add(new AnalysisResultWithIndent(eResult1, 0));
             list.Add(new AnalysisResultWithIndent(eResult2, 6));
@@ -248,9 +257,9 @@ namespace QueryPlanParserTests.UnitTests.Parsers
             // Arrange
             PostgreSqlParser parser = new PostgreSqlParser();
             List<AnalysisResultWithIndent> list = new List<AnalysisResultWithIndent>();
-            AnalysisResult eResult1 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult2 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
-            AnalysisResult eResult3 = new AnalysisResult("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult1 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult2 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
+            AnalysisResultQueryTree eResult3 = new AnalysisResultQueryTree("name", 0, 0, 0, new TimeSpan());
 
             list.Add(new AnalysisResultWithIndent(eResult1, 0));
             list.Add(new AnalysisResultWithIndent(eResult2, 6));
