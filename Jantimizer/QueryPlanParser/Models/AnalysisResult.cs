@@ -29,6 +29,10 @@ namespace QueryPlanParser.Models
             QueryTree = subTree;
         }
 
+        public AnalysisResult(string name, decimal? estimatedCost, ulong? estimatedCardinality, ulong? actualCardinality, TimeSpan? actualTime)
+            : this(new AnalysisResultQueryTree(name, estimatedCost, estimatedCardinality, actualCardinality, actualTime))
+        { }
+
         public override string ToString()
         {
             return QueryTree.BuildStringBuilderRec(new StringBuilder(), 0).ToString();
