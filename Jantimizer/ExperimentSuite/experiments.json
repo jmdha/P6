@@ -1,0 +1,26 @@
+﻿{
+  "Experiments": [
+    {
+      "ExperimentName": "Experiment One",
+      "RunParallel" : true,
+      "RunData": [
+        {
+          "ConnectorName": "POSTGRE",
+          "TestFiles": [
+            "SetupTables",
+            "RandomNumberBlocks",
+            "ConstantNumberBlocks"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "TestFiles": [
+            "SetupTables",
+            "RandomNumberBlocks",
+            "ConstantNumberBlocks"
+          ]
+        }
+      ]
+    }
+  ]
+}
