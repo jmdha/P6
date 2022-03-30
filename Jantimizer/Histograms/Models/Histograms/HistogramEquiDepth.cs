@@ -40,8 +40,8 @@ namespace Histograms.Models
 
         private IEnumerable<IComparable> SplitValues(IEnumerable<ValueCount> sortedGroups)
         {
-            foreach(var grp in sortedGroups)
-                for(int i = 0; i < grp.Count; i++)
+            foreach (var grp in sortedGroups)
+                for (int i = 0; i < grp.Count; i++)
                     yield return grp.Value;
         }
     }

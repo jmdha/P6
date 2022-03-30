@@ -54,13 +54,32 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["COLUMN_NAME"]}".ToLower();
-            var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
-            if (attributeValues.Tables.Count > 0)
-            {
-                IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
-                Histograms.Add(newHistogram);
-            }
+            DataSet sortedGroupsDs = await DbConnector.CallQuery(@$"
+                SELECT
+                    {attributeName} AS val,
+                    COUNT({attributeName}) AS c
+                FROM {tableName} WHERE
+                    {attributeName} IS NOT NULL
+                GROUP BY {attributeName}
+                ORDER BY {attributeName} ASC
+            ");
+
+            List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "c").ToList();
+
+            IDepthHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            newHistogram.GenerateHistogramFromSortedGroups(sortedGroups);
+            await Task.Delay(1);
+            Histograms.Add(newHistogram);
+        }
+
+        private IEnumerable<ValueCount> GetValueCounts(DataSet dataSet, string valueColumnName, string countColumnName)
+        {
+            return dataSet.Tables[0].AsEnumerable().Select(r =>
+                new ValueCount(
+                    (IComparable)r[valueColumnName],
+                    (long)r[countColumnName]
+                )
+            );
         }
     }
 }

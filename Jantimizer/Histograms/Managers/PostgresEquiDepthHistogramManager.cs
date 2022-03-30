@@ -68,8 +68,9 @@ namespace Histograms.Managers
 
             List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
 
-            IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            IDepthHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
             newHistogram.GenerateHistogramFromSortedGroups(sortedGroups);
+            await Task.Delay(1);
             Histograms.Add(newHistogram);
         }
 
