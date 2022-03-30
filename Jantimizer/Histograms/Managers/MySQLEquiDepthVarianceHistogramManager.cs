@@ -10,9 +10,9 @@ using Histograms.Models;
 
 namespace Histograms.Managers
 {
-    public class MySQLEquiDepthHistogramManager : BaseEquiDepthHistogramManager
+    public class MySQLEquiDepthVarianceHistogramManager : BaseEquiDepthHistogramManager
     {
-        public MySQLEquiDepthHistogramManager(ConnectionProperties connectionProperties, int depth) : base(connectionProperties, depth)
+        public MySQLEquiDepthVarianceHistogramManager(ConnectionProperties connectionProperties, int depth) : base(connectionProperties, depth)
         {
             DbConnector = new DatabaseConnector.Connectors.MySqlConnector(connectionProperties);
         }
@@ -57,7 +57,7 @@ namespace Histograms.Managers
             var attributeValues = await DbConnector.CallQuery($"SELECT {attributeName} FROM {tableName}");
             if (attributeValues.Tables.Count > 0)
             {
-                IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+                IHistogram newHistogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
                 newHistogram.GenerateHistogram(attributeValues.Tables[0], attributeName);
                 Histograms.Add(newHistogram);
             }

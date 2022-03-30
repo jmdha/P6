@@ -252,5 +252,13 @@ namespace ExperimentSuite.UserControls
             else
                 RunnerGrid.Height = collapesedHeight;
         }
+
+        private void StatusTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                textBox.ScrollToEnd();
+            }
+        }
     }
 }

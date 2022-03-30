@@ -12,7 +12,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible"/>
+        <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" TextChanged="StatusTextbox_TextChanged"/>
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
             <StackPanel x:Name="TestsPanel"/>

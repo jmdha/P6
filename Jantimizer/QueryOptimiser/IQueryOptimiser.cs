@@ -8,12 +8,10 @@ using QueryParser.Models;
 
 namespace QueryOptimiser
 {
-    public interface IQueryOptimiser<HistogramType, ConnectorType>
-        where HistogramType : IHistogram
-        where ConnectorType : IDbConnector
+    public interface IQueryOptimiser
     {
-        public IHistogramManager<HistogramType, ConnectorType> HistogramManager { get; }
-        public ICostCalculator<HistogramType, ConnectorType> CostCalculator { get; }
+        public IHistogramManager HistogramManager { get; }
+        public ICostCalculator CostCalculator { get; }
 
         /// <summary>
         /// Reorders a querys join order according to the cost of each join operation

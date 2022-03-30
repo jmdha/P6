@@ -10,16 +10,13 @@ using DatabaseConnector;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    internal interface INodeCost<NodeType, HistogramType, DbConnectorType>
-        where NodeType : INode
-        where HistogramType : IHistogram
-        where DbConnectorType : IDbConnector
+    internal interface INodeCost<NodeType> where NodeType : INode
     {
         /// <summary>
         /// Gives an estimate of the cost of the operation
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        internal long CalculateCost(NodeType node, IHistogramManager<HistogramType, DbConnectorType> histogramManager);
+        internal long CalculateCost(NodeType node, IHistogramManager histogramManager);
     }
 }
