@@ -89,5 +89,31 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         }
 
         #endregion
+
+        #region GenerateHistogramFromSorted
+
+        [TestMethod]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 10, 2)]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 5, 4)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 10, 7)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 5, 14)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 10, 17)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 1, 170)]
+        public void Can_GenerateHistogramFromSorted_BucketCount(int[] value, long[] count, int bucketSize, int expBucketCount)
+        {
+            // ARRANGE
+            IDepthHistogram histogram = new HistogramEquiDepth("A", "b", bucketSize);
+            List<ValueCount> values = new List<ValueCount>();
+            for (int i = 0; i < value.Length; i++)
+                values.Add(new ValueCount(value[i], count[i]));
+
+            // ACT
+            histogram.GenerateHistogramFromSortedGroups(values);
+
+            // ASSERT
+            Assert.AreEqual(expBucketCount, histogram.Buckets.Count);
+        }
+
+        #endregion
     }
 }

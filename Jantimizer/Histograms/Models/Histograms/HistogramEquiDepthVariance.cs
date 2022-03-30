@@ -33,7 +33,12 @@ namespace Histograms.Models
                 {
                     variance += (int)Math.Pow((int)sorted[bIter] - mean, 2);
                 }
-                variance = (int)Math.Sqrt(variance / countValue - 1);
+                if (countValue > 1 && variance != 0)
+                    variance = (int)Math.Sqrt(variance / countValue - 1);
+                else
+                    variance = 0;
+                if (variance < 0)
+                    variance = 0;
 
                 Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
             }

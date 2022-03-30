@@ -175,5 +175,87 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         }
 
         #endregion
+
+        #region GenerateHistogramFromSorted
+
+        [TestMethod]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 10, 2)]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 5, 4)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 10, 7)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 5, 14)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 10, 17)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 1, 170)]
+        public void Can_GenerateHistogramFromSorted_BucketCount(int[] value, long[] count, int bucketSize, int expBucketCount)
+        {
+            // ARRANGE
+            IDepthHistogram histogram = new HistogramEquiDepthVariance("A", "b", bucketSize);
+            List<ValueCount> values = new List<ValueCount>();
+            for (int i = 0; i < value.Length; i++)
+                values.Add(new ValueCount(value[i], count[i]));
+
+            // ACT
+            histogram.GenerateHistogramFromSortedGroups(values);
+
+            // ASSERT
+            Assert.AreEqual(expBucketCount, histogram.Buckets.Count);
+        }
+
+        [TestMethod]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 10, new int[] { 0, 0 })]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 20, new int[] { 0 })]
+        [DataRow(new int[] { 1, 200 }, new long[] { 20, 50 }, 15, new int[] { 0, 93, 0, 0, 0 })]
+        [DataRow(new int[] { 1, 5 }, new long[] { 10, 5 }, 3, new int[] { 0, 0, 0, 1, 0 })]
+        [DataRow(new int[] { 1, 10, 17, 2, 40 }, new long[] { 5, 20, 60, 2, 10 }, 20, new int[] { 3, 2, 0, 0, 14 })]
+        public void Can_GenerateHistogramFromSorted_Variance(int[] value, long[] count, int bucketSize, int[] expVariances)
+        {
+            // ARRANGE
+            IDepthHistogram histogram = new HistogramEquiDepthVariance("A", "b", bucketSize);
+            List<ValueCount> values = new List<ValueCount>();
+            for (int i = 0; i < value.Length; i++)
+                values.Add(new ValueCount(value[i], count[i]));
+
+            // ACT
+            histogram.GenerateHistogramFromSortedGroups(values);
+
+            // ASSERT
+            Assert.IsTrue(histogram.Buckets.Count > 0);
+            for (int i = 0; i < histogram.Buckets.Count; i++)
+            {
+                if (histogram.Buckets[i] is IHistogramBucketVariance var)
+                    Assert.AreEqual(expVariances[i], var.Variance);
+                else
+                    Assert.Fail();
+            }
+        }
+
+        [TestMethod]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 10, new int[] { 1, 1 })]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 20, new int[] { 1 })]
+        [DataRow(new int[] { 1, 200 }, new long[] { 20, 50 }, 15, new int[] { 1, 133, 200, 200, 200 })]
+        [DataRow(new int[] { 1, 5 }, new long[] { 10, 5 }, 3, new int[] { 1, 1, 1, 3, 5 })]
+        [DataRow(new int[] { 1, 10, 17, 2, 40 }, new long[] { 5, 20, 60, 2, 10 }, 20, new int[] { 7, 15, 17, 17, 28 })]
+        public void Can_GenerateHistogramFromSorted_Mean(int[] value, long[] count, int bucketSize, int[] expVariances)
+        {
+            // ARRANGE
+            IDepthHistogram histogram = new HistogramEquiDepthVariance("A", "b", bucketSize);
+            List<ValueCount> values = new List<ValueCount>();
+            for (int i = 0; i < value.Length; i++)
+                values.Add(new ValueCount(value[i], count[i]));
+
+            // ACT
+            histogram.GenerateHistogramFromSortedGroups(values);
+
+            // ASSERT
+            Assert.IsTrue(histogram.Buckets.Count > 0);
+            for (int i = 0; i < histogram.Buckets.Count; i++)
+            {
+                if (histogram.Buckets[i] is IHistogramBucketVariance var)
+                    Assert.AreEqual(expVariances[i], var.Mean);
+                else
+                    Assert.Fail();
+            }
+        }
+
+        #endregion
     }
 }
