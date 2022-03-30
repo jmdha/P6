@@ -6,7 +6,7 @@ namespace Histograms.Models
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
-    public class HistogramEquiDepthVariance : HistogramEquiDepth, IEquiDepthVarianceHistogram
+    public class HistogramEquiDepthVariance : HistogramEquiDepth
     {
         public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
         {
