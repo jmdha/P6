@@ -124,9 +124,23 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
             long rightBucketCount = 0;
 
             for (int i = leftBucketStart; i <= leftBucketEnd; i++)
-                leftBucketCount += leftGram.Buckets[i].Count;
+            {
+                if (i == leftBucketEnd && leftGram.Buckets[i] is HistogramBucketVariance bucket)
+                {
+                    leftBucketCount += bucket.Variance / bucket.Count;
+                }
+                else
+                    leftBucketCount += leftGram.Buckets[i].Count;
+            }
             for (int i = rightBucketStart; i <= rightBucketEnd; i++)
-                rightBucketCount += rightGram.Buckets[i].Count;
+            {
+                if (i == rightBucketEnd && rightGram.Buckets[i] is HistogramBucketVariance bucket)
+                {
+                    rightBucketCount += bucket.Variance / bucket.Count;
+                }
+                else
+                    rightBucketCount += rightGram.Buckets[i].Count;
+            }
 
             return leftBucketCount * rightBucketCount;
         }

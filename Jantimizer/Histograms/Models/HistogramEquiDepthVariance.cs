@@ -19,7 +19,7 @@ namespace Histograms.Models
                 IComparable startValue = sorted[bStart];
                 IComparable endValue = sorted[bStart];
                 int countValue = 1;
-                int mean = 0;
+                int mean = (int)endValue;
                 int variance = 0;
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
@@ -28,11 +28,11 @@ namespace Histograms.Models
                     endValue = sorted[bIter];
                     mean += (int)endValue;
                 }
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                mean = mean / countValue;
+                for (int bIter = bStart; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                 {
                     variance += (int)Math.Pow((int)sorted[bIter] - mean, 2);
                 }
-                mean = mean / countValue;
                 variance = (int)Math.Sqrt(variance / countValue - 1);
 
                 Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
