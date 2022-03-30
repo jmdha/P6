@@ -7,7 +7,7 @@ using Tools.Models;
 
 namespace Histograms.Managers
 {
-    public abstract class BaseEquiDepthHistogramManager : BaseHistogramManager
+    public abstract class BaseEquiDepthHistogramManager : BaseHistogramManager, IDepthHistogramManager
     {
         public int Depth { get; }
 
