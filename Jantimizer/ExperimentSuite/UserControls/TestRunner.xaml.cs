@@ -250,9 +250,7 @@ namespace ExperimentSuite.UserControls
         private void StatusTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
-            {
                 textBox.ScrollToEnd();
-            }
         }
     }
 }

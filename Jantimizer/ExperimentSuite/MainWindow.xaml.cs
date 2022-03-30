@@ -60,7 +60,7 @@ namespace ExperimentSuite
                     {
                         ExperimentProgressBar.Value++;
                         ExperimentNameLabel.Content = experiment.ExperimentName;
-                        TestsPanel.Children.Add(getSeperator(experiment.ExperimentName));
+                        TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
 
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
                         await RunExperimentQueue(
@@ -156,7 +156,7 @@ namespace ExperimentSuite
             }
         }
 
-        private Label getSeperator(string text)
+        private Label GetSeperatorLabel(string text)
         {
             var newLabel = new Label();
             newLabel.Content = text;
@@ -168,12 +168,6 @@ namespace ExperimentSuite
         {
             RunButton.IsEnabled = false;
             await RunExperiments();
-        }
-
-        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (sender is ScrollViewer scrollViewer)
-                scrollViewer.ScrollToEnd();
         }
     }
 }

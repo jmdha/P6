@@ -12,14 +12,21 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" Width="500" TextChanged="StatusTextbox_TextChanged"/>
-            <Label x:Name="ExperimentNameLabel" Content="Experiment _" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-            <ProgressBar x:Name="ExperimentProgressBar" Width="300" Margin="5"/>
-            <Button x:Name="RunButton" Content="Run Experiments" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
-        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible" ScrollChanged="ScrollViewer_ScrollChanged">
+            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
+            <Label x:Name="ExperimentNameLabel" Content="Experiment _" Grid.Column="1" FontSize="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="2" Margin="5"/>
+            <Button x:Name="RunButton" Content="Run Experiments" Grid.Column="3" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
             <StackPanel x:Name="TestsPanel"/>
         </ScrollViewer>
     </Grid>
