@@ -13,7 +13,7 @@
 
         public override string? ToString()
         {
-            return $"Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}]";
+            return $"Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}], Variance: [{Variance}], Mean: [{Mean}]";
         }
     }
 }
