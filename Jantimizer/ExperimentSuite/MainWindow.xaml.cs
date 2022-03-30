@@ -35,9 +35,11 @@ namespace ExperimentSuite
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             WriteToStatus("Setting up suite datas...");
-            var pgData = SuiteDataSets.GetPostgresSD();
-            var myData = SuiteDataSets.GetMySQLSD(pgData.QueryParserManager.QueryParsers[0]);
-            var connectorSet = new List<SuiteData>() { pgData, myData };
+            var pgDataDefault = SuiteDataSets.GetPostgresSD_Default();
+            var pgDataEquiDepth = SuiteDataSets.GetPostgresSD_EquiDepth();
+            var myDataDefault = SuiteDataSets.GetMySQLSD_Default(pgDataDefault.QueryParserManager.QueryParsers[0]);
+            var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
+            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth };
 
             DateTime runTime = DateTime.UtcNow;
 
@@ -77,7 +79,7 @@ namespace ExperimentSuite
             {
                 foreach (SuiteData suitData in connectorSet)
                 {
-                    if (data.ConnectorName == suitData.Name)
+                    if (data.ConnectorName == suitData.Name && data.ConnectorID == suitData.ID)
                     {
                         foreach (string testFile in data.TestFiles)
                         {
