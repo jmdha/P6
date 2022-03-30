@@ -1,4 +1,5 @@
 ﻿using Histograms.Models;
+using HistogramsTests.TestHelpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HistogramsTests.Unit_Tests.Models
+namespace HistogramsTests.Unit_Tests.Models.Histograms
 {
     [TestClass]
     public class HistogramEquiDepthTests
@@ -55,10 +56,9 @@ namespace HistogramsTests.Unit_Tests.Models
         {
             // ARRANGE
             IDepthHistogram histogram = new HistogramEquiDepth("A", columnName, depth);
-            DataTable table = new DataTable();
-            table.Columns.Add(new DataColumn(columnName, typeof(int)));
-            foreach(int row in rows)
-                table.Rows.Add(AddRow(table, new int[] { row }));
+            DataTable table = DataTableHelper.GetDatatable(columnName, typeof(int));
+            foreach (int row in rows)
+                DataTableHelper.AddRow(table, new int[] { row });
 
             // ACT
             histogram.GenerateHistogram(table, columnName);
@@ -86,18 +86,6 @@ namespace HistogramsTests.Unit_Tests.Models
 
             // ASSERT
             Assert.AreEqual(expBucketCount, histogram.Buckets.Count);
-        }
-
-        #endregion
-
-        #region Private Test Methods
-
-        private DataRow AddRow(DataTable dt, int[] data)
-        {
-            DataRow row = dt.NewRow();
-            for (int i = 0; i < data.Length; i++)
-                row[i] = data[i];
-            return row;
         }
 
         #endregion
