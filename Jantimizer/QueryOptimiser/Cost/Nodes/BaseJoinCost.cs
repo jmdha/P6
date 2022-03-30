@@ -18,10 +18,10 @@ namespace QueryOptimiser.Cost.Nodes
             {
                 int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
 
-                if (value.CompareTo(gram.Buckets[mid].ValueStart) >= 0 || value.CompareTo(gram.Buckets[mid].ValueEnd) <= 0)
+                if (value.CompareTo(gram.Buckets[mid].ValueStart) >= 0 && value.CompareTo(gram.Buckets[mid].ValueEnd) <= 0)
                     return mid;
 
-                if (value.CompareTo(gram.Buckets[mid].ValueEnd) > 0)
+                if (value.CompareTo(gram.Buckets[mid].ValueEnd) < 0)
                     return GetMatchBucketIndex(gram, lowerIndexBound, mid - 1, value);
 
                 return GetMatchBucketIndex(gram, mid + 1, upperIndexBound, value);
@@ -112,18 +112,33 @@ namespace QueryOptimiser.Cost.Nodes
             int rightEnd = rightGram.Buckets.Count - 1;
 
             if (leftGram.Buckets[0].ValueStart.CompareTo(rightGram.Buckets[0].ValueStart) < 0)
+            {
                 if (node.ComType != ComparisonType.Type.Less && node.ComType != ComparisonType.Type.EqualOrLess)
                     leftStart = GetMatchBucketIndex(leftGram, 0, leftGram.Buckets.Count - 1, rightGram.Buckets[0].ValueStart);
-                else
+            }
+            else if (leftGram.Buckets[0].ValueStart.CompareTo(rightGram.Buckets[0].ValueStart) > 0)
+            {
                 if (node.ComType != ComparisonType.Type.More && node.ComType != ComparisonType.Type.EqualOrMore)
                     rightStart = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[0].ValueStart);
+            }
+            else if (node.ComType == ComparisonType.Type.Less)
+                return 0;
 
             if (leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd.CompareTo(rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd) > 0)
+            {
                 if (node.ComType != ComparisonType.Type.More && node.ComType != ComparisonType.Type.EqualOrMore)
                     leftEnd = GetMatchBucketIndex(leftGram, 0, leftGram.Buckets.Count - 1, rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd);
-                else
+            }
+            else if (leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd.CompareTo(rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd) < 0)
+            {
                 if (node.ComType != ComparisonType.Type.Less && node.ComType != ComparisonType.Type.EqualOrLess)
                     rightEnd = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd);
+            }
+            else if (node.ComType == ComparisonType.Type.More)
+                return 0;
+
+            if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
+                return 0;
 
             Range leftBucketMatch = new Range(leftStart, leftEnd + 1);
             Range rightBucketMatch = new Range(rightStart, rightEnd + 1);
