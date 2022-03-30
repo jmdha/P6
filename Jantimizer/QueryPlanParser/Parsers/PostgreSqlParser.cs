@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Tools.Regex;
 
 namespace QueryPlanParser.Parsers
 {
@@ -24,13 +25,13 @@ namespace QueryPlanParser.Parsers
             if (resultQueue.Count == 0)
                 throw new BadQueryPlanInputException("Analysis got no rows!");
 
-            return RunAnalysis(resultQueue);
+            return new AnalysisResult(RunAnalysis(resultQueue));
         }
 
-        internal AnalysisResult RunAnalysis(Queue<AnalysisResultWithIndent> rows)
+        internal AnalysisResultQueryTree RunAnalysis(Queue<AnalysisResultWithIndent> rows)
         {
             AnalysisResultWithIndent? row = rows.Dequeue();
-            var analysisRes = row.AnalysisResult;
+            var analysisRes = row.AnalysisQueryTree;
 
             // Recursively add subqueries
             while (rows.Count > 0)
@@ -90,13 +91,18 @@ namespace QueryPlanParser.Parsers
             // Data Parsing
             int indentation = rowData["indentation"].ToString().Length;
 
+            decimal? timeMax = RegexHelperFunctions.GetRegexValNullable<decimal>(match, "timeMax");
+            TimeSpan? timeCost = null;
+            if (timeMax != null)
+                timeCost = TimeSpanFromMs((decimal)timeMax);
+
             // Create Result
-            var analysisResult = new AnalysisResult(
-                rowData["name"].Value.Trim(),
-                decimal.Parse(rowData["costMin"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                ulong.Parse(rowData["estimatedRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                ulong.Parse(rowData["actualRows"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                TimeSpanFromMs(decimal.Parse(rowData["timeMax"].Value, System.Globalization.CultureInfo.InvariantCulture))
+            var analysisResult = new AnalysisResultQueryTree(
+                RegexHelperFunctions.GetRegexVal<string>(match, "name").Trim(),
+                RegexHelperFunctions.GetRegexValNullable<decimal>(match, "costMin"),
+                RegexHelperFunctions.GetRegexValNullable<ulong>(match, "estimatedRows"),
+                RegexHelperFunctions.GetRegexValNullable<ulong>(match, "actualRows"),
+                timeCost
             );
 
             // Return

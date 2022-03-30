@@ -2,16 +2,16 @@
 using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
-using QueryOptimiser.Cost.Nodes.EquiDepth;
+using QueryOptimiser.Cost.Nodes.EquiDepthVariance;
 using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
-    public class CostCalculatorEquiDepth : ICostCalculator
+    public class CostCalculatorEquiDepthVariance : ICostCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
 
-        public CostCalculatorEquiDepth(IHistogramManager histogramManager)
+        public CostCalculatorEquiDepthVariance(IHistogramManager histogramManager)
         {
             HistogramManager = histogramManager;
         }
@@ -20,7 +20,7 @@ namespace QueryOptimiser.Cost.CostCalculators
         {
             if (node is JoinNode joinNode)
             {
-                return new JoinCostEquiDepth().CalculateCost(joinNode, HistogramManager);
+                return new JoinCostEquiDepthVariance().CalculateCost(joinNode, HistogramManager);
             }
             else
             {

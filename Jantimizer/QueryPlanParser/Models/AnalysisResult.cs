@@ -15,31 +15,27 @@ namespace QueryPlanParser.Models
         public ulong ActualCardinality { get; }
         public TimeSpan ActualTime { get; }
         [Ignore]
-        public List<AnalysisResult> SubQueries { get; }
+        public AnalysisResultQueryTree QueryTree { get; }
 
-        public AnalysisResult(string name, decimal estimatedCost, ulong estimatedCardinality, ulong actualCardinality, TimeSpan actualTime)
+        public AnalysisResult(AnalysisResultQueryTree subTree)
         {
-            Name = name;
-            EstimatedCost = estimatedCost;
-            EstimatedCardinality = estimatedCardinality;
-            ActualCardinality = actualCardinality;
-            ActualTime = actualTime;
-            SubQueries = new List<AnalysisResult>();
+
+            Name = subTree.Name;
+
+            EstimatedCost = subTree.EstimatedCost               ?? throw new NullReferenceException("Cost is null at top of query tree");
+            EstimatedCardinality = subTree.EstimatedCardinality ?? throw new NullReferenceException("Estimated cardinality is null at top of query tree");
+            ActualCardinality = subTree.ActualCardinality       ?? throw new NullReferenceException("Actual cardinality is null at top of query tree");
+            ActualTime = subTree.ActualTime                     ?? throw new NullReferenceException("Actual Time is null at top of query tree");
+            QueryTree = subTree;
         }
+
+        public AnalysisResult(string name, decimal? estimatedCost, ulong? estimatedCardinality, ulong? actualCardinality, TimeSpan? actualTime)
+            : this(new AnalysisResultQueryTree(name, estimatedCost, estimatedCardinality, actualCardinality, actualTime))
+        { }
 
         public override string ToString()
         {
-            return BuildStringBuilderRec(new StringBuilder(), 0).ToString();
-        }
-
-        private StringBuilder BuildStringBuilderRec(StringBuilder sb, int indentLevel)
-        {
-            sb.Append(new string('\t', indentLevel));
-            sb.AppendLine(Name);
-            foreach(var sub in SubQueries)
-                sub.BuildStringBuilderRec(sb, indentLevel+1);
-
-            return sb;
+            return QueryTree.BuildStringBuilderRec(new StringBuilder(), 0).ToString();
         }
 
     }

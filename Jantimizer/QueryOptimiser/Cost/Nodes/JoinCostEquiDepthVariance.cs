@@ -8,11 +8,11 @@ using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
 
-namespace QueryOptimiser.Cost.Nodes.EquiDepth
+namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
 {
-    public class JoinCost : INodeCostEquiDepth<JoinNode, IDbConnector>
+    public class JoinCostEquiDepthVariance : INodeCost<JoinNode>
     {
-        public long CalculateCost(JoinNode node, IHistogramManager<IHistogram, IDbConnector> histogramManager)
+        public long CalculateCost(JoinNode node, IHistogramManager histogramManager)
         {
             if (node.Relation != null) {
                 if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate && node.Relation.LeafPredicate != null)
@@ -26,7 +26,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                 
         }
 
-        public long CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public long CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager histogramManager) {
             JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
             JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
 
@@ -45,7 +45,8 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
                 throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());            
         }
 
-        public long CalculateCost(JoinPredicate node, IHistogramManager<IHistogram, IDbConnector> histogramManager) {
+        public long CalculateCost(JoinPredicate node, IHistogramManager histogramManager)
+        {
             IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
             int leftBucketStart = -1;
@@ -123,9 +124,23 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
             long rightBucketCount = 0;
 
             for (int i = leftBucketStart; i <= leftBucketEnd; i++)
-                leftBucketCount += leftGram.Buckets[i].Count;
+            {
+                if (i == leftBucketEnd && leftGram.Buckets[i] is HistogramBucketVariance bucket)
+                {
+                    leftBucketCount += (1 / bucket.Variance) * bucket.Count;
+                }
+                else
+                    leftBucketCount += leftGram.Buckets[i].Count;
+            }
             for (int i = rightBucketStart; i <= rightBucketEnd; i++)
-                rightBucketCount += rightGram.Buckets[i].Count;
+            {
+                if (i == rightBucketEnd && rightGram.Buckets[i] is HistogramBucketVariance bucket)
+                {
+                    rightBucketCount += ( 1 / bucket.Variance) * bucket.Count;
+                }
+                else
+                    rightBucketCount += rightGram.Buckets[i].Count;
+            }
 
             return leftBucketCount * rightBucketCount;
         }

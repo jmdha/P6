@@ -69,6 +69,40 @@ namespace QueryPlanParserTests.SystemTests.Parsers
             2,
             1
         })]
+        [DataRow(
+            "-> Filter: (jan_table.Id <= jano_table.Id)  (cost=0.18 rows=1) (actual time=0.032..0.036 rows=2 loops=2)\n"  +
+            "    -> Nested loop inner join  (cost=1.10 rows=2) (actual time=0.059..0.100 rows=3 loops=1)\n" +
+            "        -> Table scan on jan_table  (cost=0.45 rows=2) (actual time=0.023..0.025 rows=2 loops=1)"
+        , new string[] {
+            "Filter:",
+            "Nested loop inner join",
+            "Table scan on jan_table"
+        }, new int[]
+        {
+            0,
+            1,
+            2
+        })]
+        [DataRow(
+            "-> Filter: ((a.V >= b.V) and (a.V <= b.V))  (cost=0.70 rows=1) (actual time=0.016..0.016 rows=0 loops=1)\n" +
+            "    -> Inner hash join (no condition)  (cost=0.70 rows=1) (actual time=0.015..0.015 rows=0 loops=1)\n" +
+            "        -> Table scan on b  (cost=0.35 rows=1) (never executed)\n" +
+            "        -> Hash\n" +
+            "            -> Table scan on a  (cost=0.35 rows=1) (actual time=0.011..0.011 rows=0 loops=1)\n"
+        , new string[] {
+            "Filter:",
+            "Inner hash join",
+            "Table scan on b",
+            "Hash",
+            "Table scan on a"
+        }, new int[]
+        {
+            0,
+            1,
+            2,
+            2,
+            3
+        })]
         public void Can_ParsePlan_WithCorrectData(string lines, string[] eNameOrder, int[] nameDepth)
         {
             // Arrange
@@ -84,7 +118,7 @@ namespace QueryPlanParserTests.SystemTests.Parsers
 
             // Assert
             for (int i = 0; i < nameDepth.Length; i++)
-                Assert.AreEqual(nameDepth[i], GetNameDepth(result, 0, eNameOrder[i]));
+                Assert.AreEqual(nameDepth[i], GetNameDepth(result.QueryTree, 0, eNameOrder[i]));
         }
 
         [TestMethod()]
@@ -106,14 +140,14 @@ namespace QueryPlanParserTests.SystemTests.Parsers
 
         #region Private Test Methods
 
-        private int? GetNameDepth(AnalysisResult res, int curDepth, string targetName)
+        private int? GetNameDepth(AnalysisResultQueryTree res, int curDepth, string targetName)
         {
             if (res.Name == targetName)
             {
                 return curDepth;
             }
             curDepth++;
-            foreach (AnalysisResult innerRes in res.SubQueries)
+            foreach (AnalysisResultQueryTree innerRes in res.SubQueries)
             {
                 var ret = GetNameDepth(innerRes, curDepth, targetName);
                 if (ret != null)

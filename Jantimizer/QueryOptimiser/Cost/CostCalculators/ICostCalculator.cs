@@ -11,11 +11,9 @@ using DatabaseConnector;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
-    public interface ICostCalculator<HistogramType, DbConnectorType>
-        where HistogramType : IHistogram
-        where DbConnectorType : IDbConnector
+    public interface ICostCalculator
     {
-        public IHistogramManager<HistogramType, DbConnectorType> HistogramManager { get; set; }
+        public IHistogramManager HistogramManager { get; set; }
 
         public long CalculateCost(INode node);
     }

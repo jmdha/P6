@@ -9,10 +9,10 @@ using Tools.Models;
 
 namespace Histograms.Managers
 {
-    public abstract class BaseHistogramManager : IHistogramManager<IHistogram, IDbConnector>
+    public abstract class BaseHistogramManager : IHistogramManager
     {
-        public IDbConnector DbConnector { get; protected set; }
-        public List<IHistogram> Histograms { get; }
+        public IDbConnector DbConnector { get; internal set; }
+        public List<IHistogram> Histograms { get; internal set; }
         public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
         public List<string> Attributes
         {
@@ -24,13 +24,13 @@ namespace Histograms.Managers
                 return returnList;
             }
         }
-        public int Depth { get; }
 
-        public BaseHistogramManager(int depth)
+        public BaseHistogramManager(ConnectionProperties connectionProperties)
         {
             Histograms = new List<IHistogram>();
-            Depth = depth;
         }
+
+        public abstract Task<List<Task>> AddHistogramsFromDB();
 
         public void AddHistogram(IHistogram histogram)
         {
@@ -40,8 +40,6 @@ namespace Histograms.Managers
                 throw new ArgumentException("Attribute name cannot be empty!");
             Histograms.Add(histogram);
         }
-
-        public abstract Task<List<Task>> AddHistogramsFromDB();
 
         public void ClearHistograms()
         {
@@ -56,6 +54,7 @@ namespace Histograms.Managers
 
             throw new ArgumentException("No histogram found");
         }
+
         public List<IHistogram> GetHistogramsByTable(string table)
         {
             List<IHistogram> grams = new List<IHistogram>();
@@ -73,6 +72,15 @@ namespace Histograms.Managers
                     grams.Add(gram);
 
             return grams;
+        }
+
+        public override string? ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Recorded Histograms:");
+            foreach (var histogram in Histograms)
+                sb.AppendLine(histogram.ToString());
+            return sb.ToString();
         }
     }
 }

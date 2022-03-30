@@ -3,16 +3,18 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment" : true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
+          "ConnectorID" : "Default",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
         },
         {
           "ConnectorName": "MYSQL",
+          "ConnectorID": "Default",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
@@ -21,6 +23,7 @@
       "RunData": [
         {
           "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
@@ -28,6 +31,46 @@
         },
         {
           "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks"
+          ]
+        }
+      ]
+    },
+    {
+      "ExperimentName": "Experiment Two",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepthVariance",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"

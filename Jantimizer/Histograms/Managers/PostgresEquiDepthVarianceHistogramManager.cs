@@ -11,10 +11,10 @@ using Histograms.Models;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiDepthHistogramManager : BaseEquiDepthHistogramManager
+    public class PostgresEquiDepthVarianceHistogramManager : BaseEquiDepthHistogramManager
     {
 
-        public PostgresEquiDepthHistogramManager(ConnectionProperties connectionProperties, int depth) : base(connectionProperties, depth)
+        public PostgresEquiDepthVarianceHistogramManager(ConnectionProperties connectionProperties, int depth) : base(connectionProperties, depth)
         {
             DbConnector = new PostgreSqlConnector(connectionProperties);
         }
@@ -68,7 +68,7 @@ namespace Histograms.Managers
 
             List<ValueCount> sortedGroups = GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
 
-            IHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            IHistogram newHistogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
             newHistogram.GenerateHistogramFromSortedGroups(sortedGroups);
             Histograms.Add(newHistogram);
         }
