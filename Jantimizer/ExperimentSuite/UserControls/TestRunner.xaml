@@ -23,7 +23,7 @@
         <Button x:Name="CollapseButton" Content="Collapse" Width="100" Grid.Column="1" Click="CollapseButton_Click"/>
 
         <Label Content="Status" Grid.Row="1" Grid.Column="0"/>
-        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" IsEnabled="False" VerticalScrollBarVisibility="Visible"/>
+        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" IsEnabled="False" VerticalScrollBarVisibility="Visible" TextChanged="StatusTextBox_TextChanged"/>
 
         <Label Content="Progress" Grid.Row="1" Grid.Column="1"/>
         <StackPanel Grid.Row="2" Grid.Column="1">

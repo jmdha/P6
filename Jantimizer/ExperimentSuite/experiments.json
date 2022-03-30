@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -62,7 +62,7 @@
       "RunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
@@ -70,7 +70,7 @@
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
