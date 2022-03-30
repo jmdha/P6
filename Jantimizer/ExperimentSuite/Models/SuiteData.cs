@@ -22,9 +22,9 @@ namespace ExperimentSuite.Models
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
 
-        public IHistogramManager<IHistogram, IDbConnector> HistoManager { get; set; }
+        public IHistogramManager HistoManager { get; set; }
 
-        public IQueryOptimiser<IHistogram, IDbConnector> Optimiser { get; set; }
+        public IQueryOptimiser Optimiser { get; set; }
         public IParserManager QueryParserManager { get; set; }
 
         public SuiteData(
@@ -33,8 +33,8 @@ namespace ExperimentSuite.Models
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
-            IHistogramManager<IHistogram, IDbConnector> histoManager, 
-            IQueryOptimiser<IHistogram, IDbConnector> optimiser, 
+            IHistogramManager histoManager, 
+            IQueryOptimiser optimiser, 
             IParserManager queryParserManager)
         {
             Settings = settings;

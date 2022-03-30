@@ -40,7 +40,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Equal);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -64,7 +64,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Equal);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -108,7 +108,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Less);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -128,7 +128,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.Less);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -172,7 +172,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.More);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -192,7 +192,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.More);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -223,7 +223,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrLess);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -243,7 +243,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrLess);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -274,7 +274,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrMore);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 
@@ -294,7 +294,7 @@ public class JoinCostTest
 
         var nodes = Utilities.GenerateNodes(1, ComparisonType.Type.EqualOrMore);
 
-        var joinCost = new JoinCost();
+        var joinCost = new JoinCostEquiDepth();
 
         long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager);
 

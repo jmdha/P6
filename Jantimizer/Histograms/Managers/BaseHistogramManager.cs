@@ -9,7 +9,7 @@ using Tools.Models;
 
 namespace Histograms.Managers
 {
-    public abstract class BaseHistogramManager : IHistogramManager<IHistogram, IDbConnector>
+    public abstract class BaseHistogramManager : IHistogramManager
     {
         public IDbConnector DbConnector { get; internal set; }
         public List<IHistogram> Histograms { get; internal set; }

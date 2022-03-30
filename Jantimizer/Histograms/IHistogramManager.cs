@@ -8,11 +8,9 @@ using Histograms.Models;
 
 namespace Histograms
 {
-    public interface IHistogramManager<HistogramType, ConnectorType> 
-        where HistogramType : IHistogram 
-        where ConnectorType : IDbConnector
+    public interface IHistogramManager
     {
-        public ConnectorType DbConnector { get; }
+        public IDbConnector DbConnector { get; }
         public List<IHistogram> Histograms { get; }
         public List<string> Tables { get; }
         public List<string> Attributes { get; }

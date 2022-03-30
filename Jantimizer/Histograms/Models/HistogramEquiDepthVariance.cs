@@ -6,7 +6,7 @@ namespace Histograms.Models
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
-    public class HistogramEquiDepthVariance : HistogramEquiDepth
+    public class HistogramEquiDepthVariance : HistogramEquiDepth, IEquiDepthVarianceHistogram
     {
         public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
         {
@@ -33,7 +33,7 @@ namespace Histograms.Models
                     variance += (int)Math.Pow((int)sorted[bIter] - mean, 2);
                 }
                 mean = mean / countValue;
-                variance = variance / countValue - 1;
+                variance = (int)Math.Sqrt(variance / countValue - 1);
 
                 Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
             }

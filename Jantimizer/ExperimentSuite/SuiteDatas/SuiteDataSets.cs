@@ -68,7 +68,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MySQLEquiDepthVarianceHistogramManager(mySQLConnector.ConnectionProperties, 10);
-            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
+            var mySQLOptimiser = new QueryOptimiserEquiDepthVariance(mySQLHistoManager);
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { });
             if (additionalParser != null)
                 mySQLParserManager.QueryParsers.Add(additionalParser);
@@ -134,7 +134,7 @@ namespace ExperimentSuite.SuiteDatas
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new PostgresEquiDepthVarianceHistogramManager(postConnector.ConnectionProperties, 10);
-            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postOptimiser = new QueryOptimiserEquiDepthVariance(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);

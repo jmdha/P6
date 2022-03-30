@@ -8,15 +8,15 @@ using QueryParser.Models;
 
 namespace QueryOptimiser
 {
-    public class QueryOptimiserEquiDepth : IQueryOptimiser
+    public class QueryOptimiserEquiDepthVariance : IQueryOptimiser
     {
         public IHistogramManager HistogramManager { get; set; }
         public ICostCalculator CostCalculator { get; set; }
 
-        public QueryOptimiserEquiDepth(IHistogramManager histogramManager)
+        public QueryOptimiserEquiDepthVariance(IHistogramManager histogramManager)
         {
             HistogramManager = histogramManager;
-            CostCalculator = new CostCalculatorEquiDepth(histogramManager);
+            CostCalculator = new CostCalculatorEquiDepthVariance(histogramManager);
         }
 
         /// <summary>
