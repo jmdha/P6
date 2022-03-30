@@ -17,7 +17,7 @@
   <ItemGroup>
     <Folder Include="System Tests\" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
   </ItemGroup>
