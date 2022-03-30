@@ -127,7 +127,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
             {
                 if (i == leftBucketEnd && leftGram.Buckets[i] is HistogramBucketVariance bucket)
                 {
-                    leftBucketCount += bucket.Variance / bucket.Count;
+                    // Magic
                 }
                 else
                     leftBucketCount += leftGram.Buckets[i].Count;
@@ -136,7 +136,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
             {
                 if (i == rightBucketEnd && rightGram.Buckets[i] is HistogramBucketVariance bucket)
                 {
-                    rightBucketCount += bucket.Variance / bucket.Count;
+                    // Magic
                 }
                 else
                     rightBucketCount += rightGram.Buckets[i].Count;
