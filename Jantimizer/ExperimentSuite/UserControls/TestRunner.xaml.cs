@@ -30,7 +30,7 @@ namespace ExperimentSuite.UserControls
     {
         private int collapesedHeight = 40;
 
-        public string Name { get; }
+        public string RunnerName { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
@@ -39,25 +39,20 @@ namespace ExperimentSuite.UserControls
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner()
-        {
-            InitializeComponent();
-        }
-
         public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            Name = name;
+            RunnerName = name;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
-            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{Name}.csv");
+            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
 
             RunnerGrid.Height = collapesedHeight;
-            TestNameLabel.Content = Name;
+            TestNameLabel.Content = RunnerName;
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -141,7 +136,7 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestCaseResult testCase = new TestCaseResult(RunData.Name, Name, queryFile, RunData, analysisResult, jantimiserResult);
+                    TestCaseResult testCase = new TestCaseResult(RunData.Name, RunnerName, queryFile, RunData, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
@@ -183,8 +178,7 @@ namespace ExperimentSuite.UserControls
                     "{0, -20}",
                     "{0, -10}",
                     "{0, -10}"
-                },
-                2);
+                });
             }
         }
 
@@ -242,7 +236,7 @@ namespace ExperimentSuite.UserControls
         {
             StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
                     new List<string>() { left, right },
-                    new List<string>() { "{0,-30}", "{0,-30}" }, 1);
+                    new List<string>() { "{0,-30}", "{0,-30}" });
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)

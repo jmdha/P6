@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal">
-            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Width="500" TextChanged="StatusTextbox_TextChanged"/>
+            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" Width="500" TextChanged="StatusTextbox_TextChanged"/>
             <Label x:Name="ExperimentNameLabel" Content="Experiment _" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             <ProgressBar x:Name="ExperimentProgressBar" Width="300" Margin="5"/>
             <Button x:Name="RunButton" Content="Run Experiments" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
