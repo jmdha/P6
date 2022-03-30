@@ -11,9 +11,4 @@
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Histograms\" />
-    <Folder Include="Models\Buckets\" />
-  </ItemGroup>
-
 </Project>

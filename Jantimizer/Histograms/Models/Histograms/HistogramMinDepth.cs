@@ -6,7 +6,7 @@ namespace Histograms.Models
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
-    public class HistogramMinDepth : BaseHistogram
+    public class HistogramMinDepth : BaseHistogram, IDepthHistogram
     {
         public int Depth { get; }
 

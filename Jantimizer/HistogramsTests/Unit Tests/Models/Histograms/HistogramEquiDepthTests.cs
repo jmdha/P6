@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HistogramsTests.Unit_Tests.HistogramModels
+namespace HistogramsTests.Unit_Tests.Models
 {
     [TestClass]
     public class HistogramEquiDepthTests
