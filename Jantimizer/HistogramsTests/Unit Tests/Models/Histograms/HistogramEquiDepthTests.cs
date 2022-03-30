@@ -19,7 +19,7 @@ namespace HistogramsTests.Unit_Tests.Models
         {
             // ARRANGE
             // ACT
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", 1);
+            IDepthHistogram histogram = new HistogramEquiDepth("A", "b", 1);
 
             // ASSERT
             Assert.IsNotNull(histogram.Buckets);
@@ -34,7 +34,7 @@ namespace HistogramsTests.Unit_Tests.Models
         {
             // ARRANGE
             // ACT
-            HistogramEquiDepth histogram = new HistogramEquiDepth(tableName, attributeName, depth);
+            IDepthHistogram histogram = new HistogramEquiDepth(tableName, attributeName, depth);
 
             // ASSERT
             Assert.AreEqual(tableName, histogram.TableName);
@@ -54,7 +54,7 @@ namespace HistogramsTests.Unit_Tests.Models
         public void Can_GenerateHistogram_Table(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", columnName, depth);
+            IDepthHistogram histogram = new HistogramEquiDepth("A", columnName, depth);
             DataTable table = new DataTable();
             table.Columns.Add(new DataColumn(columnName, typeof(int)));
             foreach(int row in rows)
@@ -79,7 +79,7 @@ namespace HistogramsTests.Unit_Tests.Models
         public void Can_GenerateHistogram_List(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", columnName, depth);
+            IDepthHistogram histogram = new HistogramEquiDepth("A", columnName, depth);
 
             // ACT
             histogram.GenerateHistogram(rows.Cast<IComparable>().ToList());
