@@ -16,6 +16,8 @@
 
   <ItemGroup>
     <Folder Include="System Tests\" />
+    <Folder Include="Unit Tests\Models\Buckets\" />
+    <Folder Include="Unit Tests\Models\Histograms\" />
   </ItemGroup>
   
   <ItemGroup>
