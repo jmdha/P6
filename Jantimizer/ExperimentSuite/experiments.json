@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -37,12 +37,15 @@
             "BasicTests_ConstantNumberBlocks"
           ]
         }
-      ]
+      ],
+      "OptionalTestSettings": {
+        "BucketSize" : 10
+      }
     },
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -76,7 +79,10 @@
             "BasicTests_ConstantNumberBlocks"
           ]
         }
-      ]
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
     }
   ]
 }

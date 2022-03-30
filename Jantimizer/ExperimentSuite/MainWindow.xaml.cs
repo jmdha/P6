@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,15 +35,6 @@ namespace ExperimentSuite
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            WriteToStatus("Setting up suite datas...");
-            var pgDataDefault = SuiteDataSets.GetPostgresSD_Default();
-            var pgDataEquiDepth = SuiteDataSets.GetPostgresSD_EquiDepth();
-            var pgDataEquiDepthVariance = SuiteDataSets.GetPostgresSD_EquiDepthVariance();
-            var myDataDefault = SuiteDataSets.GetMySQLSD_Default(pgDataDefault.QueryParserManager.QueryParsers[0]);
-            var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
-            var myDataEquiDepthVariance = SuiteDataSets.GetMySQLSD_EquiDepthVariance(pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
-            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance };
-
             DateTime runTime = DateTime.UtcNow;
 
             WriteToStatus("Parsing experiment list...");
@@ -55,6 +47,8 @@ namespace ExperimentSuite
                 {
                     if (experiment.RunExperiment)
                     {
+                        var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
+
                         TestsPanel.Children.Add(getSeperator(experiment.ExperimentName));
 
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
@@ -74,6 +68,22 @@ namespace ExperimentSuite
         private void WriteToStatus(string text)
         {
             StatusTextbox.Text += $"{text}{Environment.NewLine}";
+        }
+
+        private List<SuiteData> GetSuiteDatas(JsonObject optionalSettings)
+        {
+            WriteToStatus("Setting up suite datas...");
+
+            var pgDataDefault = SuiteDataSets.GetPostgresSD_Default(optionalSettings);
+            var pgDataEquiDepth = SuiteDataSets.GetPostgresSD_EquiDepth(optionalSettings);
+            var pgDataEquiDepthVariance = SuiteDataSets.GetPostgresSD_EquiDepthVariance(optionalSettings);
+
+            var myDataDefault = SuiteDataSets.GetMySQLSD_Default(optionalSettings, pgDataDefault.QueryParserManager.QueryParsers[0]);
+            var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(optionalSettings, pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
+            var myDataEquiDepthVariance = SuiteDataSets.GetMySQLSD_EquiDepthVariance(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
+
+            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance };
+            return connectorSet;
         }
 
         private Dictionary<string, List<Func<Task>>> GetRunDataFromList(List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
