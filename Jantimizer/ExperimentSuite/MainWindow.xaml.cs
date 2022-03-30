@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ namespace ExperimentSuite
             InitializeComponent();
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private async Task RunExperiments()
         {
             WriteToStatus("Setting up suite datas...");
             var pgDataDefault = SuiteDataSets.GetPostgresSD_Default();
@@ -51,10 +52,14 @@ namespace ExperimentSuite
             var res = JsonSerializer.Deserialize(File.ReadAllText(experimentsFile.FullName), typeof(ExperimentList));
             if (res is ExperimentList expList)
             {
+                ExperimentProgressBar.Maximum = expList.Experiments.Count;
+                ExperimentProgressBar.Value = 0;
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
+                        ExperimentProgressBar.Value++;
+                        ExperimentNameLabel.Content = experiment.ExperimentName;
                         TestsPanel.Children.Add(getSeperator(experiment.ExperimentName));
 
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
@@ -68,7 +73,14 @@ namespace ExperimentSuite
                     WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
                 }
             }
+            ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
             WriteToStatus("All experiments complete!");
+            RunButton.IsEnabled = true;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await RunExperiments();
         }
 
         private void WriteToStatus(string text)
@@ -150,6 +162,18 @@ namespace ExperimentSuite
             newLabel.Content = text;
             newLabel.FontSize = 20;
             return newLabel;
+        }
+
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
+        {
+            RunButton.IsEnabled = false;
+            await RunExperiments();
+        }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (sender is ScrollViewer scrollViewer)
+                scrollViewer.ScrollToEnd();
         }
     }
 }
