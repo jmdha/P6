@@ -85,13 +85,16 @@ namespace ExperimentSuite.UserControls
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 HistogramProgressBar.Maximum = tasks.Count;
+                Update_HistogramProgressLabel(0, (int)HistogramProgressBar.Maximum);
 
                 foreach (var t in tasks)
                 {
                     await t;
                     HistogramProgressBar.Value++;
+                    Update_HistogramProgressLabel((int)HistogramProgressBar.Value, (int)HistogramProgressBar.Maximum);
                 }
                 HistogramProgressBar.Value = HistogramProgressBar.Maximum;
+                Update_HistogramProgressLabel((int)HistogramProgressBar.Maximum, (int)HistogramProgressBar.Maximum);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -126,13 +129,13 @@ namespace ExperimentSuite.UserControls
         {
             PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
-            int count = 0;
             SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
                     await Task.Delay(1);
+                    Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
                     CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
                     SQLProgressBar.Value++;
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
@@ -148,9 +151,9 @@ namespace ExperimentSuite.UserControls
                 {
                     MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
                 }
-                count++;
             }
             SQLProgressBar.Value = SQLProgressBar.Maximum;
+            Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
             return testCases;
         }
 
@@ -259,6 +262,16 @@ namespace ExperimentSuite.UserControls
             {
                 textBox.ScrollToEnd();
             }
+        }
+
+        private void Update_HistogramProgressLabel(int current, int max)
+        {
+            HistogramProgressLabel.Content = $"Histogram Progress ({current}/{max})";
+        }
+
+        private void Update_SQLProgressLabel(int current, int max)
+        {
+            SQLProgressLabel.Content = $"SQL Progress ({current}/{max})";
         }
     }
 }

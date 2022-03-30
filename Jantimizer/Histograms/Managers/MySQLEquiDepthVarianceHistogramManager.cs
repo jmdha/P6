@@ -24,13 +24,9 @@ namespace Histograms.Managers
             IEnumerable<DataRow> allTables = (await GetTablesInSchema()).Rows.Cast<DataRow>();
             foreach (var table in allTables)
             {
-                Task t = Task.Run(async () =>
-                {
-                    string tableName = $"{table["TABLE_NAME"]}".ToLower();
-                    foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
-                        await AddHistogramForAttribute(row, tableName);
-                });
-                tasks.Add(t);
+                string tableName = $"{table["TABLE_NAME"]}".ToLower();
+                foreach (DataRow row in (await GetAttributenamesForTable(tableName)).Rows)
+                    tasks.Add(AddHistogramForAttribute(row, tableName));
             }
             return tasks;
         }
