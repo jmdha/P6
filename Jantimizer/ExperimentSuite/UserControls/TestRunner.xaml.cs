@@ -80,10 +80,12 @@ namespace ExperimentSuite.UserControls
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 HistogramProgressBar.Maximum = tasks.Count;
-
-                foreach (var t in tasks)
+                // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
+                while (tasks.Any())
                 {
-                    await t;
+                    var finishedTask = await Task.WhenAny(tasks);
+                    tasks.Remove(finishedTask);
+                    await finishedTask;
                     HistogramProgressBar.Value++;
                 }
                 HistogramProgressBar.Value = HistogramProgressBar.Maximum;
