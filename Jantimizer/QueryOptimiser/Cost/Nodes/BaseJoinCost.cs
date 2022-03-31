@@ -72,8 +72,8 @@ namespace QueryOptimiser.Cost.Nodes
 
         private long CalculateCost(JoinPredicate node, IHistogramManager histogramManager)
         {
-            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.Alias, node.LeftAttribute);
-            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.Alias, node.RightAttribute);
+            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute);
+            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute);
             int leftStart = 0;
             int leftEnd = leftGram.Buckets.Count - 1;
             int rightStart = 0;
