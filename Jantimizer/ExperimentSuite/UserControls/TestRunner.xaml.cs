@@ -28,7 +28,7 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class TestRunner : UserControl
     {
-        private int collapesedHeight = 40;
+        private int collapesedHeight = 30;
 
         public string RunnerName { get; }
         public SuiteData RunData { get; }
