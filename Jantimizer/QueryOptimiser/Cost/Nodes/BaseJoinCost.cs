@@ -34,9 +34,9 @@ namespace QueryOptimiser.Cost.Nodes
         {
             if (node.Relation != null)
             {
-                if (node.Relation.Type == JoinPredicateRelation.RelationType.Predicate && node.Relation.LeafPredicate != null)
+                if (node.Relation.Type == RelationType.Type.Predicate && node.Relation.LeafPredicate != null)
                     return CalculateCost(node.Relation.LeafPredicate, histogramManager);
-                else if (node.Relation.Type == JoinPredicateRelation.RelationType.And || node.Relation.Type == JoinPredicateRelation.RelationType.Or)
+                else if (node.Relation.Type == RelationType.Type.And || node.Relation.Type == RelationType.Type.Or)
                     return CalculateCost(node.Relation, histogramManager);
                 else
                     throw new ArgumentException("Missing noderelation type " + node.Relation.ToString());
@@ -53,11 +53,11 @@ namespace QueryOptimiser.Cost.Nodes
 
             if (leftRelation != null && rightRelation != null)
             {
-                if (nodeRelation.Type == JoinPredicateRelation.RelationType.And)
+                if (nodeRelation.Type == RelationType.Type.And)
                     return Math.Min(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
-                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.Or)
+                else if (nodeRelation.Type == RelationType.Type.Or)
                     return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
-                else if (nodeRelation.Type == JoinPredicateRelation.RelationType.None)
+                else if (nodeRelation.Type == RelationType.Type.None)
                     throw new ArgumentNullException($"Noderelation type is not set {nodeRelation.ToString()}");
                 else
                     throw new NotImplementedException($"The noderelation type of {nodeRelation.Type} is unhandled");
