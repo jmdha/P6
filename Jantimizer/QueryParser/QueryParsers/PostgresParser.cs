@@ -111,7 +111,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
+        internal static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
         internal void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
@@ -134,7 +134,7 @@ namespace QueryParser.QueryParsers
         }
 
 
-        private static readonly Regex FilterAndConditionFinder = new Regex(@"
+        internal static readonly Regex FilterAndConditionFinder = new Regex(@"
                 (?:^\s*->.*?\sScan(?:\susing\s\w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?\s\s\(cost=[^\n]+)
 
                 (?:\s+ Index\ Cond:\ \((?<joinProp>\w+)\ (?<relation>[=<>]{1,2})\ (?<otherAlias>\w+)\.(?<otherProp>\w+)\))?

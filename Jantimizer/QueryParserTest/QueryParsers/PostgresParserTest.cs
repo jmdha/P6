@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryParser;
 using QueryParser.Models;
 using QueryParser.QueryParsers;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace QueryParsers
@@ -241,6 +242,55 @@ namespace QueryParsers
 
             // ASSERT
             Assert.AreEqual(expAlias, res);
+        }
+
+        #endregion
+
+        #region InsertJoins
+
+        [TestMethod]
+        [DataRow(
+     $"Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n",
+     0)]
+        [DataRow(
+     $"Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"  Join Filter: (a.v1 = b.v2)\n" +
+     $"  ->  Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n" +
+     $"  ->  Materialize(cost=0.00..1.15 rows=10 width=8)\n" +
+     $"      ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8)\n",
+     1)]
+        [DataRow(
+     $"Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"  Join Filter: (a.v1 = b.v2)\n" +
+     $"  ->  Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n" +
+     $"      Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"        Join Filter: (a.v1 = b.v2)\n" +
+     $"        ->  Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n" +
+     $"        ->  Materialize(cost=0.00..1.15 rows=10 width=8)\n" +
+     $"            ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8)\n",
+     2)]
+        [DataRow(
+     $"Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"  Join Filter: (a.v1 = b.v2)\n" +
+     $"      Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"        Join Filter: (a.v1 = b.v2)\n" +
+     $"        ->  Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n" +
+     $"        ->  Materialize(cost=0.00..1.15 rows=10 width=8)\n" +
+     $"            ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8)\n" +
+     $"      Nested Loop  (cost=0.00..10.13 rows=167 width=16)\n" +
+     $"        Join Filter: (a.v1 = b.v2)\n" +
+     $"        ->  Seq Scan on b  (cost=0.00..1.50 rows=50 width=8)\n" +
+     $"        ->  Materialize(cost=0.00..1.15 rows=10 width=8)\n" +
+     $"            ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8)\n",
+     3)]
+        public void Can_InsertJoins(string explainResults, int expJoinCount)
+        {
+            PostgresParser parser = new PostgresParser();
+            ParserResult result = new ParserResult();
+            parser.InsertTables(explainResults, ref result);
+            parser.InsertJoins(explainResults, ref result);
+
+            Assert.AreEqual(expJoinCount, result.Joins.Count);
         }
 
         #endregion
