@@ -1,4 +1,5 @@
 ﻿using DatabaseConnector.Connectors;
+using QueryParser.Exceptions;
 using QueryParser.Models;
 using System;
 using System.Collections.Generic;
@@ -234,7 +235,7 @@ namespace QueryParser.QueryParsers
             if (relationType == RelationType.Type.None || sides.Length < 1)
                 return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", ""), result));
             else if (sides.Length != 2)
-                throw new InvalidDataException("Somehow only had one side " + predicate);
+                throw new InvalidPredicateException("Somehow only had one side ", predicate);
 
             JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0], result);
             JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1], result);
@@ -260,13 +261,13 @@ namespace QueryParser.QueryParsers
                 }
             }
             if (comparisonType == ComparisonType.Type.None)
-                throw new InvalidDataException("Has no operator " + predicate);
+                throw new InvalidOperatorException("Has no operator!", predicate);
 
             string[] leftSplit = predicateSplit[0].Split(".");
             string[] rightSplit = predicateSplit[1].Split(".");
 
             if (leftSplit.Length != 2 || rightSplit.Length != 2)
-                throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
+                throw new InvalidPredicateException($"Invalid split in predicate '{predicateSplit[0]} {predicateSplit[1]}'", predicate);
 
             return new JoinPredicate(
                 result.GetTableRef(leftSplit[0].Trim()),
