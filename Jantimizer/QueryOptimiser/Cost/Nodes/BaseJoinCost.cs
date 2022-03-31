@@ -30,38 +30,6 @@ namespace QueryOptimiser.Cost.Nodes
             return -1;
         }
 
-        protected static bool CheckEqualBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
-        {
-            return ((rightValueStart.CompareTo(leftValueStart) >= 0 &&
-                         rightValueStart.CompareTo(leftValueEnd) <= 0) ||
-                        (rightValueEnd.CompareTo(leftValueEnd) <= 0 &&
-                         rightValueEnd.CompareTo(leftValueStart) >= 0));
-        }
-
-        protected static bool CheckLessBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
-        {
-            return leftValueStart.CompareTo(rightValueEnd) < 0;
-        }
-
-        protected static bool CheckMoreBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
-        {
-            return leftValueEnd.CompareTo(rightValueStart) > 0;
-        }
-
-        protected static bool CheckEqualOrLessBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
-        {
-            return (
-                CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
-                CheckLessBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd));
-        }
-
-        protected static bool CheckEqualOrMoreBounds(IComparable leftValueStart, IComparable rightValueStart, IComparable leftValueEnd, IComparable rightValueEnd)
-        {
-            return (
-                CheckEqualBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd) ||
-                CheckMoreBounds(leftValueStart, rightValueStart, leftValueEnd, rightValueEnd));
-        }
-
         public long CalculateCost(JoinNode node, IHistogramManager histogramManager)
         {
             if (node.Relation != null)
