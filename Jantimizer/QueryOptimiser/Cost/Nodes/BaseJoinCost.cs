@@ -121,8 +121,6 @@ namespace QueryOptimiser.Cost.Nodes
                 if (node.ComType != ComparisonType.Type.More && node.ComType != ComparisonType.Type.EqualOrMore)
                     rightStart = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[0].ValueStart);
             }
-            else if (node.ComType == ComparisonType.Type.Less)
-                return 0;
 
             if (leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd.CompareTo(rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd) > 0)
             {
@@ -134,10 +132,14 @@ namespace QueryOptimiser.Cost.Nodes
                 if (node.ComType != ComparisonType.Type.Less && node.ComType != ComparisonType.Type.EqualOrLess)
                     rightEnd = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd);
             }
-            else if (node.ComType == ComparisonType.Type.More)
-                return 0;
 
             if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
+                return 0;
+
+            // This is a tad bit of symptom fixing rather than actual fix
+            if (node.ComType == ComparisonType.Type.Less && leftGram.Buckets[leftEnd].ValueEnd.CompareTo(rightGram.Buckets[rightStart].ValueStart) == 0)
+                return 0;
+            if (node.ComType == ComparisonType.Type.More && leftGram.Buckets[leftStart].ValueEnd.CompareTo(rightGram.Buckets[rightEnd].ValueEnd) == 0)
                 return 0;
 
             Range leftBucketMatch = new Range(leftStart, leftEnd + 1);
