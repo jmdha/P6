@@ -61,14 +61,14 @@ namespace QueryParser.QueryParsers
             return parsed.Joins.Select(j => j as INode).ToList();
         }
 
-        public async Task<ParserResult> GetParserResult(string query)
+        private async Task<ParserResult> GetParserResult(string query)
         {
-            string explanationTextBlock = await GetPGExplainationTextBlock(query);
+            string explanationTextBlock = await GetPGExplainationTextBlockAsync(query);
 
             return AnalyseExplanationText(explanationTextBlock);
         }
 
-        public ParserResult AnalyseExplanationText(string explanationText)
+        internal ParserResult AnalyseExplanationText(string explanationText)
         {
             var result = new ParserResult();
 
@@ -99,7 +99,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private static string GetAliasFromRegexMatch(Match match)
+        internal string GetAliasFromRegexMatch(Match match)
         {
             if (match.Groups["alias"].Success)
                 return match.Groups["alias"].Value;
@@ -189,7 +189,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private async Task<string> GetPGExplainationTextBlock(string query)
+        internal async Task<string> GetPGExplainationTextBlockAsync(string query)
         {
             var explanation = await Connector.ExplainQueryAsync(query);
             var rawRows = explanation.Tables[0].Rows;
@@ -211,7 +211,7 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        private JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
+        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
             JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
             string[] sides = new string[] {};
@@ -236,7 +236,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        private JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
