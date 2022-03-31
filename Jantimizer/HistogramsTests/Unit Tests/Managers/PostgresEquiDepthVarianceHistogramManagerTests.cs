@@ -14,7 +14,7 @@ using Tools.Models;
 namespace HistogramsTests.Unit_Tests.Managers
 {
     [TestClass]
-    public class MySQLEquiDepthHistogramManagerTests
+    public class PostgresEquiDepthVarianceHistogramManagerTests
     {
         #region Constructor
 
@@ -23,11 +23,11 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.DbConnector);
-            Assert.IsInstanceOfType(manager.DbConnector, typeof(DatabaseConnector.Connectors.MySqlConnector));
+            Assert.IsInstanceOfType(manager.DbConnector, typeof(PostgreSqlConnector));
         }
 
         [TestMethod]
@@ -35,7 +35,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
 
             // ASSERT
             Assert.IsNotNull(manager.Histograms);
@@ -48,7 +48,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            MySQLEquiDepthHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), depth);
+            PostgresEquiDepthVarianceHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), depth);
 
             // ASSERT
             Assert.AreEqual(depth, manager.Depth);
@@ -65,9 +65,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Tables(string[] tableNames, string attribute, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             foreach (string tableName in tableNames)
-                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tableName, attribute, 10));
 
             // ACT
             var result = manager.Tables;
@@ -85,9 +85,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_Get_Attributes(string[] attributeName, string tableName, string[] expectedResult)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             foreach (string attribute in attributeName)
-                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tableName, attribute, 10));
 
             // ACT
             var result = manager.Attributes;
@@ -109,8 +109,8 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Can_AddHistogram(string tableName, string attributeName)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
-            IHistogram histogram = new HistogramEquiDepth(tableName, attributeName, 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, 10);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -127,8 +127,8 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfTableNameEmpty(string tableName)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
-            IHistogram histogram = new HistogramEquiDepth(tableName, "a", 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogram histogram = new HistogramEquiDepthVariance(tableName, "a", 10);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -142,8 +142,8 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Cant_AddHistogram_IfAttributeNameEmpty(string attributeName)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
-            IHistogram histogram = new HistogramEquiDepth("A", attributeName, 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogram histogram = new HistogramEquiDepthVariance("A", attributeName, 10);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -156,9 +156,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void ClearHistogram()
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new HistogramEquiDepth("", "", 10)
+                new HistogramEquiDepthVariance("", "", 10)
             );
 
             if (manager.Histograms.Count == 0)
@@ -179,9 +179,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogram_Single(string table, string attribute)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new HistogramEquiDepth(table, attribute, 10)
+                new HistogramEquiDepthVariance(table, attribute, 10)
             );
 
             // ACT
@@ -199,9 +199,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogram_NoHit(string table, string attribute)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new HistogramEquiDepth("A", "a", 10)
+                new HistogramEquiDepthVariance("A", "a", 10)
             );
 
             // ACT
@@ -215,9 +215,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogram_Multiple(string table, string attribute, string[] tables, string[] attributes)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < tables.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(tables[i], attributes[i], 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tables[i], attributes[i], 1));
 
             // ACT
             IHistogram actualHistogram = manager.GetHistogram(table, attribute);
@@ -234,9 +234,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogram_MultipleDuplicate(string table, string attribute, string[] tables, string[] attributes)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < tables.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(tables[i], attributes[i], 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tables[i], attributes[i], 1));
 
             // ACT
             IHistogram actualHistogram = manager.GetHistogram(table, attribute);
@@ -254,9 +254,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByTable_Single(string table)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new HistogramEquiDepth(table, "", 10)
+                new HistogramEquiDepthVariance(table, "", 10)
             );
 
             // ACT
@@ -274,9 +274,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByTable_SingleNoHit(string table, string attribute, string[] tables)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < tables.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(tables[i], attribute, 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tables[i], attribute, 1));
 
             // ACT
             List<IHistogram> actualHistograms = manager.GetHistogramsByTable(table);
@@ -293,9 +293,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByTable_Multiple(string table, int hits, string[] tables)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < tables.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(tables[i], "b", 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance(tables[i], "b", 1));
 
             // ACT
             List<IHistogram> actualHistograms = manager.GetHistogramsByTable(table);
@@ -312,9 +312,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByAttribute_Single(string attribute)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new HistogramEquiDepth("A", attribute, 10)
+                new HistogramEquiDepthVariance("A", attribute, 10)
             );
 
             // ACT
@@ -332,9 +332,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByAttribute_SingleNoHit(string table, string attribute, string[] attributes)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < attributes.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(table, attributes[i], 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance(table, attributes[i], 1));
 
             // ACT
             List<IHistogram> actualHistograms = manager.GetHistogramsByAttribute(attribute);
@@ -351,9 +351,9 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void GetHistogramByAttribute_Multiple(string table, int hits, string[] attributes)
         {
             // ARRANGE
-            IHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), 10);
+            IDepthHistogramManager manager = new PostgresEquiDepthVarianceHistogramManager(new ConnectionProperties(), 10);
             for (int i = 0; i < attributes.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth("A", attributes[i], 1));
+                manager.AddHistogram(new HistogramEquiDepthVariance("A", attributes[i], 1));
 
             // ACT
             List<IHistogram> actualHistograms = manager.GetHistogramsByAttribute(table);

@@ -6,11 +6,15 @@ namespace Histograms.Models
     /// <summary>
     /// Contains n buckets, which each represent the same m number of elements.
     /// </summary>
-    public class HistogramEquiDepthVariance : HistogramEquiDepth
+    public class HistogramEquiDepth : BaseHistogram, IDepthHistogram
     {
-        public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
+        public int Depth { get; }
+
+        public HistogramEquiDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
         {
+            Depth = depth;
         }
+
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
@@ -19,24 +23,26 @@ namespace Histograms.Models
                 IComparable startValue = sorted[bStart];
                 IComparable endValue = sorted[bStart];
                 int countValue = 1;
-                int mean = (int)endValue;
-                int variance = 0;
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                 {
                     countValue++;
                     endValue = sorted[bIter];
-                    mean += (int)endValue;
                 }
-                mean = mean / countValue;
-                for (int bIter = bStart; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
-                {
-                    variance += (int)Math.Pow((int)sorted[bIter] - mean, 2);
-                }
-                variance = (int)Math.Sqrt(variance / countValue - 1);
-
-                Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
+                Buckets.Add(new HistogramBucket(startValue, endValue, countValue));
             }
+        }
+
+        public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
+        {
+            GenerateHistogramFromSorted(SplitValues(sortedGroups).ToList());
+        }
+
+        private IEnumerable<IComparable> SplitValues(IEnumerable<ValueCount> sortedGroups)
+        {
+            foreach (var grp in sortedGroups)
+                for (int i = 0; i < grp.Count; i++)
+                    yield return grp.Value;
         }
     }
 }

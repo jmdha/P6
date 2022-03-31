@@ -28,9 +28,9 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class TestRunner : UserControl
     {
-        private int collapesedHeight = 40;
+        private int collapesedHeight = 30;
 
-        public string Name { get; }
+        public string RunnerName { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
@@ -39,25 +39,20 @@ namespace ExperimentSuite.UserControls
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner()
-        {
-            InitializeComponent();
-        }
-
         public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            Name = name;
+            RunnerName = name;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestCaseResult>();
-            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{Name}.csv");
+            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
 
             RunnerGrid.Height = collapesedHeight;
-            TestNameLabel.Content = Name;
+            TestNameLabel.Content = RunnerName;
         }
 
         public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
@@ -85,13 +80,19 @@ namespace ExperimentSuite.UserControls
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 HistogramProgressBar.Maximum = tasks.Count;
-
-                foreach (var t in tasks)
+                HistogramProgressBar.Value = 0;
+                Update_HistogramProgressLabel(0, (int)HistogramProgressBar.Maximum);
+                // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
+                while (tasks.Any())
                 {
-                    await t;
+                    var finishedTask = await Task.WhenAny(tasks);
+                    tasks.Remove(finishedTask);
+                    await finishedTask;
                     HistogramProgressBar.Value++;
+                    Update_HistogramProgressLabel((int)HistogramProgressBar.Value, (int)HistogramProgressBar.Maximum);
                 }
                 HistogramProgressBar.Value = HistogramProgressBar.Maximum;
+                Update_HistogramProgressLabel((int)HistogramProgressBar.Maximum, (int)HistogramProgressBar.Maximum);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -126,13 +127,13 @@ namespace ExperimentSuite.UserControls
         {
             PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestCaseResult>();
-            int count = 0;
             SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
                     await Task.Delay(1);
+                    Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
                     CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
                     SQLProgressBar.Value++;
                     DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
@@ -141,16 +142,16 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestCaseResult testCase = new TestCaseResult(RunData.Name, Name, queryFile, RunData, analysisResult, jantimiserResult);
+                    TestCaseResult testCase = new TestCaseResult(RunData.Name, RunnerName, queryFile, RunData, analysisResult, jantimiserResult);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
                 }
-                count++;
             }
             SQLProgressBar.Value = SQLProgressBar.Maximum;
+            Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
             return testCases;
         }
 
@@ -159,7 +160,7 @@ namespace ExperimentSuite.UserControls
             PrintTestUpdate("Displaying report...", RunData.Name);
 
             ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2);
+                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"));
 
             foreach (var testCase in Results)
             {
@@ -183,8 +184,7 @@ namespace ExperimentSuite.UserControls
                     "{0, -20}",
                     "{0, -10}",
                     "{0, -10}"
-                },
-                2);
+                });
             }
         }
 
@@ -242,7 +242,7 @@ namespace ExperimentSuite.UserControls
         {
             StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
                     new List<string>() { left, right },
-                    new List<string>() { "{0,-30}", "{0,-30}" }, 1);
+                    new List<string>() { "{0,-30}", "{0,-30}" });
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)
@@ -256,9 +256,17 @@ namespace ExperimentSuite.UserControls
         private void StatusTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
-            {
                 textBox.ScrollToEnd();
-            }
+        }
+
+        private void Update_HistogramProgressLabel(int current, int max)
+        {
+            HistogramProgressLabel.Content = $"Histogram Progress ({current}/{max})";
+        }
+
+        private void Update_SQLProgressLabel(int current, int max)
+        {
+            SQLProgressLabel.Content = $"SQL Progress ({current}/{max})";
         }
     }
 }

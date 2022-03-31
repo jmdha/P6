@@ -1,4 +1,5 @@
 ﻿using Histograms.Models;
+using HistogramsTests.TestHelpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HistogramsTests.Unit_Tests.HistogramModels
+namespace HistogramsTests.Unit_Tests.Models.Histograms
 {
     [TestClass]
     public class HistogramEquiDepthTests
@@ -19,7 +20,7 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
         {
             // ARRANGE
             // ACT
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", 1);
+            IDepthHistogram histogram = new HistogramEquiDepth("A", "b", 1);
 
             // ASSERT
             Assert.IsNotNull(histogram.Buckets);
@@ -34,7 +35,7 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
         {
             // ARRANGE
             // ACT
-            HistogramEquiDepth histogram = new HistogramEquiDepth(tableName, attributeName, depth);
+            IDepthHistogram histogram = new HistogramEquiDepth(tableName, attributeName, depth);
 
             // ASSERT
             Assert.AreEqual(tableName, histogram.TableName);
@@ -54,11 +55,10 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
         public void Can_GenerateHistogram_Table(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", columnName, depth);
-            DataTable table = new DataTable();
-            table.Columns.Add(new DataColumn(columnName, typeof(int)));
-            foreach(int row in rows)
-                table.Rows.Add(AddRow(table, new int[] { row }));
+            IDepthHistogram histogram = new HistogramEquiDepth("A", columnName, depth);
+            DataTable table = DataTableHelper.GetDatatable(columnName, typeof(int));
+            foreach (int row in rows)
+                DataTableHelper.AddRow(table, new int[] { row });
 
             // ACT
             histogram.GenerateHistogram(table, columnName);
@@ -79,7 +79,7 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
         public void Can_GenerateHistogram_List(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", columnName, depth);
+            IDepthHistogram histogram = new HistogramEquiDepth("A", columnName, depth);
 
             // ACT
             histogram.GenerateHistogram(rows.Cast<IComparable>().ToList());
@@ -90,14 +90,28 @@ namespace HistogramsTests.Unit_Tests.HistogramModels
 
         #endregion
 
-        #region Private Test Methods
+        #region GenerateHistogramFromSorted
 
-        private DataRow AddRow(DataTable dt, int[] data)
+        [TestMethod]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 10, 2)]
+        [DataRow(new int[] { 1 }, new long[] { 20 }, 5, 4)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 10, 7)]
+        [DataRow(new int[] { 1, 2 }, new long[] { 20, 50 }, 5, 14)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 10, 17)]
+        [DataRow(new int[] { 1, 2, 3 }, new long[] { 20, 50, 100 }, 1, 170)]
+        public void Can_GenerateHistogramFromSorted_BucketCount(int[] value, long[] count, int bucketSize, int expBucketCount)
         {
-            DataRow row = dt.NewRow();
-            for (int i = 0; i < data.Length; i++)
-                row[i] = data[i];
-            return row;
+            // ARRANGE
+            IDepthHistogram histogram = new HistogramEquiDepth("A", "b", bucketSize);
+            List<ValueCount> values = new List<ValueCount>();
+            for (int i = 0; i < value.Length; i++)
+                values.Add(new ValueCount(value[i], count[i]));
+
+            // ACT
+            histogram.GenerateHistogramFromSortedGroups(values);
+
+            // ASSERT
+            Assert.AreEqual(expBucketCount, histogram.Buckets.Count);
         }
 
         #endregion

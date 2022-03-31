@@ -158,7 +158,7 @@ namespace HistogramsTests.Unit_Tests.Managers
             // ARRANGE
             IHistogramManager manager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
             manager.Histograms.Add(
-                new Histograms.Models.HistogramEquiDepth("", "", 10)
+                new HistogramEquiDepth("", "", 10)
             );
 
             if (manager.Histograms.Count == 0)

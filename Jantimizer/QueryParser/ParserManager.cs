@@ -23,11 +23,7 @@ namespace QueryParser
             foreach (IQueryParser parser in QueryParsers)
             {
                 if (parser.DoesQueryMatch(query))
-                {
-                    List<INode>? resultNodes = ParseQuerySpecific(query, parser);
-                    if (resultNodes != null)
-                        return resultNodes;
-                }
+                    return ParseQuerySpecific(query, parser);
             }
             if (throwIfNotFound)
                 throw new ParserException("Error, no valid parser found for the query!", QueryParsers, query);
@@ -39,24 +35,20 @@ namespace QueryParser
             foreach (IQueryParser parser in QueryParsers)
             {
                 if (parser.DoesQueryMatch(query))
-                {
-                    List<INode>? resultNodes = await ParseQuerySpecificAsync(query, parser);
-                    if (resultNodes != null)
-                        return resultNodes;
-                }
+                    return await ParseQuerySpecificAsync(query, parser);
             }
             if (throwIfNotFound)
                 throw new ParserException("Error, no valid parser found for the query!", QueryParsers, query);
             return new List<INode>();
         }
 
-        public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
+        public List<INode> ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
         {
             List<INode> nodes = parser.ParseQuery(query);
             return nodes;
         }
 
-        public async Task<List<INode>>? ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser
+        public async Task<List<INode>> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser
         {
             List<INode> nodes = await parser.ParseQueryAsync(query);
             return nodes;
