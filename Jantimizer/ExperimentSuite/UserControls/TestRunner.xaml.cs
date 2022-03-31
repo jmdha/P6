@@ -156,7 +156,7 @@ namespace ExperimentSuite.UserControls
             PrintTestUpdate("Displaying report...", RunData.Name);
 
             ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"), 2);
+                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"));
 
             foreach (var testCase in Results)
             {
