@@ -31,9 +31,11 @@ namespace ExperimentSuite
         public MainWindow()
         {
             InitializeComponent();
+            var iconHandle = ExperimentSuite.Properties.Resources.icon;
+            this.Icon = ByteToImage(iconHandle);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        public static ImageSource ByteToImage(byte[] imageData)
         {
             DateTime runTime = DateTime.UtcNow;
 
@@ -43,13 +45,16 @@ namespace ExperimentSuite
             var res = JsonSerializer.Deserialize(File.ReadAllText(experimentsFile.FullName), typeof(ExperimentList));
             if (res is ExperimentList expList)
             {
+                ExperimentProgressBar.Maximum = expList.Experiments.Count;
+                ExperimentProgressBar.Value = 0;
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
+                        ExperimentProgressBar.Value++;
+                        ExperimentNameLabel.Content = experiment.ExperimentName;
+                        TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
                         var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
-
-                        TestsPanel.Children.Add(getSeperator(experiment.ExperimentName));
 
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
                         await RunExperimentQueue(
@@ -62,7 +67,14 @@ namespace ExperimentSuite
                     WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
                 }
             }
+            ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
             WriteToStatus("All experiments complete!");
+            RunButton.IsEnabled = true;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await RunExperiments();
         }
 
         private void WriteToStatus(string text)
@@ -154,12 +166,18 @@ namespace ExperimentSuite
             }
         }
 
-        private Label getSeperator(string text)
+        private Label GetSeperatorLabel(string text)
         {
             var newLabel = new Label();
             newLabel.Content = text;
             newLabel.FontSize = 20;
             return newLabel;
+        }
+
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
+        {
+            RunButton.IsEnabled = false;
+            await RunExperiments();
         }
     }
 }
