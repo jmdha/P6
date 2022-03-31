@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public class ComparisonType
+    public static class ComparisonType
     {
         public enum Type
         {

@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleToAttribute("QueryParserTest")]
+[assembly: InternalsVisibleTo("QueryParserTest")]
 
 namespace QueryParser.QueryParsers
 {

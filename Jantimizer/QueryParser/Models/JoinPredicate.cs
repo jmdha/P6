@@ -19,20 +19,5 @@
             Condition = condition;
             ComType = type;
         }
-
-        private void GetTableNamesFromPredicate(string[] s, List<string?> tables)
-        {
-            if (s.Length > 0)
-                tables.Add(GetTableNameFromAttributeName(s[0]));
-            if (s.Length > 1)
-                tables.Add(GetTableNameFromAttributeName(s[1]));
-        }
-
-        private string? GetTableNameFromAttributeName(string s)
-        {
-            if (s.Contains("."))
-                return s.Split(".")[0].Trim();
-            return null;
-        }
     }
 }
