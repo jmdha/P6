@@ -213,19 +213,19 @@ namespace QueryParser.QueryParsers
 
         internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
-            JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
+            RelationType.Type[] relationTypes = new RelationType.Type[] { RelationType.Type.And, RelationType.Type.Or };
             string[] sides = new string[] {};
-            JoinPredicateRelation.RelationType relationType = JoinPredicateRelation.RelationType.None;
+            RelationType.Type relationType = RelationType.Type.None;
             for (int i = 0; i < relationTypes.Length; i++)
             {
-                sides = predicate.Split(JoinPredicateRelation.GetRelationString(relationTypes[i]));
+                sides = predicate.Split(RelationType.GetRelationString(relationTypes[i]));
                 if (sides.Length == 2)
                 {
                     relationType = relationTypes[i];
                     break;
                 }
             }
-            if (relationType == JoinPredicateRelation.RelationType.None || sides.Length < 1)
+            if (relationType == RelationType.Type.None || sides.Length < 1)
                 return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", ""), result));
             else if (sides.Length != 2)
                 throw new InvalidDataException("Somehow only had one side " + predicate);
