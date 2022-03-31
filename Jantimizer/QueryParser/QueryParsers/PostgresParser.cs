@@ -15,15 +15,17 @@ namespace QueryParser.QueryParsers
 {
     public class PostgresParser : IQueryParser
     {
-        private PostgreSqlConnector Connector { get; set; }
+        private PostgreSqlConnector? Connector { get; set; }
 
-        public PostgresParser(PostgreSqlConnector connector)
+        public PostgresParser(PostgreSqlConnector? connector = null)
         {
             Connector = connector;
         }
 
         public bool DoesQueryMatch(string query)
         {
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
             try
             {
                 Connector.ExplainQuery(query);
@@ -37,6 +39,8 @@ namespace QueryParser.QueryParsers
 
         public async Task<bool> DoesQueryMatchAsync(string query)
         {
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
             try
             {
                 await Connector.ExplainQueryAsync(query);
@@ -81,7 +85,7 @@ namespace QueryParser.QueryParsers
         }
 
 
-        private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
+        internal static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
         internal void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
@@ -191,6 +195,8 @@ namespace QueryParser.QueryParsers
 
         internal async Task<string> GetPGExplainationTextBlockAsync(string query)
         {
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
             var explanation = await Connector.ExplainQueryAsync(query);
             var rawRows = explanation.Tables[0].Rows;
 
