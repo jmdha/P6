@@ -20,7 +20,7 @@ namespace QueryParser.Models
 
         public static Type GetOperatorType(string stringOperator)
         {
-            switch (stringOperator)
+            switch (stringOperator.Trim())
             {
                 case "=": return Type.Equal;
                 case "<": return Type.Less;

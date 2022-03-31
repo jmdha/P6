@@ -18,7 +18,7 @@ namespace QueryParser.Models
 
         public static Type GetRelationType(string stringType)
         {
-            switch (stringType.ToUpper())
+            switch (stringType.ToUpper().Trim())
             {
                 case "AND": return Type.And;
                 case "OR": return Type.Or;
