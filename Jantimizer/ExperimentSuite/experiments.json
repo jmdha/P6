@@ -37,7 +37,10 @@
             "BasicTests_ConstantNumberBlocks"
           ]
         }
-      ]
+      ],
+      "OptionalTestSettings": {
+        "BucketSize" : 10
+      }
     },
     {
       "ExperimentName": "Experiment Two",
@@ -76,7 +79,10 @@
             "BasicTests_ConstantNumberBlocks"
           ]
         }
-      ]
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
     }
   ]
 }
