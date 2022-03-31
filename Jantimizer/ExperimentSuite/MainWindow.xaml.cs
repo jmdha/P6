@@ -31,6 +31,21 @@ namespace ExperimentSuite
         public MainWindow()
         {
             InitializeComponent();
+            var iconHandle = ExperimentSuite.Properties.Resources.icon;
+            this.Icon = ByteToImage(iconHandle);
+        }
+
+        public static ImageSource ByteToImage(byte[] imageData)
+        {
+            BitmapImage biImg = new BitmapImage();
+            MemoryStream ms = new MemoryStream(imageData);
+            biImg.BeginInit();
+            biImg.StreamSource = ms;
+            biImg.EndInit();
+
+            ImageSource imgSrc = biImg as ImageSource;
+
+            return imgSrc;
         }
 
         private async Task RunExperiments()
