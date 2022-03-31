@@ -80,6 +80,7 @@ namespace ExperimentSuite.UserControls
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
                 HistogramProgressBar.Maximum = tasks.Count;
+                HistogramProgressBar.Value = 0;
                 Update_HistogramProgressLabel(0, (int)HistogramProgressBar.Maximum);
                 // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
                 while (tasks.Any())
@@ -87,8 +88,10 @@ namespace ExperimentSuite.UserControls
                     var finishedTask = await Task.WhenAny(tasks);
                     tasks.Remove(finishedTask);
                     await finishedTask;
+                    HistogramProgressBar.Value++;
                     Update_HistogramProgressLabel((int)HistogramProgressBar.Value, (int)HistogramProgressBar.Maximum);
                 }
+                HistogramProgressBar.Value = HistogramProgressBar.Maximum;
                 Update_HistogramProgressLabel((int)HistogramProgressBar.Maximum, (int)HistogramProgressBar.Maximum);
             }
 
@@ -254,7 +257,6 @@ namespace ExperimentSuite.UserControls
         {
             if (sender is TextBox textBox)
                 textBox.ScrollToEnd();
-            }
         }
 
         private void Update_HistogramProgressLabel(int current, int max)
