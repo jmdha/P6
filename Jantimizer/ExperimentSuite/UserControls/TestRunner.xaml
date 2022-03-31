@@ -27,9 +27,9 @@
 
         <Label Content="Progress" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
         <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1" Margin="5">
-            <Label Content="Histogram Progress"/>
+            <Label x:Name="HistogramProgressLabel" Content="Histogram Progress (0/0)"/>
             <ProgressBar x:Name="HistogramProgressBar" Height="20"/>
-            <Label Content="SQL Progress"/>
+            <Label x:Name="SQLProgressLabel" Content="SQL Progress (0/0)"/>
             <Label x:Name="CurrentSqlFileLabels" Content="File: " FontSize="10"/>
             <ProgressBar x:Name="SQLProgressBar" Height="20"/>
         </StackPanel>
