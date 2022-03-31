@@ -5,14 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExperimentSuite"
         mc:Ignorable="d"
-        Title="Jantimiser" Height="750" Width="1000" Loaded="Window_Loaded">
+        Title="Jantimiser" Height="750" Width="1200" Loaded="Window_Loaded">
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="70"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" TextChanged="StatusTextbox_TextChanged"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
+            <Label x:Name="ExperimentNameLabel" Content="Experiment _" Grid.Column="1" FontSize="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="2" Margin="5"/>
+            <Button x:Name="RunButton" Content="Run!" Grid.Column="3" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
+        </Grid>
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
             <StackPanel x:Name="TestsPanel"/>
