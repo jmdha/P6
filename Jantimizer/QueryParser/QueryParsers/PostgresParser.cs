@@ -235,7 +235,7 @@ namespace QueryParser.QueryParsers
             if (relationType == RelationType.Type.None || sides.Length < 1)
                 return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", ""), result));
             else if (sides.Length != 2)
-                throw new InvalidPredicateException("Somehow only had one side ", predicate);
+                throw new InvalidPredicateException("Somehow only had one side!", predicate);
 
             JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0], result);
             JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1], result);
