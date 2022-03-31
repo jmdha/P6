@@ -22,12 +22,31 @@ namespace QueryParser.QueryParsers
             Connector = connector;
         }
 
-
         public bool DoesQueryMatch(string query)
         {
-            return true;
+            try
+            {
+                Connector.ExplainQuery(query);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
+        public async Task<bool> DoesQueryMatchAsync(string query)
+        {
+            try
+            {
+                await Connector.ExplainQueryAsync(query);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public List<INode> ParseQuery(string query)
         {
@@ -172,8 +191,7 @@ namespace QueryParser.QueryParsers
 
         private async Task<string> GetPGExplainationTextBlock(string query)
         {
-            string explainQuery = $"EXPLAIN {query}";
-            var explanation = await Connector.CallQuery(explainQuery);
+            var explanation = await Connector.ExplainQueryAsync(query);
             var rawRows = explanation.Tables[0].Rows;
 
             var stringRows = new List<string>();
@@ -182,7 +200,7 @@ namespace QueryParser.QueryParsers
             {
                 object queryPlan = row["QUERY PLAN"];
                 if (queryPlan == null)
-                    throw new NullReferenceException($"\"QUERY PLAN\" not found from running '{explainQuery}' on postgres. Verify the connection");
+                    throw new NullReferenceException($"\"QUERY PLAN\" not found from running '{query}' on postgres. Verify the connection");
 
                 string? rowStr = queryPlan.ToString();
 
