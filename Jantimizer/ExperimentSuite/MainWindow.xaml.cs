@@ -53,8 +53,6 @@ namespace ExperimentSuite
         {
             DateTime runTime = DateTime.UtcNow;
 
-            new QueryPlanCacher();
-
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");
             var testsPath = IOHelper.GetDirectory("../../../Tests");
@@ -67,6 +65,8 @@ namespace ExperimentSuite
                 {
                     if (experiment.RunExperiment)
                     {
+                        new QueryPlanCacher();
+
                         ExperimentProgressBar.Value++;
                         ExperimentNameLabel.Content = experiment.ExperimentName;
                         TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));

@@ -39,9 +39,9 @@ namespace ExperimentSuite.UserControls
         public List<TestCaseResult> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(string runnerName, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            RunnerName = name;
+            RunnerName = runnerName;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
@@ -138,7 +138,7 @@ namespace ExperimentSuite.UserControls
                     SQLProgressBar.Value++;
 
                     DataSet dbResult;
-                    ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(File.ReadAllText(queryFile.FullName));
+                    ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(queryFile, RunnerName);
                     if (accCardinality != null)
                         dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
                     else
@@ -148,7 +148,7 @@ namespace ExperimentSuite.UserControls
                     if (accCardinality != null)
                         analysisResult.ActualCardinality = (ulong)accCardinality;
                     else
-                        QueryPlanCacher.AddToCacheIfNotThere(File.ReadAllText(queryFile.FullName), analysisResult.ActualCardinality);
+                        QueryPlanCacher.AddToCacheIfNotThere(queryFile, RunnerName, analysisResult.ActualCardinality);
 
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);

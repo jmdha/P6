@@ -19,24 +19,30 @@ namespace Tools.Services
             Instance = this;
         }
 
-        public static void AddToCacheIfNotThere(string query, ulong actualCardinality)
+        public static void AddToCacheIfNotThere(FileInfo queryFile, string testName, ulong actualCardinality) 
+            => AddToCacheIfNotThere(File.ReadAllText(queryFile.FullName), testName, actualCardinality);
+
+        public static void AddToCacheIfNotThere(string queryText, string testName, ulong actualCardinality)
         {
-            var key = GetKeyFromQuery(query);
+            var key = GetKeyFromQuery(queryText, testName);
             if (!ActualCardinalityCache.ContainsKey(key))
                 ActualCardinalityCache.Add(key, actualCardinality);
         }
 
-        public static ulong? GetCardinalityOrNull(string query)
+        public static ulong? GetCardinalityOrNull(FileInfo queryFile, string testName)
+            => GetCardinalityOrNull(File.ReadAllText(queryFile.FullName), testName);
+
+        public static ulong? GetCardinalityOrNull(string queryText, string testName)
         {
-            var key = GetKeyFromQuery(query);
+            var key = GetKeyFromQuery(queryText, testName);
             if (ActualCardinalityCache.ContainsKey(key))
                 return ActualCardinalityCache[key];
             return null;
         }
 
-        private static string GetKeyFromQuery(string query)
+        private static string GetKeyFromQuery(string queryText, string testName)
         {
-            var res = MD5.HashData(Encoding.ASCII.GetBytes(query));
+            var res = MD5.HashData(Encoding.ASCII.GetBytes(queryText + testName));
             var key = Encoding.Default.GetString(res);
             return key;
         }
