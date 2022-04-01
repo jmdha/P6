@@ -41,6 +41,10 @@ namespace QueryPlanParser.Parsers
                     break;
             }
 
+            if (analysisRes.ActualCardinality == null)
+                analysisRes.ActualCardinality = 0;
+            if (analysisRes.ActualTime == null)
+                analysisRes.ActualTime = new TimeSpan();
             return analysisRes;
         }
 
@@ -77,16 +81,15 @@ namespace QueryPlanParser.Parsers
                     cost=(?<cost>\d+.\d+)\      # cost=0.70
                     rows=(?<estimatedRows>\d+)  # rows=1
                 \))
-                \ 
                 (?:
-                    \(
+                    \ \(
                         actual\ time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+)\  # actual time=0.016..0.016
                         rows=(?<actualRows>\d+)\                                  # rows=0
                         loops=(?<loops>\d+)                                       # loops=1
                     \)
                 |
                     \(never\ executed\)
-                )
+                )?
             )?
         ", RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace);
 

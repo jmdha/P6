@@ -20,6 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Tools.Helpers;
+using Tools.Services;
 
 namespace ExperimentSuite
 {
@@ -51,6 +52,8 @@ namespace ExperimentSuite
         private async Task RunExperiments()
         {
             DateTime runTime = DateTime.UtcNow;
+
+            new QueryPlanCacher();
 
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");

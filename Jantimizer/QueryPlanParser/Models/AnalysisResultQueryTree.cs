@@ -12,8 +12,8 @@ namespace QueryPlanParser.Models
         public string Name { get; }
         public decimal? EstimatedCost { get; }
         public ulong? EstimatedCardinality { get; }
-        public ulong? ActualCardinality { get; }
-        public TimeSpan? ActualTime { get; }
+        public ulong? ActualCardinality { get; set; }
+        public TimeSpan? ActualTime { get; set; }
         [Ignore]
         public List<AnalysisResultQueryTree> SubQueries { get; }
 

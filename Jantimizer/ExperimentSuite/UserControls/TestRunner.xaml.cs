@@ -136,8 +136,19 @@ namespace ExperimentSuite.UserControls
                     Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
                     CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
                     SQLProgressBar.Value++;
-                    DataSet dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+
+                    DataSet dbResult;
+                    ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(File.ReadAllText(queryFile.FullName));
+                    if (accCardinality != null)
+                        dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
+                    else
+                        dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    if (accCardinality != null)
+                        analysisResult.ActualCardinality = (ulong)accCardinality;
+                    else
+                        QueryPlanCacher.AddToCacheIfNotThere(File.ReadAllText(queryFile.FullName), analysisResult.ActualCardinality);
 
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
