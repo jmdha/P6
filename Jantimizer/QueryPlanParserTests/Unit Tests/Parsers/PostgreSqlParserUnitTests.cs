@@ -115,22 +115,6 @@ namespace QueryPlanParserTests.UnitTests.Parsers
         }
 
         [TestMethod]
-        [DataRow("Nested Loop  (cost=0.00..10.13 rows=167 width=16)")]
-        [DataRow("  ->  Materialize  (cost=0.00..1.15 rows=10 width=8)")]
-        [DataRow("        ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8)")]
-        public void Can_ParseQueryAnalysisRow_IgnoreRowsWithNoActuals(string line)
-        {
-            // Arrange
-            PostgreSqlParser parser = new PostgreSqlParser();
-
-            // Act
-            var result = parser.ParseQueryAnalysisRow(line);
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
         [DataRow("Nested Loop  (cost=0.00..10.13 rows=167 width=16) (actual time=0.028..0.072 rows=45 loops=1)", 0)]
         [DataRow("  ->  Materialize  (cost=0.00..1.15 rows=10 width=8) (actual time=0.000..0.001 rows=10 loops=50)", 6)]
         [DataRow("        ->  Seq Scan on a  (cost=0.00..1.10 rows=10 width=8) (actual time=0.009..0.010 rows=10 loops=1)", 12)]
