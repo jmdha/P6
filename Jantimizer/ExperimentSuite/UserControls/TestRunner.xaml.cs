@@ -137,18 +137,10 @@ namespace ExperimentSuite.UserControls
                     CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
                     SQLProgressBar.Value++;
 
-                    DataSet dbResult;
                     ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(queryFile, RunnerName);
-                    if (accCardinality != null)
-                        dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
-                    else
-                        dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+                    DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
 
-                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
-                    if (accCardinality != null)
-                        analysisResult.ActualCardinality = (ulong)accCardinality;
-                    else
-                        QueryPlanCacher.AddToCacheIfNotThere(queryFile, RunnerName, analysisResult.ActualCardinality);
+                    AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
 
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
@@ -164,6 +156,26 @@ namespace ExperimentSuite.UserControls
             SQLProgressBar.Value = SQLProgressBar.Maximum;
             Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
             return testCases;
+        }
+
+        private async Task<DataSet> GetResultWithCache(FileInfo queryFile, ulong? accCardinality)
+        {
+            DataSet dbResult;
+            if (accCardinality != null)
+                dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
+            else
+                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+            return dbResult;
+        }
+
+        private AnalysisResult CacheActualCardinalitiesIfNotSet(DataSet dbResult, FileInfo queryFile, ulong? accCardinality)
+        {
+            AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+            if (accCardinality != null)
+                analysisResult.ActualCardinality = (ulong)accCardinality;
+            else
+                QueryPlanCacher.AddToCacheIfNotThere(queryFile, RunnerName, analysisResult.ActualCardinality);
+            return analysisResult;
         }
 
         private void WriteResultToConsole()
