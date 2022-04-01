@@ -1,7 +1,9 @@
 ﻿using DatabaseConnector;
+using Histograms.DataGatherers;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,26 +13,41 @@ namespace Histograms.Managers
 {
     public abstract class BaseHistogramManager : IHistogramManager
     {
-        public IDbConnector DbConnector { get; internal set; }
-        public List<IHistogram> Histograms { get; internal set; }
-        public List<string> Tables => Histograms.Select(x => x.TableName).Distinct().ToList();
+        private Dictionary<string, Dictionary<string, IHistogram>> Histograms { get; set; } = new Dictionary<string, Dictionary<string, IHistogram>>();
+
+
+        public List<string> Tables => Histograms.Select(x => x.Key).ToList();
         public List<string> Attributes
         {
             get
             {
                 var returnList = new List<string>();
-                foreach (var histogram in Histograms)
-                    returnList.Add($"{histogram.TableName}.{histogram.AttributeName}");
+                foreach (var table in Histograms)
+                    foreach (var attribute in table.Value)
+                        returnList.Add($"{table.Key}.{attribute.Key}");
+
                 return returnList;
             }
         }
 
-        public BaseHistogramManager(ConnectionProperties connectionProperties)
+        protected IDataGatherer DataGatherer { get; set; }
+        public BaseHistogramManager(IDataGatherer dataGatherer)
         {
-            Histograms = new List<IHistogram>();
+            DataGatherer = dataGatherer;
         }
 
-        public abstract Task<List<Task>> AddHistogramsFromDB();
+        public async Task<List<Task>> AddHistogramsFromDB()
+        {
+            ClearHistograms();
+            List<Task> tasks = new List<Task>();
+            foreach (string tableName in await DataGatherer.GetTableNamesInSchema())
+            {
+                foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
+                    tasks.Add(AddHistogramForAttribute(attributeName, tableName));
+            }
+
+            return tasks;
+        }
 
         public void AddHistogram(IHistogram histogram)
         {
@@ -38,7 +55,15 @@ namespace Histograms.Managers
                 throw new ArgumentException("Table name cannot be empty!");
             if (string.IsNullOrWhiteSpace(histogram.AttributeName))
                 throw new ArgumentException("Attribute name cannot be empty!");
-            Histograms.Add(histogram);
+
+            string tableName = histogram.TableName.ToLower();
+            string attributeName = histogram.AttributeName.ToLower();
+
+            if (!Histograms.ContainsKey(tableName))
+                Histograms.Add(tableName, new Dictionary<string, IHistogram>());
+
+            Histograms[tableName]
+                .Add(attributeName, histogram);
         }
 
         public void ClearHistograms()
@@ -46,33 +71,41 @@ namespace Histograms.Managers
             Histograms.Clear();
         }
 
-        public IHistogram GetHistogram(string table, string attribute)
+        public IHistogram GetHistogram(string tableName, string attributeName)
         {
-            foreach (var gram in Histograms)
-                if (gram.TableName.Equals(table) && gram.AttributeName.Equals(attribute))
-                    return gram;
+            tableName = tableName.ToLower();
+            attributeName = attributeName.ToLower();
 
-            throw new ArgumentException("No histogram found");
+            Dictionary<string, IHistogram> table;
+            if (!Histograms.TryGetValue(tableName, out table!))
+                throw new KeyNotFoundException($"No histograms found for table '{tableName}'");
+
+            IHistogram histogram;
+            if (!table.TryGetValue(attributeName, out histogram!))
+                throw new KeyNotFoundException($"Attribute '{attributeName}' not found for table '{tableName}'");
+
+            return histogram;
         }
 
         public List<IHistogram> GetHistogramsByTable(string table)
         {
-            List<IHistogram> grams = new List<IHistogram>();
-            foreach (var gram in Histograms)
-                if (gram.TableName.Equals(table))
-                    grams.Add(gram);
+            if (!Histograms.ContainsKey(table))
+                return new List<IHistogram>();
 
-            return grams;
+            return Histograms[table].Values.ToList();
         }
         public List<IHistogram> GetHistogramsByAttribute(string attribute)
         {
-            List<IHistogram> grams = new List<IHistogram>();
-            foreach (var gram in Histograms)
-                if (gram.AttributeName.Equals(attribute))
-                    grams.Add(gram);
-
-            return grams;
+            return Histograms
+                .Select(tableDict => tableDict.Value)
+                .Select(table => (IEnumerable<IHistogram>)table.Values.ToList())
+                .Aggregate((histograms, histogram) => histogram.Union(histograms))
+                .Where(histogram => histogram.AttributeName == attribute)
+                .ToList();
         }
+
+        protected abstract Task AddHistogramForAttribute(string attributeName, string tableName);
+
 
         public override string? ToString()
         {
