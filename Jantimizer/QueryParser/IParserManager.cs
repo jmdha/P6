@@ -16,11 +16,7 @@ namespace QueryParser
         public List<IQueryParser> QueryParsers { get; set; }
 
         /// <summary>
-        /// Parse a query, by finding the first parser that:
-        /// <list type="number">
-        ///     <item>Can accept the query. <see cref="IQueryParser.DoesQueryMatch(string)"/></item>
-        ///     <item>Does not return a null <see cref="List"/> of <see cref="INode"/>s</item>
-        /// </list>
+        /// Parse a query, by finding the first parser that can accept the query. <see cref="IQueryParser.DoesQueryMatch(string)"/>
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -34,7 +30,7 @@ namespace QueryParser
         /// <param name="query"></param>
         /// <param name="parser"></param>
         /// <returns></returns>
-        public List<INode>? ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser;
-        public Task<List<INode>>? ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser;
+        public List<INode> ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser;
+        public Task<List<INode>> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser;
     }
 }

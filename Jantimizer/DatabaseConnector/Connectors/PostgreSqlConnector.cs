@@ -32,11 +32,72 @@ namespace DatabaseConnector.Connectors
             return sb.ToString();
         }
 
-        public override async Task<DataSet> AnalyseQuery(string query)
+
+        #region AnalyseQuery
+
+        public override async Task<DataSet> AnalyseQueryAsync(string query)
         {
-            if (!query.ToUpper().Trim().StartsWith("EXPLAIN ANALYZE "))
-                return await CallQuery($"EXPLAIN ANALYZE {query}");
-            return await CallQuery(query);
+            return await CallQueryAsync($"ANALYZE {RemoveExplainIfThere(query)}");
+        }
+
+        public override DataSet AnalyseQuery(string query)
+        {
+            return CallQuery($"ANALYZE {RemoveExplainIfThere(query)}");
+        }
+
+        #endregion
+
+        #region ExplainQuery
+
+        public override async Task<DataSet> ExplainQueryAsync(string query)
+        {
+            return await CallQueryAsync($"EXPLAIN {RemoveAnalyseIfThere(query)}");
+        }
+
+        public override DataSet ExplainQuery(string query)
+        {
+            return CallQuery($"EXPLAIN {RemoveAnalyseIfThere(query)}");
+        }
+
+        #endregion
+
+        #region AnalyseExplainQuery
+
+        public override async Task<DataSet> AnalyseExplainQueryAsync(string query)
+        {
+            return await CallQueryAsync($"EXPLAIN ANALYZE {RemoveExplainAnalyseIfThere(query)}");
+        }
+
+        public override DataSet AnalyseExplainQuery(string query)
+        {
+            return CallQuery($"EXPLAIN ANALYZE {RemoveExplainAnalyseIfThere(query)}");
+        }
+
+        #endregion
+
+        private string RemoveExplainAnalyseIfThere(string query)
+        {
+            return RemoveAnalyseIfThere(RemoveExplainIfThere(query));
+        }
+
+        private string RemoveExplainIfThere(string query)
+        {
+            query = query.Trim();
+            if (query.ToUpper().Contains(" EXPLAIN "))
+                query = query.ToUpper().Replace(" EXPLAIN ", "");
+            if (query.ToUpper().StartsWith("EXPLAIN "))
+                query = query.ToUpper().Replace("EXPLAIN ", "");
+            return query;
+        }
+
+        private string RemoveAnalyseIfThere(string query)
+        {
+            query = query.Trim();
+            if (query.ToUpper().Contains(" ANALYSE "))
+                query = query.ToUpper().Replace(" ANALYSE ", "");
+            if (query.ToUpper().StartsWith("ANALYSE "))
+                query = query.ToUpper().Replace("ANALYSE ", "");
+            return query;
         }
     }
 }

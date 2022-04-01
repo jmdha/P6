@@ -35,7 +35,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetTablesInSchema()
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.tables WHERE table_schema = current_schema();");
+            var returnRows = await DbConnector.CallQueryAsync($"SELECT * FROM information_schema.tables WHERE table_schema = current_schema();");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -43,7 +43,7 @@ namespace Histograms.Managers
 
         private async Task<DataTable> GetAttributenamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = '{tableName}';");
+            var returnRows = await DbConnector.CallQueryAsync($"SELECT * FROM information_schema.columns WHERE table_schema = current_schema() AND table_name = '{tableName}';");
             if (returnRows.Tables.Count > 0)
                 return returnRows.Tables[0];
             return new DataTable();
@@ -52,7 +52,7 @@ namespace Histograms.Managers
         private async Task AddHistogramForAttribute(DataRow row, string tableName)
         {
             string attributeName = $"{row["column_name"]}".ToLower();
-            DataSet sortedGroupsDs = await DbConnector.CallQuery(@$"
+            DataSet sortedGroupsDs = await DbConnector.CallQueryAsync(@$"
                 SELECT
                     {attributeName} AS val,
                     COUNT({attributeName})

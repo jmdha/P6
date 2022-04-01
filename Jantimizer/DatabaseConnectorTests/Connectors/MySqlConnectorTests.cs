@@ -60,7 +60,7 @@ namespace DatabaseConnectorTests.Connectors
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
-            var result = await connector.CallQuery("abc");
+            var result = await connector.CallQueryAsync("abc");
         }
 
         [TestMethod]
@@ -72,7 +72,7 @@ namespace DatabaseConnectorTests.Connectors
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
-            var result = await connector.CallQuery("abc");
+            var result = await connector.CallQueryAsync("abc");
         }
 
         #endregion
