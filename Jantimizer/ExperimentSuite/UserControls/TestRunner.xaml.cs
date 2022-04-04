@@ -78,21 +78,7 @@ namespace ExperimentSuite.UserControls
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
-                List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
-                HistogramProgressBar.Maximum = tasks.Count;
-                HistogramProgressBar.Value = 0;
-                Update_HistogramProgressLabel(0, (int)HistogramProgressBar.Maximum);
-                // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
-                while (tasks.Any())
-                {
-                    var finishedTask = await Task.WhenAny(tasks);
-                    tasks.Remove(finishedTask);
-                    await finishedTask;
-                    HistogramProgressBar.Value++;
-                    Update_HistogramProgressLabel((int)HistogramProgressBar.Value, (int)HistogramProgressBar.Maximum);
-                }
-                HistogramProgressBar.Value = HistogramProgressBar.Maximum;
-                Update_HistogramProgressLabel((int)HistogramProgressBar.Maximum, (int)HistogramProgressBar.Maximum);
+                await HistogramControl.GenerateHistograms(RunData.HistoManager);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -131,15 +117,14 @@ namespace ExperimentSuite.UserControls
         {
             PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestReport>();
-            SQLProgressBar.Maximum = CaseFiles.Count();
+            SQLFileControl.SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
                     await Task.Delay(1);
-                    Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
-                    CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
-                    SQLProgressBar.Value++;
+                    SQLFileControl.UpdateFileLabel(queryFile.Name);
+                    SQLFileControl.SQLProgressBar.Value++;
                     DataSet dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
@@ -154,8 +139,7 @@ namespace ExperimentSuite.UserControls
                     MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
                 }
             }
-            SQLProgressBar.Value = SQLProgressBar.Maximum;
-            Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
+            SQLFileControl.SQLProgressBar.Value = SQLFileControl.SQLProgressBar.Maximum;
             return testCases;
         }
 
@@ -187,20 +171,10 @@ namespace ExperimentSuite.UserControls
                 RunnerGrid.Height = collapesedHeight;
         }
 
-        private void StatusTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void Textbox_Autoscroll_ToBottom(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
                 textBox.ScrollToEnd();
-        }
-
-        private void Update_HistogramProgressLabel(int current, int max)
-        {
-            HistogramProgressLabel.Content = $"Histogram Progress ({current}/{max})";
-        }
-
-        private void Update_SQLProgressLabel(int current, int max)
-        {
-            SQLProgressLabel.Content = $"SQL Progress ({current}/{max})";
         }
     }
 }

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ExperimentSuite.Models"
+             xmlns:local="clr-namespace:ExperimentSuite.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid x:Name="RunnerGrid" Background="Gray" Margin="5">
@@ -24,16 +24,13 @@
         <Label x:Name="TestNameLabel" Foreground="Red"/>
 
         <Label Content="Status" Grid.Row="1" Grid.Column="0"/>
-        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" Margin="5" IsEnabled="False" FontFamily="Courier New" VerticalScrollBarVisibility="Visible" TextChanged="StatusTextBox_TextChanged"/>
-        <TextBox x:Name="FileStatusTextBox" Grid.Row="2" Grid.Column="1" Margin="5" IsEnabled="False" FontFamily="Courier New" VerticalScrollBarVisibility="Visible" TextChanged="StatusTextBox_TextChanged"/>
+        <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" Margin="5" IsEnabled="False" FontFamily="Courier New" VerticalScrollBarVisibility="Visible" TextChanged="Textbox_Autoscroll_ToBottom"/>
+        <TextBox x:Name="FileStatusTextBox" Grid.Row="2" Grid.Column="1" Margin="5" IsEnabled="False" FontFamily="Courier New" VerticalScrollBarVisibility="Visible" TextChanged="Textbox_Autoscroll_ToBottom"/>
 
         <Label Content="Progress" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"/>
         <StackPanel Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="1" Margin="5">
-            <Label x:Name="HistogramProgressLabel" Content="Histogram Progress (0/0)"/>
-            <ProgressBar x:Name="HistogramProgressBar" Height="20"/>
-            <Label x:Name="SQLProgressLabel" Content="SQL Progress (0/0)"/>
-            <Label x:Name="CurrentSqlFileLabels" Content="File: " FontSize="10"/>
-            <ProgressBar x:Name="SQLProgressBar" Height="20"/>
+            <local:HistogramGeneratorControl x:Name="HistogramControl"/>
+            <local:SQLFileProgressControl x:Name="SQLFileControl"/>
         </StackPanel>
 
         <Label Content="Report" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"/>
