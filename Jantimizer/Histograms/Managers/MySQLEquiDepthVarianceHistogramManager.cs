@@ -11,7 +11,7 @@ using Histograms.DataGatherers;
 
 namespace Histograms.Managers
 {
-    public class MySQLEquiDepthVarianceHistogramManager : BaseEquiDepthHistogramManager
+    public class MySQLEquiDepthVarianceHistogramManager : BaseEquiDepthVarianceHistogramManager
     {
         public MySQLEquiDepthVarianceHistogramManager(ConnectionProperties connectionProperties, int depth) : this(new MySqlDataGatherer(connectionProperties), depth)
         { }

@@ -12,7 +12,7 @@ using Histograms.DataGatherers;
 
 namespace Histograms.Managers
 {
-    public class PostgresEquiDepthVarianceHistogramManager : BaseEquiDepthHistogramManager
+    public class PostgresEquiDepthVarianceHistogramManager : BaseEquiDepthVarianceHistogramManager
     {
         public PostgresEquiDepthVarianceHistogramManager(ConnectionProperties connectionProperties, int depth) : this(new PostgresDataGatherer(connectionProperties), depth)
         { }
