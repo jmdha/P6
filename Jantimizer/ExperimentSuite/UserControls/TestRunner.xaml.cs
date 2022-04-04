@@ -66,13 +66,13 @@ namespace ExperimentSuite.UserControls
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
                 PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name, ConsoleColor.Red);
-                await RunData.Connector.CallQuery(CleanupFile);
+                await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
             if (RunData.Settings.DoSetup != null && (bool)RunData.Settings.DoSetup)
             {
                 PrintTestUpdate("Running Setup", SetupFile.Name);
-                await RunData.Connector.CallQuery(SetupFile);
+                await RunData.Connector.CallQueryAsync(SetupFile);
             }
 
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
@@ -104,7 +104,7 @@ namespace ExperimentSuite.UserControls
             if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
             {
                 PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name, ConsoleColor.Red);
-                await RunData.Connector.CallQuery(CleanupFile);
+                await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
             if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
@@ -136,7 +136,7 @@ namespace ExperimentSuite.UserControls
                     Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
                     CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
                     SQLProgressBar.Value++;
-                    DataSet dbResult = await RunData.Connector.AnalyseQuery(queryFile);
+                    DataSet dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);

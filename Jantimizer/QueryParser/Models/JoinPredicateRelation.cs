@@ -8,26 +8,18 @@ namespace QueryParser.Models
 {
     public class JoinPredicateRelation
     {
-        public enum RelationType
-        {
-            None,
-            And,
-            Or,
-            Predicate
-        }
-
         public JoinPredicate? LeafPredicate { get; internal set; }
         public JoinPredicateRelation? LeftRelation { get; internal set; }
         public JoinPredicateRelation? RightRelation { get; internal set; }
-        public RelationType Type { get; internal set; }
+        public RelationType.Type Type { get; internal set; }
 
         public JoinPredicateRelation(JoinPredicate leafCondition)
         {
             LeafPredicate = leafCondition;
-            Type = RelationType.Predicate;
+            Type = RelationType.Type.Predicate;
         }
 
-        public JoinPredicateRelation(JoinPredicateRelation leftRelation, JoinPredicateRelation rightRelation, RelationType type)
+        public JoinPredicateRelation(JoinPredicateRelation leftRelation, JoinPredicateRelation rightRelation, RelationType.Type type)
         {
             LeftRelation = leftRelation;
             RightRelation = rightRelation;
@@ -49,18 +41,6 @@ namespace QueryParser.Models
                     tables.Add(LeafPredicate.RightTable);
             }
             return tables;
-        }
-
-        public static string GetRelationString(RelationType type)
-        {
-            switch (type)
-            {
-                case RelationType.None: throw new ArgumentException("Parameter type given was not initialized");
-                case RelationType.And: return "AND";
-                case RelationType.Or: return "OR";
-                default:
-                    throw new ArgumentException("Unhandled relation type", type.ToString());
-            }
         }
     }
 }

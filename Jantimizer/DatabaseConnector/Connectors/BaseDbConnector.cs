@@ -41,7 +41,10 @@ namespace DatabaseConnector.Connectors
 
         public abstract string BuildConnectionString();
 
-        public async Task<DataSet> CallQuery(string query)
+        #region CallQuery
+
+        public async Task<DataSet> CallQueryAsync(FileInfo sqlFile) => await CallQueryAsync(File.ReadAllText(sqlFile.FullName));
+        public async Task<DataSet> CallQueryAsync(string query)
         {
             using (var conn = new Connector())
             {
@@ -64,9 +67,57 @@ namespace DatabaseConnector.Connectors
             }
         }
 
-        public Task<DataSet> CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
+        public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
+        public DataSet CallQuery(string query)
+        {
+            using (var conn = new Connector())
+            {
+                conn.ConnectionString = BuildConnectionString();
+                conn.Open();
+                using (var cmd = new Command())
+                {
+                    cmd.Connection = conn;
+                    cmd.CommandText = query;
 
-        public Task<DataSet> AnalyseQuery(FileInfo sqlFile) => AnalyseQuery(File.ReadAllText(sqlFile.FullName));
-        public abstract Task<DataSet> AnalyseQuery(string query);
+                    using (var sqlAdapter = new Adapter())
+                    {
+                        sqlAdapter.SelectCommand = cmd;
+                        DataSet dt = new DataSet();
+                        sqlAdapter.Fill(dt);
+
+                        return dt;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region AnalyseQuery
+
+        public async Task<DataSet> AnalyseQueryAsync(FileInfo sqlFile) => await AnalyseQueryAsync(File.ReadAllText(sqlFile.FullName));
+        public abstract Task<DataSet> AnalyseQueryAsync(string query);
+        public DataSet AnalyseQuery(FileInfo sqlFile) => AnalyseQuery(File.ReadAllText(sqlFile.FullName));
+        public abstract DataSet AnalyseQuery(string query);
+
+        #endregion
+
+        #region ExplainQuery
+
+        public async Task<DataSet> ExplainQueryAsync(FileInfo sqlFile) => await ExplainQueryAsync(File.ReadAllText(sqlFile.FullName));
+        public abstract Task<DataSet> ExplainQueryAsync(string query);
+        public DataSet ExplainQuery(FileInfo sqlFile) => ExplainQuery(File.ReadAllText(sqlFile.FullName));
+        public abstract DataSet ExplainQuery(string query);
+
+        #endregion
+
+        #region AnalyseExplainQuery
+
+        public async Task<DataSet> AnalyseExplainQueryAsync(FileInfo sqlFile) => await AnalyseExplainQueryAsync(File.ReadAllText(sqlFile.FullName));
+        public abstract Task<DataSet> AnalyseExplainQueryAsync(string query);
+        public DataSet AnalyseExplainQuery(FileInfo sqlFile) => AnalyseExplainQuery(File.ReadAllText(sqlFile.FullName));
+        public abstract DataSet AnalyseExplainQuery(string query);
+
+        #endregion
     }
 }

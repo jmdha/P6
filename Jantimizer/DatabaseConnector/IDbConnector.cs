@@ -16,10 +16,24 @@ namespace DatabaseConnector
 
         public string BuildConnectionString();
 
-        public Task<DataSet> CallQuery(FileInfo sqlFile);
-        public Task<DataSet> CallQuery(string query);
+        public Task<DataSet> CallQueryAsync(FileInfo sqlFile);
+        public Task<DataSet> CallQueryAsync(string query);
+        public DataSet CallQuery(FileInfo sqlFile);
+        public DataSet CallQuery(string query);
 
-        public Task<DataSet> AnalyseQuery(FileInfo sqlFile);
-        public Task<DataSet> AnalyseQuery(string query);
+        public Task<DataSet> AnalyseQueryAsync(FileInfo sqlFile);
+        public Task<DataSet> AnalyseQueryAsync(string query);
+        public DataSet AnalyseQuery(FileInfo sqlFile);
+        public DataSet AnalyseQuery(string query);
+
+        public Task<DataSet> ExplainQueryAsync(FileInfo sqlFile);
+        public Task<DataSet> ExplainQueryAsync(string query);
+        public DataSet ExplainQuery(FileInfo sqlFile);
+        public DataSet ExplainQuery(string query);
+
+        public Task<DataSet> AnalyseExplainQueryAsync(FileInfo sqlFile);
+        public Task<DataSet> AnalyseExplainQueryAsync(string query);
+        public DataSet AnalyseExplainQuery(FileInfo sqlFile);
+        public DataSet AnalyseExplainQuery(string query);
     }
 }

@@ -14,9 +14,5 @@
             TableName = tableName;
             Alias = alias;
         }
-        public override string ToString()
-        {
-            return $"{TableName} AS {Alias}";
-        }
     }
 }

@@ -15,6 +15,7 @@ namespace QueryParser.QueryParsers
         /// <param name="query"></param>
         /// <returns></returns>
         public bool DoesQueryMatch(string query);
+        public Task<bool> DoesQueryMatchAsync(string query);
 
         /// <summary>
         /// Parse the query, and return a set of <see cref="INode"/> back.
