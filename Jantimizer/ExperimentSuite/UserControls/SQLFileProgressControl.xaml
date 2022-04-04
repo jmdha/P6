@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="ExperimentSuite.UserControls.SQLFileProgressControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExperimentSuite.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Label x:Name="SQLProgressLabel" Content="SQL Progress (0/0)"/>
+        <Label x:Name="CurrentSqlFileLabels" Content="File: " FontSize="10"/>
+        <ProgressBar x:Name="SQLProgressBar" Height="20" ValueChanged="SQLProgressBar_ValueChanged"/>
+    </StackPanel>
+</UserControl>

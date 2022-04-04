@@ -1,4 +1,5 @@
 ﻿using DatabaseConnector.Connectors;
+using QueryParser.Exceptions;
 using QueryParser.Models;
 using System;
 using System.Collections.Generic;
@@ -9,25 +10,48 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleToAttribute("QueryParserTest")]
+[assembly: InternalsVisibleTo("QueryParserTest")]
 
 namespace QueryParser.QueryParsers
 {
     public class PostgresParser : IQueryParser
     {
-        private PostgreSqlConnector Connector { get; set; }
+        private PostgreSqlConnector? Connector { get; set; }
 
-        public PostgresParser(PostgreSqlConnector connector)
+        public PostgresParser(PostgreSqlConnector? connector = null)
         {
             Connector = connector;
         }
 
-
         public bool DoesQueryMatch(string query)
         {
-            return true;
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
+            try
+            {
+                Connector.ExplainQuery(query);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
+        public async Task<bool> DoesQueryMatchAsync(string query)
+        {
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
+            try
+            {
+                await Connector.ExplainQueryAsync(query);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public List<INode> ParseQuery(string query)
         {
@@ -42,14 +66,14 @@ namespace QueryParser.QueryParsers
             return parsed.Joins.Select(j => j as INode).ToList();
         }
 
-        public async Task<ParserResult> GetParserResult(string query)
+        private async Task<ParserResult> GetParserResult(string query)
         {
-            string explanationTextBlock = await GetPGExplainationTextBlock(query);
+            string explanationTextBlock = await GetPGExplainationTextBlockAsync(query);
 
             return AnalyseExplanationText(explanationTextBlock);
         }
 
-        public ParserResult AnalyseExplanationText(string explanationText)
+        internal ParserResult AnalyseExplanationText(string explanationText)
         {
             var result = new ParserResult();
 
@@ -62,7 +86,7 @@ namespace QueryParser.QueryParsers
         }
 
 
-        private static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
+        internal static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
         internal void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
@@ -80,7 +104,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private static string GetAliasFromRegexMatch(Match match)
+        internal string GetAliasFromRegexMatch(Match match)
         {
             if (match.Groups["alias"].Success)
                 return match.Groups["alias"].Value;
@@ -88,7 +112,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        private static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
+        internal static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
         internal void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
@@ -111,7 +135,7 @@ namespace QueryParser.QueryParsers
         }
 
 
-        private static readonly Regex FilterAndConditionFinder = new Regex(@"
+        internal static readonly Regex FilterAndConditionFinder = new Regex(@"
                 (?:^\s*->.*?\sScan(?:\susing\s\w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?\s\s\(cost=[^\n]+)
 
                 (?:\s+ Index\ Cond:\ \((?<joinProp>\w+)\ (?<relation>[=<>]{1,2})\ (?<otherAlias>\w+)\.(?<otherProp>\w+)\))?
@@ -170,10 +194,11 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        private async Task<string> GetPGExplainationTextBlock(string query)
+        internal async Task<string> GetPGExplainationTextBlockAsync(string query)
         {
-            string explainQuery = $"EXPLAIN {query}";
-            var explanation = await Connector.CallQuery(explainQuery);
+            if (Connector == null)
+                throw new ArgumentNullException("Connector was not set for the query parser!");
+            var explanation = await Connector.ExplainQueryAsync(query);
             var rawRows = explanation.Tables[0].Rows;
 
             var stringRows = new List<string>();
@@ -182,7 +207,7 @@ namespace QueryParser.QueryParsers
             {
                 object queryPlan = row["QUERY PLAN"];
                 if (queryPlan == null)
-                    throw new NullReferenceException($"\"QUERY PLAN\" not found from running '{explainQuery}' on postgres. Verify the connection");
+                    throw new NullReferenceException($"\"QUERY PLAN\" not found from running '{query}' on postgres. Verify the connection");
 
                 string? rowStr = queryPlan.ToString();
 
@@ -193,24 +218,24 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        private JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
+        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
         {
-            JoinPredicateRelation.RelationType[] relationTypes = new JoinPredicateRelation.RelationType[] { JoinPredicateRelation.RelationType.And, JoinPredicateRelation.RelationType.Or };
+            RelationType.Type[] relationTypes = new RelationType.Type[] { RelationType.Type.And, RelationType.Type.Or };
             string[] sides = new string[] {};
-            JoinPredicateRelation.RelationType relationType = JoinPredicateRelation.RelationType.None;
+            RelationType.Type relationType = RelationType.Type.None;
             for (int i = 0; i < relationTypes.Length; i++)
             {
-                sides = predicate.Split(JoinPredicateRelation.GetRelationString(relationTypes[i]));
+                sides = predicate.Split(RelationType.GetRelationString(relationTypes[i]));
                 if (sides.Length == 2)
                 {
                     relationType = relationTypes[i];
                     break;
                 }
             }
-            if (relationType == JoinPredicateRelation.RelationType.None || sides.Length < 1)
+            if (relationType == RelationType.Type.None || sides.Length < 1)
                 return new JoinPredicateRelation(ExtrapolateJoinPredicate(predicate.Replace("(", "").Replace(")", ""), result));
             else if (sides.Length != 2)
-                throw new InvalidDataException("Somehow only had one side " + predicate);
+                throw new InvalidPredicateException("Somehow only had one side!", predicate);
 
             JoinPredicateRelation leftRelation = ExtrapolateRelation(sides[0], result);
             JoinPredicateRelation rightRelation = ExtrapolateRelation(sides[1], result);
@@ -218,7 +243,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        private JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};
@@ -236,13 +261,13 @@ namespace QueryParser.QueryParsers
                 }
             }
             if (comparisonType == ComparisonType.Type.None)
-                throw new InvalidDataException("Has no operator " + predicate);
+                throw new InvalidOperatorException("Has no operator!", predicate);
 
             string[] leftSplit = predicateSplit[0].Split(".");
             string[] rightSplit = predicateSplit[1].Split(".");
 
             if (leftSplit.Length != 2 || rightSplit.Length != 2)
-                throw new InvalidDataException("Invalid split " + predicateSplit[0] + " " + predicateSplit[1]);
+                throw new InvalidPredicateException($"Invalid split in predicate '{predicateSplit[0]} {predicateSplit[1]}'", predicate);
 
             return new JoinPredicate(
                 result.GetTableRef(leftSplit[0].Trim()),

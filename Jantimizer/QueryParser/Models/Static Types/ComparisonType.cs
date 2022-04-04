@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public class ComparisonType
+    public static class ComparisonType
     {
         public enum Type
         {
@@ -20,7 +20,7 @@ namespace QueryParser.Models
 
         public static Type GetOperatorType(string stringOperator)
         {
-            switch (stringOperator)
+            switch (stringOperator.Trim())
             {
                 case "=": return Type.Equal;
                 case "<": return Type.Less;
