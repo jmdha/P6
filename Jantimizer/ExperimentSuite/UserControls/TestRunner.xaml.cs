@@ -36,7 +36,7 @@ namespace ExperimentSuite.UserControls
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
-        public List<TestCaseResult> Results { get; private set; }
+        public List<TestReport> Results { get; private set; }
         private CSVWriter csvWriter;
 
         public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
@@ -47,7 +47,7 @@ namespace ExperimentSuite.UserControls
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
-            Results = new List<TestCaseResult>();
+            Results = new List<TestReport>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
 
@@ -55,17 +55,17 @@ namespace ExperimentSuite.UserControls
             TestNameLabel.Content = RunnerName;
         }
 
-        public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
+        public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             TestNameLabel.Foreground = Brushes.Yellow;
             RunnerGrid.Height = double.NaN;
 
-            PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
             ParseTestSettings(SettingsFile);
 
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
-                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
@@ -103,7 +103,7 @@ namespace ExperimentSuite.UserControls
 
             if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
             {
-                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
@@ -111,22 +111,26 @@ namespace ExperimentSuite.UserControls
             {
                 PrintTestUpdate("Making Report", RunData.Name);
                 if (consoleOutput)
-                    WriteResultToConsole();
+                {
+                    var newMaker = new ReportMaker(Results);
+                    ReportPanel.Children.Add(newMaker);
+
+                }
                 if (saveResult)
                     SaveResult();
             }
 
-            PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Tests finished for:", RunData.Name);
 
             RunnerGrid.Height = collapesedHeight;
             TestNameLabel.Foreground = Brushes.Green;
             return Results;
         }
 
-        private async Task<List<TestCaseResult>> RunQueriesSerial()
+        private async Task<List<TestReport>> RunQueriesSerial()
         {
             PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
-            var testCases = new List<TestCaseResult>();
+            var testCases = new List<TestReport>();
             SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
@@ -142,7 +146,7 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestCaseResult testCase = new TestCaseResult(RunData.Name, RunnerName, queryFile, RunData, analysisResult, jantimiserResult);
+                    TestReport testCase = new TestReport(RunData.Name, queryFile.Name, RunnerName, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
@@ -155,78 +159,9 @@ namespace ExperimentSuite.UserControls
             return testCases;
         }
 
-        private void WriteResultToConsole()
-        {
-            PrintTestUpdate("Displaying report...", RunData.Name);
-
-            ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"));
-
-            foreach (var testCase in Results)
-            {
-                var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
-                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstTotalCardinality);
-
-                ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(new List<string>() {
-                    testCase.Category,
-                    testCase.Name,
-                    testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
-                    testCase.JantimiserResult.EstTotalCardinality.ToString(),
-                    testCase.DbAnalysisResult.ActualCardinality.ToString(),
-                    GetAccuracyAsString(DbAnalysisAccuracy),
-                    GetAccuracyAsString(JantimiserEstimateAccuracy)
-                },
-                new List<string>() {
-                    "{0, -30}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -10}",
-                    "{0, -10}"
-                });
-            }
-        }
-
-        private string GetAccuracyAsString(decimal accuracy)
-        {
-            if (accuracy == 100)
-                return "100   %";
-            else if (accuracy == -1)
-                return "inf   %";
-            else
-                return string.Format("{0, -5} %", accuracy);
-        }
-
-        private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
-        {
-            if (actualValue == 0 && predictedValue == 0)
-                return 100;
-            if (actualValue == 0)
-                return -1;
-            if (actualValue != 0 && predictedValue == 0)
-                return -1;
-            if (actualValue < predictedValue)
-            {
-                decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
-                return Math.Round(value, 2);
-            }
-            if (actualValue > predictedValue)
-            {
-                decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
-                return Math.Round(value, 2);
-            }
-            return 100;
-        }
-
-        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
-        {
-            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20} {5,-10} {6,-10}", category, caseName, predicted, actual, jantimiser, dBAccuracy, jantimiserAccuracy);
-        }
-
         private void SaveResult()
         {
-            csvWriter.Write<TestCaseResult, TestCaseResultMap>(Results, true);
+            csvWriter.Write<TestReport, TestReportMap>(Results, true);
         }
 
         private void ParseTestSettings(FileInfo file)
@@ -238,11 +173,10 @@ namespace ExperimentSuite.UserControls
                 RunData.Settings.Update(set);
         }
 
-        private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
+        private void PrintTestUpdate(string left, string right)
         {
-            StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                    new List<string>() { left, right },
-                    new List<string>() { "{0,-30}", "{0,-30}" });
+            StatusTextBox.Text += left + Environment.NewLine;
+            FileStatusTextBox.Text += right + Environment.NewLine;
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)
