@@ -25,7 +25,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            BaseEquiDepthHistogramManagerStub manager = new BaseEquiDepthHistogramManagerStub(new DataGathererStub(), depth);
+            EquiDepthHistogramManager manager = new EquiDepthHistogramManager(new DataGathererStub(), depth);
 
             // ASSERT
             Assert.AreEqual(depth, manager.Depth);
