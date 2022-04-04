@@ -89,6 +89,7 @@ namespace Histograms.Managers
 
         public List<IHistogram> GetHistogramsByTable(string table)
         {
+            table = table.ToLower();
             if (!Histograms.ContainsKey(table))
                 return new List<IHistogram>();
 

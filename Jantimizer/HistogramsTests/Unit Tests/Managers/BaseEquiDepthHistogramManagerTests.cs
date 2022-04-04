@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
+using HistogramsTests.Stubs;
 
 namespace HistogramsTests.Unit_Tests.Managers
 {
@@ -24,7 +25,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             // ACT
-            MySQLEquiDepthHistogramManager manager = new MySQLEquiDepthHistogramManager(new ConnectionProperties(), depth);
+            BaseEquiDepthHistogramManagerStub manager = new BaseEquiDepthHistogramManagerStub(new DataGathererStub(), depth);
 
             // ASSERT
             Assert.AreEqual(depth, manager.Depth);
@@ -32,9 +33,5 @@ namespace HistogramsTests.Unit_Tests.Managers
 
         #endregion
 
-        #region Properties
-
-
-        #endregion
     }
 }
