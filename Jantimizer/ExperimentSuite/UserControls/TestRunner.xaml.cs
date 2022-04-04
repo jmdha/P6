@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tools.Helpers;
 using Tools.Services;
 
 namespace ExperimentSuite.UserControls
@@ -151,10 +152,8 @@ namespace ExperimentSuite.UserControls
         private void ParseTestSettings(FileInfo file)
         {
             if (!file.Exists)
-                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
-            var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
-            if (res is TestSettings set)
-                RunData.Settings.Update(set);
+                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");                
+            RunData.Settings.Update(JsonParsingHelper.ParseJson<TestSettings>(File.ReadAllText(file.FullName)));
         }
 
         private void PrintTestUpdate(string left, string right)
