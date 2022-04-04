@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tools.Helpers;
 using Tools.Services;
 
 namespace ExperimentSuite.UserControls
@@ -36,18 +37,18 @@ namespace ExperimentSuite.UserControls
         public FileInfo SetupFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
-        public List<TestCaseResult> Results { get; private set; }
+        public List<TestReport> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(string runnerName, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
         {
-            RunnerName = runnerName;
+            RunnerName = name;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
-            Results = new List<TestCaseResult>();
+            Results = new List<TestReport>();
             csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
 
@@ -55,17 +56,17 @@ namespace ExperimentSuite.UserControls
             TestNameLabel.Content = RunnerName;
         }
 
-        public async Task<List<TestCaseResult>> Run(bool consoleOutput = true, bool saveResult = true)
+        public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             TestNameLabel.Foreground = Brushes.Yellow;
             RunnerGrid.Height = double.NaN;
 
-            PrintTestUpdate("Parsing settings file:", SettingsFile.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
             ParseTestSettings(SettingsFile);
 
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
-                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
@@ -78,21 +79,7 @@ namespace ExperimentSuite.UserControls
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
                 PrintTestUpdate("Generating Histograms for:", RunData.Name);
-                List<Task> tasks = await RunData.HistoManager.AddHistogramsFromDB();
-                HistogramProgressBar.Maximum = tasks.Count;
-                HistogramProgressBar.Value = 0;
-                Update_HistogramProgressLabel(0, (int)HistogramProgressBar.Maximum);
-                // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
-                while (tasks.Any())
-                {
-                    var finishedTask = await Task.WhenAny(tasks);
-                    tasks.Remove(finishedTask);
-                    await finishedTask;
-                    HistogramProgressBar.Value++;
-                    Update_HistogramProgressLabel((int)HistogramProgressBar.Value, (int)HistogramProgressBar.Maximum);
-                }
-                HistogramProgressBar.Value = HistogramProgressBar.Maximum;
-                Update_HistogramProgressLabel((int)HistogramProgressBar.Maximum, (int)HistogramProgressBar.Maximum);
+                await HistogramControl.GenerateHistograms(RunData.HistoManager);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
@@ -103,7 +90,7 @@ namespace ExperimentSuite.UserControls
 
             if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
             {
-                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name, ConsoleColor.Red);
+                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
@@ -111,32 +98,33 @@ namespace ExperimentSuite.UserControls
             {
                 PrintTestUpdate("Making Report", RunData.Name);
                 if (consoleOutput)
-                    WriteResultToConsole();
+                {
+                    var newMaker = new ReportMaker(Results);
+                    ReportPanel.Children.Add(newMaker);
+
+                }
                 if (saveResult)
                     SaveResult();
             }
 
-            PrintTestUpdate("Tests finished for:", RunData.Name, ConsoleColor.Yellow);
+            PrintTestUpdate("Tests finished for:", RunData.Name);
 
             RunnerGrid.Height = collapesedHeight;
             TestNameLabel.Foreground = Brushes.Green;
             return Results;
         }
 
-        private async Task<List<TestCaseResult>> RunQueriesSerial()
+        private async Task<List<TestReport>> RunQueriesSerial()
         {
-            PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
-            var testCases = new List<TestCaseResult>();
-            SQLProgressBar.Maximum = CaseFiles.Count();
+            var testCases = new List<TestReport>();
+            SQLFileControl.SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
                 try
                 {
                     await Task.Delay(1);
-                    Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
-                    CurrentSqlFileLabels.Content = $"File: {queryFile.Name}";
-                    SQLProgressBar.Value++;
-
+                    SQLFileControl.UpdateFileLabel(queryFile.Name);
+                    SQLFileControl.SQLProgressBar.Value++;
                     ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(queryFile, RunnerName);
                     DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
 
@@ -145,7 +133,7 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestCaseResult testCase = new TestCaseResult(RunData.Name, RunnerName, queryFile, RunData, analysisResult, jantimiserResult);
+                    TestReport testCase = new TestReport(RunData.Name, queryFile.Name, RunnerName, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
@@ -153,8 +141,7 @@ namespace ExperimentSuite.UserControls
                     MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
                 }
             }
-            SQLProgressBar.Value = SQLProgressBar.Maximum;
-            Update_SQLProgressLabel((int)SQLProgressBar.Value, (int)SQLProgressBar.Maximum);
+            SQLFileControl.SQLProgressBar.Value = SQLFileControl.SQLProgressBar.Maximum;
             return testCases;
         }
 
@@ -178,94 +165,22 @@ namespace ExperimentSuite.UserControls
             return analysisResult;
         }
 
-        private void WriteResultToConsole()
-        {
-            PrintTestUpdate("Displaying report...", RunData.Name);
-
-            ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                FormatList("Category", "Case Name", "P. Db Rows", "P. Jantimiser Rows", "Actual Rows", "DB Acc (%)", "Jantimiser Acc (%)"));
-
-            foreach (var testCase in Results)
-            {
-                var DbAnalysisAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.DbAnalysisResult.EstimatedCardinality);
-                var JantimiserEstimateAccuracy = GetAccuracy(testCase.DbAnalysisResult.ActualCardinality, testCase.JantimiserResult.EstTotalCardinality);
-
-                ReportTextBox.Text += PrintUtilities.FormatUtil.PrintLine(new List<string>() {
-                    testCase.Category,
-                    testCase.Name,
-                    testCase.DbAnalysisResult.EstimatedCardinality.ToString(),
-                    testCase.JantimiserResult.EstTotalCardinality.ToString(),
-                    testCase.DbAnalysisResult.ActualCardinality.ToString(),
-                    GetAccuracyAsString(DbAnalysisAccuracy),
-                    GetAccuracyAsString(JantimiserEstimateAccuracy)
-                },
-                new List<string>() {
-                    "{0, -30}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -20}",
-                    "{0, -10}",
-                    "{0, -10}"
-                });
-            }
-        }
-
-        private string GetAccuracyAsString(decimal accuracy)
-        {
-            if (accuracy == 100)
-                return "100   %";
-            else if (accuracy == -1)
-                return "inf   %";
-            else
-                return string.Format("{0, -5} %", accuracy);
-        }
-
-        private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
-        {
-            if (actualValue == 0 && predictedValue == 0)
-                return 100;
-            if (actualValue == 0)
-                return -1;
-            if (actualValue != 0 && predictedValue == 0)
-                return -1;
-            if (actualValue < predictedValue)
-            {
-                decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
-                return Math.Round(value, 2);
-            }
-            if (actualValue > predictedValue)
-            {
-                decimal value = ((decimal)predictedValue / (decimal)actualValue) * 100;
-                return Math.Round(value, 2);
-            }
-            return 100;
-        }
-
-        private string FormatList(string category, string caseName, string predicted, string actual, string jantimiser, string dBAccuracy, string jantimiserAccuracy)
-        {
-            return string.Format("{0,-30} {1,-20} {2,-20} {3,-20} {4,-20} {5,-10} {6,-10}", category, caseName, predicted, actual, jantimiser, dBAccuracy, jantimiserAccuracy);
-        }
-
         private void SaveResult()
         {
-            csvWriter.Write<TestCaseResult, TestCaseResultMap>(Results, true);
+            csvWriter.Write<TestReport, TestReportMap>(Results, true);
         }
 
         private void ParseTestSettings(FileInfo file)
         {
             if (!file.Exists)
                 throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
-            var res = JsonSerializer.Deserialize(File.ReadAllText(file.FullName), typeof(TestSettings));
-            if (res is TestSettings set)
-                RunData.Settings.Update(set);
+            RunData.Settings.Update(JsonParsingHelper.ParseJson<TestSettings>(File.ReadAllText(file.FullName)));
         }
 
-        private void PrintTestUpdate(string left, string right, ConsoleColor leftColor = ConsoleColor.Blue, ConsoleColor rightColor = ConsoleColor.DarkGray)
+        private void PrintTestUpdate(string left, string right)
         {
-            StatusTextBox.Text += PrintUtilities.FormatUtil.PrintLine(
-                    new List<string>() { left, right },
-                    new List<string>() { "{0,-30}", "{0,-30}" });
+            StatusTextBox.Text += left + Environment.NewLine;
+            FileStatusTextBox.Text += right + Environment.NewLine;
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)
@@ -276,20 +191,10 @@ namespace ExperimentSuite.UserControls
                 RunnerGrid.Height = collapesedHeight;
         }
 
-        private void StatusTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void Textbox_Autoscroll_ToBottom(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
                 textBox.ScrollToEnd();
-        }
-
-        private void Update_HistogramProgressLabel(int current, int max)
-        {
-            HistogramProgressLabel.Content = $"Histogram Progress ({current}/{max})";
-        }
-
-        private void Update_SQLProgressLabel(int current, int max)
-        {
-            SQLProgressLabel.Content = $"SQL Progress ({current}/{max})";
         }
     }
 }
