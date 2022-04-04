@@ -21,7 +21,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<IEnumerable<string>> GetTableNamesInSchema()
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();");
+            var returnRows = await DbConnector.CallQueryAsync($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();");
             if (returnRows.Tables.Count == 0)
                 throw new NoNullAllowedException("Unexpected no result from database");
 
@@ -32,7 +32,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName)
         {
-            var returnRows = await DbConnector.CallQuery($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = database() AND TABLE_NAME = '{tableName}';");
+            var returnRows = await DbConnector.CallQueryAsync($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = database() AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count == 0)
                 throw new NoNullAllowedException("Unexpected no result from database");
 
@@ -43,7 +43,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName)
         {
-            DataSet sortedGroupsDs = await DbConnector.CallQuery(@$"
+            DataSet sortedGroupsDs = await DbConnector.CallQueryAsync(@$"
                 SELECT
                     {attributeName} AS val,
                     COUNT({attributeName}) AS c
