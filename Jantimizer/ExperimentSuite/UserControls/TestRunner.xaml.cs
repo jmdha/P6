@@ -116,7 +116,6 @@ namespace ExperimentSuite.UserControls
 
         private async Task<List<TestReport>> RunQueriesSerial()
         {
-            PrintUtilities.PrintUtil.PrintLine($"Running tests...", 2, ConsoleColor.Green);
             var testCases = new List<TestReport>();
             SQLFileControl.SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
