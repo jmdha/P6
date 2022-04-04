@@ -58,30 +58,27 @@ namespace ExperimentSuite
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");
             var testsPath = IOHelper.GetDirectory("../../../Tests");
-            var res = JsonSerializer.Deserialize(File.ReadAllText(experimentsFile.FullName), typeof(ExperimentList));
-            if (res is ExperimentList expList)
+            var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
+            ExperimentProgressBar.Maximum = expList.Experiments.Count;
+            ExperimentProgressBar.Value = 0;
+            foreach (var experiment in expList.Experiments)
             {
-                ExperimentProgressBar.Maximum = expList.Experiments.Count;
-                ExperimentProgressBar.Value = 0;
-                foreach (var experiment in expList.Experiments)
+                if (experiment.RunExperiment)
                 {
-                    if (experiment.RunExperiment)
-                    {
-                        ExperimentProgressBar.Value++;
-                        ExperimentNameLabel.Content = experiment.ExperimentName;
-                        TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
-                        var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
+                    ExperimentProgressBar.Value++;
+                    ExperimentNameLabel.Content = experiment.ExperimentName;
+                    TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
+                    var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
 
-                        WriteToStatus($"Running experiment {experiment.ExperimentName}");
-                        await RunExperimentQueue(
-                            GetRunDataFromList(experiment.PreRunData, connectorSet, testsPath, runTime),
-                            experiment.RunParallel);
-                        await RunExperimentQueue(
-                            GetRunDataFromList(experiment.RunData, connectorSet, testsPath, runTime),
-                            experiment.RunParallel);
-                    }
-                    WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
+                    WriteToStatus($"Running experiment {experiment.ExperimentName}");
+                    await RunExperimentQueue(
+                        GetRunDataFromList(experiment.PreRunData, connectorSet, testsPath, runTime),
+                        experiment.RunParallel);
+                    await RunExperimentQueue(
+                        GetRunDataFromList(experiment.RunData, connectorSet, testsPath, runTime),
+                        experiment.RunParallel);
                 }
+                WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
             }
             ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
             WriteToStatus("All experiments complete!");
