@@ -125,8 +125,10 @@ namespace ExperimentSuite.UserControls
                     await Task.Delay(1);
                     SQLFileControl.UpdateFileLabel(queryFile.Name);
                     SQLFileControl.SQLProgressBar.Value++;
-                    DataSet dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
-                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(queryFile, RunnerName);
+                    DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
+
+                    AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
 
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
@@ -143,6 +145,26 @@ namespace ExperimentSuite.UserControls
             return testCases;
         }
 
+        private async Task<DataSet> GetResultWithCache(FileInfo queryFile, ulong? accCardinality)
+        {
+            DataSet dbResult;
+            if (accCardinality != null)
+                dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
+            else
+                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+            return dbResult;
+        }
+
+        private AnalysisResult CacheActualCardinalitiesIfNotSet(DataSet dbResult, FileInfo queryFile, ulong? accCardinality)
+        {
+            AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+            if (accCardinality != null)
+                analysisResult.ActualCardinality = (ulong)accCardinality;
+            else
+                QueryPlanCacher.AddToCacheIfNotThere(queryFile, RunnerName, analysisResult.ActualCardinality);
+            return analysisResult;
+        }
+
         private void SaveResult()
         {
             csvWriter.Write<TestReport, TestReportMap>(Results, true);
@@ -151,7 +173,7 @@ namespace ExperimentSuite.UserControls
         private void ParseTestSettings(FileInfo file)
         {
             if (!file.Exists)
-                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");                
+                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
             RunData.Settings.Update(JsonParsingHelper.ParseJson<TestSettings>(File.ReadAllText(file.FullName)));
         }
 

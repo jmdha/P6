@@ -42,6 +42,10 @@ namespace QueryPlanParser.Parsers
                     break;
             }
 
+            if (analysisRes.ActualCardinality == null)
+                analysisRes.ActualCardinality = 0;
+            if (analysisRes.ActualTime == null)
+                analysisRes.ActualTime = new TimeSpan();
             return analysisRes;
         }
 
@@ -71,7 +75,7 @@ namespace QueryPlanParser.Parsers
             throw new BadQueryPlanInputException("Database did not return a correct query plan!");
         }
 
-        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\) \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\)", RegexOptions.Compiled);
+        private static Regex RowParserRegex = new Regex(@"^(?<indentation> *(?:->)? *)(?<name>[^(\n]+)\(cost=(?<costMin>\d+.\d+)\.\.(?<costMax>\d+.\d+) rows=(?<estimatedRows>\d+) width=(?<width>\d+)\)(?: \(actual time=(?<timeMin>\d+.\d+)\.\.(?<timeMax>\d+.\d+) rows=(?<actualRows>\d+) loops=(?<loops>\d+)\))?", RegexOptions.Compiled);
 
         /// <summary>
         /// Returns null if the row isn't a new subquery, e.g. if the row is the condition on a join.

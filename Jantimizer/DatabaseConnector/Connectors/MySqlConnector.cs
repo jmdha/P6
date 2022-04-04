@@ -47,12 +47,12 @@ namespace DatabaseConnector.Connectors
 
         public override async Task<DataSet> ExplainQueryAsync(string query)
         {
-            return await CallQueryAsync($"EXPLAIN {RemoveAnalyseIfThere(query)}");
+            return await CallQueryAsync($"EXPLAIN FORMAT=TREE {RemoveAnalyseIfThere(query)}");
         }
 
         public override DataSet ExplainQuery(string query)
         {
-            return CallQuery($"EXPLAIN {RemoveAnalyseIfThere(query)}");
+            return CallQuery($"EXPLAIN FORMAT=TREE {RemoveAnalyseIfThere(query)}");
         }
 
         #endregion
@@ -89,10 +89,10 @@ namespace DatabaseConnector.Connectors
         private string RemoveAnalyseIfThere(string query)
         {
             query = query.Trim();
-            if (query.ToUpper().Contains(" ANALYSE "))
-                query = query.ToUpper().Replace(" ANALYSE ", "");
-            if (query.ToUpper().StartsWith("ANALYSE "))
-                query = query.ToUpper().Replace("ANALYSE ", "");
+            if (query.ToUpper().Contains(" ANALYZE "))
+                query = query.ToUpper().Replace(" ANALYZE ", "");
+            if (query.ToUpper().StartsWith("ANALYZE "))
+                query = query.ToUpper().Replace("ANALYZE ", "");
             return query;
         }
     }
