@@ -14,88 +14,117 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
     {
         protected override long CalculateCost(ComparisonType.Type predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
         {
-            long leftSum = 0;
-            long rightSum = 0;
+            long estimate = -1;
+
+            switch (predicate)
+            {
+                case ComparisonType.Type.Equal:
+                    return CalculateEqualCost(leftBuckets, rightBuckets);
+                case ComparisonType.Type.Less:
+                    return CalculateInEqualityCost(predicate, leftBuckets, rightBuckets);
+                case ComparisonType.Type.More:
+                    return CalculateInEqualityCost(predicate, leftBuckets, rightBuckets);
+                case ComparisonType.Type.EqualOrLess:
+                    return CalculateInEqualityCost(predicate, leftBuckets, rightBuckets);
+                case ComparisonType.Type.EqualOrMore:
+                    return CalculateInEqualityCost(predicate, leftBuckets, rightBuckets);
+            }
+            
+            return estimate;
+        }
+
+        private long CalculateEqualCost(IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        {
+            long estimate = 0;
+            int rightCutoff = 0;
             for (int i = 0; i < leftBuckets.Length; i++)
             {
-                if (i == 0 && leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) < 0)
-                    leftSum += GetVariatedCount(predicate, leftBuckets[i] as HistogramBucketVariance, rightBuckets[0] as HistogramBucketVariance);
-                else if (i == leftBuckets.Length - 1 && leftBuckets[i].ValueEnd.CompareTo(rightBuckets[rightBuckets.Length - 1].ValueEnd) > 0)
-                    leftSum += GetVariatedCount(predicate, leftBuckets[i] as HistogramBucketVariance, rightBuckets[rightBuckets.Length - 1] as HistogramBucketVariance);
-                else
-                    leftSum += leftBuckets[i].Count;
+                for (int j = rightCutoff; j < rightBuckets.Length; j++)
+                {
+                    if (DoesMatch(leftBuckets[i], rightBuckets[j]))
+                        estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                    else
+                        rightCutoff = Math.Max(0, j - 1);
+                }
             }
-            for (int i = 0; i < rightBuckets.Length; i++)
-            {
-                if (i == 0 && rightBuckets[0].ValueStart.CompareTo(leftBuckets[0].ValueStart) < 0)
-                    rightSum += GetVariatedCount(predicate, rightBuckets[i] as HistogramBucketVariance, leftBuckets[0] as HistogramBucketVariance);
-                else if (i == rightBuckets.Length - 1 && rightBuckets[0].ValueEnd.CompareTo(leftBuckets[leftBuckets.Length - 1].ValueEnd) > 0)
-                    rightSum += GetVariatedCount(predicate, rightBuckets[i] as HistogramBucketVariance, leftBuckets[leftBuckets.Length - 1] as HistogramBucketVariance);
-                else
-                    rightSum += rightBuckets[i].Count;
-            }
-            return leftSum * rightSum;
-        }
-        private double AsDouble(object value, out bool success)
-        {
-            if (value is decimal || value is float || value is double)
-            {
-                success = true;
-                return Convert.ToDouble(value);
-            }
-            success = false;
-            return 0;
+            return estimate;
         }
 
-        private long AsLong(object value, out bool success)
+        private long CalculateInEqualityCost(ComparisonType.Type predicateType, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
         {
-            if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is long || value is ulong)
+            long estimate = 0;
+            int rightCutoff = rightBuckets.Length - 1;
+            for (int i = leftBuckets.Length - 1; i >= 0; i--)
             {
-                success = true;
-                return Convert.ToInt64(value);
+                for (int j = rightCutoff; j >= 0; j--)
+                {
+                    bool Match = true;
+                    switch(predicateType)
+                    {
+                        case ComparisonType.Type.Less:
+                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) < 0)
+                                estimate += GetCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) < 0)
+                                estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else 
+                                Match = false;
+                            break;
+                        case ComparisonType.Type.EqualOrLess:
+                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) <= 0)
+                                estimate += GetCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) <= 0)
+                                estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else
+                                Match = false;
+                            break;
+                        case ComparisonType.Type.More:
+                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) > 0)
+                                estimate += GetCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) > 0)
+                                estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else
+                                Match = false;
+                            break;
+                        case ComparisonType.Type.EqualOrMore:
+                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) >= 0)
+                                estimate += GetCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) >= 0)
+                                estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
+                            else
+                                Match = false;
+                            break;
+                    }
+
+                    if (Match)
+                        rightCutoff = Math.Max(0, j - 1);
+                }
             }
-            success = false;
-            return 0;
+            return estimate;
         }
 
-        private long GetVariatedCount(ComparisonType.Type predicate, HistogramBucketVariance bucket, HistogramBucketVariance comparisonBucket)
+        private bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
-            // if all values in the bucket is the same
-            if (bucket.Variance == 0)
-                return bucket.Count;
+            if ((rightBucket.ValueStart.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueStart.CompareTo(leftBucket.ValueEnd) <= 0) ||
+                (rightBucket.ValueEnd.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueEnd.CompareTo(leftBucket.ValueEnd) <= 0))
+                return true;
+            return false;
+        }
 
-            
+        private long GetCount(HistogramBucketVariance bucket, HistogramBucketVariance comparisonBucket)
+        {
+            return bucket.Count * comparisonBucket.Count;
+        }
 
-            bool vsSuccess = false;
-            bool veSuccess = false;
-            bool cvsSuccess = false;
-            bool cveSuccess = false;
-
-            var vs = AsLong(bucket.ValueStart, out vsSuccess);
-            var ve = AsLong(bucket.ValueEnd, out veSuccess);
-            var cvs = AsLong(comparisonBucket.ValueStart, out cvsSuccess);
-            var cve = AsLong(comparisonBucket.ValueStart, out cveSuccess);
-            
-
-            if (bucket.ValueStart is long vs && veSuccess && cvsSuccess && cveSuccess)
-            {
-                long startDiff = Math.Abs(cvs - vs);
-                long endDiff = Math.Abs(cve - ve);
-                long totalDiff = startDiff + endDiff;
-                long valueRange = Math.Abs(ve - vs);
-
-                double overlap = (double)totalDiff / valueRange;
-
-                double overlapPercent = (double)overlap / valueRange;
-
-                long overlappedCount = (long)(bucket.Count * overlapPercent);
-                if (overlappedCount == 0)
-                    return 1;
-                else 
-                    return overlappedCount;
-            }
-
-            return bucket.Count;
+        private long GetVariatedCount(HistogramBucketVariance bucket, HistogramBucketVariance comparisonBucket)
+        {
+            double certainty = (double)Math.Abs((double)bucket.Variance / comparisonBucket.Variance);
+            if (certainty > 1)
+                certainty = 1 / certainty;
+            long estimate = (long)(bucket.Count * certainty);
+            if (estimate == 0)
+                return 1;
+            else
+                return estimate;
         }
     }
 }
