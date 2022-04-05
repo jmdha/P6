@@ -9,11 +9,16 @@ namespace Tools.Caches
 {
     public interface ICacherService<T>
     {
+        public FileInfo CacheFile { get; set; }
         public static ICacherService<T>? Instance { get; set; }
         public void AddToCacheIfNotThere(string hashValue, T value);
         public void AddToCacheIfNotThere(string[] hashValues, T value);
         public T? GetValueOrNull(string hashValue);
         public T? GetValueOrNull(string[] hashValues);
         public string GetCacheKey(string[] hashValues);
+
+        public void ClearCache();
+        public void LoadCacheFromFile();
+        public void SaveCacheToFile();
     }
 }
