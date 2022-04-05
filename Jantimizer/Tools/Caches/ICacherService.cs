@@ -17,7 +17,7 @@ namespace Tools.Caches
         public T? GetValueOrNull(string[] hashValues);
         public string GetCacheKey(string[] hashValues);
 
-        public void ClearCache();
+        public void ClearCache(bool deleteFile = false);
         public void LoadCacheFromFile();
         public void SaveCacheToFile();
     }

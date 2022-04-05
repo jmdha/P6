@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Histograms.Caches;
+using System.Data;
 using System.Text;
 
 namespace Histograms.Models
@@ -10,6 +11,12 @@ namespace Histograms.Models
     {
         public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
         {
+        }
+
+        internal HistogramEquiDepthVariance(CachedHisto histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
+        {
+            foreach (var bucket in histo.Buckets)
+                Buckets.Add(new HistogramBucketVariance(bucket.ValueStart, bucket.ValueEnd, bucket.Count, bucket.Variance, bucket.Mean));
         }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)

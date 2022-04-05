@@ -22,7 +22,7 @@ namespace Tools.Caches
             return key;
         }
 
-        public abstract void ClearCache();
+        public abstract void ClearCache(bool deleteFile = false);
         public abstract void LoadCacheFromFile();
         public abstract void SaveCacheToFile();
     }

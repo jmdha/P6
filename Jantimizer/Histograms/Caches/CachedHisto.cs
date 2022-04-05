@@ -28,16 +28,21 @@ namespace Histograms.Caches
             Hash = hash;
         }
 
-        public CachedHisto(IHistogram histogram, string hash)
+        public CachedHisto(HistogramEquiDepth histogram, string hash)
         {
-            throw new NotImplementedException("Unknown histogram type");
+            List<CachedBucket> newBuckets = new List<CachedBucket>();
+            foreach (var bucket in histogram.Buckets)
+                newBuckets.Add(new CachedBucket(bucket));
+            Buckets = newBuckets;
+            TableName = histogram.TableName;
+            AttributeName = histogram.AttributeName;
+            Depth = histogram.Depth;
+            Hash = hash;
+            TypeName = "HistogramEquiDepthVariance";
         }
 
-        public CachedHisto(IDepthHistogram histogram, string hash)
+        public CachedHisto(HistogramEquiDepthVariance histogram, string hash)
         {
-            if (histogram is not HistogramEquiDepth || histogram is not HistogramEquiDepthVariance)
-                throw new NotImplementedException("Unknown histogram type");
-
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
                 newBuckets.Add(new CachedBucket(bucket));

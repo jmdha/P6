@@ -44,8 +44,10 @@ namespace QueryPlanParser.Caches
             return null;
         }
 
-        public override void ClearCache()
+        public override void ClearCache(bool deleteFile = false)
         {
+            if (CacheFile.Exists && deleteFile)
+                CacheFile.Delete();
             ActualCardinalityCache.Clear();
         }
 

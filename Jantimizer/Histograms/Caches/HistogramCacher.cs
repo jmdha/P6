@@ -46,8 +46,10 @@ namespace Histograms.Caches
             return null;
         }
 
-        public override void ClearCache()
+        public override void ClearCache(bool deleteFile = false)
         {
+            if (CacheFile.Exists && deleteFile)
+                CacheFile.Delete();
             HistogramCacheDict.Clear();
         }
 
@@ -64,16 +66,10 @@ namespace Histograms.Caches
                         switch (value.TypeName)
                         {
                             case "HistogramEquiDepth":
-                                var newHistoEqui = new HistogramEquiDepth(value.TableName, value.AttributeName, value.Depth);
-                                foreach (var bucket in value.Buckets)
-                                    newHistoEqui.Buckets.Add(ConvertBucket(bucket));
-                                HistogramCacheDict.Add(value.Hash, newHistoEqui);
+                                HistogramCacheDict.Add(value.Hash, new HistogramEquiDepth(value));
                                 break;
                             case "HistogramEquiDepthVariance":
-                                var newHistoVariance = new HistogramEquiDepthVariance(value.TableName, value.AttributeName, value.Depth);
-                                foreach (var bucket in value.Buckets)
-                                    newHistoVariance.Buckets.Add(ConvertBucket(bucket));
-                                HistogramCacheDict.Add(value.Hash, newHistoVariance);
+                                HistogramCacheDict.Add(value.Hash, new HistogramEquiDepthVariance(value));
                                 break;
                         }
                     }
@@ -81,27 +77,12 @@ namespace Histograms.Caches
             }
         }
 
-        private IHistogramBucket ConvertBucket(CachedBucket bucket)
-        {
-            switch (bucket.TypeName)
-            {
-                case "HistogramBucket": return new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count);
-                case "HistogramBucketVariance": return new HistogramBucketVariance(bucket.ValueStart, bucket.ValueEnd, bucket.Count, bucket.Variance, bucket.Mean);
-            }
-            throw new InvalidCastException("Unknown bucket type!");
-        }
-
         public override void SaveCacheToFile()
         {
             List<CachedHisto> histograms = new List<CachedHisto>();
             foreach(var key in HistogramCacheDict.Keys)
-            {
-                var addHisto = HistogramCacheDict[key];
-                if (addHisto is IDepthHistogram depthHisto)
-                    histograms.Add(new CachedHisto(depthHisto, key));
-                if (addHisto is IHistogram defaultHisto)
-                    histograms.Add(new CachedHisto(defaultHisto, key));
-            }
+                histograms.Add(new CachedHisto((dynamic)HistogramCacheDict[key], key));
+
             string jsonText = JsonSerializer.Serialize(histograms);
             if (CacheFile.Exists)
                 CacheFile.Delete();
