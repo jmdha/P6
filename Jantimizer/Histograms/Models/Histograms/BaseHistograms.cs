@@ -42,5 +42,7 @@ namespace Histograms.Models
             }
             return sb.ToString();
         }
+
+        public abstract object Clone();
     }
 }

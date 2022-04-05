@@ -1,10 +1,12 @@
-﻿using Histograms.Models;
+﻿using Histograms.Caches;
+using Histograms.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Caches;
 using Tools.Models;
 
 namespace Histograms.DataGatherers
@@ -57,6 +59,20 @@ namespace Histograms.DataGatherers
             ");
 
             return GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
+        }
+
+        public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
+        {
+            DataSet columnHash = await DbConnector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::text), ',')) as \"hash\" FROM {tableName};");
+            if (columnHash.Tables.Count == 0)
+                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
+            if (columnHash.Tables[0].Rows.Count == 0)
+                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
+            DataRow hashRow = columnHash.Tables[0].Rows[0];
+            if (!hashRow.Table.Columns.Contains("hash"))
+                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
+            string hashValue = (string)hashRow["hash"];
+            return hashValue;
         }
     }
 }

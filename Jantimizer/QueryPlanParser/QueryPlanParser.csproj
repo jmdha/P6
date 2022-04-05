@@ -11,4 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Caches\" />
+  </ItemGroup>
 </Project>

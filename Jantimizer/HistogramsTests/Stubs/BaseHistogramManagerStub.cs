@@ -1,5 +1,6 @@
 ﻿using Histograms.DataGatherers;
 using Histograms.Managers;
+using Histograms.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,14 @@ namespace HistogramsTests.Stubs
         public BaseHistogramManagerStub() : base(new DataGathererStub()) { }
 
         public BaseHistogramManagerStub(IDataGatherer dataGatherer) : base(dataGatherer) { }
-
-        protected override Task AddHistogramForAttribute(string attributeName, string tableName)
+        protected override Task<IHistogram> CreateHistogramForAttribute(string attributeName, string tableName)
         {
             throw new NotImplementedException();
         }
 
+        protected override Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

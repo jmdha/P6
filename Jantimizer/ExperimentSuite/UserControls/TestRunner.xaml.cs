@@ -1,6 +1,7 @@
 ﻿using ExperimentSuite.Models;
 using QueryOptimiser.Models;
 using QueryParser.Models;
+using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tools.Caches;
 using Tools.Helpers;
 using Tools.Services;
 
@@ -127,7 +129,9 @@ namespace ExperimentSuite.UserControls
                     await Task.Delay(1);
                     SQLFileControl.UpdateFileLabel(queryFile.Name);
                     SQLFileControl.SQLProgressBar.Value++;
-                    ulong? accCardinality = QueryPlanCacher.GetCardinalityOrNull(queryFile, RunnerName);
+                    ulong? accCardinality = null;
+                    if (QueryPlanCacher.Instance != null)
+                        accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
                     DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
 
                     AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
@@ -163,7 +167,7 @@ namespace ExperimentSuite.UserControls
             if (accCardinality != null)
                 analysisResult.ActualCardinality = (ulong)accCardinality;
             else
-                QueryPlanCacher.AddToCacheIfNotThere(queryFile, RunnerName, analysisResult.ActualCardinality);
+                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
             return analysisResult;
         }
 

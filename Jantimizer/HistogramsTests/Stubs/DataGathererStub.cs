@@ -15,7 +15,17 @@ namespace HistogramsTests.Stubs
             throw new NotImplementedException();
         }
 
+        public Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
 ﻿using DatabaseConnector;
+using Histograms.Caches;
 using Histograms.DataGatherers;
 using Histograms.Models;
 using System;
@@ -105,8 +106,30 @@ namespace Histograms.Managers
                 .ToList();
         }
 
-        protected abstract Task AddHistogramForAttribute(string attributeName, string tableName);
+        protected abstract Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName);
+        protected abstract Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName);
 
+        protected async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram) {
+            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
+            if (HistogramCacher.Instance != null)
+                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash }, histogram);
+        }
+
+        protected virtual async Task AddHistogramForAttribute(string attributeName, string tableName)
+        {
+            var cached = await GetCachedHistogramOrNull(tableName, attributeName);
+
+            if (cached != null)
+            {
+                AddHistogram(cached);
+            }
+            else
+            {
+                var newHistogram = await CreateHistogramForAttribute(tableName, attributeName);
+                await CacheHistogram(tableName, attributeName, newHistogram);
+                AddHistogram(newHistogram);
+            }
+        }
 
         public override string? ToString()
         {

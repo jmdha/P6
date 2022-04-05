@@ -43,5 +43,14 @@ namespace Histograms.Models
                 Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
             }
         }
+
+        public override object Clone()
+        {
+            var retObj = new HistogramEquiDepthVariance(TableName, AttributeName, Depth);
+            foreach (var bucket in Buckets)
+                if (bucket is IHistogramBucketVariance vari)
+                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean));
+            return retObj;
+        }
     }
 }

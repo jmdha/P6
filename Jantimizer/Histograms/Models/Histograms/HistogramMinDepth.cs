@@ -55,5 +55,13 @@ namespace Histograms.Models
                 Buckets.Add(new HistogramBucket(minValue, maxValue, count));
             }
         }
+
+        public override object Clone()
+        {
+            var retObj = new HistogramMinDepth(TableName, AttributeName, Depth);
+            foreach (var bucket in Buckets)
+                retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+            return retObj;
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Histograms.Models
 {
-    public interface IHistogram
+    public interface IHistogram : ICloneable
     {
         public string TableName { get; }
         public string AttributeName { get; }

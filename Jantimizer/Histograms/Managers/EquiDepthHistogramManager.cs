@@ -1,10 +1,12 @@
-﻿using Histograms.DataGatherers;
+﻿using Histograms.Caches;
+using Histograms.DataGatherers;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Caches;
 using Tools.Models;
 
 namespace Histograms.Managers
@@ -18,12 +20,20 @@ namespace Histograms.Managers
             Depth = depth;
         }
 
-        protected override async Task AddHistogramForAttribute(string attributeName, string tableName)
+        protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
-            IDepthHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-            newHistogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
-            await Task.Delay(1);
-            AddHistogram(newHistogram);
+            IDepthHistogram histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
+            return histogram;
+        }
+        protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
+        {
+            var cacheHisto = await DataGatherer.GetHistogramFromCacheOrNull(tableName, attributeName);
+
+            if (cacheHisto != null && cacheHisto is HistogramEquiDepth)
+                return cacheHisto;
+
+            return null;
         }
     }
 }
