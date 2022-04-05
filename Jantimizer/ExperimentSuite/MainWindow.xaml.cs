@@ -52,6 +52,7 @@ namespace ExperimentSuite
         private async Task RunExperiments()
         {
             DateTime runTime = DateTime.UtcNow;
+            string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
 
             new QueryPlanCacher();
 
@@ -72,16 +73,19 @@ namespace ExperimentSuite
 
                     WriteToStatus($"Running experiment {experiment.ExperimentName}");
                     await RunExperimentQueue(
-                        GetRunDataFromList(experiment.PreRunData, connectorSet, testsPath, runTime),
+                        GetRunDataFromList(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
                         experiment.RunParallel);
                     await RunExperimentQueue(
-                        GetRunDataFromList(experiment.RunData, connectorSet, testsPath, runTime),
+                        GetRunDataFromList(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                         experiment.RunParallel);
                 }
                 WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
             }
             ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
             WriteToStatus("All experiments complete!");
+            WriteToStatus("Merging results");
+            CSVMerger.Merge<TestReport, TestReportMap>(rootResultPath, "results.csv");
+            WriteToStatus("Merging finished");
             RunButton.IsEnabled = true;
         }
 
@@ -111,7 +115,7 @@ namespace ExperimentSuite
             return connectorSet;
         }
 
-        private Dictionary<string, List<Func<Task>>> GetRunDataFromList(List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo bastTestPath, DateTime timestamp)
+        private Dictionary<string, List<Func<Task>>> GetRunDataFromList(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
         {
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
             foreach (TestRunData data in runData)
@@ -122,19 +126,20 @@ namespace ExperimentSuite
                     {
                         foreach (string testFile in data.TestFiles)
                         {
-                            var newDir = IOHelper.GetDirectory(bastTestPath, testFile);
+                            var newDir = IOHelper.GetDirectory(baseTestPath, testFile);
 
                             IOHelper.CreateDirIfNotExist(newDir.FullName, "Cases/");
                             var caseDir = IOHelper.GetDirectory(newDir.FullName, "Cases/");
 
                             TestRunner runner = new TestRunner(
+                                experimentName,
                                 testFile,
+                                rootResultPath,
                                 suitData,
                                 IOHelper.GetFileVariant(newDir, "testSettings", suitData.Name.ToLower(), "json"),
                                 IOHelper.GetFileVariantOrNone(newDir, "setup", suitData.Name.ToLower(), "sql"),
                                 IOHelper.GetFileVariantOrNone(newDir, "cleanup", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name.ToLower(), "sql")),
-                                timestamp
+                                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name.ToLower(), "sql"))
                             );
                             TestsPanel.Children.Add(runner);
 
