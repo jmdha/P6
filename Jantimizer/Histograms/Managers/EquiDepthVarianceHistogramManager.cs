@@ -1,4 +1,5 @@
-﻿using Histograms.DataGatherers;
+﻿using Histograms.Caches;
+using Histograms.DataGatherers;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,8 @@ namespace Histograms.Managers
                 IDepthHistogram newHistogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
                 newHistogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
                 string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-                HistogramCache.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash }, newHistogram);
+                if (HistogramCacher.Instance != null)
+                    HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash }, newHistogram);
                 AddHistogram(newHistogram);
             }
             else

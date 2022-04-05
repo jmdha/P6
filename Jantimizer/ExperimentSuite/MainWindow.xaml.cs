@@ -2,6 +2,8 @@
 using ExperimentSuite.Models.ExperimentParsing;
 using ExperimentSuite.SuiteDatas;
 using ExperimentSuite.UserControls;
+using Histograms.Caches;
+using QueryPlanParser.Caches;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,7 +57,7 @@ namespace ExperimentSuite
             DateTime runTime = DateTime.UtcNow;
 
             new QueryPlanCacher();
-            new HistogramCache();
+            new HistogramCacher();
 
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");

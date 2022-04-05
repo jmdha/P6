@@ -4,10 +4,11 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Caches;
 
-namespace Tools.Caches
+namespace QueryPlanParser.Caches
 {
-    public class QueryPlanCacher : ICacheService<ulong?>
+    public class QueryPlanCacher : ICacherService<ulong?>
     {
         public static QueryPlanCacher? Instance { get; set; }
 

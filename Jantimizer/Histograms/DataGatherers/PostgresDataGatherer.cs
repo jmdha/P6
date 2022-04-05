@@ -1,4 +1,5 @@
-﻿using Histograms.Models;
+﻿using Histograms.Caches;
+using Histograms.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -62,7 +63,9 @@ namespace Histograms.DataGatherers
 
         public override async Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
         {
-            var retVal = HistogramCache.Instance.GetValueOrNull(new string[] { tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName) }) as IHistogram;
+            if (HistogramCacher.Instance == null)
+                return null;
+            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName) }) as IHistogram;
             return retVal;
         }
 

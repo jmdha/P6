@@ -1,44 +1,46 @@
-﻿using System;
+﻿using Histograms.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Caches;
 
-namespace Tools.Caches
+namespace Histograms.Caches
 {
-    public class HistogramCache : ICacheService<object>
+    public class HistogramCacher : ICacherService<IHistogram>
     {
-        public static HistogramCache? Instance { get; set; }
+        public static HistogramCacher? Instance { get; set; }
 
-        internal Dictionary<string, object> HistogramCacheDict { get; set; }
+        internal Dictionary<string, IHistogram> HistogramCacheDict { get; set; }
 
-        public HistogramCache()
+        public HistogramCacher()
         {
-            HistogramCacheDict = new Dictionary<string, object>();
+            HistogramCacheDict = new Dictionary<string, IHistogram>();
             Instance = this;
         }
 
-        public void AddToCacheIfNotThere(string hashValue, object value)
+        public void AddToCacheIfNotThere(string hashValue, IHistogram value)
         {
             if (!HistogramCacheDict.ContainsKey(hashValue))
                 HistogramCacheDict.Add(hashValue, value);
         }
 
-        public void AddToCacheIfNotThere(string[] hashValues, object value)
+        public void AddToCacheIfNotThere(string[] hashValues, IHistogram value)
         {
             string hashValue = GetCacheKey(hashValues);
             AddToCacheIfNotThere(hashValue, value);
         }
 
-        public object GetValueOrNull(string hashValue)
+        public IHistogram GetValueOrNull(string hashValue)
         {
             if (HistogramCacheDict.ContainsKey(hashValue))
                 return HistogramCacheDict[hashValue];
             return null;
         }
 
-        public object GetValueOrNull(string[] hashValues)
+        public IHistogram GetValueOrNull(string[] hashValues)
         {
             string hashValue = GetCacheKey(hashValues);
             return GetValueOrNull(hashValue);

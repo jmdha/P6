@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Tools.Caches
 {
-    public interface ICacheService<T>
+    public interface ICacherService<T>
     {
-        public static ICacheService<T>? Instance { get; set; }
+        public static ICacherService<T>? Instance { get; set; }
         public void AddToCacheIfNotThere(string hashValue, T value);
         public void AddToCacheIfNotThere(string[] hashValues, T value);
         public T GetValueOrNull(string hashValue);
