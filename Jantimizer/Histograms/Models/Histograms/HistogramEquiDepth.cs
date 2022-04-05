@@ -44,5 +44,13 @@ namespace Histograms.Models
                 for (int i = 0; i < grp.Count; i++)
                     yield return grp.Value;
         }
+
+        public virtual object Clone()
+        {
+            var retObj = new HistogramEquiDepth(TableName, AttributeName, Depth);
+            foreach (var bucket in Buckets)
+                retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+            return retObj;
+        }
     }
 }
