@@ -56,7 +56,7 @@ namespace Histograms.Models
             }
         }
 
-        public virtual object Clone()
+        public override object Clone()
         {
             var retObj = new HistogramMinDepth(TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)

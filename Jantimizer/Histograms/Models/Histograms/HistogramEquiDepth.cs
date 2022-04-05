@@ -45,7 +45,7 @@ namespace Histograms.Models
                     yield return grp.Value;
         }
 
-        public virtual object Clone()
+        public override object Clone()
         {
             var retObj = new HistogramEquiDepth(TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)

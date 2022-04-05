@@ -12,11 +12,11 @@ namespace Histograms.Services
     {
         public static HistogramCache Instance { get; set; }
 
-        internal static Dictionary<string, IHistogram> HistogramCacheDict { get; set; }
+        internal static Dictionary<string, object> HistogramCacheDict { get; set; }
 
         public HistogramCache()
         {
-            HistogramCacheDict = new Dictionary<string, IHistogram>();
+            HistogramCacheDict = new Dictionary<string, object>();
             Instance = this;
         }
 
@@ -24,7 +24,16 @@ namespace Histograms.Services
         {
             var key = GetKeyFromData(table, attribute, columnHash);
             if (!HistogramCacheDict.ContainsKey(key))
-                HistogramCacheDict.Add(key, histogram);
+                HistogramCacheDict.Add(key, histogram.Clone());
+        }
+
+        public static IHistogram? GetCardinalityOrNull(string table, string attribute, string columnHash)
+        {
+            var key = GetKeyFromData(table, attribute, columnHash);
+            if (HistogramCacheDict.ContainsKey(key))
+                if (HistogramCacheDict[key] is IHistogram histo)
+                    return histo;
+            return null;
         }
 
         private static string GetKeyFromData(string table, string attribute, string columnHash)
