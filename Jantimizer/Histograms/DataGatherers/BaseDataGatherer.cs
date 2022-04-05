@@ -20,7 +20,8 @@ namespace Histograms.DataGatherers
         {
             if (HistogramCacher.Instance == null)
                 return null;
-            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName) });
+            string hash = await GetTableAttributeColumnHash(tableName, attributeName);
+            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, hash });
             return retVal;
         }
 
