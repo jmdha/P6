@@ -27,18 +27,18 @@ namespace Histograms.Services
                 HistogramCacheDict.Add(key, histogram.Clone());
         }
 
-        public static IHistogram? GetCardinalityOrNull(string table, string attribute, string columnHash)
+        public static IHistogram? GetHistogramOrNull(string table, string attribute, string columnHash)
         {
             var key = GetKeyFromData(table, attribute, columnHash);
             if (HistogramCacheDict.ContainsKey(key))
                 if (HistogramCacheDict[key] is IHistogram histo)
-                    return histo;
+                    return histo.Clone() as IHistogram;
             return null;
         }
 
         private static string GetKeyFromData(string table, string attribute, string columnHash)
         {
-            var res = MD5.HashData(Encoding.ASCII.GetBytes(table + attribute + columnHash));
+            var res = MD5.HashData(Encoding.ASCII.GetBytes(table.ToLower() + attribute.ToLower() + columnHash.ToLower()));
             var key = Encoding.Default.GetString(res);
             return key;
         }
