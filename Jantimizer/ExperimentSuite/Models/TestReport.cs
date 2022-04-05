@@ -8,6 +8,7 @@ namespace ExperimentSuite.Models
 {
     public class TestReport
     {
+        public string ExperimentName { get; set; }
         public string Category { get; set; }
         public string CaseName { get; set; }
         public string DatabaseName { get; set; }
@@ -17,8 +18,14 @@ namespace ExperimentSuite.Models
         public decimal DatabaseAcc { get; }
         public decimal OptimiserAcc { get; }
 
-        public TestReport(string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted)
+        public TestReport()
         {
+
+        }
+
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted)
+        {
+            ExperimentName = experimentName;
             Category = category;
             CaseName = caseName;
             DatabaseName = databaseName;

@@ -31,6 +31,7 @@ namespace ExperimentSuite.UserControls
     {
         private int collapesedHeight = 30;
 
+        public string ExperimentName { get; }
         public string RunnerName { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
@@ -40,16 +41,17 @@ namespace ExperimentSuite.UserControls
         public List<TestReport> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(string name, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles, DateTime timeStamp)
+        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
-            RunnerName = name;
+            ExperimentName = experimentName;
+            RunnerName = runName;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestReport>();
-            csvWriter = new CSVWriter($"Results/{timeStamp.ToString("yyyy-MM-dd HH.mm.ss")}", $"{RunData.Name}-{RunnerName}.csv");
+            csvWriter = new CSVWriter($"{rootResultsPath}/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
 
             RunnerGrid.Height = collapesedHeight;
@@ -133,7 +135,7 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestReport testCase = new TestReport(RunData.Name, queryFile.Name, RunnerName, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
+                    TestReport testCase = new TestReport(ExperimentName, RunData.Name, queryFile.Name, RunnerName, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
