@@ -61,14 +61,6 @@ namespace Histograms.DataGatherers
             return GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
         }
 
-        public override async Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
-        {
-            if (HistogramCacher.Instance == null)
-                return null;
-            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName) });
-            return retVal as IHistogram;
-        }
-
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
             DataSet columnHash = await DbConnector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::text), ',')) as \"hash\" FROM {tableName};");
