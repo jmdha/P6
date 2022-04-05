@@ -20,21 +20,20 @@ namespace Histograms.Managers
             Depth = depth;
         }
 
-        protected override async Task AddHistogramForAttribute(string attributeName, string tableName)
+        protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
+        {
+            IDepthHistogram histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
+            return histogram;
+        }
+        protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
         {
             var cacheHisto = await DataGatherer.GetHistogramFromCacheOrNull(tableName, attributeName);
-            if (cacheHisto == null || cacheHisto is not HistogramEquiDepth)
-            {
-                IDepthHistogram newHistogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                newHistogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
-                string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-                if (HistogramCacher.Instance != null)
-                    HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash }, newHistogram);
-                AddHistogram(newHistogram);
-            }
-            else
-                if (cacheHisto is HistogramEquiDepth histo)
-                    AddHistogram(histo);
+
+            if (cacheHisto != null && cacheHisto is HistogramEquiDepth)
+                return cacheHisto;
+
+            return null;
         }
     }
 }
