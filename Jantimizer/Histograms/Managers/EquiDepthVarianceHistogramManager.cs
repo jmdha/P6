@@ -20,7 +20,7 @@ namespace Histograms.Managers
         protected override async Task AddHistogramForAttribute(string attributeName, string tableName)
         {
             var cacheHisto = await DataGatherer.GetHistogramFromCacheOrNull(tableName, attributeName);
-            if (cacheHisto == null)
+            if (cacheHisto == null || cacheHisto is not HistogramEquiDepthVariance)
             {
                 IDepthHistogram newHistogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
                 newHistogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
@@ -30,7 +30,8 @@ namespace Histograms.Managers
                 AddHistogram(newHistogram);
             }
             else
-                AddHistogram(cacheHisto);
+                if (cacheHisto is HistogramEquiDepthVariance histo)
+                    AddHistogram(histo);
         }
     }
 }

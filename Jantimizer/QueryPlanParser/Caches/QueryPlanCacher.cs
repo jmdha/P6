@@ -12,18 +12,19 @@ namespace QueryPlanParser.Caches
     {
         public static QueryPlanCacher? Instance { get; set; }
 
-        internal Dictionary<string, ulong?> ActualCardinalityCache { get; set; }
+        internal Dictionary<string, ulong> ActualCardinalityCache { get; set; }
 
         public QueryPlanCacher()
         {
-            ActualCardinalityCache= new Dictionary<string, ulong?>();
+            ActualCardinalityCache= new Dictionary<string, ulong>();
             Instance = this;
         }
 
         public void AddToCacheIfNotThere(string hashValue, ulong? value)
         {
             if (!ActualCardinalityCache.ContainsKey(hashValue))
-                ActualCardinalityCache.Add(hashValue, value);
+                if (value != null)
+                    ActualCardinalityCache.Add(hashValue, (ulong)value);
         }
 
         public void AddToCacheIfNotThere(string[] hashValues, ulong? value)
