@@ -15,7 +15,7 @@ namespace HistogramsTests.Stubs
             throw new NotImplementedException();
         }
 
-        public Task<object?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
+        public Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
         {
             throw new NotImplementedException();
         }
