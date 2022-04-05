@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -55,15 +56,53 @@ namespace Histograms.Caches
             if (CacheFile.Exists)
             {
                 ClearCache();
-                //var obj = JsonSerializer.Deserialize<Dictionary<string, IHistogram>>(File.ReadAllText(CacheFile.FullName));
-                //if (obj != null)
-                //    HistogramCacheDict = obj;
+                var list = JsonSerializer.Deserialize<List<CachedHisto>>(File.ReadAllText(CacheFile.FullName));
+                if (list != null)
+                {
+                    foreach (var value in list)
+                    {
+                        switch (value.TypeName)
+                        {
+                            case "HistogramEquiDepth":
+                                var newHistoEqui = new HistogramEquiDepth(value.TableName, value.AttributeName, value.Depth);
+                                foreach (var bucket in value.Buckets)
+                                    newHistoEqui.Buckets.Add(ConvertBucket(bucket));
+                                HistogramCacheDict.Add(value.Hash, newHistoEqui);
+                                break;
+                            case "HistogramEquiDepthVariance":
+                                var newHistoVariance = new HistogramEquiDepthVariance(value.TableName, value.AttributeName, value.Depth);
+                                foreach (var bucket in value.Buckets)
+                                    newHistoVariance.Buckets.Add(ConvertBucket(bucket));
+                                HistogramCacheDict.Add(value.Hash, newHistoVariance);
+                                break;
+                        }
+                    }
+                }
             }
+        }
+
+        private IHistogramBucket ConvertBucket(CachedBucket bucket)
+        {
+            switch (bucket.TypeName)
+            {
+                case "HistogramBucket": return new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count);
+                case "HistogramBucketVariance": return new HistogramBucketVariance(bucket.ValueStart, bucket.ValueEnd, bucket.Count, bucket.Variance, bucket.Mean);
+            }
+            throw new InvalidCastException("Unknown bucket type!");
         }
 
         public override void SaveCacheToFile()
         {
-            string jsonText = JsonSerializer.Serialize(HistogramCacheDict);
+            List<CachedHisto> histograms = new List<CachedHisto>();
+            foreach(var key in HistogramCacheDict.Keys)
+            {
+                var addHisto = HistogramCacheDict[key];
+                if (addHisto is IDepthHistogram depthHisto)
+                    histograms.Add(new CachedHisto(depthHisto, key));
+                if (addHisto is IHistogram defaultHisto)
+                    histograms.Add(new CachedHisto(defaultHisto, key));
+            }
+            string jsonText = JsonSerializer.Serialize(histograms);
             if (CacheFile.Exists)
                 CacheFile.Delete();
 

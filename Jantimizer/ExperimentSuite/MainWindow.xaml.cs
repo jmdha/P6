@@ -204,5 +204,13 @@ namespace ExperimentSuite
             RunButton.IsEnabled = false;
             await RunExperiments();
         }
+
+        private void ClearCachesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (QueryPlanCacher.Instance != null)
+                QueryPlanCacher.Instance.ClearCache();
+            if (HistogramCacher.Instance != null)
+                HistogramCacher.Instance.ClearCache();
+        }
     }
 }
