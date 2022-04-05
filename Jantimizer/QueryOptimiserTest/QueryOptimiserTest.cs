@@ -8,6 +8,7 @@ using QueryParser.QueryParsers;
 using QueryParser.Models;
 using DatabaseConnector;
 using Tools.Models;
+using QueryOptimiserTest.Stubs;
 
 namespace QueryOptimiserTest;
 
@@ -90,7 +91,7 @@ public class QueryOptimiserTest
     public void OptimiseJoinQueryEqual(int testID, int[] expectedOrder, List<HistogramEquiDepth> histograms, List<INode> nodes)
     {
         // Arrange
-        var histogramManager = new PostgresEquiDepthHistogramManager(new ConnectionProperties(), 10);
+        var histogramManager = new EquiDepthHistogramManager(new DataGathererStub(), 10);
         for (int i = 0; i < histograms.Count; i++)
             histogramManager.AddHistogram(histograms[i]);
         

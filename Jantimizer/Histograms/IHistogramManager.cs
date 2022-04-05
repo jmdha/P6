@@ -10,8 +10,6 @@ namespace Histograms
 {
     public interface IHistogramManager
     {
-        public IDbConnector DbConnector { get; }
-        public List<IHistogram> Histograms { get; }
         public List<string> Tables { get; }
         public List<string> Attributes { get; }
 
