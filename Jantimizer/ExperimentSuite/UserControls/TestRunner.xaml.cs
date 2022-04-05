@@ -135,7 +135,7 @@ namespace ExperimentSuite.UserControls
                     List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestReport testCase = new TestReport(ExperimentName, RunData.Name, queryFile.Name, RunnerName, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
+                    TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                     testCases.Add(testCase);
                 }
                 catch (Exception ex)
