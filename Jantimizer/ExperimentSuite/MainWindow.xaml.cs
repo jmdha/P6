@@ -2,7 +2,6 @@
 using ExperimentSuite.Models.ExperimentParsing;
 using ExperimentSuite.SuiteDatas;
 using ExperimentSuite.UserControls;
-using Histograms.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;

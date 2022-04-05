@@ -47,7 +47,7 @@ namespace Tools.Caches
         public string GetCacheKey(string[] values)
         {
             var concat = string.Join("",values);
-            var res = MD5.HashData(Encoding.ASCII.GetBytes(concat));
+            var res = MD5.HashData(Encoding.ASCII.GetBytes(concat.ToLower()));
             var key = Encoding.Default.GetString(res);
             return key;
         }

@@ -1,11 +1,11 @@
 ﻿using Histograms.Models;
-using Histograms.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Caches;
 using Tools.Models;
 
 namespace Histograms.DataGatherers
@@ -62,7 +62,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
         {
-            var retVal = HistogramCache.GetHistogramOrNull(tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName));
+            var retVal = HistogramCache.Instance.GetValueOrNull(new string[] { tableName, attributeName, await GetTableAttributeColumnHash(tableName, attributeName) }) as IHistogram;
             return retVal;
         }
 
