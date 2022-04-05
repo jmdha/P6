@@ -9,9 +9,9 @@ namespace Tools.Caches
 {
     public class QueryPlanCacher : ICacheService<ulong?>
     {
-        public static QueryPlanCacher Instance { get; set; }
+        public static QueryPlanCacher? Instance { get; set; }
 
-        internal static Dictionary<string, ulong?> ActualCardinalityCache { get; set; }
+        internal Dictionary<string, ulong?> ActualCardinalityCache { get; set; }
 
         public QueryPlanCacher()
         {

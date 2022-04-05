@@ -9,9 +9,9 @@ namespace Tools.Caches
 {
     public class HistogramCache : ICacheService<object>
     {
-        public static HistogramCache Instance { get; set; }
+        public static HistogramCache? Instance { get; set; }
 
-        internal static Dictionary<string, object> HistogramCacheDict { get; set; }
+        internal Dictionary<string, object> HistogramCacheDict { get; set; }
 
         public HistogramCache()
         {
