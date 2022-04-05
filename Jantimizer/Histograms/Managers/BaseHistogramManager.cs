@@ -107,7 +107,7 @@ namespace Histograms.Managers
         }
 
         protected abstract Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName);
-        protected abstract Task<IHistogram> CreateHistogramForAttribute(string attributeName, string tableName);
+        protected abstract Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName);
 
         protected async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram) {
             string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
@@ -125,7 +125,7 @@ namespace Histograms.Managers
             }
             else
             {
-                var newHistogram = await CreateHistogramForAttribute(attributeName, tableName);
+                var newHistogram = await CreateHistogramForAttribute(tableName, attributeName);
                 await CacheHistogram(tableName, attributeName, newHistogram);
                 AddHistogram(newHistogram);
             }
