@@ -11,7 +11,6 @@ namespace Tools.Caches
     {
         public bool UseCacheFile { get; set; }
         public FileInfo CacheFile { get; set; }
-        public static ICacherService<T>? Instance { get; set; }
         public void AddToCacheIfNotThere(string hashValue, T value);
         public void AddToCacheIfNotThere(string[] hashValues, T value);
         public T? GetValueOrNull(string hashValue);
