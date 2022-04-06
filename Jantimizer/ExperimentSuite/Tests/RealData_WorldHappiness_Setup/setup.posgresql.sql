@@ -1,4 +1,9 @@
-create table world_happiness_2022
+CREATE SCHEMA IF NOT EXISTS worldhappiness;
+SET search_path TO worldhappiness;
+
+DROP TABLE IF EXISTS world_happiness_2022;
+
+CREATE TABLE world_happiness_2022
 (
     rank                     integer,
     country                  text,

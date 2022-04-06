@@ -2,7 +2,7 @@
   "DoPreCleanup": false,
   "DoSetup": true,
   "DoInserts": false,
-  "DoAnalyse": true,
+  "DoAnalyse": false,
   "DoPostCleanup": false,
   "DoMakeHistograms": false,
   "DoRunTests": false,

@@ -141,9 +141,10 @@ namespace ExperimentSuite
                                 rootResultPath,
                                 suitData,
                                 IOHelper.GetFileVariant(newDir, "testSettings", suitData.Name.ToLower(), "json"),
-                                IOHelper.GetFileVariantOrNone(newDir, "setup", suitData.Name.ToLower(), "sql"),
+                                IOHelper.GetFileVariantOrNull(newDir, "setup", suitData.Name.ToLower(), "sql"),
                                 IOHelper.GetFileVariantOrNull(newDir, "inserts", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetFileVariantOrNone(newDir, "cleanup", suitData.Name.ToLower(), "sql"),
+                                IOHelper.GetFileVariantOrNull(newDir, "analyse", suitData.Name.ToLower(), "sql"),
+                                IOHelper.GetFileVariantOrNull(newDir, "cleanup", suitData.Name.ToLower(), "sql"),
                                 IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name.ToLower(), "sql"))
                             );
                             TestsPanel.Children.Add(runner);

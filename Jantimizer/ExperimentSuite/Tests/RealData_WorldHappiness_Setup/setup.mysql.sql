@@ -1,3 +1,7 @@
+CREATE DATABASE IF NOT EXISTS worldhappiness;
+USE worldhappiness;
+
+DROP TABLE IF EXISTS world_happiness_2022;
 
 CREATE TABLE world_happiness_2022
 (

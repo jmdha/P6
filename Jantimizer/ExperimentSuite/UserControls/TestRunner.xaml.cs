@@ -37,14 +37,15 @@ namespace ExperimentSuite.UserControls
         public string RunnerName { get; }
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
-        public FileInfo SetupFile { get; private set; }
+        public FileInfo? SetupFile { get; private set; }
         public FileInfo? DataInsertsFile { get; private set; }
-        public FileInfo CleanupFile { get; private set; }
+        public FileInfo? DataAnalyseFile { get; private set; }
+        public FileInfo? CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo? insertsFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
             ExperimentName = experimentName;
             RunnerName = runName;
@@ -52,6 +53,7 @@ namespace ExperimentSuite.UserControls
             SettingsFile = settingsFile;
             SetupFile = setupFile;
             DataInsertsFile = insertsFile;
+            DataAnalyseFile = analyseFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestReport>();
@@ -72,20 +74,34 @@ namespace ExperimentSuite.UserControls
 
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
+                if (CleanupFile == null)
+                    throw new IOException("Cleanup file was null!");
                 PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
             if (RunData.Settings.DoSetup != null && (bool)RunData.Settings.DoSetup)
             {
+                if (SetupFile == null)
+                    throw new IOException("Setup file was null!");
                 PrintTestUpdate("Running Setup", SetupFile.Name);
                 await RunData.Connector.CallQueryAsync(SetupFile);
-                if(DataInsertsFile != null)
-                {
-                    PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
-                    await RunData.Connector.CallQueryAsync(DataInsertsFile);
-                }
+            }
 
+            if (RunData.Settings.DoInserts != null && (bool)RunData.Settings.DoInserts)
+            {
+                if (DataInsertsFile == null)
+                    throw new IOException("Inserts file was null!");
+                PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
+                await RunData.Connector.CallQueryAsync(DataInsertsFile);
+            }
+
+            if (RunData.Settings.DoAnalyse != null && (bool)RunData.Settings.DoAnalyse)
+            {
+                if (DataAnalyseFile == null)
+                    throw new IOException("Analyse file was null!");
+                PrintTestUpdate("Analysing Tables", DataAnalyseFile.Name);
+                await RunData.Connector.CallQueryAsync(DataAnalyseFile);
             }
 
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
@@ -102,6 +118,8 @@ namespace ExperimentSuite.UserControls
 
             if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
             {
+                if (CleanupFile == null)
+                    throw new IOException("Cleanup file was null!");
                 PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
@@ -110,11 +128,7 @@ namespace ExperimentSuite.UserControls
             {
                 PrintTestUpdate("Making Report", RunData.Name);
                 if (consoleOutput)
-                {
-                    var newMaker = new ReportMaker(Results);
-                    ReportPanel.Children.Add(newMaker);
-
-                }
+                    ReportPanel.Children.Add(new ReportMaker(Results));
                 if (saveResult)
                     SaveResult();
             }
@@ -175,7 +189,8 @@ namespace ExperimentSuite.UserControls
             if (accCardinality != null)
                 analysisResult.ActualCardinality = (ulong)accCardinality;
             else
-                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
+                if (QueryPlanCacher.Instance != null)
+                    QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
             return analysisResult;
         }
 
