@@ -53,5 +53,10 @@ namespace Histograms.Caches
             Hash = hash;
             TypeName = "HistogramEquiDepthVariance";
         }
+
+        public CachedHisto(IHistogram histogram, string hash)
+        {
+            throw new NotImplementedException("Unknown histogram type for caching!");
+        }
     }
 }

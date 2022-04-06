@@ -4,32 +4,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExperimentSuite"
+        xmlns:uc="clr-namespace:ExperimentSuite.UserControls"
         mc:Ignorable="d"
-        Title="Jantimiser" Height="750" Width="1200" Loaded="Window_Loaded">
+        Title="Jantimiser" Height="750" Width="1600" Loaded="Window_Loaded">
     <Grid x:Name="MainGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
-            <Label x:Name="ExperimentNameLabel" Content="Experiment _" Grid.Column="1" FontSize="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
-            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="2" Margin="5"/>
-            <Button x:Name="RunButton" Content="Run!" Grid.Column="3" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
-            <Button x:Name="ClearCachesButton" Content="Clear Caches" Grid.Column="4" Margin="5" Click="ClearCachesButton_Click"/>
+                <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
+                <Label x:Name="ExperimentNameLabel" Content="Experiment _" Grid.Column="1" FontSize="20" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="2" Margin="5"/>
+                <Button x:Name="RunButton" Content="Run!" Grid.Column="3" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
+                <Button x:Name="CacheViewerButton" Grid.Column="4" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="TestsPanel"/>
+            </ScrollViewer>
         </Grid>
 
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible">
-            <StackPanel x:Name="TestsPanel"/>
-        </ScrollViewer>
+        <uc:CacheViewer x:Name="CacheViewerControl" Grid.Column="1"/>
     </Grid>
 </Window>

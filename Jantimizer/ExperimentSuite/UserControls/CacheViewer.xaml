@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="ExperimentSuite.UserControls.CacheViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExperimentSuite.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="400" Width="400" MaxWidth="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="100"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Content="Cache Viewer" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Button x:Name="ClearCachesButton" Content="Clear Caches" Grid.Column="1" Margin="5" Click="ClearCachesButton_Click"/>
+
+        <StackPanel Grid.Row="1"/>
+    </Grid>
+</UserControl>
