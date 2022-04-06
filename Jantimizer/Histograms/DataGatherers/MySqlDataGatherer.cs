@@ -60,7 +60,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
-            DataSet columnHash = await DbConnector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5({attributeName}))) as hash FROM {tableName};");
+            DataSet columnHash = await DbConnector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5(`{attributeName}`))) as hash FROM `{tableName}`;");
             if (columnHash.Tables.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
             if (columnHash.Tables[0].Rows.Count == 0)

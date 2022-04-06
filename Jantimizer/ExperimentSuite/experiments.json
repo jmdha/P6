@@ -7,14 +7,14 @@
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID" : "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
@@ -39,7 +39,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize" : 10
+        "BucketSize": 10
       }
     },
     {
@@ -49,14 +49,14 @@
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_SetupTables"
           ]
@@ -77,6 +77,46 @@
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "New Data Experiment",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "RealData_WorldHappiness_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "RealData_WorldHappiness_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "RealData_WorldHappiness"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "Default",
+          "TestFiles": [
+            "RealData_WorldHappiness"
           ]
         }
       ],

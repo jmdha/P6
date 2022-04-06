@@ -9,6 +9,6 @@
   "DoMakeReport": true,
   "Properties": {
     "Database": "postgres",
-    "Schema": "basictests"
+    "Schema": "worldhappiness"
   }
 }

@@ -58,8 +58,3 @@ CALL LoadTestData_A();
 CALL LoadTestData_B();
 CALL LoadTestData_C();
 CALL LoadTestData_D();
-
-ANALYZE TABLE a;
-ANALYZE TABLE b;
-ANALYZE TABLE c;
-ANALYZE TABLE d;

@@ -8,7 +8,7 @@
   "DoRunTests": true,
   "DoMakeReport": true,
   "Properties": {
-    "Database": "postgres",
-    "Schema": "basictests"
+    "Database": "worldhappiness",
+    "Schema": "worldhappiness"
   }
 }
