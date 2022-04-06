@@ -78,6 +78,7 @@ namespace ExperimentSuite.UserControls
                 cacheItems.AddRange(QueryPlanCacher.Instance.GetAllCacheItems());
 
             CacheItemCountLabel.Content = $"{cacheItems.Count} item(s)";
+            cacheItems.Insert(0, new CacheItem("Hash", "Data", "Cacher Service"));
             foreach (var cacheItem in cacheItems)
                 DataPanel.Children.Add(new CacheItemControl(cacheItem));
         }
