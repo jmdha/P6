@@ -35,7 +35,7 @@ namespace QueryOptimiser
         }
 
         /// <summary>
-        /// Calculates worst case cost of each node
+        /// Calculates worst case cost of each join operation
         /// </summary>
         /// <returns></returns>
         internal List<ValuedNode> CalculateNodeCost(List<INode> nodes)
@@ -47,16 +47,6 @@ namespace QueryOptimiser
                 valuedNodes.Add(new ValuedNode(cost, node));
             }
             return valuedNodes;
-        }
-
-        /// <summary>
-        /// Calculates worst case cost of a node
-        /// </summary>
-        /// <returns></returns>
-        internal ValuedNode CalculateNodeCost(INode node)
-        {
-            long cost = CostCalculator.CalculateCost(node);
-            return new ValuedNode(cost, node);
         }
     }
 }

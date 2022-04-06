@@ -17,6 +17,6 @@ namespace QueryOptimiser.Cost.Nodes
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        internal long CalculateCost(NodeType node, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets);
+        internal long CalculateCost(NodeType node, IHistogramManager histogramManager);
     }
 }
