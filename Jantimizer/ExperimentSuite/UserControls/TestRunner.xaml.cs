@@ -38,18 +38,20 @@ namespace ExperimentSuite.UserControls
         public SuiteData RunData { get; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo SetupFile { get; private set; }
+        public FileInfo? DataInsertsFile { get; private set; }
         public FileInfo CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
         private CSVWriter csvWriter;
 
-        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo setupFile, FileInfo? insertsFile, FileInfo cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
             ExperimentName = experimentName;
             RunnerName = runName;
             RunData = runData;
             SettingsFile = settingsFile;
             SetupFile = setupFile;
+            DataInsertsFile = insertsFile;
             CleanupFile = cleanupFile;
             CaseFiles = caseFiles;
             Results = new List<TestReport>();
@@ -78,6 +80,12 @@ namespace ExperimentSuite.UserControls
             {
                 PrintTestUpdate("Running Setup", SetupFile.Name);
                 await RunData.Connector.CallQueryAsync(SetupFile);
+                if(DataInsertsFile != null)
+                {
+                    PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
+                    await RunData.Connector.CallQueryAsync(DataInsertsFile);
+                }
+
             }
 
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
