@@ -140,7 +140,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_SaveCacheToFile_HistogramEquiDepth()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
@@ -177,7 +177,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_SaveCacheToFile_HistogramEquiDepthVariance()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
@@ -214,7 +214,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_SaveCacheToFile_Mixed()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
@@ -255,7 +255,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_LoadCacheFromFile_HistogramEquiDepth()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
@@ -285,7 +285,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_LoadCacheFromFile_HistogramEquiDepthVariance()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
@@ -315,7 +315,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         public void Can_LoadCacheFromFile_Mixed()
         {
             // ARRANGE
-            string fileName = "test-cache.json";
+            string fileName = "histogram-cache.json";
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
