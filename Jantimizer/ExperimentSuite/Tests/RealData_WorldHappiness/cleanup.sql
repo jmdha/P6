@@ -1,0 +1,1 @@
+﻿DROP TABLE IF EXISTS world_happiness_2022;
