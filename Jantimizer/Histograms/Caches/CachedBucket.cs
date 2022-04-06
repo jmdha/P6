@@ -10,15 +10,16 @@ namespace Histograms.Caches
 {
     public class CachedBucket
     {
-        public int ValueStart { get; }
-        public int ValueEnd { get; }
+        public string ValueStart { get; }
+        public string ValueEnd { get; }
         public long Count { get; }
         public int Variance { get; }
         public int Mean { get; }
         public string TypeName { get; }
+        public string ValueType { get; }
 
         [JsonConstructorAttribute]
-        public CachedBucket(int valueStart, int valueEnd, long count, int variance, int mean, string typeName)
+        public CachedBucket(string valueStart, string valueEnd, long count, int variance, int mean, string typeName, string valueType)
         {
             ValueStart = valueStart;
             ValueEnd = valueEnd;
@@ -26,23 +27,26 @@ namespace Histograms.Caches
             Variance = variance;
             Mean = mean;
             TypeName = typeName;
+            ValueType = valueType;
         }
 
         public CachedBucket(HistogramBucket bucket)
         {
-            ValueStart = (int)bucket.ValueStart;
-            ValueEnd = (int)bucket.ValueEnd;
+            ValueStart = $"{bucket.ValueStart}";
+            ValueEnd = $"{bucket.ValueEnd}";
             Count = bucket.Count;
+            ValueType = bucket.ValueStart.GetType().ToString();
             TypeName = nameof(HistogramBucket);
         }
 
         public CachedBucket(HistogramBucketVariance bucket)
         {
-            ValueStart = (int)bucket.ValueStart;
-            ValueEnd = (int)bucket.ValueEnd;
+            ValueStart = $"{bucket.ValueStart}";
+            ValueEnd = $"{bucket.ValueEnd}";
             Count = bucket.Count;
             Variance = bucket.Variance;
             Mean = bucket.Mean;
+            ValueType = bucket.ValueStart.GetType().ToString();
             TypeName = nameof(HistogramBucketVariance);
         }
 

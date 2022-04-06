@@ -20,7 +20,19 @@ namespace Histograms.Models
         {
             Depth = histo.Depth;
             foreach (var bucket in histo.Buckets)
-                Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+            {
+                Type? type = Type.GetType(bucket.ValueType);
+                if (type != null && type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IComparable<>)))
+                {
+                    var valueStart = Convert.ChangeType(bucket.ValueStart, type) as IComparable;
+                    var valueEnd = Convert.ChangeType(bucket.ValueEnd, type) as IComparable;
+
+                    if (valueStart == null || valueEnd == null)
+                        throw new ArgumentNullException("Read bucket value was invalid!");
+
+                    Buckets.Add(new HistogramBucket(valueStart, valueEnd, bucket.Count));
+                }
+            }
         }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
