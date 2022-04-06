@@ -9,6 +9,9 @@ namespace Tools.Caches
 {
     public abstract class BaseCacherService<T> : ICacherService<T>
     {
+        public bool UseCacheFile { get; set; } = true;
+        public abstract List<CacheItem> GetAllCacheItems();
+        public abstract FileInfo CacheFile { get; set; }
         public abstract void AddToCacheIfNotThere(string hashValue, T value);
         public void AddToCacheIfNotThere(string[] hashValues, T value) => AddToCacheIfNotThere(GetCacheKey(hashValues), value);
         public abstract T? GetValueOrNull(string hashValue);
@@ -20,5 +23,9 @@ namespace Tools.Caches
             var key = Encoding.Default.GetString(res);
             return key;
         }
+
+        public abstract void ClearCache(bool deleteFile = false);
+        public abstract void LoadCacheFromFile();
+        public abstract void SaveCacheToFile();
     }
 }

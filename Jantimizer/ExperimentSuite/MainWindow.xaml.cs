@@ -57,9 +57,6 @@ namespace ExperimentSuite
             DateTime runTime = DateTime.UtcNow;
             string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
 
-            new QueryPlanCacher();
-            new HistogramCacher();
-
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");
             var testsPath = IOHelper.GetDirectory("../../../Tests");
@@ -200,6 +197,11 @@ namespace ExperimentSuite
         {
             RunButton.IsEnabled = false;
             await RunExperiments();
+        }
+
+        private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
+        {
+            CacheViewerControl.Toggle();
         }
     }
 }
