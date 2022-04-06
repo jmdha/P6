@@ -20,7 +20,7 @@ namespace QueryOptimiser.Cost.CostCalculators
         {
             if (node is JoinNode joinNode)
             {
-                return new JoinCostEquiDepth().CalculateCost(joinNode, HistogramManager);
+                return new JoinCostEquiDepth().CalculateCost(joinNode, HistogramManager.GetHistogram("", "").Buckets, HistogramManager.GetHistogram("", "").Buckets);
             }
             else
             {
