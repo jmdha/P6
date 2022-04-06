@@ -93,5 +93,13 @@ namespace Histograms.Caches
                 fs.Write(info, 0, info.Length);
             }
         }
+
+        public override List<CacheItem> GetAllCacheItems()
+        {
+            var returnList = new List<CacheItem>();
+            foreach (var key in HistogramCacheDict.Keys)
+                returnList.Add(new CacheItem(key, HistogramCacheDict[key].ToString(), nameof(HistogramCacher)));
+            return returnList;
+        }
     }
 }

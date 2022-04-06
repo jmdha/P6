@@ -57,12 +57,6 @@ namespace ExperimentSuite
             DateTime runTime = DateTime.UtcNow;
             string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
 
-            string queryPlanCache = "query-plan-cache.json";
-            string histogramCache = "histogram-cache.json";
-
-            new QueryPlanCacher(queryPlanCache);
-            new HistogramCacher(histogramCache);
-
             WriteToStatus("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile("../../../experiments.json");
             var testsPath = IOHelper.GetDirectory("../../../Tests");

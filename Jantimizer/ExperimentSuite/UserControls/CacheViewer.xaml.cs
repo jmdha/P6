@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tools.Caches;
 
 namespace ExperimentSuite.UserControls
 {
@@ -26,6 +27,7 @@ namespace ExperimentSuite.UserControls
         {
             InitializeComponent();
             ExpandedSize = MaxWidth;
+            LoadCachesFromFile();
         }
 
         public double CollapsedSize { get; } = 0;
@@ -48,12 +50,47 @@ namespace ExperimentSuite.UserControls
                 Width = ExpandedSize;
         }
 
-        private void ClearCachesButton_Click(object sender, RoutedEventArgs e)
+        private void ClearLocalCachesButton_Click(object sender, RoutedEventArgs e)
         {
             if (QueryPlanCacher.Instance != null)
                 QueryPlanCacher.Instance.ClearCache();
             if (HistogramCacher.Instance != null)
                 HistogramCacher.Instance.ClearCache();
+            DataPanel.Children.Clear();
+        }
+
+        private void ClearFileCachesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (QueryPlanCacher.Instance != null)
+                QueryPlanCacher.Instance.ClearCache(true);
+            if (HistogramCacher.Instance != null)
+                HistogramCacher.Instance.ClearCache(true);
+            DataPanel.Children.Clear();
+        }
+
+        private void RefreshCachesButton_Click(object sender, RoutedEventArgs e)
+        {
+            DataPanel.Children.Clear();
+            var cacheItems = new List<CacheItem>();
+            if (HistogramCacher.Instance != null)
+                cacheItems.AddRange(HistogramCacher.Instance.GetAllCacheItems());
+            if (QueryPlanCacher.Instance != null)
+                cacheItems.AddRange(QueryPlanCacher.Instance.GetAllCacheItems());
+
+            CacheItemCountLabel.Content = $"{cacheItems.Count} item(s)";
+            foreach (var cacheItem in cacheItems)
+                DataPanel.Children.Add(new CacheItemControl(cacheItem));
+        }
+
+        private void LoadFromFile_Click(object sender, RoutedEventArgs e)
+        {
+            LoadCachesFromFile();
+        }
+
+        private void LoadCachesFromFile()
+        {
+            new QueryPlanCacher("query-plan-cache.json");
+            new HistogramCacher("histogram-cache.json");
         }
     }
 }

@@ -74,5 +74,13 @@ namespace QueryPlanParser.Caches
                 fs.Write(info, 0, info.Length);
             }
         }
+
+        public override List<CacheItem> GetAllCacheItems()
+        {
+            var returnList = new List<CacheItem>();
+            foreach (var key in ActualCardinalityCache.Keys)
+                returnList.Add(new CacheItem(key, ActualCardinalityCache[key].ToString(), nameof(QueryPlanCacher)));
+            return returnList;
+        }
     }
 }

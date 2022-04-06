@@ -9,6 +9,7 @@ namespace Tools.Caches
 {
     public abstract class BaseCacherService<T> : ICacherService<T>
     {
+        public abstract List<CacheItem> GetAllCacheItems();
         public abstract FileInfo CacheFile { get; set; }
         public abstract void AddToCacheIfNotThere(string hashValue, T value);
         public void AddToCacheIfNotThere(string[] hashValues, T value) => AddToCacheIfNotThere(GetCacheKey(hashValues), value);
