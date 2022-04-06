@@ -20,8 +20,16 @@ namespace QueryPlanParser.Caches
         {
             ActualCardinalityCache= new Dictionary<string, ulong>();
             CacheFile = new FileInfo(cacheFilePath);
-            if (CacheFile.Exists)
+            if (CacheFile.Exists && UseCacheFile)
                 LoadCacheFromFile();
+            Instance = this;
+        }
+
+        public QueryPlanCacher()
+        {
+            ActualCardinalityCache = new Dictionary<string, ulong>();
+            CacheFile = new FileInfo("none");
+            UseCacheFile = false;
             Instance = this;
         }
 
@@ -32,7 +40,8 @@ namespace QueryPlanParser.Caches
                 if (value != null)
                 {
                     ActualCardinalityCache.Add(hashValue, (ulong)value);
-                    SaveCacheToFile();
+                    if (UseCacheFile)
+                        SaveCacheToFile();
                 }
             }
         }

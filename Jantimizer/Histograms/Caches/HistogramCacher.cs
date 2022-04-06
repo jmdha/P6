@@ -22,8 +22,16 @@ namespace Histograms.Caches
         {
             HistogramCacheDict = new Dictionary<string, IHistogram>();
             CacheFile = new FileInfo(cacheFilePath);
-            if (CacheFile.Exists)
+            if (CacheFile.Exists && UseCacheFile)
                 LoadCacheFromFile();
+            Instance = this;
+        }
+
+        public HistogramCacher()
+        {
+            HistogramCacheDict = new Dictionary<string, IHistogram>();
+            CacheFile = new FileInfo("none");
+            UseCacheFile = false;
             Instance = this;
         }
 
@@ -34,7 +42,8 @@ namespace Histograms.Caches
                 if (value != null)
                 {
                     HistogramCacheDict.Add(hashValue, value);
-                    SaveCacheToFile();
+                    if (UseCacheFile)
+                        SaveCacheToFile();
                 }
             }
         }

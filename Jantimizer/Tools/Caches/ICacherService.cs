@@ -9,6 +9,7 @@ namespace Tools.Caches
 {
     public interface ICacherService<T>
     {
+        public bool UseCacheFile { get; set; }
         public FileInfo CacheFile { get; set; }
         public static ICacherService<T>? Instance { get; set; }
         public void AddToCacheIfNotThere(string hashValue, T value);
