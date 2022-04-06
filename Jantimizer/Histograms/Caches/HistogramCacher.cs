@@ -58,7 +58,7 @@ namespace Histograms.Caches
             if (CacheFile.Exists)
             {
                 ClearCache();
-                var list = JsonSerializer.Deserialize<List<CachedHisto>>(File.ReadAllText(CacheFile.FullName));
+                var list = JsonSerializer.Deserialize<List<CachedHistogram>>(File.ReadAllText(CacheFile.FullName));
                 if (list != null)
                 {
                     foreach (var value in list)
@@ -79,9 +79,9 @@ namespace Histograms.Caches
 
         public override void SaveCacheToFile()
         {
-            List<CachedHisto> histograms = new List<CachedHisto>();
+            List<CachedHistogram> histograms = new List<CachedHistogram>();
             foreach(var key in HistogramCacheDict.Keys)
-                histograms.Add(new CachedHisto((dynamic)HistogramCacheDict[key], key));
+                histograms.Add(new CachedHistogram((dynamic)HistogramCacheDict[key], key));
 
             string jsonText = JsonSerializer.Serialize(histograms);
             if (CacheFile.Exists)

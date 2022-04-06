@@ -16,7 +16,7 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        internal HistogramEquiDepth(CachedHisto histo) : base(histo.TableName, histo.AttributeName)
+        internal HistogramEquiDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
         {
             Depth = histo.Depth;
             foreach (var bucket in histo.Buckets)

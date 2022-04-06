@@ -13,7 +13,7 @@ namespace Histograms.Models
         {
         }
 
-        internal HistogramEquiDepthVariance(CachedHisto histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
+        internal HistogramEquiDepthVariance(CachedHistogram histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
         {
             foreach (var bucket in histo.Buckets)
                 Buckets.Add(new HistogramBucketVariance(bucket.ValueStart, bucket.ValueEnd, bucket.Count, bucket.Variance, bucket.Mean));

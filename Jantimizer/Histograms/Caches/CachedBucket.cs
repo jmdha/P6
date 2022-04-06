@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Histograms.Caches
 {
-    internal class CachedBucket
+    public class CachedBucket
     {
         public int ValueStart { get; }
         public int ValueEnd { get; }
@@ -28,26 +28,27 @@ namespace Histograms.Caches
             TypeName = typeName;
         }
 
-        public CachedBucket(IHistogramBucket bucket)
+        public CachedBucket(HistogramBucket bucket)
         {
-            if (bucket is not HistogramBucket)
-                throw new NotImplementedException("Unknown bucket type");
             ValueStart = (int)bucket.ValueStart;
             ValueEnd = (int)bucket.ValueEnd;
             Count = bucket.Count;
-            TypeName = "HistogramBucket";
+            TypeName = nameof(HistogramBucket);
         }
 
-        public CachedBucket(IHistogramBucketVariance bucket)
+        public CachedBucket(HistogramBucketVariance bucket)
         {
-            if (bucket is not HistogramBucketVariance)
-                throw new NotImplementedException("Unknown bucket type");
             ValueStart = (int)bucket.ValueStart;
             ValueEnd = (int)bucket.ValueEnd;
             Count = bucket.Count;
             Variance = bucket.Variance;
             Mean = bucket.Mean;
-            TypeName = "HistogramBucketVariance";
+            TypeName = nameof(HistogramBucketVariance);
+        }
+
+        public CachedBucket(IHistogramBucket bucket)
+        {
+            throw new NotImplementedException("Unknown bucket type");
         }
     }
 }

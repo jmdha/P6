@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Histograms.Caches
 {
-    internal class CachedHisto
+    public class CachedHistogram
     {
         public List<CachedBucket> Buckets { get; }
         public string TableName { get; }
@@ -18,7 +18,7 @@ namespace Histograms.Caches
         public string Hash { get; }
 
         [JsonConstructorAttribute]
-        public CachedHisto(List<CachedBucket> buckets, string tableName, string attributeName, int depth, string typeName, string hash)
+        public CachedHistogram(List<CachedBucket> buckets, string tableName, string attributeName, int depth, string typeName, string hash)
         {
             Buckets = buckets;
             TableName = tableName;
@@ -28,33 +28,33 @@ namespace Histograms.Caches
             Hash = hash;
         }
 
-        public CachedHisto(HistogramEquiDepth histogram, string hash)
+        public CachedHistogram(HistogramEquiDepth histogram, string hash)
         {
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
-                newBuckets.Add(new CachedBucket(bucket));
+                newBuckets.Add(new CachedBucket((dynamic)bucket));
             Buckets = newBuckets;
             TableName = histogram.TableName;
             AttributeName = histogram.AttributeName;
             Depth = histogram.Depth;
             Hash = hash;
-            TypeName = "HistogramEquiDepthVariance";
+            TypeName = nameof(HistogramEquiDepth);
         }
 
-        public CachedHisto(HistogramEquiDepthVariance histogram, string hash)
+        public CachedHistogram(HistogramEquiDepthVariance histogram, string hash)
         {
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
-                newBuckets.Add(new CachedBucket(bucket));
+                newBuckets.Add(new CachedBucket((dynamic)bucket));
             Buckets = newBuckets;
             TableName = histogram.TableName;
             AttributeName = histogram.AttributeName;
             Depth = histogram.Depth;
             Hash = hash;
-            TypeName = "HistogramEquiDepthVariance";
+            TypeName = nameof(HistogramEquiDepthVariance);
         }
 
-        public CachedHisto(IHistogram histogram, string hash)
+        public CachedHistogram(IHistogram histogram, string hash)
         {
             throw new NotImplementedException("Unknown histogram type for caching!");
         }
