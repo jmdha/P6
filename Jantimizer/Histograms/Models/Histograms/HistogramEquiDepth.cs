@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Histograms.Caches;
+using System.Data;
 using System.Text;
 
 namespace Histograms.Models
@@ -15,6 +16,12 @@ namespace Histograms.Models
             Depth = depth;
         }
 
+        internal HistogramEquiDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
+        {
+            Depth = histo.Depth;
+            foreach (var bucket in histo.Buckets)
+                Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+        }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {

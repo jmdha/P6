@@ -29,10 +29,8 @@ namespace ExperimentSuite.UserControls
     /// <summary>
     /// Interaction logic for TestRunner.xaml
     /// </summary>
-    public partial class TestRunner : UserControl
+    public partial class TestRunner : UserControl, ICollapsable
     {
-        private int collapesedHeight = 30;
-
         public string ExperimentName { get; }
         public string RunnerName { get; }
         public SuiteData RunData { get; }
@@ -43,6 +41,11 @@ namespace ExperimentSuite.UserControls
         public FileInfo? CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
+
+        public double CollapsedSize { get; } = 30;
+
+        public double ExpandedSize { get; } = double.NaN;
+
         private CSVWriter csvWriter;
 
         public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
@@ -59,15 +62,15 @@ namespace ExperimentSuite.UserControls
             Results = new List<TestReport>();
             csvWriter = new CSVWriter($"{rootResultsPath}/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
             InitializeComponent();
+            Toggle(true);
 
-            RunnerGrid.Height = collapesedHeight;
             TestNameLabel.Content = RunnerName;
         }
 
         public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
         {
             TestNameLabel.Foreground = Brushes.Yellow;
-            RunnerGrid.Height = double.NaN;
+            Toggle(false);
 
             PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
             ParseTestSettings(SettingsFile);
@@ -135,7 +138,7 @@ namespace ExperimentSuite.UserControls
 
             PrintTestUpdate("Tests finished for:", RunData.Name);
 
-            RunnerGrid.Height = collapesedHeight;
+            Toggle(true);
             TestNameLabel.Foreground = Brushes.Green;
             return Results;
         }
@@ -214,16 +217,29 @@ namespace ExperimentSuite.UserControls
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)
         {
-            if (RunnerGrid.Height == collapesedHeight)
-                RunnerGrid.Height = double.NaN;
-            else
-                RunnerGrid.Height = collapesedHeight;
+            Toggle();
         }
 
         private void Textbox_Autoscroll_ToBottom(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
                 textBox.ScrollToEnd();
+        }
+
+        public void Toggle()
+        {
+            if (RunnerGrid.Height == CollapsedSize)
+                RunnerGrid.Height = ExpandedSize;
+            else
+                RunnerGrid.Height = CollapsedSize;
+        }
+
+        public void Toggle(bool collapse)
+        {
+            if (collapse)
+                RunnerGrid.Height = CollapsedSize;
+            else
+                RunnerGrid.Height = ExpandedSize;
         }
     }
 }
