@@ -15,18 +15,28 @@ namespace QueryOptimiser.Models
         {
             BDictionary = new Dictionary<string, Dictionary<string, List<IHistogramBucket>>>();
         }
+        internal void AddBucket(string tableName, string attributeName, IHistogramBucket histogramBucket)
+        {
+            HandleNonExistance(tableName, attributeName);
+            if (!BDictionary[tableName][attributeName].Contains(histogramBucket))
+                BDictionary[tableName][attributeName].Add(histogramBucket);
+        }
 
         internal void AddBuckets(string tableName, string attributeName, List<IHistogramBucket> histogramBuckets)
         {
-            if (!BDictionary.ContainsKey(tableName))
-                BDictionary.Add(tableName, new Dictionary<string, List<IHistogramBucket>>());
+            HandleNonExistance(tableName, attributeName);
+            foreach (var bucket in histogramBuckets)
+                if (!BDictionary[tableName][attributeName].Contains(bucket))
+                    BDictionary[tableName][attributeName].Add(bucket);
+        }
 
-            if (!BDictionary[tableName].ContainsKey(attributeName))
-                BDictionary[tableName].Add(attributeName, histogramBuckets);
-            else
-                foreach (var bucket in histogramBuckets)
-                    if (!BDictionary[tableName][attributeName].Contains(bucket))
-                        BDictionary[tableName][attributeName].Add(bucket);
+        private void HandleNonExistance(string table, string attribute)
+        {
+            if (!BDictionary.ContainsKey(table))
+                BDictionary.Add(table, new Dictionary<string, List<IHistogramBucket>>());
+
+            if (!BDictionary[table].ContainsKey(attribute))
+                BDictionary[table].Add(attribute, new List<IHistogramBucket>());
         }
     }
 }

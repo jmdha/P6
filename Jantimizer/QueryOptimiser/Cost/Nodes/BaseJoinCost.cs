@@ -61,12 +61,9 @@ namespace QueryOptimiser.Cost.Nodes
                     switch (nodeRelation.Type)
                     {
                         case RelationType.Type.And:
-                            return new CalculationResult(Math.Min(leftResult.Estimate, rightResult.Estimate));
-                        //throw new NotImplementedException("IMPLEMENT DICTIONARY ADDITION OF BOTH LIMITATIONS OF BUCKETS");
-                        // if table and attribute is the same return only those who are in both dictionaries
-                        // Else return the sum of all dictioanry, i.e. all limitations
+                            return CalculationResult.CreateAndCalculationResult(Math.Min(leftResult.Estimate, rightResult.Estimate), leftResult.BucketLimit, rightResult.BucketLimit);           
                         case RelationType.Type.Or:
-                            return new CalculationResult(leftResult.Estimate + rightResult.Estimate, leftResult.BucketLimit, rightResult.BucketLimit);
+                            return CalculationResult.CreateOrCalculationResult(leftResult.Estimate + rightResult.Estimate, leftResult.BucketLimit, rightResult.BucketLimit);
                         default:
                             throw new Exception($"Can't happen, but compiler is not happy if this doesn't throw an exception. {nodeRelation.Type.ToString()}");
                     }
@@ -125,7 +122,7 @@ namespace QueryOptimiser.Cost.Nodes
                 return new CalculationResult(0);
 
             List<IHistogramBucket> leftBuckets = leftGram.Buckets.GetRange(leftStart, (leftEnd + 1) - leftStart);
-            List<IHistogramBucket> rightBuckets = leftGram.Buckets.GetRange(rightStart, (rightEnd + 1) - rightStart);
+            List<IHistogramBucket> rightBuckets = rightGram.Buckets.GetRange(rightStart, (rightEnd + 1) - rightStart);
 
 
             BucketDictionary bucketLimitations = new BucketDictionary();

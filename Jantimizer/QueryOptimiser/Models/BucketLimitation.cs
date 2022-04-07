@@ -12,6 +12,12 @@ namespace QueryOptimiser.Models
         internal BucketDictionary PrimaryBuckets { get; }
         internal BucketDictionary AlternatveBuckets { get; }
 
+        internal BucketLimitation()
+        {
+            PrimaryBuckets = new BucketDictionary();
+            AlternatveBuckets = new BucketDictionary();
+        }
+
         internal BucketLimitation(BucketDictionary primaryBuckets)
         {
             PrimaryBuckets = primaryBuckets;

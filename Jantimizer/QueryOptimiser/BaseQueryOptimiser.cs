@@ -24,13 +24,14 @@ namespace QueryOptimiser
         /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            BucketDictionary matchedBuckets = new BucketDictionary();
+            BucketLimitation bucketLimitation = new BucketLimitation();
             
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             for (int i = 0; i < nodes.Count; i++)
             {
                 CalculationResult result = CalculateNodeCost(nodes[i]);
                 valuedNodes.Add(new ValuedNode(result.Estimate, nodes[i]));
+                
             }
              
             if (valuedNodes.Count == 0)

@@ -7,6 +7,7 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
+using QueryOptimiser.Models;
 
 namespace QueryOptimiser.Cost.Nodes
 {
@@ -17,6 +18,6 @@ namespace QueryOptimiser.Cost.Nodes
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        internal long CalculateCost(NodeType node, IHistogramManager histogramManager);
+        internal CalculationResult CalculateCost(NodeType node, IHistogramManager histogramManager);
     }
 }
