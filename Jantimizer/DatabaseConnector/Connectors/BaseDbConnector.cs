@@ -79,7 +79,8 @@ namespace DatabaseConnector.Connectors
         public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
         public DataSet CallQuery(string query)
         {
-            try { 
+            try 
+            { 
                 using (var conn = new Connector())
                 {
                     conn.ConnectionString = BuildConnectionString();
