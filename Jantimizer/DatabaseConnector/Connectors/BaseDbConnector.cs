@@ -20,6 +20,7 @@ namespace DatabaseConnector.Connectors
 
         public BaseDbConnector(ConnectionProperties connectionProperties)
         {
+            Name = "None";
             ConnectionProperties = connectionProperties;
         }
 
