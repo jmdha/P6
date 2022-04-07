@@ -12,7 +12,7 @@ namespace DatabaseConnector.Exceptions
         public string ConnectorID { get; set; }
         public string Query { get; set; }
 
-        public DatabaseConnectorErrorLogException(string? message, string connectorID, string query) : base(message)
+        public DatabaseConnectorErrorLogException(Exception actualException, string connectorID, string query) : base(actualException)
         {
             ConnectorID = connectorID;
             Query = query;

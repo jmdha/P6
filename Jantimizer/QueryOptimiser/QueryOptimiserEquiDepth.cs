@@ -39,7 +39,7 @@ namespace QueryOptimiser
             }
             catch(Exception ex)
             {
-                throw new OptimiserErrorLogException(ex.Message, this, nodes);
+                throw new OptimiserErrorLogException(ex, this, nodes);
             }
         }
 

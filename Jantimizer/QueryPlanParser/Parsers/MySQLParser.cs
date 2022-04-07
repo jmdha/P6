@@ -15,16 +15,23 @@ namespace QueryPlanParser.Parsers
     {
         public override AnalysisResult ParsePlan(DataSet planData)
         {
-            Queue<AnalysisResultWithIndent> resultQueue;
+            try
+            {
+                Queue<AnalysisResultWithIndent> resultQueue;
 
-            string[] explainRows = GetExplainRows(planData.Tables[0].Rows);
-            var resultRows = ParseQueryAnalysisRows(explainRows);
-            resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
+                string[] explainRows = GetExplainRows(planData.Tables[0].Rows);
+                var resultRows = ParseQueryAnalysisRows(explainRows);
+                resultQueue = new Queue<AnalysisResultWithIndent>(resultRows);
 
-            if (resultQueue.Count == 0)
-                throw new BadQueryPlanInputException("Analysis got no rows!");
+                if (resultQueue.Count == 0)
+                    throw new BadQueryPlanInputException("Analysis got no rows!");
 
-            return new AnalysisResult(RunAnalysis(resultQueue));
+                return new AnalysisResult(RunAnalysis(resultQueue));
+            }
+            catch (Exception ex)
+            {
+                throw new QueryPlanParserErrorLogException(ex, planData);
+            }
         }
 
         internal AnalysisResultQueryTree RunAnalysis(Queue<AnalysisResultWithIndent> rows)

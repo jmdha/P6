@@ -8,8 +8,10 @@ namespace Tools.Exceptions
 {
     public abstract class BaseErrorLogException : Exception
     {
-        public BaseErrorLogException(string? message) : base(message)
+        public Exception ActualException { get; set; }
+        public BaseErrorLogException(Exception actualExceptio)
         {
+            ActualException = actualExceptio;
         }
 
         public abstract string GetErrorLogMessage();

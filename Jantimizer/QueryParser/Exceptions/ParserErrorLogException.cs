@@ -13,7 +13,7 @@ namespace QueryParser.Exceptions
         public List<IQueryParser> Parsers { get; }
         public string Query { get; }
 
-        public ParserErrorLogException(string message, List<IQueryParser> parsers, string query) : base(message)
+        public ParserErrorLogException(Exception actualException, List<IQueryParser> parsers, string query) : base(actualException)
         {
             Parsers = parsers;
             Query = query;

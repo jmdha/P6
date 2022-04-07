@@ -30,10 +30,10 @@ namespace QueryParser
             }
             catch (Exception ex)
             {
-                throw new ParserErrorLogException(ex.Message, QueryParsers, query);
+                throw new ParserErrorLogException(ex, QueryParsers, query);
             }
             if (throwIfNotFound)
-                throw new ParserErrorLogException("Error, no valid parser found for the query!", QueryParsers, query);
+                throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
             return new List<INode>();
         }
 
@@ -49,10 +49,10 @@ namespace QueryParser
             }
             catch (Exception ex)
             {
-                throw new ParserErrorLogException(ex.Message, QueryParsers, query);
+                throw new ParserErrorLogException(ex, QueryParsers, query);
             }
             if (throwIfNotFound)
-                throw new ParserErrorLogException("Error, no valid parser found for the query!", QueryParsers, query);
+                throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
             return new List<INode>();
         }
 

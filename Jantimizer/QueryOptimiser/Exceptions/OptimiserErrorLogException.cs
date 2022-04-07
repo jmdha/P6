@@ -14,7 +14,7 @@ namespace QueryOptimiser.Exceptions
         public IQueryOptimiser Optimiser { get; set; }
         public List<INode> InputNodes { get; set; }
 
-        public OptimiserErrorLogException(string? message, IQueryOptimiser optimiser, List<INode> inputNodes) : base(message)
+        public OptimiserErrorLogException(Exception actualException, IQueryOptimiser optimiser, List<INode> inputNodes) : base(actualException)
         {
             InputNodes = inputNodes;
             Optimiser = optimiser;
