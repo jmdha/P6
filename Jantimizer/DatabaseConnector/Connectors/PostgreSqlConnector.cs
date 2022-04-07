@@ -8,9 +8,8 @@ namespace DatabaseConnector.Connectors
 {
     public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand, NpgsqlDataAdapter>
     {
-        public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
+        public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
-            Name = "PostgreSQL";
         }
 
         public override string BuildConnectionString()

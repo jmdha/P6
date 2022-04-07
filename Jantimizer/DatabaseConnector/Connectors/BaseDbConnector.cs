@@ -18,9 +18,9 @@ namespace DatabaseConnector.Connectors
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
 
-        public BaseDbConnector(ConnectionProperties connectionProperties)
+        public BaseDbConnector(ConnectionProperties connectionProperties, string name)
         {
-            Name = "None";
+            Name = name;
             ConnectionProperties = connectionProperties;
         }
 
