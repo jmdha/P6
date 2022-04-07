@@ -21,6 +21,7 @@ namespace DatabaseConnector.Connectors
             sb.Append($"Port={ConnectionProperties.Secrets.Port};");
             sb.Append($"Uid={ConnectionProperties.Secrets.Username};");
             sb.Append($"Pwd={ConnectionProperties.Secrets.Password};");
+            sb.Append("default command timeout=13370420;");
 
             if (ConnectionProperties.Database != null)
                 sb.Append($"Database={ConnectionProperties.Database};");
