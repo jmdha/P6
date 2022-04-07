@@ -16,6 +16,6 @@ namespace QueryOptimiser.Cost.CostCalculators
     {
         public IHistogramManager HistogramManager { get; }
 
-        public CalculationResult CalculateCost(INode node);
+        public CalculationResult CalculateCost(INode node, BucketLimitation limitation);
     }
 }

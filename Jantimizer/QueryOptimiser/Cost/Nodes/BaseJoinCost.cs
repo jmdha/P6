@@ -13,32 +13,32 @@ namespace QueryOptimiser.Cost.Nodes
 {
     public abstract class BaseJoinCost : INodeCost<JoinNode>
     {
-        protected int GetMatchBucketIndex(IHistogram gram, int lowerIndexBound, int upperIndexBound, IComparable value)
+        protected int GetMatchBucketIndex(List<IHistogramBucket> buckets, int lowerIndexBound, int upperIndexBound, IComparable value)
         {
             if (upperIndexBound >= lowerIndexBound)
             {
                 int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
 
-                if (value.CompareTo(gram.Buckets[mid].ValueStart) >= 0 && value.CompareTo(gram.Buckets[mid].ValueEnd) <= 0)
+                if (value.CompareTo(buckets[mid].ValueStart) >= 0 && value.CompareTo(buckets[mid].ValueEnd) <= 0)
                     return mid;
 
-                if (value.CompareTo(gram.Buckets[mid].ValueEnd) < 0)
-                    return GetMatchBucketIndex(gram, lowerIndexBound, mid - 1, value);
+                if (value.CompareTo(buckets[mid].ValueEnd) < 0)
+                    return GetMatchBucketIndex(buckets, lowerIndexBound, mid - 1, value);
 
-                return GetMatchBucketIndex(gram, mid + 1, upperIndexBound, value);
+                return GetMatchBucketIndex(buckets, mid + 1, upperIndexBound, value);
             }
 
             return -1;
         }
 
-        public CalculationResult CalculateCost(JoinNode node, IHistogramManager histogramManager)
+        public CalculationResult CalculateCost(JoinNode node, IHistogramManager histogramManager, BucketLimitation limitation)
         {
             if (node.Relation != null)
             {
                 if (node.Relation.Type == RelationType.Type.Predicate && node.Relation.LeafPredicate != null)
-                    return CalculateCost(node.Relation.LeafPredicate, histogramManager);
+                    return CalculateCost(node.Relation.LeafPredicate, histogramManager, limitation);
                 else if (node.Relation.Type == RelationType.Type.And || node.Relation.Type == RelationType.Type.Or)
-                    return CalculateCost(node.Relation, histogramManager);
+                    return CalculateCost(node.Relation, histogramManager, limitation);
                 else
                     throw new ArgumentException("Missing noderelation type " + node.Relation.ToString());
             }
@@ -47,7 +47,7 @@ namespace QueryOptimiser.Cost.Nodes
 
         }
 
-        private CalculationResult CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager histogramManager)
+        private CalculationResult CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager histogramManager, BucketLimitation limitation)
         {
             JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
             JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
@@ -56,8 +56,8 @@ namespace QueryOptimiser.Cost.Nodes
             {
                 if (nodeRelation.Type == RelationType.Type.And || nodeRelation.Type == RelationType.Type.Or)
                 {
-                    CalculationResult leftResult = CalculateCost(leftRelation, histogramManager);
-                    CalculationResult rightResult = CalculateCost(rightRelation, histogramManager);
+                    CalculationResult leftResult = CalculateCost(leftRelation, histogramManager, limitation);
+                    CalculationResult rightResult = CalculateCost(rightRelation, histogramManager, limitation);
                     switch (nodeRelation.Type)
                     {
                         case RelationType.Type.And:
@@ -75,62 +75,71 @@ namespace QueryOptimiser.Cost.Nodes
             }
             else if (nodeRelation.LeafPredicate != null)
             {
-                return CalculateCost(nodeRelation.LeafPredicate, histogramManager);
+                return CalculateCost(nodeRelation.LeafPredicate, histogramManager, limitation);
             }
             else
                 throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
         }
 
-        private CalculationResult CalculateCost(JoinPredicate node, IHistogramManager histogramManager)
+        private CalculationResult CalculateCost(JoinPredicate node, IHistogramManager histogramManager, BucketLimitation limitation)
         {
-            IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute);
-            IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute);
+            List<IHistogramBucket> leftBuckets = new List<IHistogramBucket>();
+            List<IHistogramBucket> rightBuckets = new List<IHistogramBucket>();
+            if (limitation.PrimaryBuckets.BDictionary.ContainsKey(node.LeftTable.TableName) && limitation.PrimaryBuckets.BDictionary[node.LeftTable.TableName].ContainsKey(node.LeftAttribute))
+                leftBuckets = limitation.PrimaryBuckets.BDictionary[node.LeftTable.TableName][node.LeftAttribute];
+            else
+                leftBuckets = histogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets;
+            if (limitation.PrimaryBuckets.BDictionary.ContainsKey(node.RightTable.TableName) && limitation.PrimaryBuckets.BDictionary[node.RightTable.TableName].ContainsKey(node.RightAttribute))
+                rightBuckets = limitation.PrimaryBuckets.BDictionary[node.RightTable.TableName][node.RightAttribute];
+            else
+                rightBuckets = histogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets;
+            
             int leftStart = 0;
-            int leftEnd = leftGram.Buckets.Count - 1;
+            int leftEnd = leftBuckets.Count - 1;
             int rightStart = 0;
-            int rightEnd = rightGram.Buckets.Count - 1;
+            int rightEnd = rightBuckets.Count - 1;
 
-            if (leftGram.Buckets[0].ValueStart.CompareTo(rightGram.Buckets[0].ValueStart) < 0)
+            if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) < 0)
             {
                 if (node.ComType != ComparisonType.Type.Less && node.ComType != ComparisonType.Type.EqualOrLess)
-                    leftStart = GetMatchBucketIndex(leftGram, 0, leftGram.Buckets.Count - 1, rightGram.Buckets[0].ValueStart);
+                    leftStart = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[0].ValueStart);
             }
-            else if (leftGram.Buckets[0].ValueStart.CompareTo(rightGram.Buckets[0].ValueStart) > 0)
+            else if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) > 0)
             {
                 if (node.ComType != ComparisonType.Type.More && node.ComType != ComparisonType.Type.EqualOrMore)
-                    rightStart = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[0].ValueStart);
+                    rightStart = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[0].ValueStart);
             }
 
-            if (leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd.CompareTo(rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd) > 0)
+            if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) > 0)
             {
                 if (node.ComType != ComparisonType.Type.More && node.ComType != ComparisonType.Type.EqualOrMore)
-                    leftEnd = GetMatchBucketIndex(leftGram, 0, leftGram.Buckets.Count - 1, rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd);
+                    leftEnd = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[rightBuckets.Count - 1].ValueEnd);
             }
-            else if (leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd.CompareTo(rightGram.Buckets[rightGram.Buckets.Count - 1].ValueEnd) < 0)
+            else if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) < 0)
             {
                 if (node.ComType != ComparisonType.Type.Less && node.ComType != ComparisonType.Type.EqualOrLess)
-                    rightEnd = GetMatchBucketIndex(rightGram, 0, rightGram.Buckets.Count - 1, leftGram.Buckets[leftGram.Buckets.Count - 1].ValueEnd);
+                    rightEnd = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[leftBuckets.Count - 1].ValueEnd);
             }
 
             if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
                 return new CalculationResult(0);
 
             // This is a tad bit of symptom fixing rather than actual fix
-            if (node.ComType == ComparisonType.Type.Less && leftGram.Buckets[leftEnd].ValueEnd.CompareTo(rightGram.Buckets[rightStart].ValueStart) == 0)
+            if (node.ComType == ComparisonType.Type.Less && leftBuckets[leftEnd].ValueEnd.CompareTo(rightBuckets[rightStart].ValueStart) == 0)
                 return new CalculationResult(0);
-            if (node.ComType == ComparisonType.Type.More && leftGram.Buckets[leftStart].ValueEnd.CompareTo(rightGram.Buckets[rightEnd].ValueEnd) == 0)
+            if (node.ComType == ComparisonType.Type.More && leftBuckets[leftStart].ValueEnd.CompareTo(rightBuckets[rightEnd].ValueEnd) == 0)
                 return new CalculationResult(0);
 
-            List<IHistogramBucket> leftBuckets = leftGram.Buckets.GetRange(leftStart, (leftEnd + 1) - leftStart);
-            List<IHistogramBucket> rightBuckets = rightGram.Buckets.GetRange(rightStart, (rightEnd + 1) - rightStart);
+            List<IHistogramBucket> leftMatchBuckets = leftBuckets.GetRange(leftStart, (leftEnd + 1) - leftStart);
+            List<IHistogramBucket> rightMatchBuckets = rightBuckets.GetRange(rightStart, (rightEnd + 1) - rightStart);
 
 
             BucketDictionary bucketLimitations = new BucketDictionary();
-            bucketLimitations.AddBuckets(node.LeftTable.TableName, node.LeftAttribute, leftBuckets);
-            bucketLimitations.AddBuckets(node.RightTable.TableName, node.RightAttribute, rightBuckets);
+            bucketLimitations.AddBuckets(node.LeftTable.TableName, node.LeftAttribute, leftMatchBuckets);
+            bucketLimitations.AddBuckets(node.RightTable.TableName, node.RightAttribute, rightMatchBuckets);
 
 
-            return new CalculationResult(CalculateCost(node.ComType, leftBuckets, rightBuckets), new BucketLimitation(bucketLimitations));
+            return new CalculationResult(CalculateCost(node.ComType, leftMatchBuckets, rightMatchBuckets), new BucketLimitation(bucketLimitations));
         }
 
         protected abstract long CalculateCost(ComparisonType.Type predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets);

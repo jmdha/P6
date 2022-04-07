@@ -29,9 +29,10 @@ namespace QueryOptimiser
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             for (int i = 0; i < nodes.Count; i++)
             {
-                CalculationResult result = CalculateNodeCost(nodes[i]);
+                CalculationResult result = CostCalculator.CalculateCost(nodes[i], bucketLimitation);
                 valuedNodes.Add(new ValuedNode(result.Estimate, nodes[i]));
-                
+                if (result.BucketLimit != null)
+                    bucketLimitation = BucketLimitation.MergeOnOverlap(bucketLimitation, result.BucketLimit);
             }
              
             if (valuedNodes.Count == 0)
@@ -41,11 +42,6 @@ namespace QueryOptimiser
                 expCardinality *= (ulong)node.Cost;
 
             return new OptimiserResult(expCardinality, valuedNodes);
-        }
-
-        internal CalculationResult CalculateNodeCost(INode node)
-        {
-            return CostCalculator.CalculateCost(node);
         }
     }
 }

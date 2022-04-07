@@ -17,11 +17,11 @@ namespace QueryOptimiser.Cost.CostCalculators
             HistogramManager = histogramManager;
         }
 
-        public CalculationResult CalculateCost(INode node)
+        public CalculationResult CalculateCost(INode node, BucketLimitation limitation)
         {
             if (node is JoinNode joinNode)
             {
-                return new JoinCostEquiDepthVariance().CalculateCost(joinNode, HistogramManager);
+                return new JoinCostEquiDepthVariance().CalculateCost(joinNode, HistogramManager, limitation);
             }
             else
             {

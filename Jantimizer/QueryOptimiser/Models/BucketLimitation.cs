@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace QueryOptimiser.Models
 {
-    internal class BucketLimitation
+    public class BucketLimitation
     {
         internal BucketDictionary PrimaryBuckets { get; }
 
-        internal BucketLimitation()
+        public BucketLimitation()
         {
             PrimaryBuckets = new BucketDictionary();
         }

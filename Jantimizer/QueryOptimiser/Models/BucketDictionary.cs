@@ -21,7 +21,11 @@ namespace QueryOptimiser.Models
             foreach (var tableLimit in dictionary.BDictionary)
                 foreach (var attributeLimit in tableLimit.Value)
                     foreach (IHistogramBucket bucket in attributeLimit.Value)
+                    {
+                        HandleNonExistance(tableLimit.Key, attributeLimit.Key);
                         BDictionary[tableLimit.Key][attributeLimit.Key].Add(bucket);
+                    }
+                        
         }
 
         internal void AddBucket(string tableName, string attributeName, IHistogramBucket histogramBucket)

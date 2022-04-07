@@ -43,7 +43,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -67,7 +67,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -111,7 +111,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -131,7 +131,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -175,7 +175,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -195,7 +195,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -226,7 +226,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -246,7 +246,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -277,7 +277,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
@@ -297,7 +297,7 @@ public class JoinCostTest
 
         var joinCost = new JoinCostEquiDepth();
 
-        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager).Estimate;
+        long cost = joinCost.CalculateCost((JoinNode)nodes[0], histogramManager, new QueryOptimiser.Models.BucketLimitation()).Estimate;
 
         Assert.AreEqual(expectedHits, cost);
     }
