@@ -1,1 +1,1 @@
-﻿SELECT * FROM a JOIN b OyN b.v >= a.v
+﻿SELECT * FROM a JOIN b ON b.v >= a.v

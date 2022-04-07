@@ -92,13 +92,11 @@ namespace ExperimentSuite
                 WriteToStatus("Merging finished");
                 RunButton.IsEnabled = true;
             }
-            catch (Exception ex)
+            catch (BaseErrorLogException ex)
             {
                 var errorWindow = new ErrorLog();
-                if (ex is BaseErrorLogException accEx)
-                    errorWindow.ErrorLabel.Content = accEx.ToString();
-                else
-                    errorWindow.ErrorLabel.Content = ex.Message;
+                errorWindow.ErrorLabel.Content = ex.ToString();
+                errorWindow.ExceptionText.Content = ex.Message;
                 errorWindow.StackTraceTextbox.Text = ex.StackTrace;
                 errorWindow.Show();
             }
