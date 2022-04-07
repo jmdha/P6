@@ -10,7 +10,7 @@ namespace DatabaseConnector.Connectors
     {
         public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
         {
-
+            Name = "PostgreSQL";
         }
 
         public override string BuildConnectionString()

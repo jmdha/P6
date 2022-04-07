@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DatabaseConnector.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -14,6 +15,7 @@ namespace DatabaseConnector.Connectors
         where Command : DbCommand, new()
         where Adapter : DbDataAdapter, new()
     {
+        public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
 
         public BaseDbConnector(ConnectionProperties connectionProperties)
@@ -46,48 +48,61 @@ namespace DatabaseConnector.Connectors
         public async Task<DataSet> CallQueryAsync(FileInfo sqlFile) => await CallQueryAsync(File.ReadAllText(sqlFile.FullName));
         public async Task<DataSet> CallQueryAsync(string query)
         {
-            using (var conn = new Connector())
+            try
             {
-                conn.ConnectionString = BuildConnectionString();
-                await conn.OpenAsync();
-                using (var cmd = new Command())
+                using (var conn = new Connector())
                 {
-                    cmd.Connection = conn;
-                    cmd.CommandText = query;
-
-                    using (var sqlAdapter = new Adapter())
+                    conn.ConnectionString = BuildConnectionString();
+                    await conn.OpenAsync();
+                    using (var cmd = new Command())
                     {
-                        sqlAdapter.SelectCommand = cmd;
-                        DataSet dt = new DataSet();
-                        await Task.Run(() => sqlAdapter.Fill(dt));
+                        cmd.Connection = conn;
+                        cmd.CommandText = query;
 
-                        return dt;
+                        using (var sqlAdapter = new Adapter())
+                        {
+                            sqlAdapter.SelectCommand = cmd;
+                            DataSet dt = new DataSet();
+                            sqlAdapter.Fill(dt);
+
+                            return dt;
+                        }
                     }
                 }
+            }
+            catch(Exception ex)
+            {
+                throw new GenericSQLException(ex.Message, Name, query);
             }
         }
 
         public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
         public DataSet CallQuery(string query)
         {
-            using (var conn = new Connector())
-            {
-                conn.ConnectionString = BuildConnectionString();
-                conn.Open();
-                using (var cmd = new Command())
+            try { 
+                using (var conn = new Connector())
                 {
-                    cmd.Connection = conn;
-                    cmd.CommandText = query;
-
-                    using (var sqlAdapter = new Adapter())
+                    conn.ConnectionString = BuildConnectionString();
+                    conn.Open();
+                    using (var cmd = new Command())
                     {
-                        sqlAdapter.SelectCommand = cmd;
-                        DataSet dt = new DataSet();
-                        sqlAdapter.Fill(dt);
+                        cmd.Connection = conn;
+                        cmd.CommandText = query;
 
-                        return dt;
+                        using (var sqlAdapter = new Adapter())
+                        {
+                            sqlAdapter.SelectCommand = cmd;
+                            DataSet dt = new DataSet();
+                            sqlAdapter.Fill(dt);
+
+                            return dt;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new GenericSQLException(ex.Message, Name, query);
             }
         }
 

@@ -9,7 +9,7 @@ namespace DatabaseConnector.Connectors
     {
         public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
         {
-
+            Name = "MySQL";
         }
 
         public override string BuildConnectionString()

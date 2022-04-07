@@ -10,6 +10,7 @@ namespace DatabaseConnector
 {
     public interface IDbConnector
     {
+        public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
 
         public bool CheckConnection();

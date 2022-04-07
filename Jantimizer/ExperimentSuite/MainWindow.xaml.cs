@@ -1,4 +1,5 @@
-﻿using ExperimentSuite.Models;
+﻿using DatabaseConnector.Exceptions;
+using ExperimentSuite.Models;
 using ExperimentSuite.Models.ExperimentParsing;
 using ExperimentSuite.SuiteDatas;
 using ExperimentSuite.UserControls;
@@ -22,6 +23,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Tools.Caches;
+using Tools.Exceptions;
 using Tools.Helpers;
 using Tools.Services;
 
@@ -54,7 +56,6 @@ namespace ExperimentSuite
 
         private async Task RunExperiments()
         {
-
             try
             {
                 DateTime runTime = DateTime.UtcNow;
@@ -94,7 +95,10 @@ namespace ExperimentSuite
             catch (Exception ex)
             {
                 var errorWindow = new ErrorLog();
-                errorWindow.ErrorLabel.Content = ex.Message;
+                if (ex is BaseErrorLogException accEx)
+                    errorWindow.ErrorLabel.Content = accEx.ToString();
+                else
+                    errorWindow.ErrorLabel.Content = ex.Message;
                 errorWindow.StackTraceTextbox.Text = ex.StackTrace;
                 errorWindow.Show();
             }
