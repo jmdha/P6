@@ -8,9 +8,8 @@ namespace DatabaseConnector.Connectors
 {
     public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand, NpgsqlDataAdapter>
     {
-        public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
+        public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
-
         }
 
         public override string BuildConnectionString()
@@ -23,6 +22,7 @@ namespace DatabaseConnector.Connectors
             sb.Append($"Port={ConnectionProperties.Secrets.Port};");
             sb.Append($"Username={ConnectionProperties.Secrets.Username};");
             sb.Append($"Password={ConnectionProperties.Secrets.Password};");
+            sb.Append($"CommandTimeout=13370;");
 
             if (ConnectionProperties.Database != null)
                 sb.Append($"Database={ConnectionProperties.Database};");

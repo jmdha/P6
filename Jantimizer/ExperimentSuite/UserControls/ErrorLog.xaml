@@ -1,0 +1,26 @@
+﻿<Window x:Class="ExperimentSuite.UserControls.ErrorLog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ExperimentSuite.UserControls"
+        mc:Ignorable="d"
+        Title="Error Log" Height="450" Width="800">
+    <ScrollViewer>
+        <StackPanel>
+            <Label Content="An error occured!" FontSize="20" HorizontalAlignment="Center"/>
+            <Button x:Name="SaveToFile" Content="Save to File" Click="SaveToFile_Click"/>
+            <Label x:Name="ErrorType" FontSize="20" Foreground="Red"/>
+            <Label x:Name="ErrorLabel" Content="Error: " Foreground="Red"/>
+            <Label x:Name="ExceptionText" Content="Exception: " Foreground="Orange"/>
+            <Label Content="Stack Trace"/>
+            <ScrollViewer Height="200">
+                <TextBox x:Name="StackTraceTextbox"/>
+            </ScrollViewer>
+            <Label Content="Cache was"/>
+            <ScrollViewer Height="200">
+                <StackPanel x:Name="CachePanel"/>
+            </ScrollViewer>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

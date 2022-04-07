@@ -149,28 +149,21 @@ namespace ExperimentSuite.UserControls
             SQLFileControl.SQLProgressBar.Maximum = CaseFiles.Count();
             foreach (var queryFile in CaseFiles)
             {
-                try
-                {
-                    await Task.Delay(1);
-                    SQLFileControl.UpdateFileLabel(queryFile.Name);
-                    SQLFileControl.SQLProgressBar.Value++;
-                    ulong? accCardinality = null;
-                    if (QueryPlanCacher.Instance != null)
-                        accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
-                    DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
+                await Task.Delay(1);
+                SQLFileControl.UpdateFileLabel(queryFile.Name);
+                SQLFileControl.SQLProgressBar.Value++;
+                ulong? accCardinality = null;
+                if (QueryPlanCacher.Instance != null)
+                    accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
+                DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
 
-                    AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
+                AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
 
-                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
+                OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                    TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
-                    testCases.Add(testCase);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error! The query file [{queryFile}] failed with the following error: {ex.ToString()}");
-                }
+                TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
+                testCases.Add(testCase);
             }
             SQLFileControl.SQLProgressBar.Value = SQLFileControl.SQLProgressBar.Maximum;
             return testCases;

@@ -100,7 +100,14 @@ namespace QueryPlanParserTests.SystemTests.Parsers
             dataSet.Tables.Add(table);
 
             // Act
-            parser.ParsePlan(dataSet);
+            try
+            {
+                parser.ParsePlan(dataSet);
+            }
+            catch (QueryPlanParserErrorLogException ex)
+            {
+                throw ex.ActualException;
+            }
         }
 
         #endregion
