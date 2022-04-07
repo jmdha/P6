@@ -24,7 +24,15 @@ namespace QueryOptimiser
         /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
+            BucketDictionary matchedBuckets = new BucketDictionary();
+            
+            List<ValuedNode> valuedNodes = new List<ValuedNode>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                CalculationResult result = CalculateNodeCost(nodes[i]);
+                valuedNodes.Add(new ValuedNode(result.Estimate, nodes[i]));
+            }
+             
             if (valuedNodes.Count == 0)
                 return new OptimiserResult(0, new List<ValuedNode>());
             ulong expCardinality = 1;
@@ -34,19 +42,9 @@ namespace QueryOptimiser
             return new OptimiserResult(expCardinality, valuedNodes);
         }
 
-        /// <summary>
-        /// Calculates worst case cost of each join operation
-        /// </summary>
-        /// <returns></returns>
-        internal List<ValuedNode> CalculateNodeCost(List<INode> nodes)
+        internal CalculationResult CalculateNodeCost(INode node)
         {
-            List<ValuedNode> valuedNodes = new List<ValuedNode>();
-            foreach (var node in nodes)
-            {
-                long cost = CostCalculator.CalculateCost(node);
-                valuedNodes.Add(new ValuedNode(cost, node));
-            }
-            return valuedNodes;
+            return CostCalculator.CalculateCost(node);
         }
     }
 }

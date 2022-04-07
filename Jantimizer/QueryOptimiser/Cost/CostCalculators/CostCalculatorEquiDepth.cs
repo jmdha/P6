@@ -3,11 +3,12 @@ using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.Nodes.EquiDepth;
+using QueryOptimiser.Models;
 using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
-    public class CostCalculatorEquiDepth : ICostCalculator
+    internal class CostCalculatorEquiDepth : ICostCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
 
@@ -16,7 +17,7 @@ namespace QueryOptimiser.Cost.CostCalculators
             HistogramManager = histogramManager;
         }
 
-        public long CalculateCost(INode node)
+        public CalculationResult CalculateCost(INode node)
         {
             if (node is JoinNode joinNode)
             {

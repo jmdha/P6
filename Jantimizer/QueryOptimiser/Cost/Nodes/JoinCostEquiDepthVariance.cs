@@ -12,7 +12,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
 {
     public class JoinCostEquiDepthVariance : BaseJoinCost
     {
-        protected override long CalculateCost(ComparisonType.Type predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        protected override long CalculateCost(ComparisonType.Type predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             long estimate = -1;
 
@@ -33,13 +33,13 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
             return estimate;
         }
 
-        private long CalculateEqualCost(IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        private long CalculateEqualCost(List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             long estimate = 0;
             int rightCutoff = 0;
-            for (int i = 0; i < leftBuckets.Length; i++)
+            for (int i = 0; i < leftBuckets.Count; i++)
             {
-                for (int j = rightCutoff; j < rightBuckets.Length; j++)
+                for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
                     if (DoesMatch(leftBuckets[i], rightBuckets[j]))
                         estimate += GetVariatedCount((HistogramBucketVariance)leftBuckets[i], (HistogramBucketVariance)rightBuckets[j]);
@@ -50,11 +50,11 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
             return estimate;
         }
 
-        private long CalculateInEqualityCost(ComparisonType.Type predicateType, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        private long CalculateInEqualityCost(ComparisonType.Type predicateType, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             long estimate = 0;
-            int rightCutoff = rightBuckets.Length - 1;
-            for (int i = leftBuckets.Length - 1; i >= 0; i--)
+            int rightCutoff = rightBuckets.Count - 1;
+            for (int i = leftBuckets.Count - 1; i >= 0; i--)
             {
                 for (int j = rightCutoff; j >= 0; j--)
                 {

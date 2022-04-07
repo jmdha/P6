@@ -7,6 +7,7 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
+using QueryOptimiser.Models;
 
 namespace QueryOptimiser.Cost.Nodes
 {
@@ -30,7 +31,7 @@ namespace QueryOptimiser.Cost.Nodes
             return -1;
         }
 
-        public long CalculateCost(JoinNode node, IHistogramManager histogramManager)
+        public CalculationResult CalculateCost(JoinNode node, IHistogramManager histogramManager)
         {
             if (node.Relation != null)
             {
@@ -46,17 +47,30 @@ namespace QueryOptimiser.Cost.Nodes
 
         }
 
-        private long CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager histogramManager)
+        private CalculationResult CalculateCost(JoinPredicateRelation nodeRelation, IHistogramManager histogramManager)
         {
             JoinPredicateRelation? leftRelation = nodeRelation.LeftRelation;
             JoinPredicateRelation? rightRelation = nodeRelation.RightRelation;
 
             if (leftRelation != null && rightRelation != null)
             {
-                if (nodeRelation.Type == RelationType.Type.And)
-                    return Math.Min(CalculateCost(leftRelation, histogramManager), CalculateCost(rightRelation, histogramManager));
-                else if (nodeRelation.Type == RelationType.Type.Or)
-                    return CalculateCost(leftRelation, histogramManager) + CalculateCost(rightRelation, histogramManager);
+                if (nodeRelation.Type == RelationType.Type.And || nodeRelation.Type == RelationType.Type.Or)
+                {
+                    CalculationResult leftResult = CalculateCost(leftRelation, histogramManager);
+                    CalculationResult rightResult = CalculateCost(rightRelation, histogramManager);
+                    switch (nodeRelation.Type)
+                    {
+                        case RelationType.Type.And:
+                            return new CalculationResult(Math.Min(leftResult.Estimate, rightResult.Estimate));
+                        //throw new NotImplementedException("IMPLEMENT DICTIONARY ADDITION OF BOTH LIMITATIONS OF BUCKETS");
+                        // if table and attribute is the same return only those who are in both dictionaries
+                        // Else return the sum of all dictioanry, i.e. all limitations
+                        case RelationType.Type.Or:
+                            return new CalculationResult(leftResult.Estimate + rightResult.Estimate, leftResult.BucketLimit, rightResult.BucketLimit);
+                        default:
+                            throw new Exception($"Can't happen, but compiler is not happy if this doesn't throw an exception. {nodeRelation.Type.ToString()}");
+                    }
+                }
                 else if (nodeRelation.Type == RelationType.Type.None)
                     throw new ArgumentNullException($"Noderelation type is not set {nodeRelation.ToString()}");
                 else
@@ -70,7 +84,7 @@ namespace QueryOptimiser.Cost.Nodes
                 throw new ArgumentException("Missing noderelation type " + nodeRelation.ToString());
         }
 
-        private long CalculateCost(JoinPredicate node, IHistogramManager histogramManager)
+        private CalculationResult CalculateCost(JoinPredicate node, IHistogramManager histogramManager)
         {
             IHistogram leftGram = histogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute);
             IHistogram rightGram = histogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute);
@@ -102,23 +116,26 @@ namespace QueryOptimiser.Cost.Nodes
             }
 
             if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
-                return 0;
+                return new CalculationResult(0);
 
             // This is a tad bit of symptom fixing rather than actual fix
             if (node.ComType == ComparisonType.Type.Less && leftGram.Buckets[leftEnd].ValueEnd.CompareTo(rightGram.Buckets[rightStart].ValueStart) == 0)
-                return 0;
+                return new CalculationResult(0);
             if (node.ComType == ComparisonType.Type.More && leftGram.Buckets[leftStart].ValueEnd.CompareTo(rightGram.Buckets[rightEnd].ValueEnd) == 0)
-                return 0;
+                return new CalculationResult(0);
 
-            Range leftBucketMatch = new Range(leftStart, leftEnd + 1);
-            Range rightBucketMatch = new Range(rightStart, rightEnd + 1);
+            List<IHistogramBucket> leftBuckets = leftGram.Buckets.GetRange(leftStart, (leftEnd + 1) - leftStart);
+            List<IHistogramBucket> rightBuckets = leftGram.Buckets.GetRange(rightStart, (rightEnd + 1) - rightStart);
 
-            IHistogramBucket[] leftBuckets = leftGram.Buckets.ToArray()[leftBucketMatch];
-            IHistogramBucket[] rightBuckets = rightGram.Buckets.ToArray()[rightBucketMatch];
 
-            return CalculateCost(node.ComType, leftBuckets, rightBuckets);
+            BucketDictionary bucketLimitations = new BucketDictionary();
+            bucketLimitations.AddBuckets(node.LeftTable.TableName, node.LeftAttribute, leftBuckets);
+            bucketLimitations.AddBuckets(node.RightTable.TableName, node.RightAttribute, rightBuckets);
+
+
+            return new CalculationResult(CalculateCost(node.ComType, leftBuckets, rightBuckets), new BucketLimitation(bucketLimitations));
         }
 
-        protected abstract long CalculateCost(ComparisonType.Type predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets);
+        protected abstract long CalculateCost(ComparisonType.Type predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets);
     }
 }

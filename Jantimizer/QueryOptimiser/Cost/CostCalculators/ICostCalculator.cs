@@ -8,13 +8,14 @@ using Histograms;
 using Histograms.Managers;
 using Histograms.Models;
 using DatabaseConnector;
+using QueryOptimiser.Models;
 
 namespace QueryOptimiser.Cost.CostCalculators
 {
     public interface ICostCalculator
     {
-        public IHistogramManager HistogramManager { get; set; }
+        public IHistogramManager HistogramManager { get; }
 
-        public long CalculateCost(INode node);
+        public CalculationResult CalculateCost(INode node);
     }
 }
