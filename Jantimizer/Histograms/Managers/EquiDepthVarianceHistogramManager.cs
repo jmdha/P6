@@ -26,7 +26,7 @@ namespace Histograms.Managers
 
         protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
         {
-            var cacheHisto = await DataGatherer.GetHistogramFromCacheOrNull(tableName, attributeName);
+            var cacheHisto = await GetHistogramFromCacheOrNull(tableName, attributeName);
 
             if(cacheHisto != null && cacheHisto is HistogramEquiDepthVariance)
                 return cacheHisto;
