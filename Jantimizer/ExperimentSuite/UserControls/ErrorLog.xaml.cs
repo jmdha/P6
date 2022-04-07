@@ -27,10 +27,10 @@ namespace ExperimentSuite.UserControls
         public ErrorLog()
         {
             InitializeComponent();
-            AddCache();
+            PrintCacheToErrorLog();
         }
 
-        public void AddCache()
+        public void PrintCacheToErrorLog()
         {
             CachePanel.Children.Clear();
             var cacheItems = new List<CacheItem>();
