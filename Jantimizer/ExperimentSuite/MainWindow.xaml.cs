@@ -54,40 +54,50 @@ namespace ExperimentSuite
 
         private async Task RunExperiments()
         {
-            DateTime runTime = DateTime.UtcNow;
-            string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
 
-            WriteToStatus("Parsing experiment list...");
-            var experimentsFile = IOHelper.GetFile("../../../experiments.json");
-            var testsPath = IOHelper.GetDirectory("../../../Tests");
-            var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
-            ExperimentProgressBar.Maximum = expList.Experiments.Count;
-            ExperimentProgressBar.Value = 0;
-            foreach (var experiment in expList.Experiments)
+            try
             {
-                if (experiment.RunExperiment)
-                {
-                    ExperimentProgressBar.Value++;
-                    ExperimentNameLabel.Content = experiment.ExperimentName;
-                    TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
-                    var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
+                DateTime runTime = DateTime.UtcNow;
+                string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
 
-                    WriteToStatus($"Running experiment {experiment.ExperimentName}");
-                    await RunExperimentQueue(
-                        GetRunDataFromList(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
-                        experiment.RunParallel);
-                    await RunExperimentQueue(
-                        GetRunDataFromList(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
-                        experiment.RunParallel);
+                WriteToStatus("Parsing experiment list...");
+                var experimentsFile = IOHelper.GetFile("../../../experiments.json");
+                var testsPath = IOHelper.GetDirectory("../../../Tests");
+                var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
+                ExperimentProgressBar.Maximum = expList.Experiments.Count;
+                ExperimentProgressBar.Value = 0;
+                foreach (var experiment in expList.Experiments)
+                {
+                    if (experiment.RunExperiment)
+                    {
+                        ExperimentProgressBar.Value++;
+                        ExperimentNameLabel.Content = experiment.ExperimentName;
+                        TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
+                        var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
+                        WriteToStatus($"Running experiment {experiment.ExperimentName}");
+                        await RunExperimentQueue(
+                            GetRunDataFromList(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
+                            experiment.RunParallel);
+                        await RunExperimentQueue(
+                            GetRunDataFromList(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
+                            experiment.RunParallel);
+                    }
+                    WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
                 }
-                WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
+                ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
+                WriteToStatus("All experiments complete!");
+                WriteToStatus("Merging results");
+                CSVMerger.Merge<TestReport, TestReportMap>(rootResultPath, "results.csv");
+                WriteToStatus("Merging finished");
+                RunButton.IsEnabled = true;
             }
-            ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
-            WriteToStatus("All experiments complete!");
-            WriteToStatus("Merging results");
-            CSVMerger.Merge<TestReport, TestReportMap>(rootResultPath, "results.csv");
-            WriteToStatus("Merging finished");
-            RunButton.IsEnabled = true;
+            catch (Exception ex)
+            {
+                var errorWindow = new ErrorLog();
+                errorWindow.ErrorLabel.Content = ex.Message;
+                errorWindow.StackTraceTextbox.Text = ex.StackTrace;
+                errorWindow.Show();
+            }
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
