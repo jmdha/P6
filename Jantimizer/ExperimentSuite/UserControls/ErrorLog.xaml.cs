@@ -51,8 +51,16 @@ namespace ExperimentSuite.UserControls
             if (saveFileDialog.ShowDialog() == true)
             {
                 var sb = new StringBuilder();
+                sb.AppendLine("Exception Name:");
+                sb.AppendLine(ErrorType.Content.ToString());
+                sb.AppendLine();
+
                 sb.AppendLine("Error:");
                 sb.AppendLine(ErrorLabel.Content.ToString());
+                sb.AppendLine();
+
+                sb.AppendLine("Exception Message:");
+                sb.AppendLine(ExceptionText.Content.ToString());
                 sb.AppendLine();
 
                 sb.AppendLine("Stack Trace:");
