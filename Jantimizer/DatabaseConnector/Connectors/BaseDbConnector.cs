@@ -64,7 +64,7 @@ namespace DatabaseConnector.Connectors
                         {
                             sqlAdapter.SelectCommand = cmd;
                             DataSet dt = new DataSet();
-                            sqlAdapter.Fill(dt);
+                            await Task.Run(() => sqlAdapter.Fill(dt));
 
                             return dt;
                         }
