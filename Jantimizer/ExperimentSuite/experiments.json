@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -45,7 +45,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -121,7 +121,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 100
       }
     }
   ]
