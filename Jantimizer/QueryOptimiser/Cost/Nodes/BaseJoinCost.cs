@@ -61,11 +61,11 @@ namespace QueryOptimiser.Cost.Nodes
                     switch (nodeRelation.Type)
                     {
                         case RelationType.Type.And:
-                            return CalculationResult.CreateAndCalculationResult(Math.Min(leftResult.Estimate, rightResult.Estimate), leftResult.BucketLimit, rightResult.BucketLimit);           
+                            return new CalculationResult(Math.Min(leftResult.Estimate, rightResult.Estimate), BucketLimitation.MergeOnOverlap(leftResult.BucketLimit, rightResult.BucketLimit));           
                         case RelationType.Type.Or:
-                            return CalculationResult.CreateOrCalculationResult(leftResult.Estimate + rightResult.Estimate, leftResult.BucketLimit, rightResult.BucketLimit);
+                            return new CalculationResult(leftResult.Estimate + rightResult.Estimate, BucketLimitation.Merge(leftResult.BucketLimit, rightResult.BucketLimit));
                         default:
-                            throw new Exception($"Can't happen, but compiler is not happy if this doesn't throw an exception. {nodeRelation.Type.ToString()}");
+                            throw new Exception($"Can't happen, but compiler is not happy if this doesn't throw an exception(or returns). {nodeRelation.Type.ToString()}");
                     }
                 }
                 else if (nodeRelation.Type == RelationType.Type.None)
