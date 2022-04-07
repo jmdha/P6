@@ -14,6 +14,12 @@ namespace HistogramsTests.Stubs
         public BaseHistogramManagerStub() : base(new DataGathererStub()) { }
 
         public BaseHistogramManagerStub(IDataGatherer dataGatherer) : base(dataGatherer) { }
+
+        protected override Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
+        {
+            throw new NotImplementedException();
+        }
+
         protected override Task<IHistogram> CreateHistogramForAttribute(string attributeName, string tableName)
         {
             throw new NotImplementedException();

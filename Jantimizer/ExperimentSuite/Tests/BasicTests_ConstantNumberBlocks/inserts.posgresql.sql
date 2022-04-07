@@ -62,6 +62,3 @@ CALL LoadTestData_A();
 CALL LoadTestData_B();
 CALL LoadTestData_C();
 CALL LoadTestData_D();
-
-
-ANALYSE;

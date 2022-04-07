@@ -1,6 +1,8 @@
 ﻿{
   "DoPreCleanup": true,
-  "DoSetup": true,
+  "DoSetup": false,
+  "DoInserts": true,
+  "DoAnalyse": true,
   "DoPostCleanup": true,
   "DoMakeHistograms": true,
   "DoRunTests": true,

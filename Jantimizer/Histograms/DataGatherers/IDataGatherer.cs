@@ -12,7 +12,6 @@ namespace Histograms.DataGatherers
         public Task<IEnumerable<string>> GetTableNamesInSchema();
         public Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName);
         public Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName);
-        public Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName);
         public Task<string> GetTableAttributeColumnHash(string tableName, string attributeName);
     }
 }

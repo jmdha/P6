@@ -11,6 +11,8 @@ namespace ExperimentSuite.Models
     {
         public bool? DoPreCleanup { get; set; }
         public bool? DoSetup { get; set; }
+        public bool? DoInserts { get; set; }
+        public bool? DoAnalyse { get; set; }
         public bool? DoPostCleanup { get; set; }
         public bool? DoMakeHistograms { get; set; }
         public bool? DoRunTests { get; set; }
@@ -21,10 +23,12 @@ namespace ExperimentSuite.Models
         {
         }
 
-        public TestSettings(bool? doPreCleanup, bool? doSetup, bool? doPostCleanup, bool? doMakeHistograms, bool? doRunTests, bool? doMakeReport, ConnectionProperties? properties)
+        public TestSettings(bool? doPreCleanup, bool? doSetup, bool? doInserts, bool? doAnalyse, bool? doPostCleanup, bool? doMakeHistograms, bool? doRunTests, bool? doMakeReport, ConnectionProperties? properties)
         {
             DoPreCleanup = doPreCleanup;
             DoSetup = doSetup;
+            DoInserts = doInserts;
+            DoAnalyse = doAnalyse;
             DoPostCleanup = doPostCleanup;
             DoMakeHistograms = doMakeHistograms;
             DoRunTests = doRunTests;
@@ -36,6 +40,8 @@ namespace ExperimentSuite.Models
         {
             DoPreCleanup = settings.DoPreCleanup;
             DoSetup = settings.DoSetup;
+            DoInserts = settings.DoInserts;
+            DoAnalyse = settings.DoAnalyse;
             DoPostCleanup = settings.DoPostCleanup;
             DoMakeHistograms = settings.DoMakeHistograms;
             DoRunTests = settings.DoRunTests;

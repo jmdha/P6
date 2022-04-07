@@ -26,8 +26,8 @@ namespace HistogramsTests.Unit_Tests.Caches
             CachedBucket bucket = new CachedBucket(histogramBucket);
 
             // ASSERT
-            Assert.AreEqual(start, bucket.ValueStart);
-            Assert.AreEqual(end, bucket.ValueEnd);
+            Assert.AreEqual(start.ToString(), bucket.ValueStart);
+            Assert.AreEqual(end.ToString(), bucket.ValueEnd);
             Assert.AreEqual(count, bucket.Count);
             Assert.AreEqual(0, bucket.Variance);
             Assert.AreEqual(0, bucket.Mean);
@@ -47,8 +47,8 @@ namespace HistogramsTests.Unit_Tests.Caches
             CachedBucket bucket = new CachedBucket(histogramBucket);
 
             // ASSERT
-            Assert.AreEqual(start, bucket.ValueStart);
-            Assert.AreEqual(end, bucket.ValueEnd);
+            Assert.AreEqual(start.ToString(), bucket.ValueStart);
+            Assert.AreEqual(end.ToString(), bucket.ValueEnd);
             Assert.AreEqual(count, bucket.Count);
             Assert.AreEqual(variance, bucket.Variance);
             Assert.AreEqual(mean, bucket.Mean);

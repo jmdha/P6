@@ -109,11 +109,7 @@ namespace Histograms.Managers
         protected abstract Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName);
         protected abstract Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName);
 
-        protected async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram) {
-            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash }, histogram);
-        }
+        protected abstract Task CacheHistogram(string tableName, string attributeName, IHistogram histogram);
 
         protected virtual async Task AddHistogramForAttribute(string attributeName, string tableName)
         {

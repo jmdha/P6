@@ -89,6 +89,40 @@ namespace HistogramsTests.Unit_Tests.Caches
             Assert.AreEqual(1, allHistos.Count);
         }
 
+        [TestMethod]
+        [DataRow(
+            new string[] { "A", "A", "A"},
+            new string[] { "s", "s", "s"},
+            new int[] { 1, 10, 93839 },
+            new string[] { "abc", "abc", "abc" })]
+        public void Can_AddToCacheIfNotThere_DifferenBucketSizes(string[] tableName, string[] attributeName, int[] depth, string[] columnHashes)
+        {
+            // ARRANGE
+            new HistogramCacher();
+            Assert.IsNotNull(HistogramCacher.Instance);
+            HistogramEquiDepth[] histograms = new HistogramEquiDepth[tableName.Length];
+            string[] hash = new string[tableName.Length];
+            for (int i = 0; i < tableName.Length; i++)
+            {
+                histograms[i] = new HistogramEquiDepth(tableName[i], attributeName[i], depth[i]);
+                hash[i] = HistogramCacher.Instance.GetCacheKey(new string[] { tableName[i], attributeName[i], columnHashes[i], depth[i].ToString() });
+            }
+
+            // ACT
+            for (int i = 0; i < tableName.Length; i++)
+                HistogramCacher.Instance.AddToCacheIfNotThere(hash[i], histograms[i]);
+
+            // ASSERT
+            for (int i = 0; i < tableName.Length; i++)
+            {
+                HistogramEquiDepth? returnHistogram = HistogramCacher.Instance.GetValueOrNull(hash[i]) as HistogramEquiDepth;
+                Assert.IsNotNull(returnHistogram);
+                Assert.AreEqual(tableName[i], returnHistogram.TableName);
+                Assert.AreEqual(attributeName[i], returnHistogram.AttributeName);
+                Assert.AreEqual(depth[i], returnHistogram.Depth);
+            }
+        }
+
         #endregion
 
         #region ClearCache
