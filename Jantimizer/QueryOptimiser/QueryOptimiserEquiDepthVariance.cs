@@ -3,6 +3,7 @@ using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.CostCalculators;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.Exceptions;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 
@@ -25,14 +26,21 @@ namespace QueryOptimiser
         /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
-            if (valuedNodes.Count == 0)
-                return new OptimiserResult(0, new List<ValuedNode>());
-            ulong expCardinality = 1;
-            foreach (ValuedNode node in valuedNodes)
-                expCardinality *= (ulong)node.Cost;
+            try 
+            { 
+                List<ValuedNode> valuedNodes = CalculateNodeCost(nodes).OrderByDescending(x => -x.Cost).ToList();
+                if (valuedNodes.Count == 0)
+                    return new OptimiserResult(0, new List<ValuedNode>());
+                ulong expCardinality = 1;
+                foreach (ValuedNode node in valuedNodes)
+                    expCardinality *= (ulong)node.Cost;
 
-            return new OptimiserResult(expCardinality, valuedNodes);
+                return new OptimiserResult(expCardinality, valuedNodes);
+            }
+            catch (Exception ex)
+            {
+                throw new OptimiserErrorLogException(ex, this, nodes);
+            }
         }
 
         /// <summary>

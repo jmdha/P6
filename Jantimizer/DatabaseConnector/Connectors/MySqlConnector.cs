@@ -7,9 +7,8 @@ namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
-        public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties)
+        public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
-
         }
 
         public override string BuildConnectionString()

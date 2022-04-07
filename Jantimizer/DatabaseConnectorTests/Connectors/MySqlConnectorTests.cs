@@ -1,4 +1,5 @@
 ﻿using DatabaseConnector;
+using DatabaseConnector.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MySqlConnector;
 using System;
@@ -60,7 +61,14 @@ namespace DatabaseConnectorTests.Connectors
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
-            var result = await connector.CallQueryAsync("abc");
+            try
+            {
+                var result = await connector.CallQueryAsync("abc");
+            }
+            catch(DatabaseConnectorErrorLogException ex)
+            {
+                throw ex.ActualException;
+            }
         }
 
         [TestMethod]
@@ -72,7 +80,14 @@ namespace DatabaseConnectorTests.Connectors
             IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
-            var result = await connector.CallQueryAsync("abc");
+            try
+            {
+                var result = await connector.CallQueryAsync("abc");
+            }
+            catch (DatabaseConnectorErrorLogException ex)
+            {
+                throw ex.ActualException;
+            }
         }
 
         #endregion
