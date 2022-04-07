@@ -11,5 +11,7 @@ namespace Tools.Exceptions
         public BaseErrorLogException(string? message) : base(message)
         {
         }
+
+        public abstract string GetErrorLogMessage();
     }
 }

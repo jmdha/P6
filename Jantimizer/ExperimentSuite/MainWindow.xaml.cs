@@ -95,7 +95,8 @@ namespace ExperimentSuite
             catch (BaseErrorLogException ex)
             {
                 var errorWindow = new ErrorLog();
-                errorWindow.ErrorLabel.Content = ex.ToString();
+                errorWindow.ErrorType.Content = ex.GetType().Name;
+                errorWindow.ErrorLabel.Content = ex.GetErrorLogMessage();
                 errorWindow.ExceptionText.Content = ex.Message;
                 errorWindow.StackTraceTextbox.Text = ex.StackTrace;
                 errorWindow.Show();

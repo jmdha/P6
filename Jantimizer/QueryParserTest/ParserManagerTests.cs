@@ -82,7 +82,7 @@ namespace QueryParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ParserException))]
+        [ExpectedException(typeof(ParserErrorLogException))]
         public void Cant_ParseQuery_IfParserNotSet_Throw()
         {
             // ARRANGE
@@ -145,7 +145,7 @@ namespace QueryParserTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ParserException))]
+        [ExpectedException(typeof(ParserErrorLogException))]
         public async Task Cant_ParseQueryAsync_IfParserNotSet_Throw()
         {
             // ARRANGE

@@ -9,18 +9,18 @@ using Tools.Exceptions;
 
 namespace QueryOptimiser.Exceptions
 {
-    public class GenericOptimiserException : BaseErrorLogException
+    public class OptimiserErrorLogException : BaseErrorLogException
     {
         public IQueryOptimiser Optimiser { get; set; }
         public List<INode> InputNodes { get; set; }
 
-        public GenericOptimiserException(string? message, IQueryOptimiser optimiser, List<INode> inputNodes) : base(message)
+        public OptimiserErrorLogException(string? message, IQueryOptimiser optimiser, List<INode> inputNodes) : base(message)
         {
             InputNodes = inputNodes;
             Optimiser = optimiser;
         }
 
-        public override string ToString()
+        public override string GetErrorLogMessage()
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Optimiser Name: {Optimiser.GetType().Name}");

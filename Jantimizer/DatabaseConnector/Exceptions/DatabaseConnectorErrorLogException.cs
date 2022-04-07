@@ -7,18 +7,18 @@ using Tools.Exceptions;
 
 namespace DatabaseConnector.Exceptions
 {
-    public class GenericSQLException : BaseErrorLogException
+    public class DatabaseConnectorErrorLogException : BaseErrorLogException
     {
         public string ConnectorID { get; set; }
         public string Query { get; set; }
 
-        public GenericSQLException(string? message, string connectorID, string query) : base(message)
+        public DatabaseConnectorErrorLogException(string? message, string connectorID, string query) : base(message)
         {
             ConnectorID = connectorID;
             Query = query;
         }
 
-        public override string ToString()
+        public override string GetErrorLogMessage()
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Connector: {ConnectorID}");

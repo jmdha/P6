@@ -72,7 +72,7 @@ namespace DatabaseConnector.Connectors
             }
             catch(Exception ex)
             {
-                throw new GenericSQLException(ex.Message, Name, query);
+                throw new DatabaseConnectorErrorLogException(ex.Message, Name, query);
             }
         }
 
@@ -102,7 +102,7 @@ namespace DatabaseConnector.Connectors
             }
             catch (Exception ex)
             {
-                throw new GenericSQLException(ex.Message, Name, query);
+                throw new DatabaseConnectorErrorLogException(ex.Message, Name, query);
             }
         }
 

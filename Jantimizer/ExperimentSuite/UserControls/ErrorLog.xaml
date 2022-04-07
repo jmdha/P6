@@ -10,6 +10,7 @@
         <StackPanel>
             <Label Content="An error occured!" FontSize="20" HorizontalAlignment="Center"/>
             <Button x:Name="SaveToFile" Content="Save to File" Click="SaveToFile_Click"/>
+            <Label x:Name="ErrorType" FontSize="20" Foreground="Red"/>
             <Label x:Name="ErrorLabel" Content="Error: " Foreground="Red"/>
             <Label x:Name="ExceptionText" Content="Exception: " Foreground="Orange"/>
             <Label Content="Stack Trace"/>
