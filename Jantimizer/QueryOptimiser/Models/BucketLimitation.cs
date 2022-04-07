@@ -80,7 +80,7 @@ namespace QueryOptimiser.Models
                 foreach (var tableLimit in bucketLimitation2.PrimaryBuckets.BDictionary)
                     foreach (var attributeLimit in tableLimit.Value)
                         foreach (IHistogramBucket bucket in attributeLimit.Value)
-                            if (!uncheckedBuckets.Contains(bucket))
+                            if (uncheckedBuckets.Contains(bucket))
                                 merged.PrimaryBuckets.AddBucket(tableLimit.Key, attributeLimit.Key, bucket);
             }
             return merged;
