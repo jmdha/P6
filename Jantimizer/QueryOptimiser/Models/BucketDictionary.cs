@@ -23,7 +23,8 @@ namespace QueryOptimiser.Models
                     foreach (IHistogramBucket bucket in attributeLimit.Value)
                     {
                         HandleNonExistance(tableLimit.Key, attributeLimit.Key);
-                        BDictionary[tableLimit.Key][attributeLimit.Key].Add(bucket);
+                        if (!BDictionary[tableLimit.Key][attributeLimit.Key].Contains(bucket))
+                            BDictionary[tableLimit.Key][attributeLimit.Key].Add(bucket);
                     }
                         
         }
