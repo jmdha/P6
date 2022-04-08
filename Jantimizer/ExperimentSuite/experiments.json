@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -45,7 +45,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -85,9 +85,9 @@
       }
     },
     {
-      "ExperimentName": "New Data Experiment",
+      "ExperimentName": "Real: World Happiness",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -117,6 +117,46 @@
           "ConnectorID": "EquiDepth",
           "TestFiles": [
             "WorldHappiness_With_GDP"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "Census 2013",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013"
           ]
         }
       ],
