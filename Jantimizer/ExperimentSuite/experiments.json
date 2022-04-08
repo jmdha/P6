@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -45,7 +45,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -91,37 +91,37 @@
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "RealData_WorldHappiness_Setup"
+            "WorldHappiness_With_GDP_Setup"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "RealData_WorldHappiness_Setup"
+            "WorldHappiness_With_GDP_Setup"
           ]
         }
       ],
       "RunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "RealData_WorldHappiness"
+            "WorldHappiness_With_GDP"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "Default",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "RealData_WorldHappiness"
+            "WorldHappiness_With_GDP"
           ]
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 100
+        "BucketSize": 10
       }
     }
   ]
