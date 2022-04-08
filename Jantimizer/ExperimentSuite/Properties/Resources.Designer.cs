@@ -63,6 +63,16 @@ namespace ExperimentSuite.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] errorIcon {
+            get {
+                object obj = ResourceManager.GetObject("errorIcon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);

@@ -27,7 +27,22 @@ namespace ExperimentSuite.UserControls
         public ErrorLog()
         {
             InitializeComponent();
+            var iconHandle = ExperimentSuite.Properties.Resources.errorIcon;
+            this.Icon = ByteToImage(iconHandle);
             PrintCacheToErrorLog();
+        }
+
+        public static ImageSource ByteToImage(byte[] imageData)
+        {
+            BitmapImage biImg = new BitmapImage();
+            MemoryStream ms = new MemoryStream(imageData);
+            biImg.BeginInit();
+            biImg.StreamSource = ms;
+            biImg.EndInit();
+
+            ImageSource imgSrc = biImg as ImageSource;
+
+            return imgSrc;
         }
 
         public void PrintCacheToErrorLog()
