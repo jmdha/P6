@@ -3,6 +3,7 @@ SET search_path TO census2013;
 
 DROP TABLE IF EXISTS census;
 CREATE TABLE census (
+	id SERIAL PRIMARY KEY,
 	age INT,
 	workclass TEXT,
 	education TEXT,

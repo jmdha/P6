@@ -5,6 +5,7 @@ SET GLOBAL max_allowed_packet=1073741824;
 
 DROP TABLE IF EXISTS census;
 CREATE TABLE census (
+	id INT AUTO_INCREMENT,
 	age INT,
 	workclass varchar(100),
 	education varchar(100),
@@ -17,5 +18,6 @@ CREATE TABLE census (
 	capital_gain INT,
 	capital_loss INT,
 	hours_per_week INT,
-	native_country varchar(100)
+	native_country varchar(100),
+    PRIMARY KEY (id)
 );
