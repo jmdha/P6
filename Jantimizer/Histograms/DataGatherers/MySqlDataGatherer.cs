@@ -47,12 +47,12 @@ namespace Histograms.DataGatherers
         {
             DataSet sortedGroupsDs = await DbConnector.CallQueryAsync(@$"
                 SELECT
-                    {attributeName} AS val,
-                    COUNT({attributeName}) AS c
-                FROM {tableName} WHERE
-                    {attributeName} IS NOT NULL
-                GROUP BY {attributeName}
-                ORDER BY {attributeName} ASC
+                    `{attributeName}` AS val,
+                    COUNT(`{attributeName}`) AS c
+                FROM `{tableName}` WHERE
+                    `{attributeName}` IS NOT NULL
+                GROUP BY `{attributeName}`
+                ORDER BY `{attributeName}` ASC
             ");
 
             return GetValueCounts(sortedGroupsDs, "val", "c").ToList();
