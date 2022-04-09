@@ -10,9 +10,9 @@ using DatabaseConnector;
 
 namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
-    public class JoinCostEquiDepth : BaseJoinCost
+    internal class JoinCostEquiDepth : BaseJoinCost
     {
-        protected override long CalculateCost(ComparisonType.Type predicate, HistogramBucket leftBucket, IHistogramBucket rightBucket)
+        public override long GetCombinedEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             return leftBucket.Count * rightBucket.Count;
         }

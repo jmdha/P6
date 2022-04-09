@@ -29,21 +29,14 @@ namespace QueryOptimiser
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             for (int i = 0; i < nodes.Count; i++)
             {
-                CalculationResult result = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
-                valuedNodes.Add(new ValuedNode(result.Estimate, nodes[i]));
-                if (result.Table != null)
-                {
-                    intermediateTable = result.Table;
-                }
+                IntermediateTable newTable = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
+                if (intermediateTable.Buckets.Count == 0)
+                    intermediateTable = newTable;
+                else
+                    intermediateTable = IntermediateTable.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
             }
-             
-            if (valuedNodes.Count == 0)
-                return new OptimiserResult(0, new List<ValuedNode>());
-            ulong expCardinality = 1;
-            foreach (ValuedNode node in valuedNodes)
-                expCardinality *= (ulong)node.Cost;
 
-            return new OptimiserResult(expCardinality, valuedNodes);
+            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), valuedNodes);
         }
     }
 }

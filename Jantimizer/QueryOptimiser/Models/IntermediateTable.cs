@@ -21,15 +21,26 @@ namespace QueryOptimiser.Models
             Buckets = new List<IntermediateBucket>();
         }
 
-        public IntermediateTable(List<IntermediateBucket> buckets) {
+        public IntermediateTable(List<IntermediateBucket> buckets, List<Tuple<TableReferenceNode, List<string>>> references) {
             Buckets = buckets;
+            foreach (var reference in references)
+            {
+                if (!References.ContainsKey(reference.Item1)) {
+                    References.Add(reference.Item1, reference.Item2);
+                    continue;
+                }
+                
+                foreach (var attribute in reference.Item2)
+                    if (!References[reference.Item1].Contains(attribute))
+                        References[reference.Item1].Add(attribute);
+            }
         }
 
         public long GetRowEstimate()
         {
             long estimate = 0;
             foreach (IntermediateBucket bucket in Buckets)
-                estimate += bucket.Count;
+                estimate +=bucket.Count;
             return estimate;
         }
 
@@ -69,8 +80,10 @@ namespace QueryOptimiser.Models
 
         private static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2)
         {
-            // To be implemented
-            return JoinWithoutOverlap(it, it1, it2);
+            foreach (var bucket1 in it1.Buckets)
+                foreach (var bucket2 in it2.Buckets)
+                    it.Buckets.Add(IntermediateBucket.Merge(bucket1, bucket2));
+            return it;
         }
 
         private static IntermediateTable JoinWithoutOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2)

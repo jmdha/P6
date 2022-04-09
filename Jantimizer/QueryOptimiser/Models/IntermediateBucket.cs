@@ -13,20 +13,41 @@ namespace QueryOptimiser.Models
         internal long Count { get; private set; }
         internal Dictionary<TableReferenceNode, Dictionary<string, IHistogramBucket>> Buckets { get; } = new Dictionary<TableReferenceNode, Dictionary<string, IHistogramBucket>>();
 
-        internal IntermediateBucket(List<Tuple<TableReferenceNode, string, IHistogramBucket>> buckets)
+        internal IntermediateBucket() { }
+        internal IntermediateBucket(List<Tuple<TableReferenceNode, string, IHistogramBucket>> buckets, long count)
         {
             AddBuckets(buckets);
+            Count = count;
         }
 
         internal IntermediateBucket(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
             AddBuckets(bucket1);
             AddBuckets(bucket2);
+            Count = bucket1.Count * bucket2.Count;
         }
 
-        public IHistogramBucket GetBucket(TableReferenceNode node, string attribute)
+        public static IntermediateBucket Merge(IntermediateBucket bucket1, IntermediateBucket bucket2)
+        {
+            IntermediateBucket bucket = new IntermediateBucket();
+            foreach (var tableRef in bucket1.Buckets)
+                foreach (var attribute in tableRef.Value)
+                    bucket.AddBucketsIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+            foreach (var tableRef in bucket2.Buckets)
+                foreach (var attribute in tableRef.Value)
+                    bucket.AddBucketsIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+            bucket.Count = bucket1.Count * bucket2.Count;
+            return bucket;
+        }
+
+        internal IHistogramBucket GetBucket(TableReferenceNode node, string attribute)
         {
             return Buckets[node][attribute];
+        }
+
+        internal bool DoesContain(TableReferenceNode node, string attribute)
+        {
+            return (Buckets.ContainsKey(node) && Buckets[node].ContainsKey(attribute));
         }
 
         private void AddBuckets(IntermediateBucket bucket)
@@ -48,9 +69,17 @@ namespace QueryOptimiser.Models
                 if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
                     Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
                 else
-                    throw new ArgumentException("Can not add the same bucket twice(Should not occur)");
+                    throw new ArgumentException("Can not add the same bucket twice");
                 Count *= bucket.Item3.Count;
             }
+        }
+
+        private void AddBucketsIgnoreDuplicates(Tuple<TableReferenceNode, string, IHistogramBucket> bucket)
+        {
+            if (!Buckets.ContainsKey(bucket.Item1))
+                Buckets.Add(bucket.Item1, new Dictionary<string, IHistogramBucket>());
+            if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
+                Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
         }
     }
 }
