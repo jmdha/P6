@@ -18,6 +18,7 @@ namespace QueryOptimiser.Cost.Nodes
         /// <para>Specifically it gives the worst case cardinality estimate</para>
         /// </summary>
         /// <returns></returns>
-        internal CalculationResult CalculateCost(NodeType node, IHistogramManager histogramManager, BucketLimitation limitation);
+        internal IntermediateTable GetMatches(NodeType node, IHistogramManager histogramManager, IntermediateTable intermediateTable);
+        internal long GetCombinedEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket);
     }
 }

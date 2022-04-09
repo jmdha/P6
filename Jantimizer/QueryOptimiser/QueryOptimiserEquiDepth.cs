@@ -13,7 +13,7 @@ namespace QueryOptimiser
     {
         public QueryOptimiserEquiDepth(IHistogramManager histogramManager) : base(histogramManager)
         {
-            CostCalculator = new CostCalculatorEquiDepth(histogramManager);
+            EstimateCalculator = new EstimateCalculatorEquiDepth(histogramManager);
         }
     }
 }

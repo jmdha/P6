@@ -10,12 +10,12 @@ using Histograms.Models;
 using DatabaseConnector;
 using QueryOptimiser.Models;
 
-namespace QueryOptimiser.Cost.CostCalculators
+namespace QueryOptimiser.Cost.EstimateCalculators
 {
-    public interface ICostCalculator
+    public interface IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; }
 
-        public CalculationResult CalculateCost(INode node, BucketLimitation limitation);
+        public IntermediateTable EstimateIntermediateTable(INode node, IntermediateTable intermediateTable);
     }
 }

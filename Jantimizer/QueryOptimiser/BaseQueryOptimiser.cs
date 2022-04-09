@@ -1,7 +1,7 @@
 ﻿using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
-using QueryOptimiser.Cost.CostCalculators;
+using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
 using QueryParser.Models;
@@ -11,7 +11,7 @@ namespace QueryOptimiser
     public partial class BaseQueryOptimiser : IQueryOptimiser
     {
         public IHistogramManager HistogramManager { get; set; }
-        public ICostCalculator CostCalculator { get; set; }
+        public IEstimateCalculator EstimateCalculator { get; set; }
 
         public BaseQueryOptimiser(IHistogramManager histogramManager)
         {
@@ -24,15 +24,17 @@ namespace QueryOptimiser
         /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
-            BucketLimitation bucketLimitation = new BucketLimitation();
+            IntermediateTable intermediateTable = new IntermediateTable();
             
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
             for (int i = 0; i < nodes.Count; i++)
             {
-                CalculationResult result = CostCalculator.CalculateCost(nodes[i], bucketLimitation);
+                CalculationResult result = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
                 valuedNodes.Add(new ValuedNode(result.Estimate, nodes[i]));
-                if (result.BucketLimit != null)
-                    bucketLimitation = BucketLimitation.MergeOnOverlap(bucketLimitation, result.BucketLimit);
+                if (result.Table != null)
+                {
+                    intermediateTable = result.Table;
+                }
             }
              
             if (valuedNodes.Count == 0)

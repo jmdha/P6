@@ -10,17 +10,23 @@ namespace QueryOptimiser.Models
     public class CalculationResult
     {
         public long Estimate { get; }
-        internal BucketLimitation? BucketLimit { get; set; }
+        internal IntermediateTable Table { get; set; }
 
         internal CalculationResult(long estimate)
         {
             Estimate = estimate;
         }
 
-        internal CalculationResult(long estimate, BucketLimitation bucketLimit)
+        internal CalculationResult(long estimate, IntermediateTable table)
         {
             Estimate = estimate;
-            BucketLimit = bucketLimit;
+            Table = table;
+        }
+
+        internal CalculationResult(IntermediateTable table)
+        {
+            Table = table;
+            Estimate = Table.GetRowEstimate();
         }
     }
 }
