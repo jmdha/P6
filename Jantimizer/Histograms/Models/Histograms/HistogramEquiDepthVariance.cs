@@ -10,6 +10,12 @@ namespace Histograms.Models
     /// </summary>
     public class HistogramEquiDepthVariance : HistogramEquiDepth
     {
+        public override List<TypeCode> AcceptedTypes { get; } = new List<TypeCode>() { 
+            TypeCode.Int16, 
+            TypeCode.Int32, 
+            TypeCode.Int64
+        };
+
         public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
         {
         }

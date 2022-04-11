@@ -15,6 +15,11 @@ namespace QueryOptimiserTest.Stubs
             throw new NotImplementedException();
         }
 
+        public Task<Type> GetAttributeType(string tableName, string attributeName)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
         {
             throw new NotImplementedException();
