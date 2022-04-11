@@ -74,19 +74,5 @@ namespace Histograms.DataGatherers
             string hashValue = (string)hashRow["hash"];
             return hashValue;
         }
-
-        public override async Task<Type> GetAttributeType(string tableName, string attributeName)
-        {
-            DataSet result = await DbConnector.CallQueryAsync($"SELECT \"{attributeName}\" FROM \"{tableName}\" LIMIT 1;");
-            if (result.Tables.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            if (result.Tables[0].Rows.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            if (result.Tables[0].Columns.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            DataRow rowResult = result.Tables[0].Rows[0];
-            Type typeValue = rowResult[0].GetType();
-            return typeValue;
-        }
     }
 }

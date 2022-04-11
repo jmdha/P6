@@ -20,19 +20,7 @@ namespace Histograms.Managers
 
         protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
-            var typeValue = await DataGatherer.GetAttributeType(tableName, attributeName);
-            IHistogram histogram;
-            switch (Type.GetTypeCode(typeValue))
-            {
-                case TypeCode.String:
-                    histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
-                    break;
-                case TypeCode.Int32:
-                    histogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
-                    break;
-                default:
-                    throw new HistogramManagerErrorLogException(new ArgumentException("Could not find a fitting histogram!"));
-            }
+            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
             histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
         }

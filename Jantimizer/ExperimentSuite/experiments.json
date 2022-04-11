@@ -131,14 +131,14 @@
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepthVariance",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "Census_2013_Setup"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepthVariance",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "Census_2013_Setup"
           ]
@@ -147,14 +147,14 @@
       "RunData": [
         {
           "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepthVariance",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "Census_2013"
           ]
         },
         {
           "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepthVariance",
+          "ConnectorID": "EquiDepth",
           "TestFiles": [
             "Census_2013"
           ]
