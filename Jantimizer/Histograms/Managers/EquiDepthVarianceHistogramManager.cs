@@ -20,8 +20,8 @@ namespace Histograms.Managers
 
         protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
-            IHistogramSelector selector = new HistogramSelector();
-            IHistogram histogram = selector.GetHistogramDepthOfTypeOrAlt(
+            IDepthHistogramSelector<IDepthHistogram> selector = new DepthHistogramSelector();
+            IDepthHistogram histogram = selector.GetHistogramDepthOfTypeOrAlt(
                 new HistogramEquiDepthVariance(tableName, attributeName, Depth),
                 await DataGatherer.GetAttributeType(tableName, attributeName),
                 tableName,
