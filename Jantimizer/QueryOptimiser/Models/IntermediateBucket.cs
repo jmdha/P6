@@ -27,7 +27,7 @@ namespace QueryOptimiser.Models
             Count = bucket1.Count * bucket2.Count;
         }
 
-        public static IntermediateBucket Merge(IntermediateBucket bucket1, IntermediateBucket bucket2)
+        internal static IntermediateBucket Merge(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
             IntermediateBucket bucket = new IntermediateBucket();
             foreach (var tableRef in bucket1.Buckets)
@@ -38,6 +38,17 @@ namespace QueryOptimiser.Models
                     bucket.AddBucketsIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
             bucket.Count = bucket1.Count * bucket2.Count;
             return bucket;
+        }
+
+        internal static bool DoesOverlap(TableReferenceNode node, string attribute, IntermediateBucket bucket1, IntermediateBucket bucket2)
+        {
+            if (bucket1.DoesContain(node, attribute) && bucket2.DoesContain(node, attribute)) {
+                if (bucket1.GetBucket(node, attribute) == bucket2.GetBucket(node, attribute))
+                    return true;
+                else
+                    return false;
+            } else
+                return false;
         }
 
         internal IHistogramBucket GetBucket(TableReferenceNode node, string attribute)

@@ -46,9 +46,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
             return new IntermediateTable(buckets, references);
         }
-
-
-
        
         #region Matches
         private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<Tuple<TableReferenceNode, List<string>>> references)

@@ -4,5 +4,6 @@
     {
         public int Variance { get; }
         public int Mean { get; }
+        public int Range { get; }
     }
 }

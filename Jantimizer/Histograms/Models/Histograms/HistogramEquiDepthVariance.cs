@@ -30,7 +30,7 @@ namespace Histograms.Models
                     if (valueStart == null || valueEnd == null)
                         throw new ArgumentNullException("Read bucket value was invalid!");
 
-                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean));
+                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, (int)valueEnd - (int)valueStart));
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace Histograms.Models
                 if (variance < 0)
                     variance = 0;
 
-                Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean));
+                Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean, (int)endValue - (int)startValue));
             }
         }
 
@@ -72,7 +72,7 @@ namespace Histograms.Models
             var retObj = new HistogramEquiDepthVariance(TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
                 if (bucket is IHistogramBucketVariance vari)
-                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean));
+                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.Range));
             return retObj;
         }
     }
