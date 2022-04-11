@@ -2,11 +2,11 @@
 {
     public class HistogramBucketVariance : HistogramBucket, IHistogramBucketVariance
     {
-        public decimal Variance { get; internal set; }
-        public decimal Mean { get; internal set; }
-        public decimal StandardDeviation { get; internal set; }
+        public double Variance { get; internal set; }
+        public double Mean { get; internal set; }
+        public double StandardDeviation { get; internal set; }
 
-        public HistogramBucketVariance(IComparable valueStart, IComparable valueEnd, long count, decimal variance, decimal mean, decimal standardDeviation) : base(valueStart, valueEnd, count)
+        public HistogramBucketVariance(IComparable valueStart, IComparable valueEnd, long count, double variance, double mean, double standardDeviation) : base(valueStart, valueEnd, count)
         {
             Variance = variance;
             Mean = mean;

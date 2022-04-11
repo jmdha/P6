@@ -13,14 +13,14 @@ namespace Histograms.Caches
         public string ValueStart { get; }
         public string ValueEnd { get; }
         public long Count { get; }
-        public decimal Variance { get; }
-        public decimal StandardDeviation { get; }
-        public decimal Mean { get; }
+        public double Variance { get; }
+        public double StandardDeviation { get; }
+        public double Mean { get; }
         public string TypeName { get; }
         public string ValueType { get; }
 
         [JsonConstructorAttribute]
-        public CachedBucket(string valueStart, string valueEnd, long count, decimal variance, decimal mean, decimal standardDeviation, string typeName, string valueType)
+        public CachedBucket(string valueStart, string valueEnd, long count, double variance, double mean, double standardDeviation, string typeName, string valueType)
         {
             ValueStart = valueStart;
             ValueEnd = valueEnd;

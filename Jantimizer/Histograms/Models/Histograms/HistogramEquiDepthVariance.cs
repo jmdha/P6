@@ -42,22 +42,23 @@ namespace Histograms.Models
                 IComparable startValue = sorted[bStart];
                 IComparable endValue = sorted[bStart];
                 int countValue = 1;
-                decimal mean = Convert.ToDecimal(endValue);
-                decimal variance = 0;
-                decimal standardDeviation = 0;
+                double mean = Convert.ToDouble(endValue);
+                double variance = 0;
+                double standardDeviation = 0;
 
                 for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                 {
                     countValue++;
-                    mean += Convert.ToDecimal(sorted[bIter]);
+                    endValue = sorted[bIter];
+                    mean += Convert.ToDouble(endValue);
                 }
                 mean = mean / countValue;
                 for (int bIter = bStart; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                 {
-                    variance += (decimal)Math.Pow(Convert.ToDouble(sorted[bIter]) - (double)mean, 2);
+                    variance += Math.Pow(Convert.ToDouble(sorted[bIter]) - (double)mean, 2);
                 }
                 if (countValue > 1 && variance != 0)
-                    standardDeviation = (decimal)Math.Sqrt((double)variance / countValue - 1);
+                    standardDeviation = Math.Sqrt((double)variance / countValue - 1);
                 else
                     variance = 0;
                 if (variance < 0)
