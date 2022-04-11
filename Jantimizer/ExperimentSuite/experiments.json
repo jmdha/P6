@@ -161,7 +161,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 512
       }
     }
   ]
