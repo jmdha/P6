@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Histograms.HistogramSelectors
 {
-    public interface IDepthHistogramSelector<T> where T : IDepthHistogram
+    public interface IDepthHistogramSelector<T> : IHistogramSelector<T> where T : IDepthHistogram
     {
         public T GetHistogramDepthOfTypeOrAlt(T targetType, Type type, string tableName, string attributeName, int depth);
     }

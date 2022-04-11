@@ -8,10 +8,15 @@ using System.Threading.Tasks;
 
 namespace Histograms.HistogramSelectors
 {
-    public class DepthHistogramSelector : HistogramSelector, IDepthHistogramSelector<IDepthHistogram>
+    public class DepthHistogramSelector : IDepthHistogramSelector<IDepthHistogram>
     {
         public DepthHistogramSelector()
         {
+        }
+
+        public IDepthHistogram GetHistogramDepthOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName)
+        {
+            throw new NotImplementedException("It makes no sense to call this method here! Use the one with depth");
         }
 
         public IDepthHistogram GetHistogramDepthOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName, int depth)
