@@ -9,6 +9,6 @@ namespace Histograms.HistogramSelectors
 {
     public interface IHistogramSelector<T> where T : IHistogram
     {
-        public T GetHistogramDepthOfTypeOrAlt(T targetType, Type type, string tableName, string attributeName);
+        public T GetHistogramOfTypeOrAlt(T targetType, Type type, string tableName, string attributeName);
     }
 }

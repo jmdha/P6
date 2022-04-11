@@ -14,7 +14,7 @@ namespace Histograms.HistogramSelectors
         {
         }
 
-        public IDepthHistogram GetHistogramDepthOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName)
+        public IDepthHistogram GetHistogramOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName)
         {
             throw new NotImplementedException("It makes no sense to call this method here! Use the one with depth");
         }
