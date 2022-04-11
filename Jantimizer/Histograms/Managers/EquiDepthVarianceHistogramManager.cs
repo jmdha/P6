@@ -1,5 +1,6 @@
 ﻿using Histograms.Caches;
 using Histograms.DataGatherers;
+using Histograms.Exceptions;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,11 @@ namespace Histograms.Managers
                 case TypeCode.String:
                     histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
                     break;
-                default:
+                case TypeCode.Int32:
                     histogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
                     break;
+                default:
+                    throw new HistogramManagerErrorLogException(new ArgumentException("Could not find a fitting histogram!"));
             }
             histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
