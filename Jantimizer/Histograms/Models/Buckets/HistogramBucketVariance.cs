@@ -2,18 +2,20 @@
 {
     public class HistogramBucketVariance : HistogramBucket, IHistogramBucketVariance
     {
-        public int Variance { get; internal set; }
-        public int Mean { get; internal set; }
+        public decimal Variance { get; internal set; }
+        public decimal Mean { get; internal set; }
+        public decimal StandardDeviation { get; internal set; }
 
-        public HistogramBucketVariance(IComparable valueStart, IComparable valueEnd, long count, int variance, int mean) : base(valueStart, valueEnd, count)
+        public HistogramBucketVariance(IComparable valueStart, IComparable valueEnd, long count, decimal variance, decimal mean, decimal standardDeviation) : base(valueStart, valueEnd, count)
         {
             Variance = variance;
             Mean = mean;
+            StandardDeviation = standardDeviation;
         }
 
         public override string? ToString()
         {
-            return $"Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}], Variance: [{Variance}], Mean: [{Mean}]";
+            return $"Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}], Variance: [{Variance}], Mean: [{Mean}], Standard Deviation [{StandardDeviation}]";
         }
     }
 }
