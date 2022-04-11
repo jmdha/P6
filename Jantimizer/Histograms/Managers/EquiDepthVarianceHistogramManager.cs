@@ -19,7 +19,17 @@ namespace Histograms.Managers
 
         protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
-            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
+            var typeValue = await DataGatherer.GetAttributeType(tableName, attributeName);
+            IHistogram histogram;
+            switch (Type.GetTypeCode(typeValue))
+            {
+                case TypeCode.String:
+                    histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+                    break;
+                default:
+                    histogram = new HistogramEquiDepthVariance(tableName, attributeName, Depth);
+                    break;
+            }
             histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
         }
