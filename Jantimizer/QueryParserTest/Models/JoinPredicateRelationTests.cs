@@ -97,8 +97,6 @@ namespace QueryParserTest.Models
             // ARRANGE
             var leftTable1 = new TableReferenceNode(0, "TableA", "A");
             var rightTable1 = new TableReferenceNode(1, "TableB", "B");
-            var leftTable2 = new TableReferenceNode(2, "TableC", "C");
-            var rightTable2 = new TableReferenceNode(3, "TableD", "D");
             var predicate = new JoinPredicateRelation(
                 new JoinPredicateRelation(
                     new JoinPredicate(
@@ -126,8 +124,6 @@ namespace QueryParserTest.Models
         public void Can_GetJoinTables_Relations_RightOnly()
         {
             // ARRANGE
-            var leftTable1 = new TableReferenceNode(0, "TableA", "A");
-            var rightTable1 = new TableReferenceNode(1, "TableB", "B");
             var leftTable2 = new TableReferenceNode(2, "TableC", "C");
             var rightTable2 = new TableReferenceNode(3, "TableD", "D");
             var predicate = new JoinPredicateRelation(
