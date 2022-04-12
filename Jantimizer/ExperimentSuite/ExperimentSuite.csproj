@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="UserControls\CacheViewer\Controls\" />
     <Folder Include="UserControls\TestRunner\Controls\" />
   </ItemGroup>
 
