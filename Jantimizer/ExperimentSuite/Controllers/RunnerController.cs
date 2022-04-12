@@ -70,91 +70,76 @@ namespace ExperimentSuite.Controllers
 
         public async Task<List<TestReport>> Run()
         {
-            if (SetTestNameColor != null)
-                SetTestNameColor.Invoke(Brushes.Yellow);
+            SetTestNameColor?.Invoke(Brushes.Yellow);
 
-            if (ToggleVisibility != null)
-                ToggleVisibility.Invoke(false);
+            ToggleVisibility?.Invoke(false);
 
-            if (PrintTestUpdate != null)
-                PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
+            PrintTestUpdate?.Invoke("Parsing settings file:", SettingsFile.Name);
             ParseTestSettings(SettingsFile);
 
-            if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
+            if (IsTrueAndNotNull(RunData.Settings.DoPreCleanup))
             {
                 if (CleanupFile == null)
                     throw new IOException("Cleanup file was null!");
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
+                PrintTestUpdate?.Invoke("Running Pre-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
-            if (RunData.Settings.DoSetup != null && (bool)RunData.Settings.DoSetup)
+            if (IsTrueAndNotNull(RunData.Settings.DoSetup))
             {
                 if (SetupFile == null)
                     throw new IOException("Setup file was null!");
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Running Setup", SetupFile.Name);
+                PrintTestUpdate?.Invoke("Running Setup", SetupFile.Name);
                 await RunData.Connector.CallQueryAsync(SetupFile);
             }
 
-            if (RunData.Settings.DoInserts != null && (bool)RunData.Settings.DoInserts)
+            if (IsTrueAndNotNull(RunData.Settings.DoInserts))
             {
                 if (DataInsertsFile == null)
                     throw new IOException("Inserts file was null!");
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
+                PrintTestUpdate?.Invoke("Inserting Data", DataInsertsFile.Name);
                 await RunData.Connector.CallQueryAsync(DataInsertsFile);
             }
 
-            if (RunData.Settings.DoAnalyse != null && (bool)RunData.Settings.DoAnalyse)
+            if (IsTrueAndNotNull(RunData.Settings.DoAnalyse))
             {
                 if (DataAnalyseFile == null)
                     throw new IOException("Analyse file was null!");
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Analysing Tables", DataAnalyseFile.Name);
+                PrintTestUpdate?.Invoke("Analysing Tables", DataAnalyseFile.Name);
                 await RunData.Connector.CallQueryAsync(DataAnalyseFile);
             }
 
-            if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
+            if (IsTrueAndNotNull(RunData.Settings.DoMakeHistograms))
             {
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Generating Histograms for:", RunData.Name);
+                PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 await GenerateHistograms(RunData.HistoManager);
             }
 
-            if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
+            if (IsTrueAndNotNull(RunData.Settings.DoRunTests))
             {
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Begining Test Run for:", RunData.Name);
+                PrintTestUpdate?.Invoke("Begining Test Run for:", RunData.Name);
                 Results = await RunQueriesSerial();
             }
 
-            if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
+            if (IsTrueAndNotNull(RunData.Settings.DoPostCleanup))
             {
                 if (CleanupFile == null)
                     throw new IOException("Cleanup file was null!");
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
+                PrintTestUpdate?.Invoke("Running Post-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
-            if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
+            if (IsTrueAndNotNull(RunData.Settings.DoMakeReport))
             {
-                if (PrintTestUpdate != null)
-                    PrintTestUpdate("Making Report", RunData.Name);
-                if (AddToReportPanel != null)
-                    AddToReportPanel.Invoke(new ReportMaker(Results));
+                PrintTestUpdate?.Invoke("Making Report", RunData.Name);
+                AddToReportPanel?.Invoke(new ReportMaker(Results));
                 SaveResult();
             }
 
-            if (PrintTestUpdate != null)
-                PrintTestUpdate("Tests finished for:", RunData.Name);
+            PrintTestUpdate?.Invoke("Tests finished for:", RunData.Name);
 
-            if (ToggleVisibility != null)
-                ToggleVisibility.Invoke(true);
-            if (SetTestNameColor != null)
-                SetTestNameColor.Invoke(Brushes.Green);
+            ToggleVisibility?.Invoke(true);
+            SetTestNameColor?.Invoke(Brushes.Green);
             return Results;
         }
 
@@ -162,12 +147,10 @@ namespace ExperimentSuite.Controllers
         {
             var testCases = new List<TestReport>();
             int value = 0;
-            if (UpdateRunnerProgressBar != null)
-                UpdateRunnerProgressBar.Invoke(value, CaseFiles.Count());
+            UpdateRunnerProgressBar?.Invoke(value, CaseFiles.Count());
             foreach (var queryFile in CaseFiles)
             {
-                if (UpdateRunnerProgressBar != null)
-                    UpdateRunnerProgressBar.Invoke(value++);
+                UpdateRunnerProgressBar?.Invoke(value++);
                 ulong? accCardinality = null;
                 if (QueryPlanCacher.Instance != null)
                     accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
@@ -181,8 +164,7 @@ namespace ExperimentSuite.Controllers
                 TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                 testCases.Add(testCase);
             }
-            if (UpdateRunnerProgressBar != null)
-                UpdateRunnerProgressBar.Invoke(CaseFiles.Count());
+            UpdateRunnerProgressBar?.Invoke(CaseFiles.Count());
             return testCases;
         }
 
@@ -219,24 +201,28 @@ namespace ExperimentSuite.Controllers
             RunData.Settings.Update(JsonParsingHelper.ParseJson<TestSettings>(File.ReadAllText(file.FullName)));
         }
 
-        public async Task GenerateHistograms(IHistogramManager manager)
+        private bool IsTrueAndNotNull(bool? value)
+        {
+            if (value != null)
+                return (bool)value;
+            return false;
+        }
+
+        private async Task GenerateHistograms(IHistogramManager manager)
         {
             List<Task> tasks = await manager.AddHistogramsFromDB();
             int value = 0;
             int max = tasks.Count;
-            if (UpdateHistogramProgressBar != null)
-                UpdateHistogramProgressBar.Invoke(value, max);
+            UpdateHistogramProgressBar?.Invoke(value, max);
             // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
             while (tasks.Any())
             {
                 var finishedTask = await Task.WhenAny(tasks);
                 tasks.Remove(finishedTask);
                 await finishedTask;
-                if (UpdateHistogramProgressBar != null)
-                    UpdateHistogramProgressBar.Invoke(value++);
+                UpdateHistogramProgressBar?.Invoke(value++);
             }
-            if (UpdateHistogramProgressBar != null)
-                UpdateHistogramProgressBar.Invoke(max);
+            UpdateHistogramProgressBar?.Invoke(max);
         }
     }
 }

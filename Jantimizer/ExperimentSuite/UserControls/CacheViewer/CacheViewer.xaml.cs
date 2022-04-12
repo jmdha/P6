@@ -23,16 +23,15 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class CacheViewer : UserControl, ICollapsable
     {
+        public double CollapsedSize { get; } = 0;
+        public double ExpandedSize { get; }
+
         public CacheViewer()
         {
             InitializeComponent();
             ExpandedSize = MaxWidth;
             LoadCachesFromFile();
         }
-
-        public double CollapsedSize { get; } = 0;
-
-        public double ExpandedSize { get; }
 
         public void Toggle()
         {

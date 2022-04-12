@@ -38,7 +38,6 @@ namespace ExperimentSuite.UserControls
         private RunnerController controller;
 
         public double CollapsedSize { get; } = 30;
-
         public double ExpandedSize { get; } = double.NaN;
 
         public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)

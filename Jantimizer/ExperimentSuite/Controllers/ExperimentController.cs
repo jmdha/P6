@@ -52,41 +52,31 @@ namespace ExperimentSuite.Controllers
                 var expList = GetExperimentListFromFile();
                 double _progressBarValue = 0;
                 double _progressBarMax = expList.Experiments.Count;
-                if (UpdateExperimentProgressBar != null)
-                    UpdateExperimentProgressBar.Invoke(0, _progressBarMax);
+                UpdateExperimentProgressBar?.Invoke(0, _progressBarMax);
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
-                        if (UpdateExperimentProgressBar != null)
-                            UpdateExperimentProgressBar.Invoke(_progressBarValue++);
-                        if (AddNewElement != null)
-                            AddNewElement.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
+                        UpdateExperimentProgressBar?.Invoke(_progressBarValue++);
+                        AddNewElement?.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
-                        if (WriteToStatus != null)
-                            WriteToStatus.Invoke("Setting up suite datas...");
+                        WriteToStatus?.Invoke("Setting up suite datas...");
                         var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
-                        if (WriteToStatus != null)
-                            WriteToStatus.Invoke($"Running experiment {experiment.ExperimentName}");
-                        if (AddNewElement != null)
-                            AddNewElement.Invoke(GetSeperatorLabel("Setup", 14), 1);
+                        WriteToStatus?.Invoke($"Running experiment {experiment.ExperimentName}");
+                        AddNewElement?.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
-                        if (AddNewElement != null)
-                            AddNewElement.Invoke(GetSeperatorLabel("Tests", 14), 1);
+                        AddNewElement?.Invoke(GetSeperatorLabel("Tests", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
                     }
-                    if (WriteToStatus != null)
-                        WriteToStatus.Invoke($"Experiment {experiment.ExperimentName} finished!");
+                    WriteToStatus?.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
-                if (UpdateExperimentProgressBar != null)
-                    UpdateExperimentProgressBar.Invoke(_progressBarMax);
-                if (WriteToStatus != null)
-                    WriteToStatus.Invoke("All experiments complete!");
+                UpdateExperimentProgressBar?.Invoke(_progressBarMax);
+                WriteToStatus?.Invoke("All experiments complete!");
                 SaveToCSV(rootResultPath);
             }
             catch (BaseErrorLogException ex)
@@ -110,8 +100,7 @@ namespace ExperimentSuite.Controllers
 
         private ExperimentList GetExperimentListFromFile()
         {
-            if (WriteToStatus != null)
-                WriteToStatus.Invoke("Parsing experiment list...");
+            WriteToStatus?.Invoke("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile(ExperimentsFile);
             var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
             return expList;
@@ -119,11 +108,9 @@ namespace ExperimentSuite.Controllers
 
         private void SaveToCSV(string path)
         {
-            if (WriteToStatus != null)
-                WriteToStatus.Invoke("Merging results");
+            WriteToStatus?.Invoke("Merging results...");
             CSVMerger.Merge<TestReport, TestReportMap>(path, ResultCSVFileName);
-            if (WriteToStatus != null)
-                WriteToStatus.Invoke("Merging finished");
+            WriteToStatus?.Invoke("Merging finished");
         }
 
         private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
@@ -170,8 +157,7 @@ namespace ExperimentSuite.Controllers
                 IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suiteData.Name.ToLower(), "sql"))
             );
             runner.RunnerStartedEvent += RunnerStarted;
-            if (AddNewElement != null)
-                AddNewElement.Invoke(runner);
+            AddNewElement?.Invoke(runner);
 
             Func<Task> runFunc = async () => await runner.Run();
 
@@ -180,10 +166,8 @@ namespace ExperimentSuite.Controllers
 
         private void RunnerStarted(TestRunner runner)
         {
-            if (RemoveElement != null)
-                RemoveElement.Invoke(runner);
-            if (AddNewElement != null)
-                AddNewElement.Invoke(runner,2);
+            RemoveElement?.Invoke(runner);
+            AddNewElement?.Invoke(runner,2);
         }
     }
 }
