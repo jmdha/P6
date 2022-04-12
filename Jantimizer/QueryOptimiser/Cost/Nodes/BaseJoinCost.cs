@@ -13,6 +13,6 @@ namespace QueryOptimiser.Cost.Nodes
 {
     internal abstract class BaseJoinCost : INodeCost<JoinNode>
     {
-        public abstract long GetCombinedEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket);
+        public abstract long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket);
     }
 }

@@ -3,6 +3,7 @@ using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.Exceptions;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 
@@ -27,14 +28,22 @@ namespace QueryOptimiser
             IntermediateTable intermediateTable = new IntermediateTable();
             
             List<ValuedNode> valuedNodes = new List<ValuedNode>();
-            for (int i = 0; i < nodes.Count; i++)
+            try
             {
-                IntermediateTable newTable = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
-                if (intermediateTable.Buckets.Count == 0)
-                    intermediateTable = newTable;
-                else
-                    intermediateTable = IntermediateTable.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    IntermediateTable newTable = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
+                    if (intermediateTable.Buckets.Count == 0)
+                        intermediateTable = newTable;
+                    else
+                        intermediateTable = IntermediateTable.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
+                }
             }
+            catch (Exception ex)
+            {
+                throw new OptimiserErrorLogException(ex, this, nodes);
+            }
+            
 
             return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), valuedNodes);
         }

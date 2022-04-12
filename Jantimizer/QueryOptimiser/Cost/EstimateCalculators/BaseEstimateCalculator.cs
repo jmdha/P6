@@ -86,10 +86,12 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 {
                     if (DoesMatch(leftBuckets[i], rightBuckets[j]))
                     {
-                        List<Tuple<TableReferenceNode, string, IHistogramBucket>> information = new List<Tuple<TableReferenceNode, string, IHistogramBucket>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, leftBuckets[i]));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, rightBuckets[j]));
-                        buckets.Add(new IntermediateBucket(information, JoinCost.GetCombinedEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j])));
+                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
+                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i], 
+                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
+                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[i], 
+                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[i], leftBuckets[j]))));
+                        buckets.Add(new IntermediateBucket(information));
                     }
                     else
                         rightCutoff = Math.Max(0, j - 1);
@@ -144,10 +146,12 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     }
                     if (match)
                     {
-                        List<Tuple<TableReferenceNode, string, IHistogramBucket>> information = new List<Tuple<TableReferenceNode, string, IHistogramBucket>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, leftBuckets[i]));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, rightBuckets[j]));
-                        buckets.Add(new IntermediateBucket(information, JoinCost.GetCombinedEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j])));
+                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
+                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i],
+                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
+                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j],
+                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
+                        buckets.Add(new IntermediateBucket(information));
                     } 
                     else
                         rightCutoff = Math.Max(0, j - 1);

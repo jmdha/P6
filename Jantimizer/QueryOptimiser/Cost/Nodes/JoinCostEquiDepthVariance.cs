@@ -12,14 +12,14 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
 {
     internal class JoinCostEquiDepthVariance : BaseJoinCost
     {
-        public override long GetCombinedEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
-            HistogramBucketVariance leftVBucket = (HistogramBucketVariance)leftBucket;
-            HistogramBucketVariance rightVBucket = (HistogramBucketVariance)rightBucket;
-            double certainty = ((double)leftVBucket.StandardDeviation / leftVBucket.Range) / ((double)rightVBucket.StandardDeviation / rightVBucket.Range);
+            HistogramBucketVariance vBucket = (HistogramBucketVariance)bucket;
+            HistogramBucketVariance vComparisonBucket = (HistogramBucketVariance)comparisonBucket;
+            double certainty = ((double)vBucket.StandardDeviation / vBucket.Range) / ((double)vComparisonBucket.StandardDeviation / vComparisonBucket.Range);
             if (certainty > 1)
                 certainty = 1 / certainty;
-            long estimate = (long)(certainty * (leftVBucket.Count * rightVBucket.Count));
+            long estimate = (long)(certainty * vBucket.Count);
             if (estimate == 0)
                 return 1;
             else

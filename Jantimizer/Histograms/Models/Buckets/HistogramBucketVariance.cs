@@ -12,7 +12,7 @@
             Variance = variance;
             Mean = mean;
             StandardDeviation = standardDeviation;
-            Range = Range;
+            Range = range;
         }
 
         public override string? ToString()

@@ -10,12 +10,12 @@ namespace QueryOptimiser.Models
     internal class BucketEstimate
     {
         internal IHistogramBucket Bucket { get; set; }
-        internal long Estimatee { get; set; }
+        internal long Estimate { get; set; }
 
         public BucketEstimate(IHistogramBucket bucket, long estimatee)
         {
             Bucket = bucket;
-            Estimatee = estimatee;
+            Estimate = estimatee;
         }
     }
 }

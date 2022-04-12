@@ -40,7 +40,7 @@ namespace QueryOptimiser.Models
         {
             long estimate = 0;
             foreach (IntermediateBucket bucket in Buckets)
-                estimate +=bucket.Count;
+                estimate += bucket.GetCount();
             return estimate;
         }
 
@@ -68,10 +68,11 @@ namespace QueryOptimiser.Models
             foreach (var refe in it2.References)
             {
                 if (it.References.ContainsKey(refe.Key))
+                {
                     foreach (var attribute in refe.Value)
-                        if(it.DoesContain(refe.Key, attribute))
+                        if (it.DoesContain(refe.Key, attribute))
                             overlap = new Tuple<TableReferenceNode, string>(refe.Key, attribute);
-                else
+                } else
                     it.References.Add(refe.Key, refe.Value);
             }
             if (overlap != null)
