@@ -50,12 +50,12 @@ namespace Histograms.DataGatherers
 
             DataSet sortedGroupsDs = await DbConnector.CallQueryAsync(@$"
                 SELECT
-                    {attributeName} AS val,
-                    COUNT({attributeName})
-                FROM {tableName} WHERE
-                    {attributeName} IS NOT NULL
-                GROUP BY {attributeName}
-                ORDER BY {attributeName} ASC
+                    ""{attributeName}"" AS val,
+                    COUNT(""{attributeName}"")
+                FROM ""{tableName}"" WHERE
+                    ""{attributeName}"" IS NOT NULL
+                GROUP BY ""{attributeName}""
+                ORDER BY ""{attributeName}"" ASC
             ");
 
             return GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
@@ -63,7 +63,7 @@ namespace Histograms.DataGatherers
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
-            DataSet columnHash = await DbConnector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::text), ',')) as \"hash\" FROM {tableName};");
+            DataSet columnHash = await DbConnector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::text), ',')) as \"hash\" FROM \"{tableName}\";");
             if (columnHash.Tables.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
             if (columnHash.Tables[0].Rows.Count == 0)

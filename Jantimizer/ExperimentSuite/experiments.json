@@ -85,7 +85,7 @@
       }
     },
     {
-      "ExperimentName": "New Data Experiment",
+      "ExperimentName": "World Happiness 2022",
       "RunParallel": true,
       "RunExperiment": true,
       "PreRunData": [
@@ -122,6 +122,46 @@
       ],
       "OptionalTestSettings": {
         "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "Census 2013",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 512
       }
     }
   ]
