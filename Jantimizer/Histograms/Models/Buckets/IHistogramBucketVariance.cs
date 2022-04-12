@@ -2,8 +2,9 @@
 {
     public interface IHistogramBucketVariance : IHistogramBucket
     {
-        public int Variance { get; }
-        public int Mean { get; }
-        public int Range { get; }
+        public double Variance { get; }
+        public double StandardDeviation { get; }
+        public double Mean { get; }
+        public double Range { get; }
     }
 }

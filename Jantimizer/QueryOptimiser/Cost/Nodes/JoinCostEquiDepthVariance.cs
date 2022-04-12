@@ -16,7 +16,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
         {
             HistogramBucketVariance leftVBucket = (HistogramBucketVariance)leftBucket;
             HistogramBucketVariance rightVBucket = (HistogramBucketVariance)rightBucket;
-            double certainty = ((double)leftVBucket.Variance / leftVBucket.Range) / ((double)rightVBucket.Variance / rightVBucket.Range);
+            double certainty = ((double)leftVBucket.StandardDeviation / leftVBucket.Range) / ((double)rightVBucket.StandardDeviation / rightVBucket.Range);
             if (certainty > 1)
                 certainty = 1 / certainty;
             long estimate = (long)(certainty * (leftVBucket.Count * rightVBucket.Count));
