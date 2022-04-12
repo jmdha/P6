@@ -29,9 +29,6 @@ namespace ExperimentSuite.Controllers
         public delegate void WriteToStatusHandler(string text);
         public event WriteToStatusHandler WriteToStatus;
 
-        public delegate void SetCurrentExperimentHandler(string text);
-        public event SetCurrentExperimentHandler SetCurrentExperimentLabel;
-
         public delegate void AddTestRunnerHandler(UIElement element, int index = -1);
         public event AddTestRunnerHandler AddNewElement;
 
@@ -63,7 +60,6 @@ namespace ExperimentSuite.Controllers
                     if (experiment.RunExperiment)
                     {
                         UpdateExperimentProgressBar.Invoke(_progressBarValue++);
-                        SetCurrentExperimentLabel.Invoke(experiment.ExperimentName);
                         AddNewElement.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
                         WriteToStatus.Invoke("Setting up suite datas...");
@@ -79,10 +75,10 @@ namespace ExperimentSuite.Controllers
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
                     }
-                    WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
+                    WriteToStatus.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
                 UpdateExperimentProgressBar.Invoke(_progressBarMax);
-                WriteToStatus("All experiments complete!");
+                WriteToStatus.Invoke("All experiments complete!");
                 SaveToCSV(rootResultPath);
             }
             catch (BaseErrorLogException ex)

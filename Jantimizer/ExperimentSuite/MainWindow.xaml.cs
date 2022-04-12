@@ -43,7 +43,6 @@ namespace ExperimentSuite
             controller = new ExperimentController();
 
             controller.WriteToStatus += WriteToStatus;
-            controller.SetCurrentExperimentLabel += SetCurrentExperimentLabel;
             controller.UpdateExperimentProgressBar += UpdateExperimentProgressBar;
             controller.AddNewElement += AddNewElementToTestPanel;
             controller.RemoveElement += RemoveElementFromTestPanel;
@@ -83,11 +82,6 @@ namespace ExperimentSuite
         private void WriteToStatus(string text)
         {
             StatusTextbox.Text += $"{text}{Environment.NewLine}";
-        }
-
-        private void SetCurrentExperimentLabel(string text)
-        {
-            ExperimentNameLabel.Content += $"{text}";
         }
 
         private void StatusTextbox_TextChanged(object sender, TextChangedEventArgs e)
