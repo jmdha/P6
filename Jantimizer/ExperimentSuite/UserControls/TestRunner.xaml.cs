@@ -41,6 +41,8 @@ namespace ExperimentSuite.UserControls
         public FileInfo? CleanupFile { get; private set; }
         public IEnumerable<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
+        public delegate void StartRunEventHandler(object sender, RoutedEventArgs e);
+        public event StartRunEventHandler? RunnerStartedEvent;
 
         public double CollapsedSize { get; } = 30;
 
@@ -50,6 +52,7 @@ namespace ExperimentSuite.UserControls
 
         public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
+            RunnerStartedEvent = null;
             ExperimentName = experimentName;
             RunnerName = runName;
             RunData = runData;
@@ -69,6 +72,9 @@ namespace ExperimentSuite.UserControls
 
         public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
         {
+            if (RunnerStartedEvent != null)
+                RunnerStartedEvent.Invoke(this, new RoutedEventArgs());
+
             TestNameLabel.Foreground = Brushes.Yellow;
             Toggle(false);
 

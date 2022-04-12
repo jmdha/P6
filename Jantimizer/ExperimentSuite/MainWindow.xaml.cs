@@ -73,12 +73,14 @@ namespace ExperimentSuite
                     {
                         ExperimentProgressBar.Value++;
                         ExperimentNameLabel.Content = experiment.ExperimentName;
-                        TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
+                        TestsPanel.Children.Insert(0, GetSeperatorLabel(experiment.ExperimentName));
                         var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
+                        TestsPanel.Children.Insert(1, GetSeperatorLabel("Setup", 14));
                         await RunExperimentQueue(
                             GetRunDataFromList(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
+                        TestsPanel.Children.Insert(1, GetSeperatorLabel("Tests", 14));
                         await RunExperimentQueue(
                             GetRunDataFromList(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
@@ -158,6 +160,7 @@ namespace ExperimentSuite
                                 IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name.ToLower(), "sql"))
                             );
                             TestsPanel.Children.Add(runner);
+                            runner.RunnerStartedEvent += RunnerStarted;
 
                             Func<Task> runFunc = async () => await runner.Run(true);
 
@@ -200,11 +203,11 @@ namespace ExperimentSuite
             }
         }
 
-        private Label GetSeperatorLabel(string text)
+        private Label GetSeperatorLabel(string text, int fontSize = 20)
         {
             var newLabel = new Label();
             newLabel.Content = text;
-            newLabel.FontSize = 20;
+            newLabel.FontSize = fontSize;
             return newLabel;
         }
 
@@ -217,6 +220,15 @@ namespace ExperimentSuite
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
         {
             CacheViewerControl.Toggle();
+        }
+
+        private void RunnerStarted(object sender, RoutedEventArgs e)
+        {
+            if (sender is TestRunner runner)
+            {
+                TestsPanel.Children.Remove(runner);
+                TestsPanel.Children.Insert(2, runner);
+            }
         }
     }
 }
