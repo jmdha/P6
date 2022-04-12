@@ -50,14 +50,14 @@ namespace ExperimentSuite.Controllers
 
                 var testsPath = IOHelper.GetDirectory(TestsFolder);
                 var expList = GetExperimentListFromFile();
-                double _progressBarValue = 0;
-                double _progressBarMax = expList.Experiments.Count;
-                UpdateExperimentProgressBar?.Invoke(0, _progressBarMax);
+                double max = expList.Experiments.Count;
+                double value = 0;
+                UpdateExperimentProgressBar?.Invoke(0, max);
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
-                        UpdateExperimentProgressBar?.Invoke(_progressBarValue++);
+                        UpdateExperimentProgressBar?.Invoke(value++);
                         AddNewElement?.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
                         WriteToStatus?.Invoke("Setting up suite datas...");
@@ -75,7 +75,7 @@ namespace ExperimentSuite.Controllers
                     }
                     WriteToStatus?.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
-                UpdateExperimentProgressBar?.Invoke(_progressBarMax);
+                UpdateExperimentProgressBar?.Invoke(max);
                 WriteToStatus?.Invoke("All experiments complete!");
                 SaveToCSV(rootResultPath);
             }

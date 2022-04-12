@@ -146,8 +146,9 @@ namespace ExperimentSuite.Controllers
         private async Task<List<TestReport>> RunQueriesSerial()
         {
             var testCases = new List<TestReport>();
+            int max = CaseFiles.Count();
             int value = 0;
-            UpdateRunnerProgressBar?.Invoke(value, CaseFiles.Count());
+            UpdateRunnerProgressBar?.Invoke(value, max);
             foreach (var queryFile in CaseFiles)
             {
                 UpdateRunnerProgressBar?.Invoke(value++);
@@ -167,7 +168,7 @@ namespace ExperimentSuite.Controllers
                 TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                 testCases.Add(testCase);
             }
-            UpdateRunnerProgressBar?.Invoke(CaseFiles.Count());
+            UpdateRunnerProgressBar?.Invoke(max);
             return testCases;
         }
 
