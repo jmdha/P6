@@ -66,7 +66,9 @@ namespace ExperimentSuite.Controllers
                         SetCurrentExperimentLabel.Invoke(experiment.ExperimentName);
                         AddNewElement.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
-                        var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
+                        WriteToStatus.Invoke("Setting up suite datas...");
+                        var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
+
                         WriteToStatus.Invoke($"Running experiment {experiment.ExperimentName}");
                         AddNewElement.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
@@ -115,22 +117,6 @@ namespace ExperimentSuite.Controllers
             WriteToStatus.Invoke("Merging results");
             CSVMerger.Merge<TestReport, TestReportMap>(path, ResultCSVFileName);
             WriteToStatus.Invoke("Merging finished");
-        }
-
-        private List<SuiteData> GetSuiteDatas(JsonObject optionalSettings)
-        {
-            WriteToStatus.Invoke("Setting up suite datas...");
-
-            var pgDataDefault = SuiteDataSets.GetPostgresSD_Default(optionalSettings);
-            var pgDataEquiDepth = SuiteDataSets.GetPostgresSD_EquiDepth(optionalSettings);
-            var pgDataEquiDepthVariance = SuiteDataSets.GetPostgresSD_EquiDepthVariance(optionalSettings);
-
-            var myDataDefault = SuiteDataSets.GetMySQLSD_Default(optionalSettings, pgDataDefault.QueryParserManager.QueryParsers[0]);
-            var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(optionalSettings, pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
-            var myDataEquiDepthVariance = SuiteDataSets.GetMySQLSD_EquiDepthVariance(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
-
-            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance };
-            return connectorSet;
         }
 
         private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
