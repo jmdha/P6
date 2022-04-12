@@ -84,8 +84,8 @@ namespace Histograms.DataGatherers
                 throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
             if (result.Tables[0].Columns.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            DataRow rowResult = result.Tables[0].Rows[0];
-            Type typeValue = rowResult[0].GetType();
+            DataColumn rowResult = result.Tables[0].Columns[0];
+            Type typeValue = rowResult.DataType;
             return typeValue;
         }
     }

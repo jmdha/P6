@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -45,7 +45,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -87,7 +87,7 @@
     {
       "ExperimentName": "World Happiness 2022",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -127,7 +127,7 @@
     {
       "ExperimentName": "Census 2013",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -157,6 +157,46 @@
           "ConnectorID": "EquiDepth",
           "TestFiles": [
             "Census_2013"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 512
+      }
+    },
+    {
+      "ExperimentName": "Covid Funding",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding"
           ]
         }
       ],
