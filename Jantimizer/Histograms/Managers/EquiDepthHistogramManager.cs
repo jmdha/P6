@@ -1,5 +1,6 @@
 ﻿using Histograms.Caches;
 using Histograms.DataGatherers;
+using Histograms.HistogramSelectors;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,13 @@ namespace Histograms.Managers
 
         protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
-            IDepthHistogram histogram = new HistogramEquiDepth(tableName, attributeName, Depth);
+            IDepthHistogramSelector<IDepthHistogram> selector = new DepthHistogramSelector();
+            IDepthHistogram histogram = selector.GetHistogramDepthOfTypeOrAlt(
+                new HistogramEquiDepth(tableName, attributeName, Depth),
+                await DataGatherer.GetAttributeType(tableName, attributeName),
+                tableName,
+                attributeName,
+                Depth);
             histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
         }
@@ -40,7 +47,7 @@ namespace Histograms.Managers
         {
             var cacheHisto = await GetHistogramFromCacheOrNull(tableName, attributeName);
 
-            if (cacheHisto != null && cacheHisto is HistogramEquiDepth)
+            if (cacheHisto != null)
                 return cacheHisto;
 
             return null;
@@ -50,7 +57,7 @@ namespace Histograms.Managers
         {
             string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
             if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash, Depth.ToString() }, histogram);
+                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramEquiDepth).Name }, histogram);
         }
     }
 }

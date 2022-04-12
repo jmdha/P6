@@ -5,6 +5,7 @@ namespace Histograms.Models
 {
     public abstract class BaseHistogram : IHistogram
     {
+        public abstract List<TypeCode> AcceptedTypes { get; }
         public List<IHistogramBucket> Buckets { get; }
         public string TableName { get; }
         public string AttributeName { get; }

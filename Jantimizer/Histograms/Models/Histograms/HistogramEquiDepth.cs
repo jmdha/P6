@@ -9,6 +9,18 @@ namespace Histograms.Models
     /// </summary>
     public class HistogramEquiDepth : BaseHistogram, IDepthHistogram
     {
+        public override List<TypeCode> AcceptedTypes { get; } = new List<TypeCode>() { 
+            TypeCode.String,
+            TypeCode.DateTime,
+            TypeCode.Double,
+            TypeCode.Decimal,
+            TypeCode.Int16,
+            TypeCode.Int32,
+            TypeCode.Int64,
+            TypeCode.UInt16,
+            TypeCode.UInt32,
+            TypeCode.UInt64,
+        };
         public int Depth { get; }
 
         public HistogramEquiDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
