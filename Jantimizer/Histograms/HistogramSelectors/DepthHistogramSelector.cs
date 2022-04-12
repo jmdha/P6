@@ -27,16 +27,20 @@ namespace Histograms.HistogramSelectors
             IDepthHistogram? histogram = null;
             switch (Type.GetTypeCode(type))
             {
-                case TypeCode.String:
-                case TypeCode.Double:
-                case TypeCode.Decimal:
-                case TypeCode.Boolean:
-                    histogram = new HistogramEquiDepth(tableName, attributeName, depth);
-                    break;
                 case TypeCode.Int16:
                 case TypeCode.Int32:
                 case TypeCode.Int64:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Double:
                     histogram = new HistogramEquiDepthVariance(tableName, attributeName, depth);
+                    break;
+                case TypeCode.String:
+                case TypeCode.Decimal:
+                case TypeCode.Boolean:
+                case TypeCode.DateTime:
+                    histogram = new HistogramEquiDepth(tableName, attributeName, depth);
                     break;
                 default:
                     throw new HistogramManagerErrorLogException(new ArgumentException($"Could not find a fitting histogram for TypeCode {Type.GetTypeCode(type)}!"));
