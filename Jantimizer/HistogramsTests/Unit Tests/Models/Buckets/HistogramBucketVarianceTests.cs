@@ -14,15 +14,15 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         #region Constructor
 
         [TestMethod]
-        [DataRow(1, 5, 10, 5, 10)]
-        [DataRow(111, 112, 1000, 10, 5)]
-        [DataRow(1, 50000, 10, 1, 1)]
-        [DataRow(1, 5, 110000, 1, 1000)]
-        public void Constructor_SetsProperties(int start, int stop, int count, int variance, int mean)
+        [DataRow(1, 5, 10, 5, 10, 5.2)]
+        [DataRow(111, 112, 1000, 10, 5, 34745.21564)]
+        [DataRow(1, 50000, 10, 1, 1, 0.000054)]
+        [DataRow(1, 5, 110000, 1, 1000, 1)]
+        public void Constructor_SetsProperties(int start, int stop, int count, double variance, double mean, double sd)
         {
             // ARRANGE
             // ACT
-            IHistogramBucketVariance bucket = new HistogramBucketVariance(start, stop, count, variance, mean);
+            IHistogramBucketVariance bucket = new HistogramBucketVariance(start, stop, count, variance, mean, sd);
 
             // ASSERT
             Assert.AreEqual(start, bucket.ValueStart);
@@ -30,6 +30,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
             Assert.AreEqual(count, bucket.Count);
             Assert.AreEqual(variance, bucket.Variance);
             Assert.AreEqual(mean, bucket.Mean);
+            Assert.AreEqual(sd, bucket.StandardDeviation);
         }
 
         #endregion
@@ -45,7 +46,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         {
             // ARRANGE
             // ACT
-            new HistogramBucketVariance(start, stop, 10, 0, 0);
+            new HistogramBucketVariance(start, stop, 10, 0, 0, 0);
         }
 
         [TestMethod]
@@ -57,7 +58,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         {
             // ARRANGE
             // ACT
-            new HistogramBucketVariance(1, 2, count, 0, 0);
+            new HistogramBucketVariance(1, 2, count, 0, 0, 0);
         }
 
         #endregion

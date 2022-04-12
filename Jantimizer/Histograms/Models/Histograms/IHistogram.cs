@@ -4,6 +4,7 @@ namespace Histograms.Models
 {
     public interface IHistogram : ICloneable
     {
+        public List<TypeCode> AcceptedTypes { get; }
         public string TableName { get; }
         public string AttributeName { get; }
         public List<IHistogramBucket> Buckets { get; }

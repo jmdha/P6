@@ -8,6 +8,7 @@ namespace Histograms.Models
     /// </summary>
     public class HistogramMinDepth : BaseHistogram, IDepthHistogram
     {
+        public override List<TypeCode> AcceptedTypes { get; } = new List<TypeCode>() {};
         public int Depth { get; }
 
         public HistogramMinDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)

@@ -16,6 +16,8 @@ namespace HistogramsTests.Stubs
 
         public List<IHistogramBucket> Buckets => throw new NotImplementedException();
 
+        public List<TypeCode> AcceptedTypes => throw new NotImplementedException();
+
         public object Clone()
         {
             throw new NotImplementedException();
