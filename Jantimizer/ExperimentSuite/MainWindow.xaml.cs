@@ -34,6 +34,11 @@ namespace ExperimentSuite
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly string ExperimentsFile = "../../../experiments.json";
+        private readonly string TestsFolder = "../../../Tests";
+        private readonly string ResultsFolder = "Results/";
+        private readonly string CaseFolderName = "Cases/";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -59,39 +64,33 @@ namespace ExperimentSuite
         {
             try
             {
-                DateTime runTime = DateTime.UtcNow;
-                string rootResultPath = $"Results/{runTime.ToString("yyyy-MM-dd HH.mm.ss")}";
+                string rootResultPath = $"{ResultsFolder}/{DateTime.UtcNow.ToString("yyyy-MM-dd HH.mm.ss")}";
 
-                WriteToStatus("Parsing experiment list...");
-                var experimentsFile = IOHelper.GetFile("../../../experiments.json");
-                var testsPath = IOHelper.GetDirectory("../../../Tests");
-                var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
-                ExperimentProgressBar.Maximum = expList.Experiments.Count;
-                ExperimentProgressBar.Value = 0;
+                var testsPath = IOHelper.GetDirectory(TestsFolder);
+                var expList = GetExperimentListFromFile();
+                UpdateExperimentProgressBar(0, expList.Experiments.Count);
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
-                        ExperimentProgressBar.Value++;
+                        UpdateExperimentProgressBar(ExperimentProgressBar.Value + 1);
                         ExperimentNameLabel.Content = experiment.ExperimentName;
                         TestsPanel.Children.Add(GetSeperatorLabel(experiment.ExperimentName));
+
                         var connectorSet = GetSuiteDatas(experiment.OptionalTestSettings);
                         WriteToStatus($"Running experiment {experiment.ExperimentName}");
                         await RunExperimentQueue(
-                            GetRunDataFromList(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
+                            GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
                         await RunExperimentQueue(
-                            GetRunDataFromList(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
+                            GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
                     }
                     WriteToStatus($"Experiment {experiment.ExperimentName} finished!");
                 }
-                ExperimentProgressBar.Value = ExperimentProgressBar.Maximum;
+                UpdateExperimentProgressBar(ExperimentProgressBar.Maximum);
                 WriteToStatus("All experiments complete!");
-                WriteToStatus("Merging results");
-                CSVMerger.Merge<TestReport, TestReportMap>(rootResultPath, "results.csv");
-                WriteToStatus("Merging finished");
-                RunButton.IsEnabled = true;
+                SaveToCSV(rootResultPath);
             }
             catch (BaseErrorLogException ex)
             {
@@ -102,6 +101,29 @@ namespace ExperimentSuite
                 errorWindow.StackTraceTextbox.Text = ex.ActualException.StackTrace;
                 errorWindow.Show();
             }
+            RunButton.IsEnabled = true;
+        }
+
+        private void UpdateExperimentProgressBar(double value, double max = 0)
+        {
+            if (max != 0)
+                ExperimentProgressBar.Maximum = max;
+            ExperimentProgressBar.Value = value;
+        }
+
+        private ExperimentList GetExperimentListFromFile()
+        {
+            WriteToStatus("Parsing experiment list...");
+            var experimentsFile = IOHelper.GetFile(ExperimentsFile);
+            var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
+            return expList;
+        }
+
+        private void SaveToCSV(string path)
+        {
+            WriteToStatus("Merging results");
+            CSVMerger.Merge<TestReport, TestReportMap>(path, "results.csv");
+            WriteToStatus("Merging finished");
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -130,7 +152,7 @@ namespace ExperimentSuite
             return connectorSet;
         }
 
-        private Dictionary<string, List<Func<Task>>> GetRunDataFromList(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
+        private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
         {
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
             foreach (TestRunData data in runData)
@@ -141,26 +163,7 @@ namespace ExperimentSuite
                     {
                         foreach (string testFile in data.TestFiles)
                         {
-                            var newDir = IOHelper.GetDirectory(baseTestPath, testFile);
-
-                            IOHelper.CreateDirIfNotExist(newDir.FullName, "Cases/");
-                            var caseDir = IOHelper.GetDirectory(newDir.FullName, "Cases/");
-
-                            TestRunner runner = new TestRunner(
-                                experimentName,
-                                testFile,
-                                rootResultPath,
-                                suitData,
-                                IOHelper.GetFileVariant(newDir, "testSettings", suitData.Name.ToLower(), "json"),
-                                IOHelper.GetFileVariantOrNull(newDir, "setup", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetFileVariantOrNull(newDir, "inserts", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetFileVariantOrNull(newDir, "analyse", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetFileVariantOrNull(newDir, "cleanup", suitData.Name.ToLower(), "sql"),
-                                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suitData.Name.ToLower(), "sql"))
-                            );
-                            TestsPanel.Children.Add(runner);
-
-                            Func<Task> runFunc = async () => await runner.Run(true);
+                            var runFunc = CreateNewTestRunnerDelegate(testFile, experimentName, rootResultPath, suitData);
 
                             if (returnTasks.ContainsKey(testFile))
                                 returnTasks[testFile].Add(runFunc);
@@ -173,32 +176,64 @@ namespace ExperimentSuite
             return returnTasks;
         }
 
+        private Func<Task> CreateNewTestRunnerDelegate(string testFile, string experimentName, string resultPath, SuiteData suiteData)
+        {
+            var newDir = IOHelper.GetDirectory(IOHelper.GetDirectory(TestsFolder), testFile);
+
+            IOHelper.CreateDirIfNotExist(newDir.FullName, CaseFolderName);
+            var caseDir = IOHelper.GetDirectory(newDir.FullName, CaseFolderName);
+
+            TestRunner runner = new TestRunner(
+                experimentName,
+                testFile,
+                resultPath,
+                suiteData,
+                IOHelper.GetFileVariant(newDir, "testSettings", suiteData.Name.ToLower(), "json"),
+                IOHelper.GetFileVariantOrNull(newDir, "setup", suiteData.Name.ToLower(), "sql"),
+                IOHelper.GetFileVariantOrNull(newDir, "inserts", suiteData.Name.ToLower(), "sql"),
+                IOHelper.GetFileVariantOrNull(newDir, "analyse", suiteData.Name.ToLower(), "sql"),
+                IOHelper.GetFileVariantOrNull(newDir, "cleanup", suiteData.Name.ToLower(), "sql"),
+                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suiteData.Name.ToLower(), "sql"))
+            );
+            TestsPanel.Children.Add(runner);
+
+            Func<Task> runFunc = async () => await runner.Run(true);
+
+            return runFunc;
+        }
+
         private async Task RunExperimentQueue(Dictionary<string, List<Func<Task>>> dict, bool runParallel = true)
         {
             if (runParallel)
-            {
-                foreach (string key in dict.Keys)
-                {
-                    List<Task> results = new List<Task>();
-                    foreach (Func<Task> funcs in dict[key])
-                    {
-                        results.Add(funcs.Invoke());
-                    }
-                    await Task.WhenAll(results.ToArray());
-                }
-            }
+                await RunExperimentQueueParallel(dict);
             else
-                foreach (string key in dict.Keys)
-                    foreach (Func<Task> funcs in dict[key])
-                        await funcs.Invoke();
+                await RunExperimentQueueSerial(dict);
+        }
+
+        private async Task RunExperimentQueueParallel(Dictionary<string, List<Func<Task>>> dict)
+        {
+            foreach (string key in dict.Keys)
+            {
+                List<Task> results = new List<Task>();
+                foreach (Func<Task> funcs in dict[key])
+                {
+                    results.Add(funcs.Invoke());
+                }
+                await Task.WhenAll(results.ToArray());
+            }
+        }
+
+        private async Task RunExperimentQueueSerial(Dictionary<string, List<Func<Task>>> dict)
+        {
+            foreach (string key in dict.Keys)
+                foreach (Func<Task> funcs in dict[key])
+                    await funcs.Invoke();
         }
 
         private void StatusTextbox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
-            {
                 textBox.ScrollToEnd();
-            }
         }
 
         private Label GetSeperatorLabel(string text)
