@@ -25,11 +25,6 @@ namespace ExperimentSuite.UserControls
             InitializeComponent();
         }
 
-        public void UpdateFileLabel(string fileName)
-        {
-            CurrentSqlFileLabels.Content = $"File: {fileName}";
-        }
-
         private void SQLProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum})";

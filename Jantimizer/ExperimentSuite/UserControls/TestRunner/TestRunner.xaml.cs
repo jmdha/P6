@@ -1,4 +1,5 @@
-﻿using ExperimentSuite.Models;
+﻿using ExperimentSuite.Controllers;
+using ExperimentSuite.Models;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 using QueryPlanParser.Caches;
@@ -34,183 +35,73 @@ namespace ExperimentSuite.UserControls
         public delegate void StartRunEventHandler(TestRunner runner);
         public event StartRunEventHandler RunnerStartedEvent;
 
-        public string ExperimentName { get; }
-        public string RunnerName { get; }
-        public SuiteData RunData { get; }
-        public FileInfo SettingsFile { get; private set; }
-        public FileInfo? SetupFile { get; private set; }
-        public FileInfo? DataInsertsFile { get; private set; }
-        public FileInfo? DataAnalyseFile { get; private set; }
-        public FileInfo? CleanupFile { get; private set; }
-        public IEnumerable<FileInfo> CaseFiles { get; private set; }
-        public List<TestReport> Results { get; private set; }
+        private RunnerController controller;
 
         public double CollapsedSize { get; } = 30;
 
         public double ExpandedSize { get; } = double.NaN;
 
-        private CSVWriter csvWriter;
-
         public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
-            ExperimentName = experimentName;
-            RunnerName = runName;
-            RunData = runData;
-            SettingsFile = settingsFile;
-            SetupFile = setupFile;
-            DataInsertsFile = insertsFile;
-            DataAnalyseFile = analyseFile;
-            CleanupFile = cleanupFile;
-            CaseFiles = caseFiles;
-            Results = new List<TestReport>();
-            csvWriter = new CSVWriter($"{rootResultsPath}/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
+            controller = new RunnerController(
+                experimentName,
+                runName,
+                rootResultsPath,
+                runData,
+                settingsFile,
+                setupFile,
+                insertsFile,
+                analyseFile,
+                cleanupFile,
+                caseFiles);
+
+            controller.PrintTestUpdate += PrintTestUpdate;
+            controller.UpdateRunnerProgressBar += UpdateSQLFileProgressBar;
+            controller.UpdateHistogramProgressBar += UpdateHistogramProgressBar;
+            controller.SetTestNameColor += SetTestNameColor;
+            controller.ToggleVisibility += Toggle;
+            controller.AddToReportPanel += AddToReportPanel;
+
             InitializeComponent();
             Toggle(true);
 
-            TestNameLabel.Content = RunnerName;
+            TestNameLabel.Content = runName;
         }
 
-        public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
+        public async Task Run()
         {
             RunnerStartedEvent.Invoke(this);
-
-            TestNameLabel.Foreground = Brushes.Yellow;
-            Toggle(false);
-
-            PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
-            ParseTestSettings(SettingsFile);
-
-            if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
-            {
-                if (CleanupFile == null)
-                    throw new IOException("Cleanup file was null!");
-                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
-                await RunData.Connector.CallQueryAsync(CleanupFile);
-            }
-
-            if (RunData.Settings.DoSetup != null && (bool)RunData.Settings.DoSetup)
-            {
-                if (SetupFile == null)
-                    throw new IOException("Setup file was null!");
-                PrintTestUpdate("Running Setup", SetupFile.Name);
-                await RunData.Connector.CallQueryAsync(SetupFile);
-            }
-
-            if (RunData.Settings.DoInserts != null && (bool)RunData.Settings.DoInserts)
-            {
-                if (DataInsertsFile == null)
-                    throw new IOException("Inserts file was null!");
-                PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
-                await RunData.Connector.CallQueryAsync(DataInsertsFile);
-            }
-
-            if (RunData.Settings.DoAnalyse != null && (bool)RunData.Settings.DoAnalyse)
-            {
-                if (DataAnalyseFile == null)
-                    throw new IOException("Analyse file was null!");
-                PrintTestUpdate("Analysing Tables", DataAnalyseFile.Name);
-                await RunData.Connector.CallQueryAsync(DataAnalyseFile);
-            }
-
-            if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
-            {
-                PrintTestUpdate("Generating Histograms for:", RunData.Name);
-                await HistogramControl.GenerateHistograms(RunData.HistoManager);
-            }
-
-            if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
-            {
-                PrintTestUpdate("Begining Test Run for:", RunData.Name);
-                Results = await RunQueriesSerial();
-            }
-
-            if (RunData.Settings.DoPostCleanup != null && (bool)RunData.Settings.DoPostCleanup)
-            {
-                if (CleanupFile == null)
-                    throw new IOException("Cleanup file was null!");
-                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
-                await RunData.Connector.CallQueryAsync(CleanupFile);
-            }
-
-            if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
-            {
-                PrintTestUpdate("Making Report", RunData.Name);
-                if (consoleOutput)
-                    ReportPanel.Children.Add(new ReportMaker(Results));
-                if (saveResult)
-                    SaveResult();
-            }
-
-            PrintTestUpdate("Tests finished for:", RunData.Name);
-
-            Toggle(true);
-            TestNameLabel.Foreground = Brushes.Green;
-            return Results;
+            await controller.Run();
         }
 
-        private async Task<List<TestReport>> RunQueriesSerial()
+        private void UpdateHistogramProgressBar(double value, double max = 0)
         {
-            var testCases = new List<TestReport>();
-            SQLFileControl.SQLProgressBar.Maximum = CaseFiles.Count();
-            foreach (var queryFile in CaseFiles)
-            {
-                await Task.Delay(1);
-                SQLFileControl.UpdateFileLabel(queryFile.Name);
-                SQLFileControl.SQLProgressBar.Value++;
-                ulong? accCardinality = null;
-                if (QueryPlanCacher.Instance != null)
-                    accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
-                DataSet dbResult = await GetResultWithCache(queryFile, accCardinality);
-
-                AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
-
-                List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-
-                TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
-                testCases.Add(testCase);
-            }
-            SQLFileControl.SQLProgressBar.Value = SQLFileControl.SQLProgressBar.Maximum;
-            return testCases;
+            if (max != 0)
+                HistogramControl.HistogramProgressBar.Maximum = max;
+            HistogramControl.HistogramProgressBar.Value = value;
         }
 
-        private async Task<DataSet> GetResultWithCache(FileInfo queryFile, ulong? accCardinality)
+        private void UpdateSQLFileProgressBar(double value, double max = 0)
         {
-            DataSet dbResult;
-            if (accCardinality != null)
-                dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
-            else
-                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
-            return dbResult;
-        }
-
-        private AnalysisResult CacheActualCardinalitiesIfNotSet(DataSet dbResult, FileInfo queryFile, ulong? accCardinality)
-        {
-            AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
-            if (accCardinality != null)
-                analysisResult.ActualCardinality = (ulong)accCardinality;
-            else
-                if (QueryPlanCacher.Instance != null)
-                    QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
-            return analysisResult;
-        }
-
-        private void SaveResult()
-        {
-            csvWriter.Write<TestReport, TestReportMap>(Results, true);
-        }
-
-        private void ParseTestSettings(FileInfo file)
-        {
-            if (!file.Exists)
-                throw new IOException($"Error!, Test setting file `{file.Name}` not found!");
-            RunData.Settings.Update(JsonParsingHelper.ParseJson<TestSettings>(File.ReadAllText(file.FullName)));
+            if (max != 0)
+                SQLFileControl.SQLProgressBar.Maximum = max;
+            SQLFileControl.SQLProgressBar.Value = value;
         }
 
         private void PrintTestUpdate(string left, string right)
         {
             StatusTextBox.Text += left + Environment.NewLine;
             FileStatusTextBox.Text += right + Environment.NewLine;
+        }
+
+        private void SetTestNameColor(Brush brush)
+        {
+            TestNameLabel.Foreground = brush;
+        }
+
+        private void AddToReportPanel(UIElement element)
+        {
+            ReportPanel.Children.Add(element);
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)

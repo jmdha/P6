@@ -161,7 +161,7 @@ namespace ExperimentSuite.Controllers
             runner.RunnerStartedEvent += RunnerStarted;
             AddNewElement.Invoke(runner);
 
-            Func<Task> runFunc = async () => await runner.Run(true);
+            Func<Task> runFunc = async () => await runner.Run();
 
             return runFunc;
         }

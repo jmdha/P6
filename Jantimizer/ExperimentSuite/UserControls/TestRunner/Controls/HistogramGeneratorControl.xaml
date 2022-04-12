@@ -8,6 +8,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <Label x:Name="HistogramProgressLabel" Content="Histogram Progress (0/0)"/>
-        <ProgressBar x:Name="HistogramProgressBar" Height="20"/>
+        <ProgressBar x:Name="HistogramProgressBar" Height="20" ValueChanged="HistogramProgressBar_ValueChanged"/>
     </StackPanel>
 </UserControl>
