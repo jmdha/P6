@@ -26,7 +26,8 @@
           "ConnectorID": "EquiDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         },
         {
@@ -34,7 +35,8 @@
           "ConnectorID": "EquiDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         }
       ],
@@ -68,7 +70,8 @@
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         },
         {
@@ -76,7 +79,8 @@
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         }
       ],
@@ -87,7 +91,7 @@
     {
       "ExperimentName": "World Happiness 2022",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -127,7 +131,7 @@
     {
       "ExperimentName": "Census 2013",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
