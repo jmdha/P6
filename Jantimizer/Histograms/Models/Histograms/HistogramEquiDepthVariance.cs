@@ -58,7 +58,7 @@ namespace Histograms.Models
                     variance += Math.Pow(Convert.ToDouble(sorted[bIter]) - (double)mean, 2);
                 }
                 if (countValue > 1 && variance != 0)
-                    standardDeviation = Math.Sqrt((double)variance / countValue - 1);
+                    standardDeviation = Math.Sqrt((double)variance / countValue);
                 else
                     variance = 0;
                 if (variance < 0)
