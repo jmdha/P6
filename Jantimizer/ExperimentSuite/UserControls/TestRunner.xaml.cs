@@ -31,6 +31,9 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class TestRunner : UserControl, ICollapsable
     {
+        public delegate void StartRunEventHandler(TestRunner runner);
+        public event StartRunEventHandler RunnerStartedEvent;
+
         public string ExperimentName { get; }
         public string RunnerName { get; }
         public SuiteData RunData { get; }
@@ -69,6 +72,8 @@ namespace ExperimentSuite.UserControls
 
         public async Task<List<TestReport>> Run(bool consoleOutput = true, bool saveResult = true)
         {
+            RunnerStartedEvent.Invoke(this);
+
             TestNameLabel.Foreground = Brushes.Yellow;
             Toggle(false);
 
