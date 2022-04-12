@@ -120,12 +120,14 @@ namespace ExperimentSuite
             var pgDataDefault = SuiteDataSets.GetPostgresSD_Default(optionalSettings);
             var pgDataEquiDepth = SuiteDataSets.GetPostgresSD_EquiDepth(optionalSettings);
             var pgDataEquiDepthVariance = SuiteDataSets.GetPostgresSD_EquiDepthVariance(optionalSettings);
+            var pgDataMinDepth = SuiteDataSets.GetPostgresSD_MinDepth(optionalSettings);
 
             var myDataDefault = SuiteDataSets.GetMySQLSD_Default(optionalSettings, pgDataDefault.QueryParserManager.QueryParsers[0]);
             var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(optionalSettings, pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
             var myDataEquiDepthVariance = SuiteDataSets.GetMySQLSD_EquiDepthVariance(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
+            var myDataMinDepth = SuiteDataSets.GetMySQLSD_MinDepth(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
 
-            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance };
+            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataMinDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance, myDataMinDepth };
             return connectorSet;
         }
 

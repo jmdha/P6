@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -32,6 +32,48 @@
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "Experiment One_min",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ConstantNumberBlocks"
@@ -155,6 +197,46 @@
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "Census_2013"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 512
+      }
+    },
+    {
+      "ExperimentName": "Census 2013_min",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "Census_2013_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "Census_2013"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
           "TestFiles": [
             "Census_2013"
           ]
