@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -45,7 +45,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -87,7 +87,7 @@
     {
       "ExperimentName": "World Happiness 2022",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -127,7 +127,7 @@
     {
       "ExperimentName": "Census 2013",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
