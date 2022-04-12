@@ -22,22 +22,22 @@ namespace ExperimentSuite.Controllers
     internal class RunnerController
     {
         public delegate void UpdateHistogramProgressBarHandler(double value, double max = 0);
-        public event UpdateHistogramProgressBarHandler UpdateHistogramProgressBar;
+        public event UpdateHistogramProgressBarHandler? UpdateHistogramProgressBar;
 
         public delegate void UpdateRunnerProgressBarHandler(double value, double max = 0);
-        public event UpdateRunnerProgressBarHandler UpdateRunnerProgressBar;
+        public event UpdateRunnerProgressBarHandler? UpdateRunnerProgressBar;
 
         public delegate void SetTestNameColorHandler(Brush brush);
-        public event SetTestNameColorHandler SetTestNameColor;
+        public event SetTestNameColorHandler? SetTestNameColor;
 
         public delegate void ToggleVisibilityHandler(bool state);
-        public event ToggleVisibilityHandler ToggleVisibility;
+        public event ToggleVisibilityHandler? ToggleVisibility;
 
         public delegate void AddToReportPanelHandler(UIElement element);
-        public event AddToReportPanelHandler AddToReportPanel;
+        public event AddToReportPanelHandler? AddToReportPanel;
 
         public delegate void PrintTestUpdateHandler(string left, string right);
-        public event PrintTestUpdateHandler PrintTestUpdate;
+        public event PrintTestUpdateHandler? PrintTestUpdate;
 
         public string ExperimentName { get; }
         public string RunnerName { get; }
@@ -70,17 +70,22 @@ namespace ExperimentSuite.Controllers
 
         public async Task<List<TestReport>> Run()
         {
-            SetTestNameColor.Invoke(Brushes.Yellow);
-            ToggleVisibility.Invoke(false);
+            if (SetTestNameColor != null)
+                SetTestNameColor.Invoke(Brushes.Yellow);
 
-            PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
+            if (ToggleVisibility != null)
+                ToggleVisibility.Invoke(false);
+
+            if (PrintTestUpdate != null)
+                PrintTestUpdate("Parsing settings file:", SettingsFile.Name);
             ParseTestSettings(SettingsFile);
 
             if (RunData.Settings.DoPreCleanup != null && (bool)RunData.Settings.DoPreCleanup)
             {
                 if (CleanupFile == null)
                     throw new IOException("Cleanup file was null!");
-                PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Running Pre-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
@@ -88,7 +93,8 @@ namespace ExperimentSuite.Controllers
             {
                 if (SetupFile == null)
                     throw new IOException("Setup file was null!");
-                PrintTestUpdate("Running Setup", SetupFile.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Running Setup", SetupFile.Name);
                 await RunData.Connector.CallQueryAsync(SetupFile);
             }
 
@@ -96,7 +102,8 @@ namespace ExperimentSuite.Controllers
             {
                 if (DataInsertsFile == null)
                     throw new IOException("Inserts file was null!");
-                PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Inserting Data", DataInsertsFile.Name);
                 await RunData.Connector.CallQueryAsync(DataInsertsFile);
             }
 
@@ -104,19 +111,22 @@ namespace ExperimentSuite.Controllers
             {
                 if (DataAnalyseFile == null)
                     throw new IOException("Analyse file was null!");
-                PrintTestUpdate("Analysing Tables", DataAnalyseFile.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Analysing Tables", DataAnalyseFile.Name);
                 await RunData.Connector.CallQueryAsync(DataAnalyseFile);
             }
 
             if (RunData.Settings.DoMakeHistograms != null && (bool)RunData.Settings.DoMakeHistograms)
             {
-                PrintTestUpdate("Generating Histograms for:", RunData.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Generating Histograms for:", RunData.Name);
                 await GenerateHistograms(RunData.HistoManager);
             }
 
             if (RunData.Settings.DoRunTests != null && (bool)RunData.Settings.DoRunTests)
             {
-                PrintTestUpdate("Begining Test Run for:", RunData.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Begining Test Run for:", RunData.Name);
                 Results = await RunQueriesSerial();
             }
 
@@ -124,21 +134,27 @@ namespace ExperimentSuite.Controllers
             {
                 if (CleanupFile == null)
                     throw new IOException("Cleanup file was null!");
-                PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Running Post-Cleanup", CleanupFile.Name);
                 await RunData.Connector.CallQueryAsync(CleanupFile);
             }
 
             if (RunData.Settings.DoMakeReport != null && (bool)RunData.Settings.DoMakeReport)
             {
-                PrintTestUpdate("Making Report", RunData.Name);
-                AddToReportPanel.Invoke(new ReportMaker(Results));
+                if (PrintTestUpdate != null)
+                    PrintTestUpdate("Making Report", RunData.Name);
+                if (AddToReportPanel != null)
+                    AddToReportPanel.Invoke(new ReportMaker(Results));
                 SaveResult();
             }
 
-            PrintTestUpdate("Tests finished for:", RunData.Name);
+            if (PrintTestUpdate != null)
+                PrintTestUpdate("Tests finished for:", RunData.Name);
 
-            ToggleVisibility.Invoke(true);
-            SetTestNameColor.Invoke(Brushes.Green);
+            if (ToggleVisibility != null)
+                ToggleVisibility.Invoke(true);
+            if (SetTestNameColor != null)
+                SetTestNameColor.Invoke(Brushes.Green);
             return Results;
         }
 
@@ -146,10 +162,12 @@ namespace ExperimentSuite.Controllers
         {
             var testCases = new List<TestReport>();
             int value = 0;
-            UpdateRunnerProgressBar.Invoke(value, CaseFiles.Count());
+            if (UpdateRunnerProgressBar != null)
+                UpdateRunnerProgressBar.Invoke(value, CaseFiles.Count());
             foreach (var queryFile in CaseFiles)
             {
-                UpdateRunnerProgressBar.Invoke(value++);
+                if (UpdateRunnerProgressBar != null)
+                    UpdateRunnerProgressBar.Invoke(value++);
                 ulong? accCardinality = null;
                 if (QueryPlanCacher.Instance != null)
                     accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
@@ -163,7 +181,8 @@ namespace ExperimentSuite.Controllers
                 TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
                 testCases.Add(testCase);
             }
-            UpdateRunnerProgressBar.Invoke(CaseFiles.Count());
+            if (UpdateRunnerProgressBar != null)
+                UpdateRunnerProgressBar.Invoke(CaseFiles.Count());
             return testCases;
         }
 
@@ -205,16 +224,19 @@ namespace ExperimentSuite.Controllers
             List<Task> tasks = await manager.AddHistogramsFromDB();
             int value = 0;
             int max = tasks.Count;
-            UpdateHistogramProgressBar.Invoke(value, max);
+            if (UpdateHistogramProgressBar != null)
+                UpdateHistogramProgressBar.Invoke(value, max);
             // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
             while (tasks.Any())
             {
                 var finishedTask = await Task.WhenAny(tasks);
                 tasks.Remove(finishedTask);
                 await finishedTask;
-                UpdateHistogramProgressBar.Invoke(value++);
+                if (UpdateHistogramProgressBar != null)
+                    UpdateHistogramProgressBar.Invoke(value++);
             }
-            UpdateHistogramProgressBar.Invoke(max);
+            if (UpdateHistogramProgressBar != null)
+                UpdateHistogramProgressBar.Invoke(max);
         }
     }
 }

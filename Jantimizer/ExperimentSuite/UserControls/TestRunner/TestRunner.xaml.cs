@@ -33,7 +33,7 @@ namespace ExperimentSuite.UserControls
     public partial class TestRunner : UserControl, ICollapsable
     {
         public delegate void StartRunEventHandler(TestRunner runner);
-        public event StartRunEventHandler RunnerStartedEvent;
+        public event StartRunEventHandler? RunnerStartedEvent;
 
         private RunnerController controller;
 
@@ -70,7 +70,8 @@ namespace ExperimentSuite.UserControls
 
         public async Task Run()
         {
-            RunnerStartedEvent.Invoke(this);
+            if (RunnerStartedEvent != null)
+                RunnerStartedEvent.Invoke(this);
             await controller.Run();
         }
 

@@ -27,19 +27,16 @@ namespace ExperimentSuite.Controllers
         private readonly string CaseFolderName = "Cases/";
 
         public delegate void WriteToStatusHandler(string text);
-        public event WriteToStatusHandler WriteToStatus;
+        public event WriteToStatusHandler? WriteToStatus;
 
         public delegate void AddTestRunnerHandler(UIElement element, int index = -1);
-        public event AddTestRunnerHandler AddNewElement;
+        public event AddTestRunnerHandler? AddNewElement;
 
         public delegate void RemoveTestRunnerHandler(UIElement element);
-        public event RemoveTestRunnerHandler RemoveElement;
+        public event RemoveTestRunnerHandler? RemoveElement;
 
         public delegate void UpdateProgressBarHandler(double value, double max = 0);
-        public event UpdateProgressBarHandler UpdateExperimentProgressBar;
-
-        private double _progressBarValue = 0;
-        private double _progressBarMax = 0;
+        public event UpdateProgressBarHandler? UpdateExperimentProgressBar;
 
         public ExperimentController()
         { 
@@ -53,32 +50,43 @@ namespace ExperimentSuite.Controllers
 
                 var testsPath = IOHelper.GetDirectory(TestsFolder);
                 var expList = GetExperimentListFromFile();
-                _progressBarMax = expList.Experiments.Count;
-                UpdateExperimentProgressBar.Invoke(0, _progressBarMax);
+                double _progressBarValue = 0;
+                double _progressBarMax = expList.Experiments.Count;
+                if (UpdateExperimentProgressBar != null)
+                    UpdateExperimentProgressBar.Invoke(0, _progressBarMax);
                 foreach (var experiment in expList.Experiments)
                 {
                     if (experiment.RunExperiment)
                     {
-                        UpdateExperimentProgressBar.Invoke(_progressBarValue++);
-                        AddNewElement.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
+                        if (UpdateExperimentProgressBar != null)
+                            UpdateExperimentProgressBar.Invoke(_progressBarValue++);
+                        if (AddNewElement != null)
+                            AddNewElement.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
-                        WriteToStatus.Invoke("Setting up suite datas...");
+                        if (WriteToStatus != null)
+                            WriteToStatus.Invoke("Setting up suite datas...");
                         var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
-                        WriteToStatus.Invoke($"Running experiment {experiment.ExperimentName}");
-                        AddNewElement.Invoke(GetSeperatorLabel("Setup", 14), 1);
+                        if (WriteToStatus != null)
+                            WriteToStatus.Invoke($"Running experiment {experiment.ExperimentName}");
+                        if (AddNewElement != null)
+                            AddNewElement.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
-                        AddNewElement.Invoke(GetSeperatorLabel("Tests", 14), 1);
+                        if (AddNewElement != null)
+                            AddNewElement.Invoke(GetSeperatorLabel("Tests", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
                     }
-                    WriteToStatus.Invoke($"Experiment {experiment.ExperimentName} finished!");
+                    if (WriteToStatus != null)
+                        WriteToStatus.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
-                UpdateExperimentProgressBar.Invoke(_progressBarMax);
-                WriteToStatus.Invoke("All experiments complete!");
+                if (UpdateExperimentProgressBar != null)
+                    UpdateExperimentProgressBar.Invoke(_progressBarMax);
+                if (WriteToStatus != null)
+                    WriteToStatus.Invoke("All experiments complete!");
                 SaveToCSV(rootResultPath);
             }
             catch (BaseErrorLogException ex)
@@ -102,7 +110,8 @@ namespace ExperimentSuite.Controllers
 
         private ExperimentList GetExperimentListFromFile()
         {
-            WriteToStatus.Invoke("Parsing experiment list...");
+            if (WriteToStatus != null)
+                WriteToStatus.Invoke("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile(ExperimentsFile);
             var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
             return expList;
@@ -110,9 +119,11 @@ namespace ExperimentSuite.Controllers
 
         private void SaveToCSV(string path)
         {
-            WriteToStatus.Invoke("Merging results");
+            if (WriteToStatus != null)
+                WriteToStatus.Invoke("Merging results");
             CSVMerger.Merge<TestReport, TestReportMap>(path, ResultCSVFileName);
-            WriteToStatus.Invoke("Merging finished");
+            if (WriteToStatus != null)
+                WriteToStatus.Invoke("Merging finished");
         }
 
         private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
@@ -159,7 +170,8 @@ namespace ExperimentSuite.Controllers
                 IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suiteData.Name.ToLower(), "sql"))
             );
             runner.RunnerStartedEvent += RunnerStarted;
-            AddNewElement.Invoke(runner);
+            if (AddNewElement != null)
+                AddNewElement.Invoke(runner);
 
             Func<Task> runFunc = async () => await runner.Run();
 
@@ -168,8 +180,10 @@ namespace ExperimentSuite.Controllers
 
         private void RunnerStarted(TestRunner runner)
         {
-            RemoveElement.Invoke(runner);
-            AddNewElement.Invoke(runner,2);
+            if (RemoveElement != null)
+                RemoveElement.Invoke(runner);
+            if (AddNewElement != null)
+                AddNewElement.Invoke(runner,2);
         }
     }
 }
