@@ -35,13 +35,13 @@ namespace HistogramsTests.Unit_Tests.Caches
         }
 
         [TestMethod]
-        [DataRow(0, 1, 10, 1, 1)]
-        [DataRow(10, 999991, 1, 500, 204)]
-        [DataRow(0, 20, 199998, 888, 1)]
-        public void Constructor_CanSetWith_HistogramBucketVariance(int start, int end, long count, int variance, int mean)
+        [DataRow(0, 1, 10, 1.0, 1.0, 5.2)]
+        [DataRow(10, 999991, 1, 500, 204, 9284.2)]
+        [DataRow(0, 20, 199998, 888, 1, 0.99996)]
+        public void Constructor_CanSetWith_HistogramBucketVariance(int start, int end, long count, double variance, double mean, double sd)
         {
             // ARRANGE
-            HistogramBucketVariance histogramBucket = new HistogramBucketVariance(start, end, count, variance, mean);
+            HistogramBucketVariance histogramBucket = new HistogramBucketVariance(start, end, count, variance, mean, sd);
 
             // ACT
             CachedBucket bucket = new CachedBucket(histogramBucket);
@@ -52,6 +52,7 @@ namespace HistogramsTests.Unit_Tests.Caches
             Assert.AreEqual(count, bucket.Count);
             Assert.AreEqual(variance, bucket.Variance);
             Assert.AreEqual(mean, bucket.Mean);
+            Assert.AreEqual(sd, bucket.StandardDeviation);
             Assert.AreEqual(nameof(HistogramBucketVariance), bucket.TypeName);
         }
 

@@ -15,8 +15,10 @@ namespace HistogramsTests.Stubs
 
         public long Count => throw new NotImplementedException();
 
-        public int Variance => throw new NotImplementedException();
+        public double Variance => throw new NotImplementedException();
 
-        public int Mean => throw new NotImplementedException();
+        public double Mean => throw new NotImplementedException();
+
+        public double StandardDeviation => throw new NotImplementedException();
     }
 }
