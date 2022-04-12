@@ -20,4 +20,4 @@ CREATE TABLE census (
 	hours_per_week INT,
 	native_country varchar(100),
     PRIMARY KEY (id)
-);
+) COMMENT='Data from https://github.com/sfu-db/AreCELearnedYet#dataset';

@@ -18,3 +18,4 @@ CREATE TABLE census (
 	hours_per_week INT,
 	native_country TEXT
 );
+COMMENT ON TABLE census IS 'Data from https://github.com/sfu-db/AreCELearnedYet#dataset';
