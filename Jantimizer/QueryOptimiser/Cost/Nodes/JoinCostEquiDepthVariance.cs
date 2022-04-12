@@ -117,7 +117,7 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepthVariance
 
         private long GetVariatedCount(HistogramBucketVariance bucket, HistogramBucketVariance comparisonBucket)
         {
-            double certainty = (double)Math.Abs((double)bucket.Variance / comparisonBucket.Variance);
+            double certainty = (double)Math.Abs(bucket.Variance / comparisonBucket.Variance);
             if (certainty > 1)
                 certainty = 1 / certainty;
             long estimate = (long)(bucket.Count * certainty);
