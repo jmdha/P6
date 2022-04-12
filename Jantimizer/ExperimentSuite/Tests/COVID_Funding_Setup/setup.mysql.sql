@@ -22,7 +22,7 @@ CREATE TABLE flows (
 
 DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions (
-	´month´ DATE,
+	month DATE,
 	reporting_org_id varchar(1000),
 	reporting_org_name varchar(1000),
 	reporting_org_type INT,

@@ -21,7 +21,7 @@ COMMENT ON TABLE flows IS 'Data from https://data.world/hdx/e24de323-ed64-4c33-8
 
 DROP TABLE IF EXISTS transactions;
 CREATE TABLE transactions (
-	´month´ DATE,
+	month DATE,
 	reporting_org_id TEXT,
 	reporting_org_name TEXT,
 	reporting_org_type INT,
