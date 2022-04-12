@@ -39,6 +39,7 @@ namespace ExperimentSuite
             InitializeComponent();
             var iconHandle = ExperimentSuite.Properties.Resources.icon;
             this.Icon = ByteToImage(iconHandle);
+            CacheViewerControl.Toggle(true);
         }
 
         public static ImageSource ByteToImage(byte[] imageData)
