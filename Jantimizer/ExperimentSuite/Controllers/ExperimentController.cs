@@ -64,6 +64,8 @@ namespace ExperimentSuite.Controllers
                         var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
                         WriteToStatus?.Invoke($"Running experiment {experiment.ExperimentName}");
+                        var awaitingLable = GetSeperatorLabel("Waiting...", 14);
+                        AddNewElement?.Invoke(awaitingLable, 1);
                         AddNewElement?.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
@@ -72,6 +74,7 @@ namespace ExperimentSuite.Controllers
                         await TaskRunnerHelper.RunDelegates(
                             GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
                             experiment.RunParallel);
+                        RemoveElement?.Invoke(awaitingLable);
                     }
                     WriteToStatus?.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
