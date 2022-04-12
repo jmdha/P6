@@ -20,7 +20,15 @@ namespace ExperimentSuite.Models
 
         public TestReport()
         {
-
+            ExperimentName = "";
+            Category = "";
+            CaseName = "";
+            DatabaseName = "";
+            DatabasePredicted = 0;
+            DatabaseActual = 0;
+            OptimiserPredicted = 0;
+            DatabaseAcc = 0;
+            OptimiserAcc = 0;
         }
 
         public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted)

@@ -21,11 +21,10 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class ReportMaker : UserControl
     {
-        public ReportMaker(List<TestReport> reportLines = null)
+        public ReportMaker(List<TestReport> reportLines)
         {
             InitializeComponent();
-            if (reportLines != null)
-                GenerateReport(reportLines);
+            GenerateReport(reportLines);
         }
 
         public void GenerateReport(List<TestReport> reportLines)
