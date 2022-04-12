@@ -68,10 +68,10 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         }
 
         [TestMethod]
-        [DataRow(new int[] { 0, 10, 20, 30, 40 }, 14.106735979665885)]
-        [DataRow(new int[] { 1, 2, 3, 4, 5 }, 1)]
-        [DataRow(new int[] { 100, 0, 0, 0, 100 }, 48.979587585033826)]
-        [DataRow(new int[] { 1, 2, 30000, 4, 5 }, 11998.800041670833)]
+        [DataRow(new int[] { 0, 10, 20, 30, 40 }, 14.142135623730951)]
+        [DataRow(new int[] { 1, 2, 3, 4, 5 }, 1.4142135623730951)]
+        [DataRow(new int[] { 100, 0, 0, 0, 100 }, 48.98979485566356)]
+        [DataRow(new int[] { 1, 2, 30000, 4, 5 }, 11998.800083341666)]
         public void Can_GenerateHistogram_Table_StandardDeviation(int[] rows, double expDeviation)
         {
             // ARRANGE
@@ -158,10 +158,10 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         }
 
         [TestMethod]
-        [DataRow(new int[] { 0, 10, 20, 30, 40 }, 14.106735979665885)]
-        [DataRow(new int[] { 1, 2, 3, 4, 5 }, 1)]
-        [DataRow(new int[] { 100, 0, 0, 0, 100 }, 48.979587585033826)]
-        [DataRow(new int[] { 1, 2, 30000, 4, 5 }, 11998.800041670833)]
+        [DataRow(new int[] { 0, 10, 20, 30, 40 }, 14.142135623730951)]
+        [DataRow(new int[] { 1, 2, 3, 4, 5 }, 1.4142135623730951)]
+        [DataRow(new int[] { 100, 0, 0, 0, 100 }, 48.98979485566356)]
+        [DataRow(new int[] { 1, 2, 30000, 4, 5 }, 11998.800083341666)]
         public void Can_GenerateHistogram_List_StandardDeviation(int[] rows, double expDeviation)
         {
             // ARRANGE
@@ -274,9 +274,9 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         [TestMethod]
         [DataRow(new int[] { 1 }, new long[] { 20 }, 10, new double[] { 0, 0 })]
         [DataRow(new int[] { 1 }, new long[] { 20 }, 20, new double[] { 0 })]
-        [DataRow(new int[] { 1, 200 }, new long[] { 20, 50 }, 15, new double[] { 0, 93.8041695353795, 0, 0, 0 })]
-        [DataRow(new int[] { 1, 5 }, new long[] { 10, 5 }, 3, new double[] { 0, 0, 0, 1.5986105077709065, 0 })]
-        [DataRow(new int[] { 1, 10, 17, 2, 40 }, new long[] { 5, 20, 60, 2, 10 }, 20, new double[] { 3.766629793329841, 2.8613807855648994, 0, 0, 14.079728489046214 })]
+        [DataRow(new int[] { 1, 200 }, new long[] { 20, 50 }, 15, new double[] { 0, 93.8094996374153, 0, 0, 0 })]
+        [DataRow(new int[] { 1, 5 }, new long[] { 10, 5 }, 3, new double[] { 0, 0, 0, 1.8856180831641267, 0 })]
+        [DataRow(new int[] { 1, 10, 17, 2, 40 }, new long[] { 5, 20, 60, 2, 10 }, 20, new double[] { 3.897114317029974, 3.031088913245535, 0, 0, 14.115195865635716 })]
         public void Can_GenerateHistogramFromSorted_StandardDeviation(int[] value, long[] count, int bucketSize, double[] expDeviations)
         {
             // ARRANGE
