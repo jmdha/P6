@@ -125,7 +125,7 @@ namespace ExperimentSuite
             var myDataDefault = SuiteDataSets.GetMySQLSD_Default(optionalSettings, pgDataDefault.QueryParserManager.QueryParsers[0]);
             var myDataEquiDepth = SuiteDataSets.GetMySQLSD_EquiDepth(optionalSettings, pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
             var myDataEquiDepthVariance = SuiteDataSets.GetMySQLSD_EquiDepthVariance(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
-            var myDataMinDepth = SuiteDataSets.GetMySQLSD_MinDepth(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
+            var myDataMinDepth = SuiteDataSets.GetMySQLSD_MinDepth(optionalSettings, pgDataMinDepth.QueryParserManager.QueryParsers[0]);
 
             var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataMinDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance, myDataMinDepth };
             return connectorSet;
