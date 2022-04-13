@@ -160,6 +160,7 @@ namespace ExperimentSuite.UserControls
                 AnalysisResult analysisResult = CacheActualCardinalitiesIfNotSet(dbResult, queryFile, accCardinality);
 
                 List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
+                nodes.Reverse();
                 OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
                 TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);

@@ -21,18 +21,15 @@ namespace QueryOptimiser.Models
             Buckets = new List<IntermediateBucket>();
         }
 
-        public IntermediateTable(List<IntermediateBucket> buckets, List<Tuple<TableReferenceNode, List<string>>> references) {
+        public IntermediateTable(List<IntermediateBucket> buckets, List<Tuple<TableReferenceNode, string>> references) {
             Buckets = buckets;
             foreach (var reference in references)
             {
                 if (!References.ContainsKey(reference.Item1)) {
-                    References.Add(reference.Item1, reference.Item2);
+                    References.Add(reference.Item1, new List<string> { reference.Item2 });
                     continue;
-                }
-                
-                foreach (var attribute in reference.Item2)
-                    if (!References[reference.Item1].Contains(attribute))
-                        References[reference.Item1].Add(attribute);
+                } else if (!References[reference.Item1].Contains(reference.Item2))
+                    References[reference.Item1].Add(reference.Item2);
             }
         }
 

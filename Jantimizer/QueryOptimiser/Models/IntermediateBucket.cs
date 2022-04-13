@@ -29,10 +29,39 @@ namespace QueryOptimiser.Models
             IntermediateBucket bucket = new IntermediateBucket();
             foreach (var tableRef in bucket1.Buckets)
                 foreach (var attribute in tableRef.Value)
-                    bucket.AddBucketsIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+                    bucket.AddBucketIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
             foreach (var tableRef in bucket2.Buckets)
                 foreach (var attribute in tableRef.Value)
-                    bucket.AddBucketsIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+                    bucket.AddBucketIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+            return bucket;
+        }
+
+        internal static List<IntermediateBucket> MergeOnOverlap(List<IntermediateBucket> buckets1, List<IntermediateBucket> buckets2)
+        {
+            List<IntermediateBucket> buckets = new List<IntermediateBucket>();
+            foreach (var bucket in buckets1) {
+                foreach (var tableRef in bucket.Buckets) {
+                    foreach (var attribute in tableRef.Value) {
+                        foreach (var bucket2 in buckets2) {
+                            if (DoesOverlap(tableRef.Key, attribute.Key, bucket, bucket2))
+                            {
+                                buckets.Add(MergeOnOverlap(bucket, bucket2));
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            return buckets;
+        }
+
+        internal static IntermediateBucket MergeOnOverlap(IntermediateBucket bucket1, IntermediateBucket bucket2)
+        {
+            IntermediateBucket bucket = new IntermediateBucket();
+            foreach (var tableRef in bucket1.Buckets)
+                foreach (var attribute in tableRef.Value)
+                    if (DoesOverlap(tableRef.Key, attribute.Key, bucket1, bucket2))
+                        bucket.AddBucket(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
             return bucket;
         }
 
@@ -68,27 +97,30 @@ namespace QueryOptimiser.Models
 
         private void AddBuckets(IntermediateBucket bucket)
         {
-            List<Tuple<TableReferenceNode, string, BucketEstimate>> tuples = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
             foreach (var refe in bucket.Buckets)
                 foreach (var refedBucket in refe.Value)
-                    tuples.Add(new Tuple<TableReferenceNode, string, BucketEstimate>(refe.Key, refedBucket.Key, refedBucket.Value));
-            AddBuckets(tuples);
+                    AddBucket(new Tuple<TableReferenceNode, string, BucketEstimate>(refe.Key, refedBucket.Key, refedBucket.Value));
         }
 
         private void AddBuckets(List<Tuple<TableReferenceNode, string, BucketEstimate>> buckets)
         {
             foreach (var bucket in buckets)
             {
-                if (!Buckets.ContainsKey(bucket.Item1))
-                    Buckets.Add(bucket.Item1, new Dictionary<string, BucketEstimate>());
-                if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
-                    Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
-                else
-                    throw new ArgumentException("Can not add the same bucket twice");
+                AddBucket(bucket);
             }
         }
 
-        private void AddBucketsIgnoreDuplicates(Tuple<TableReferenceNode, string, BucketEstimate> bucket)
+        private void AddBucket(Tuple<TableReferenceNode, string, BucketEstimate> bucket)
+        {
+            if (!Buckets.ContainsKey(bucket.Item1))
+                Buckets.Add(bucket.Item1, new Dictionary<string, BucketEstimate>());
+            if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
+                Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
+            else
+                throw new ArgumentException("Can not add the same bucket twice");
+        }
+
+        private void AddBucketIgnoreDuplicates(Tuple<TableReferenceNode, string, BucketEstimate> bucket)
         {
             if (!Buckets.ContainsKey(bucket.Item1))
                 Buckets.Add(bucket.Item1, new Dictionary<string, BucketEstimate>());

@@ -40,7 +40,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
 
             List<IntermediateBucket> buckets;
-            List<Tuple<TableReferenceNode, List<string>>> references = new List<Tuple<TableReferenceNode, List<string>>>();
+            List<Tuple<TableReferenceNode, string>> references = new List<Tuple<TableReferenceNode, string>>();
 
             buckets = GetBucketMatches(node.Relation, table, ref references);
 
@@ -48,25 +48,37 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
        
         #region Matches
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<Tuple<TableReferenceNode, List<string>>> references)
+        private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
         {
             if (relation.Type == RelationType.Type.Predicate && relation.LeafPredicate != null)
                 return GetBucketMatches(relation.LeafPredicate, table, ref references);
-            else if (relation.Type == RelationType.Type.And || relation.Type == RelationType.Type.Or)
-                return GetBucketMatches(relation, table, ref references);
-                // Actually handle combinding via and and or
+            else if (relation.LeftRelation != null && relation.RightRelation != null)
+            {
+                List<Tuple<TableReferenceNode, string>> leftReferences = new List<Tuple<TableReferenceNode, string>>();
+                List<Tuple<TableReferenceNode, string>> rightReferences = new List<Tuple<TableReferenceNode, string>>();
+                List<IntermediateBucket> leftBuckets = GetBucketMatches(relation.LeftRelation, table, ref leftReferences);
+                List<IntermediateBucket> rightBuckets = GetBucketMatches(relation.RightRelation, table, ref rightReferences);
+                if (relation.Type == RelationType.Type.And)
+                {
+                    var overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
+                    references = GetOverlappingReferences(leftReferences, rightReferences);
+                    return overlap;
+                }
+                
+                return new List<IntermediateBucket>();
+            }
             else
                 throw new ArgumentException("Missing noderelation type " + relation.ToString());
         }
 
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<Tuple<TableReferenceNode, List<string>>> references)
+        private List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
         {
             Tuple<List<IHistogramBucket>, List<IHistogramBucket>> bucketPair = GetBucketPair(predicate, table);
             Tuple<IHistogramBucket[], IHistogramBucket[]> bounds = GetBucketBounds(predicate, bucketPair.Item1, bucketPair.Item2);
 
             if (bounds.Item1.Length > 0 && bounds.Item2.Length > 0) {
-                references.Add(new Tuple<TableReferenceNode, List<string>>(predicate.LeftTable, new List<string>() { predicate.LeftAttribute }));
-                references.Add(new Tuple<TableReferenceNode, List<string>>(predicate.RightTable, new List<string>() { predicate.RightAttribute }));
+                references.Add(new Tuple<TableReferenceNode, string>(predicate.LeftTable, predicate.LeftAttribute ));
+                references.Add(new Tuple<TableReferenceNode, string>(predicate.RightTable, predicate.RightAttribute ));
             } else
                 return new List<IntermediateBucket>();
 
@@ -169,7 +181,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
         #endregion
         #region Bounds
-
         private Tuple<IHistogramBucket[], IHistogramBucket[]> GetBucketBounds(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             int leftStart = 0;
@@ -252,6 +263,22 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
                         HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
+        }
+
+        private List<Tuple<TableReferenceNode, string>> GetOverlappingReferences(List<Tuple<TableReferenceNode, string>> leftReferences, List<Tuple<TableReferenceNode, string>> rightReferences)
+        {
+            List<Tuple<TableReferenceNode, string>> overlappingReferences = new List<Tuple<TableReferenceNode, string>>();
+            foreach (var leftReference in leftReferences)
+            {
+                foreach (var rightReference in rightReferences)
+                {
+                    if (leftReference.Item1 == rightReference.Item1 && leftReference.Item2 == rightReference.Item2)
+                    {
+                        overlappingReferences.Add(leftReference);
+                    }
+                }
+            }
+            return overlappingReferences;
         }
     }
 }
