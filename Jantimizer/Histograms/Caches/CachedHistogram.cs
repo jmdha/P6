@@ -41,6 +41,19 @@ namespace Histograms.Caches
             TypeName = nameof(HistogramEquiDepth);
         }
 
+        public CachedHistogram(HistogramMinDepth histogram, string hash)
+        {
+            List<CachedBucket> newBuckets = new List<CachedBucket>();
+            foreach (var bucket in histogram.Buckets)
+                newBuckets.Add(new CachedBucket((dynamic)bucket));
+            Buckets = newBuckets;
+            TableName = histogram.TableName;
+            AttributeName = histogram.AttributeName;
+            Depth = histogram.Depth;
+            Hash = hash;
+            TypeName = nameof(HistogramMinDepth);
+        }
+
         public CachedHistogram(HistogramEquiDepthVariance histogram, string hash)
         {
             List<CachedBucket> newBuckets = new List<CachedBucket>();
