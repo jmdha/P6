@@ -34,18 +34,12 @@ namespace Histograms.Managers
             return histogram;
         }
 
-        internal async Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
+        protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
         {
             if (HistogramCacher.Instance == null)
                 return null;
             string hash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, hash, Depth.ToString() });
-            return retVal;
-        }
-
-        protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
-        {
-            var cacheHisto = await GetHistogramFromCacheOrNull(tableName, attributeName);
+            var cacheHisto = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, hash, Depth.ToString(), typeof(HistogramEquiDepth).Name });
 
             if (cacheHisto != null)
                 return cacheHisto;
