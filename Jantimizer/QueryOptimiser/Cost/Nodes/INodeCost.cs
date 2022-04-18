@@ -7,16 +7,15 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
+using QueryOptimiser.Models;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("QueryOptimiserTest")]
 
 namespace QueryOptimiser.Cost.Nodes
 {
     internal interface INodeCost<NodeType> where NodeType : INode
     {
-        /// <summary>
-        /// Gives an estimate of the cost of the operation
-        /// <para>Specifically it gives the worst case cardinality estimate</para>
-        /// </summary>
-        /// <returns></returns>
-        internal long CalculateCost(NodeType node, IHistogramManager histogramManager);
+        internal long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket);
     }
 }

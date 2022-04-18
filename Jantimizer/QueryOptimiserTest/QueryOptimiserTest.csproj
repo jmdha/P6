@@ -20,8 +20,4 @@
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CostTest\EquiDepth\" />
-  </ItemGroup>
-
 </Project>

@@ -46,9 +46,9 @@ namespace HistogramsTests.Unit_Tests.Caches
             // ARRANGE
             HistogramEquiDepthVariance histogram = new HistogramEquiDepthVariance(tableName, attributeName, depth);
             List<IHistogramBucket> buckets = new List<IHistogramBucket>();
-            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0));
-            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0));
-            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0));
+            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0, 0));
+            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0, 0));
+            buckets.Add(new HistogramBucketVariance(0, 1, 1, 0, 0, 0, 0));
             histogram.Buckets.AddRange(buckets);
 
             // ACT

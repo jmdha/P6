@@ -25,7 +25,7 @@ namespace QueryOptimiser.Exceptions
             var sb = new StringBuilder();
             sb.AppendLine($"Optimiser Name: {Optimiser.GetType().Name}");
             sb.AppendLine($"Histogram Manager Name: {Optimiser.HistogramManager.GetType().Name}");
-            sb.AppendLine($"Cost Calculator Name: {Optimiser.CostCalculator.GetType().Name}");
+            sb.AppendLine($"Cost Calculator Name: {Optimiser.EstimateCalculator.GetType().Name}");
             sb.AppendLine("Input Nodes:");
             foreach(var node in InputNodes)
             {

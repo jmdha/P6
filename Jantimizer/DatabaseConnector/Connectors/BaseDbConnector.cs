@@ -47,7 +47,7 @@ namespace DatabaseConnector.Connectors
         #region CallQuery
 
         public async Task<DataSet> CallQueryAsync(FileInfo sqlFile) => await CallQueryAsync(File.ReadAllText(sqlFile.FullName));
-        public async Task<DataSet> CallQueryAsync(string query)
+        public virtual async Task<DataSet> CallQueryAsync(string query)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace DatabaseConnector.Connectors
         }
 
         public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
-        public DataSet CallQuery(string query)
+        public virtual DataSet CallQuery(string query)
         {
             try 
             { 
