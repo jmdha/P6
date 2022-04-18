@@ -46,8 +46,12 @@ namespace DatabaseConnector.Connectors
 
         #region CallQuery
 
-        public async Task<DataSet> CallQueryAsync(FileInfo sqlFile) => await CallQueryAsync(File.ReadAllText(sqlFile.FullName));
-        public virtual async Task<DataSet> CallQueryAsync(string query)
+        public async Task<DataSet> CallQueryAsync(FileInfo sqlFile)
+        {
+            using (var reader = new StreamReader(sqlFile.FullName))
+                return await CallQueryAsync(await reader.ReadToEndAsync());
+        }
+        public async Task<DataSet> CallQueryAsync(string query)
         {
             try
             {
@@ -71,13 +75,17 @@ namespace DatabaseConnector.Connectors
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new DatabaseConnectorErrorLogException(ex, Name, query);
             }
         }
 
-        public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
+        public DataSet CallQuery(FileInfo sqlFile)
+        {
+            using (var reader = new StreamReader(sqlFile.FullName))
+                return CallQuery(reader.ReadToEnd());
+        }
         public virtual DataSet CallQuery(string query)
         {
             try 
