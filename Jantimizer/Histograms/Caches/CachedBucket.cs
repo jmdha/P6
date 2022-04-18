@@ -15,12 +15,13 @@ namespace Histograms.Caches
         public long Count { get; }
         public double Variance { get; }
         public double StandardDeviation { get; }
+        public double Range { get; }
         public double Mean { get; }
         public string TypeName { get; }
         public string ValueType { get; }
 
         [JsonConstructorAttribute]
-        public CachedBucket(string valueStart, string valueEnd, long count, double variance, double mean, double standardDeviation, string typeName, string valueType)
+        public CachedBucket(string valueStart, string valueEnd, long count, double variance, double mean, double standardDeviation, double range, string typeName, string valueType)
         {
             ValueStart = valueStart;
             ValueEnd = valueEnd;
@@ -28,6 +29,7 @@ namespace Histograms.Caches
             Variance = variance;
             Mean = mean;
             StandardDeviation = standardDeviation;
+            Range = range;
             TypeName = typeName;
             ValueType = valueType;
         }
@@ -49,6 +51,7 @@ namespace Histograms.Caches
             Variance = bucket.Variance;
             Mean = bucket.Mean;
             StandardDeviation = bucket.StandardDeviation;
+            Range = bucket.Range;
             ValueType = bucket.ValueStart.GetType().ToString();
             TypeName = nameof(HistogramBucketVariance);
         }

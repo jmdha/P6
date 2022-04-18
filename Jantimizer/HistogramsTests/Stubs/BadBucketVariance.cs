@@ -20,5 +20,7 @@ namespace HistogramsTests.Stubs
         public double Mean => throw new NotImplementedException();
 
         public double StandardDeviation => throw new NotImplementedException();
+
+        public double Range => throw new NotImplementedException();
     }
 }
