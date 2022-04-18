@@ -1,4 +1,5 @@
-﻿using Histograms.Caches;
+﻿using ExperimentSuite.Controllers;
+using Histograms.Caches;
 using QueryPlanParser.Caches;
 using System;
 using System.Collections.Generic;
@@ -23,16 +24,19 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class CacheViewer : UserControl, ICollapsable
     {
+        private CacheController controller;
+        public double CollapsedSize { get; } = 0;
+        public double ExpandedSize { get; }
+
         public CacheViewer()
         {
+            controller = new CacheController();
+            controller.ClearViewPanel += ClearDataPanel;
+
             InitializeComponent();
             ExpandedSize = MaxWidth;
-            LoadCachesFromFile();
+            controller.LoadCachesFromFile();
         }
-
-        public double CollapsedSize { get; } = 0;
-
-        public double ExpandedSize { get; }
 
         public void Toggle()
         {
@@ -50,32 +54,25 @@ namespace ExperimentSuite.UserControls
                 Width = ExpandedSize;
         }
 
+        private void ClearDataPanel()
+        {
+            DataPanel.Children.Clear();
+        }
+
         private void ClearLocalCachesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (QueryPlanCacher.Instance != null)
-                QueryPlanCacher.Instance.ClearCache();
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.ClearCache();
-            DataPanel.Children.Clear();
+            controller.ClearLocalCaches();
         }
 
         private void ClearFileCachesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (QueryPlanCacher.Instance != null)
-                QueryPlanCacher.Instance.ClearCache(true);
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.ClearCache(true);
-            DataPanel.Children.Clear();
+            controller.ClearFileAndLocalCaches();
         }
 
         private void RefreshCachesButton_Click(object sender, RoutedEventArgs e)
         {
             DataPanel.Children.Clear();
-            var cacheItems = new List<CacheItem>();
-            if (HistogramCacher.Instance != null)
-                cacheItems.AddRange(HistogramCacher.Instance.GetAllCacheItems());
-            if (QueryPlanCacher.Instance != null)
-                cacheItems.AddRange(QueryPlanCacher.Instance.GetAllCacheItems());
+            var cacheItems = controller.GetAllCacheItems();
 
             CacheItemCountLabel.Content = $"{cacheItems.Count} item(s)";
             cacheItems.Insert(0, new CacheItem("Hash", "Data", "Cacher Service"));
@@ -85,13 +82,7 @@ namespace ExperimentSuite.UserControls
 
         private void LoadFromFile_Click(object sender, RoutedEventArgs e)
         {
-            LoadCachesFromFile();
-        }
-
-        private void LoadCachesFromFile()
-        {
-            new QueryPlanCacher("query-plan-cache.json");
-            new HistogramCacher("histogram-cache.json");
+            controller.LoadCachesFromFile();
         }
     }
 }

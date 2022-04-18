@@ -19,7 +19,7 @@ namespace QueryParser.Models
             Type = RelationType.Type.Predicate;
         }
 
-        public JoinPredicateRelation(JoinPredicateRelation leftRelation, JoinPredicateRelation rightRelation, RelationType.Type type)
+        public JoinPredicateRelation(JoinPredicateRelation? leftRelation, JoinPredicateRelation? rightRelation, RelationType.Type type)
         {
             LeftRelation = leftRelation;
             RightRelation = rightRelation;

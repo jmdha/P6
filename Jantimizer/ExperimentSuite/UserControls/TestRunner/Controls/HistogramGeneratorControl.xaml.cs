@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Histograms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,23 +17,18 @@ using System.Windows.Shapes;
 namespace ExperimentSuite.UserControls
 {
     /// <summary>
-    /// Interaction logic for SQLFileProgressControl.xaml
+    /// Interaction logic for HistogramGeneratorControl.xaml
     /// </summary>
-    public partial class SQLFileProgressControl : UserControl
+    public partial class HistogramGeneratorControl : UserControl
     {
-        public SQLFileProgressControl()
+        public HistogramGeneratorControl()
         {
             InitializeComponent();
         }
 
-        public void UpdateFileLabel(string fileName)
+        private void HistogramProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            CurrentSqlFileLabels.Content = $"File: {fileName}";
-        }
-
-        private void SQLProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum})";
+            HistogramProgressLabel.Content = $"Histogram Progress ({HistogramProgressBar.Value}/{HistogramProgressBar.Maximum})";
         }
     }
 }
