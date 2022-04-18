@@ -7,10 +7,13 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
+using System.Runtime.CompilerServices;
 
-namespace QueryOptimiser.Cost.Nodes.EquiDepth
+[assembly: InternalsVisibleTo("QueryOptimiserTest")]
+
+namespace QueryOptimiser.Cost.Nodes
 {
-    internal class JoinCostEquiDepth : BaseJoinCost
+    internal class JoinEstimateEquiDepth : BaseJoinCost
     {
         public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {

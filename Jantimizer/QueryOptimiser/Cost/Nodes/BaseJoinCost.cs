@@ -8,6 +8,9 @@ using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
 using QueryOptimiser.Models;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("QueryOptimiserTest")]
 
 namespace QueryOptimiser.Cost.Nodes
 {

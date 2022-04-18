@@ -22,7 +22,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         {
             // ARRANGE
             // ACT
-            IHistogramBucketVariance bucket = new HistogramBucketVariance(start, stop, count, variance, mean, sd);
+            IHistogramBucketVariance bucket = new HistogramBucketVariance(start, stop, count, variance, mean, sd, stop - start);
 
             // ASSERT
             Assert.AreEqual(start, bucket.ValueStart);
@@ -31,6 +31,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
             Assert.AreEqual(variance, bucket.Variance);
             Assert.AreEqual(mean, bucket.Mean);
             Assert.AreEqual(sd, bucket.StandardDeviation);
+            Assert.AreEqual(stop - start, bucket.Range);
         }
 
         #endregion
@@ -46,7 +47,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         {
             // ARRANGE
             // ACT
-            new HistogramBucketVariance(start, stop, 10, 0, 0, 0);
+            new HistogramBucketVariance(start, stop, 10, 0, 0, 0, stop - start);
         }
 
         [TestMethod]
@@ -58,7 +59,7 @@ namespace HistogramsTests.Unit_Tests.Models.Buckets
         {
             // ARRANGE
             // ACT
-            new HistogramBucketVariance(1, 2, count, 0, 0, 0);
+            new HistogramBucketVariance(1, 2, count, 0, 0, 0, 0);
         }
 
         #endregion
