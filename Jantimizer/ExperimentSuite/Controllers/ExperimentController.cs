@@ -60,20 +60,37 @@ namespace ExperimentSuite.Controllers
                         UpdateExperimentProgressBar?.Invoke(value++);
                         AddNewElement?.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
+                        // Find fitting suite data
                         WriteToStatus?.Invoke("Setting up suite datas...");
                         var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
+                        // Setup labels
                         WriteToStatus?.Invoke($"Running experiment {experiment.ExperimentName}");
                         var awaitingLable = GetSeperatorLabel("Waiting...", 14);
                         AddNewElement?.Invoke(awaitingLable, 1);
+
+                        // Pre run data
                         AddNewElement?.Invoke(GetSeperatorLabel("Setup", 14), 1);
-                        await TaskRunnerHelper.RunDelegates(
-                            GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.PreRunData, connectorSet, testsPath, rootResultPath),
-                            experiment.RunParallel);
+                        var delDict = GetTestRunnerDelegatesFromTestFiles(
+                            experiment.ExperimentName, 
+                            experiment.PreRunData, 
+                            connectorSet, 
+                            testsPath, 
+                            rootResultPath);
+                        await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
+                        delDict.Clear();
+
+                        // Run data
                         AddNewElement?.Invoke(GetSeperatorLabel("Tests", 14), 1);
-                        await TaskRunnerHelper.RunDelegates(
-                            GetTestRunnerDelegatesFromTestFiles(experiment.ExperimentName, experiment.RunData, connectorSet, testsPath, rootResultPath),
-                            experiment.RunParallel);
+                        delDict = GetTestRunnerDelegatesFromTestFiles(
+                            experiment.ExperimentName,
+                            experiment.RunData,
+                            connectorSet,
+                            testsPath,
+                            rootResultPath);
+                        await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
+                        delDict.Clear();
+
                         RemoveElement?.Invoke(awaitingLable);
                     }
                     WriteToStatus?.Invoke($"Experiment {experiment.ExperimentName} finished!");
@@ -157,7 +174,7 @@ namespace ExperimentSuite.Controllers
                 IOHelper.GetFileVariantOrNull(newDir, "inserts", suiteData.Name.ToLower(), "sql"),
                 IOHelper.GetFileVariantOrNull(newDir, "analyse", suiteData.Name.ToLower(), "sql"),
                 IOHelper.GetFileVariantOrNull(newDir, "cleanup", suiteData.Name.ToLower(), "sql"),
-                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suiteData.Name.ToLower(), "sql"))
+                IOHelper.GetInvariantsInDir(caseDir).Select(invariant => IOHelper.GetFileVariant(caseDir, invariant, suiteData.Name.ToLower(), "sql")).ToList()
             );
             runner.RunnerStartedEvent += RunnerStarted;
             AddNewElement?.Invoke(runner);

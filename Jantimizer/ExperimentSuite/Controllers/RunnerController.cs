@@ -19,7 +19,7 @@ using Tools.Services;
 
 namespace ExperimentSuite.Controllers
 {
-    internal class RunnerController
+    internal class RunnerController : IDisposable
     {
         public delegate void UpdateHistogramProgressBarHandler(double value, double max = 0);
         public event UpdateHistogramProgressBarHandler? UpdateHistogramProgressBar;
@@ -47,13 +47,13 @@ namespace ExperimentSuite.Controllers
         public FileInfo? DataInsertsFile { get; private set; }
         public FileInfo? DataAnalyseFile { get; private set; }
         public FileInfo? CleanupFile { get; private set; }
-        public IEnumerable<FileInfo> CaseFiles { get; private set; }
+        public List<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
 
 
         private CSVWriter csvWriter;
 
-        public RunnerController(string experimentName, string runnerName, string resultPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? dataInsertsFile, FileInfo? dataAnalyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public RunnerController(string experimentName, string runnerName, string resultPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? dataInsertsFile, FileInfo? dataAnalyseFile, FileInfo? cleanupFile, List<FileInfo> caseFiles)
         {
             ExperimentName = experimentName;
             RunnerName = runnerName;
@@ -152,47 +152,51 @@ namespace ExperimentSuite.Controllers
             foreach (var queryFile in CaseFiles)
             {
                 UpdateRunnerProgressBar?.Invoke(value++);
-                ulong? accCardinality = GetCacheIfThere(queryFile);
+                using (var reader = new StreamReader(queryFile.FullName))
+                {
+                    string text = await reader.ReadToEndAsync();
+                    ulong? accCardinality = GetCacheIfThere(text);
 
-                DataSet dbResult = await GetResultWithCache(queryFile, accCardinality != null);
-                AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
+                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
 
-                if (accCardinality == null)
-                    CacheCardinalities(analysisResult, queryFile);
-                else
-                    analysisResult.ActualCardinality = (ulong)accCardinality;
+                    if (accCardinality == null)
+                        CacheCardinalities(analysisResult, text);
+                    else
+                        analysisResult.ActualCardinality = (ulong)accCardinality;
 
-                List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
 
-                TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
-                testCases.Add(testCase);
+                    TestReport testCase = new TestReport(ExperimentName, RunnerName, queryFile.Name, RunData.Name, analysisResult.EstimatedCardinality, analysisResult.ActualCardinality, jantimiserResult.EstTotalCardinality);
+                    testCases.Add(testCase);
+                }
             }
             UpdateRunnerProgressBar?.Invoke(max);
             return testCases;
         }
 
-        private async Task<DataSet> GetResultWithCache(FileInfo queryFile, bool usingCache)
+        private async Task<DataSet> GetResultWithCache(string queryFileText, bool usingCache)
         {
             DataSet dbResult;
             if (usingCache)
-                dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
+                dbResult = await RunData.Connector.ExplainQueryAsync(queryFileText);
             else
-                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFileText);
             return dbResult;
         }
 
-        private void CacheCardinalities(AnalysisResult analysisResult, FileInfo queryFile)
+        private void CacheCardinalities(AnalysisResult analysisResult, string queryFileText)
         {
             if (QueryPlanCacher.Instance != null)
-                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
+                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { queryFileText, RunnerName }, analysisResult.ActualCardinality);
         }
 
-        private ulong? GetCacheIfThere(FileInfo queryFile)
+        private ulong? GetCacheIfThere(string queryFileText)
         {
             ulong? accCardinality = null;
             if (QueryPlanCacher.Instance != null)
-                accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
+                accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { queryFileText, RunnerName });
             return accCardinality;
         }
 
@@ -230,6 +234,16 @@ namespace ExperimentSuite.Controllers
                 UpdateHistogramProgressBar?.Invoke(value++);
             }
             UpdateHistogramProgressBar?.Invoke(max);
+        }
+
+        public void Dispose()
+        {
+            SetupFile = null;
+            DataInsertsFile = null;
+            DataAnalyseFile = null;
+            CleanupFile = null;
+            CaseFiles.Clear();
+            Results.Clear();
         }
     }
 }
