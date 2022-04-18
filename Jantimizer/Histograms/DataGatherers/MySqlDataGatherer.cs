@@ -52,10 +52,9 @@ namespace Histograms.DataGatherers
                 FROM `{tableName}` WHERE
                     `{attributeName}` IS NOT NULL
                 GROUP BY `{attributeName}`
-                ORDER BY `{attributeName}` ASC
             ");
 
-            return GetValueCounts(sortedGroupsDs, "val", "c").ToList();
+            return GetValueCounts(sortedGroupsDs, "val", "c").OrderBy(x => x.Value).ToList();
         }
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
