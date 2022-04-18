@@ -1,15 +1,19 @@
 ﻿using DatabaseConnector.Exceptions;
 using MySqlConnector;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
+
+[assembly:InternalsVisibleTo("DatabaseConnectorTests")]
 
 namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
         private int _timeoutCounter = 0;
-        private int _maxTimeout = 10;
+        internal int _maxTimeout = 10;
+        internal int _timeoutMs = 500;
 
         public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
@@ -67,7 +71,7 @@ namespace DatabaseConnector.Connectors
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
                         throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
-                    await Task.Delay(500);
+                    await Task.Delay(_timeoutMs);
                     return await CallQueryAsync(query);
                 }
                 else
@@ -111,7 +115,7 @@ namespace DatabaseConnector.Connectors
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
                         throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
-                    Thread.Sleep(500);
+                    Thread.Sleep(_timeoutMs);
                     return CallQuery(query);
                 }
                 else
