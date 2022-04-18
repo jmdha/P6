@@ -161,6 +161,12 @@ namespace ExperimentSuite.Controllers
             if (IsTrueAndNotNull(RunData.Settings.DoMakeReport))
             {
                 PrintTestUpdate?.Invoke("Making Report", RunData.Name);
+                SaveResult();
+            }
+
+            if (IsTrueAndNotNull(RunData.Settings.DoMakeTimeReport))
+            {
+                PrintTestUpdate?.Invoke("Making Time Report", RunData.Name);
                 var repMaker = new ReportMaker();
                 repMaker.GenerateReport(Results);
                 AddToReportPanel?.Invoke(repMaker);
@@ -172,8 +178,6 @@ namespace ExperimentSuite.Controllers
                 var caseTimeRepMaker = new ReportMaker();
                 caseTimeRepMaker.GenerateReport(CaseTimeResults);
                 AddToCaseTimeReportPanel?.Invoke(caseTimeRepMaker);
-
-                SaveResult();
             }
 
             PrintTestUpdate?.Invoke("Tests finished for:", RunData.Name);
