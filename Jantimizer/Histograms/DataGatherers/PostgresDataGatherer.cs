@@ -55,10 +55,9 @@ namespace Histograms.DataGatherers
                 FROM ""{tableName}"" WHERE
                     ""{attributeName}"" IS NOT NULL
                 GROUP BY ""{attributeName}""
-                ORDER BY ""{attributeName}"" ASC
             ");
 
-            return GetValueCounts(sortedGroupsDs, "val", "COUNT").ToList();
+            return GetValueCounts(sortedGroupsDs, "val", "COUNT").OrderBy(x => x.Value).ToList();
         }
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
@@ -84,8 +83,8 @@ namespace Histograms.DataGatherers
                 throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
             if (result.Tables[0].Columns.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            DataRow rowResult = result.Tables[0].Rows[0];
-            Type typeValue = rowResult[0].GetType();
+            DataColumn rowResult = result.Tables[0].Columns[0];
+            Type typeValue = rowResult.DataType;
             return typeValue;
         }
     }

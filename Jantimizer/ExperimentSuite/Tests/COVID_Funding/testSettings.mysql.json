@@ -1,0 +1,14 @@
+﻿{
+  "DoPreCleanup": true,
+  "DoSetup": false,
+  "DoInserts": true,
+  "DoAnalyse": true,
+  "DoPostCleanup": true,
+  "DoMakeHistograms": true,
+  "DoRunTests": true,
+  "DoMakeReport": true,
+  "Properties": {
+    "Database": "covidfunding",
+    "Schema": "covidfunding"
+  }
+}

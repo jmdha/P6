@@ -167,6 +167,46 @@
       "OptionalTestSettings": {
         "BucketSize": 512
       }
+    },
+    {
+      "ExperimentName": "Covid Funding",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth",
+          "TestFiles": [
+            "COVID_Funding"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 512
+      }
     }
   ]
 }
