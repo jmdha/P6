@@ -15,8 +15,14 @@ namespace DatabaseConnector.Connectors
         {
         }
 
-        public override string BuildConnectionString()
+        public override string GetConnectionString()
         {
+            int checkHash = ConnectionProperties.GetHashCode();
+            if (checkHash == CurrentConnectionStringHash)
+                return CurrentConnectionString;
+
+            CurrentConnectionStringHash = checkHash;
+
             if (ConnectionProperties.Secrets == null)
                 throw new ArgumentNullException("Error, base connection properties was not set!");
 
@@ -30,7 +36,9 @@ namespace DatabaseConnector.Connectors
             if (ConnectionProperties.Database != null)
                 sb.Append($"Database={ConnectionProperties.Database};");
 
-            return sb.ToString();
+            CurrentConnectionString = sb.ToString();
+
+            return CurrentConnectionString;
         }
 
         #region Overrides

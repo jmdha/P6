@@ -17,6 +17,8 @@ namespace DatabaseConnector.Connectors
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
+        internal string CurrentConnectionString = "";
+        internal int CurrentConnectionStringHash = -1;
 
         public BaseDbConnector(ConnectionProperties connectionProperties, string name)
         {
@@ -30,7 +32,7 @@ namespace DatabaseConnector.Connectors
             {
                 try
                 {
-                    conn.ConnectionString = BuildConnectionString();
+                    conn.ConnectionString = GetConnectionString();
                     conn.Open();
                     return true;
                 }
@@ -42,7 +44,7 @@ namespace DatabaseConnector.Connectors
         }
 
 
-        public abstract string BuildConnectionString();
+        public abstract string GetConnectionString();
 
         #region CallQuery
 
@@ -51,13 +53,14 @@ namespace DatabaseConnector.Connectors
             using (var reader = new StreamReader(sqlFile.FullName))
                 return await CallQueryAsync(await reader.ReadToEndAsync());
         }
-        public async Task<DataSet> CallQueryAsync(string query)
+        public virtual async Task<DataSet> CallQueryAsync(string query)
         {
             try
             {
+                DataSet dt = new DataSet();
                 using (var conn = new Connector())
                 {
-                    conn.ConnectionString = BuildConnectionString();
+                    conn.ConnectionString = GetConnectionString();
                     await conn.OpenAsync();
                     using (var cmd = new Command())
                     {
@@ -67,13 +70,18 @@ namespace DatabaseConnector.Connectors
                         using (var sqlAdapter = new Adapter())
                         {
                             sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
+                            
                             await Task.Run(() => sqlAdapter.Fill(dt));
 
-                            return dt;
+                            sqlAdapter.Dispose();
                         }
+
+                        await cmd.DisposeAsync();
                     }
+
+                    await conn.DisposeAsync();
                 }
+                return dt;
             }
             catch (Exception ex)
             {
@@ -89,10 +97,11 @@ namespace DatabaseConnector.Connectors
         public virtual DataSet CallQuery(string query)
         {
             try 
-            { 
+            {
+                DataSet dt = new DataSet();
                 using (var conn = new Connector())
                 {
-                    conn.ConnectionString = BuildConnectionString();
+                    conn.ConnectionString = GetConnectionString();
                     conn.Open();
                     using (var cmd = new Command())
                     {
@@ -102,13 +111,12 @@ namespace DatabaseConnector.Connectors
                         using (var sqlAdapter = new Adapter())
                         {
                             sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
-                            sqlAdapter.Fill(dt);
 
-                            return dt;
+                            sqlAdapter.Fill(dt);
                         }
                     }
                 }
+                return dt;
             }
             catch (Exception ex)
             {

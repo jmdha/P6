@@ -15,7 +15,7 @@ namespace DatabaseConnector
 
         public bool CheckConnection();
 
-        public string BuildConnectionString();
+        public string GetConnectionString();
 
         public Task<DataSet> CallQueryAsync(FileInfo sqlFile);
         public Task<DataSet> CallQueryAsync(string query);
