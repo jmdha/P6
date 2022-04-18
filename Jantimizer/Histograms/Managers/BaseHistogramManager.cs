@@ -106,10 +106,27 @@ namespace Histograms.Managers
                 .ToList();
         }
 
-        protected abstract Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName);
         protected abstract Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName);
 
-        protected abstract Task CacheHistogram(string tableName, string attributeName, IHistogram histogram);
+        #region Caching
+        protected abstract string[] GetCacheHashString(string tableName, string attributeName, string columnHash);
+        protected async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
+        {
+            if (HistogramCacher.Instance == null)
+                return null;
+            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
+            var cacheHisto = HistogramCacher.Instance.GetValueOrNull(GetCacheHashString(tableName, attributeName, columnHash));
+
+            return cacheHisto;
+        }
+
+        protected async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
+        {
+            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
+            if (HistogramCacher.Instance != null)
+                HistogramCacher.Instance.AddToCacheIfNotThere(GetCacheHashString(tableName, attributeName, columnHash), histogram);
+        }
+        #endregion
 
         protected virtual async Task AddHistogramForAttribute(string attributeName, string tableName)
         {
