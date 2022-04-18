@@ -61,7 +61,8 @@ namespace DatabaseConnector.Connectors
             }
             catch (MySqlException ex)
             {
-                if (ex.Message.ToString() == "SSL Authentication Error")
+                // "SSL Authentication Error" error number
+                if (ex.Number == 1042)
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
@@ -104,7 +105,8 @@ namespace DatabaseConnector.Connectors
             }
             catch (MySqlException ex)
             {
-                if (ex.Message.ToString() == "SSL Authentication Error")
+                // "SSL Authentication Error" error number
+                if (ex.Number == 1042)
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
