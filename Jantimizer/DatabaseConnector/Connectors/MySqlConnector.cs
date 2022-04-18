@@ -40,29 +40,11 @@ namespace DatabaseConnector.Connectors
         {
             try
             {
-                using (var conn = new MySqlConnection())
-                {
-                    conn.ConnectionString = BuildConnectionString();
-                    await conn.OpenAsync();
-                    using (var cmd = new MySqlCommand())
-                    {
-                        cmd.Connection = conn;
-                        cmd.CommandText = query;
-
-                        using (var sqlAdapter = new MySqlDataAdapter())
-                        {
-                            sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
-                            await Task.Run(() => sqlAdapter.Fill(dt));
-
-                            return dt;
-                        }
-                    }
-                }
+                return await base.CallQueryAsync(query);
             }
-            catch (MySqlException ex)
+            catch (DatabaseConnectorErrorLogException ex)
             {
-                if (ex.Message == "SSL Authentication Error")
+                if (ex.ActualException.Message == "SSL Authentication Error")
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
@@ -71,11 +53,7 @@ namespace DatabaseConnector.Connectors
                     return await CallQueryAsync(query);
                 }
                 else
-                    throw new DatabaseConnectorErrorLogException(ex, Name, query);
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseConnectorErrorLogException(ex, Name, query);
+                    throw ex;
             }
         }
 
@@ -83,29 +61,11 @@ namespace DatabaseConnector.Connectors
         {
             try
             {
-                using (var conn = new MySqlConnection())
-                {
-                    conn.ConnectionString = BuildConnectionString();
-                    conn.Open();
-                    using (var cmd = new MySqlCommand())
-                    {
-                        cmd.Connection = conn;
-                        cmd.CommandText = query;
-
-                        using (var sqlAdapter = new MySqlDataAdapter())
-                        {
-                            sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
-                            sqlAdapter.Fill(dt);
-
-                            return dt;
-                        }
-                    }
-                }
+                return base.CallQuery(query);
             }
-            catch (MySqlException ex)
+            catch (DatabaseConnectorErrorLogException ex)
             {
-                if (ex.Message == "SSL Authentication Error")
+                if (ex.ActualException.Message == "SSL Authentication Error")
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
@@ -114,11 +74,7 @@ namespace DatabaseConnector.Connectors
                     return CallQuery(query);
                 }
                 else
-                    throw new DatabaseConnectorErrorLogException(ex, Name, query);
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseConnectorErrorLogException(ex, Name, query);
+                    throw ex;
             }
         }
 
