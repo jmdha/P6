@@ -21,6 +21,8 @@ namespace ExperimentSuite.SuiteDatas
     internal static class SuiteDataSets
     {
         internal static SecretsService<MainWindow> secrets = new SecretsService<MainWindow>();
+
+        #region MySQL
         public static SuiteData GetMySQLSD_Default(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
@@ -93,6 +95,10 @@ namespace ExperimentSuite.SuiteDatas
             return mySQLModel;
         }
 
+        #endregion
+
+        #region Postgres
+
         public static SuiteData GetPostgresSD_Default(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
@@ -163,6 +169,22 @@ namespace ExperimentSuite.SuiteDatas
                 postOptimiser,
                 postParserManager);
             return postgresModel;
+        }
+
+        #endregion
+
+        public static List<SuiteData> GetSuiteDatas(JsonObject optionalSettings)
+        {
+            var pgDataDefault = GetPostgresSD_Default(optionalSettings);
+            var pgDataEquiDepth = GetPostgresSD_EquiDepth(optionalSettings);
+            var pgDataEquiDepthVariance = GetPostgresSD_EquiDepthVariance(optionalSettings);
+
+            var myDataDefault = GetMySQLSD_Default(optionalSettings, pgDataDefault.QueryParserManager.QueryParsers[0]);
+            var myDataEquiDepth = GetMySQLSD_EquiDepth(optionalSettings, pgDataEquiDepth.QueryParserManager.QueryParsers[0]);
+            var myDataEquiDepthVariance = GetMySQLSD_EquiDepthVariance(optionalSettings, pgDataEquiDepthVariance.QueryParserManager.QueryParsers[0]);
+
+            var connectorSet = new List<SuiteData>() { pgDataDefault, myDataDefault, pgDataEquiDepth, myDataEquiDepth, pgDataEquiDepthVariance, myDataEquiDepthVariance };
+            return connectorSet;
         }
     }
 }

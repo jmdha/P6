@@ -1,4 +1,5 @@
-﻿using Histograms.Caches;
+﻿using ExperimentSuite.Helpers;
+using Histograms.Caches;
 using Microsoft.Win32;
 using QueryPlanParser.Caches;
 using System;
@@ -27,22 +28,9 @@ namespace ExperimentSuite.UserControls
         public ErrorLog()
         {
             InitializeComponent();
-            var iconHandle = ExperimentSuite.Properties.Resources.errorIcon;
-            this.Icon = ByteToImage(iconHandle);
+            var iconHandle = Properties.Resources.errorIcon;
+            this.Icon = ImageHelper.ByteToImage(iconHandle);
             PrintCacheToErrorLog();
-        }
-
-        public static ImageSource ByteToImage(byte[] imageData)
-        {
-            BitmapImage biImg = new BitmapImage();
-            MemoryStream ms = new MemoryStream(imageData);
-            biImg.BeginInit();
-            biImg.StreamSource = ms;
-            biImg.EndInit();
-
-            ImageSource imgSrc = biImg as ImageSource;
-
-            return imgSrc;
         }
 
         public void PrintCacheToErrorLog()

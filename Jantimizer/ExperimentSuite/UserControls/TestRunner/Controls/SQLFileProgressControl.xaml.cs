@@ -1,5 +1,4 @@
-﻿using ExperimentSuite.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,20 +16,18 @@ using System.Windows.Shapes;
 namespace ExperimentSuite.UserControls
 {
     /// <summary>
-    /// Interaction logic for ReportMaker.xaml
+    /// Interaction logic for SQLFileProgressControl.xaml
     /// </summary>
-    public partial class ReportMaker : UserControl
+    public partial class SQLFileProgressControl : UserControl
     {
-        public ReportMaker(List<TestReport> reportLines = null)
+        public SQLFileProgressControl()
         {
             InitializeComponent();
-            if (reportLines != null)
-                GenerateReport(reportLines);
         }
 
-        public void GenerateReport(List<TestReport> reportLines)
+        private void SQLProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            MainGrid.ItemsSource = reportLines;
+            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum})";
         }
     }
 }
