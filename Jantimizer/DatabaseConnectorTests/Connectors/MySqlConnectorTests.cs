@@ -77,7 +77,7 @@ namespace DatabaseConnectorTests.Connectors
         {
             // ARRANGE
             var properties = new ConnectionProperties(new SecretsItem("a", "b", "nonexistinghost", 3306), "aaa", "bbb");
-            DatabaseConnector.Connectors.MySqlConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
+            IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
 
             // ACT
             try
