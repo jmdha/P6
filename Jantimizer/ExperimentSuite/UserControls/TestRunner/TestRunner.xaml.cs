@@ -61,6 +61,7 @@ namespace ExperimentSuite.UserControls
             controller.ToggleVisibility += Toggle;
             controller.AddToReportPanel += AddToReportPanel;
             controller.AddToTimeReportPanel += AddToTimeReportPanel;
+            controller.AddToCaseTimeReportPanel += AddToCaseTimeReportPanel;
 
             InitializeComponent();
             Toggle(true);
@@ -108,6 +109,11 @@ namespace ExperimentSuite.UserControls
         private void AddToTimeReportPanel(UIElement element)
         {
             TimeReportPanel.Children.Add(element);
+        }
+
+        private void AddToCaseTimeReportPanel(UIElement element)
+        {
+            CaseTimeReportPanel.Children.Add(element);
         }
 
         private void CollapseButton_Click(object sender, RoutedEventArgs e)

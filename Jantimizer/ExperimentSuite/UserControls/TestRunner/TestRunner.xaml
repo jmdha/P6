@@ -38,8 +38,11 @@
         <Label Content="Report" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"/>
         <StackPanel x:Name="ReportPanel" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Background="LightGray" Margin="5"/>
 
-        <Label Content="Run Timing" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4"/>
-        <StackPanel x:Name="TimeReportPanel" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Background="LightGray" Margin="5"/>
+        <Label Content="Test Timings" Grid.Row="5" Grid.Column="0"/>
+        <StackPanel x:Name="TimeReportPanel" Grid.Row="6" Grid.Column="0" Background="LightGray" Margin="5"/>
+
+        <Label Content="Case Timings" Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="3"/>
+        <StackPanel x:Name="CaseTimeReportPanel" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" Background="LightGray" Margin="5"/>
 
         <Button x:Name="CollapseButton" Content="Collapse" Margin="5" Grid.Column="3" Click="CollapseButton_Click"/>
     </Grid>
