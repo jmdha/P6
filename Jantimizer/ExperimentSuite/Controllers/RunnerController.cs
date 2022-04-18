@@ -198,14 +198,16 @@ namespace ExperimentSuite.Controllers
             {
                 UpdateRunnerProgressBar?.Invoke(value++);
 
+                string text = File.ReadAllText(queryFile.FullName);
+
                 // Get Cache
                 var timer = TimerHelper.GetWatchAndStart();
-                ulong? accCardinality = GetCacheIfThere(queryFile);
+                ulong? accCardinality = GetCacheIfThere(text);
                 CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
 
                 // Get DB result (with or without cache)
                 timer = TimerHelper.GetWatchAndStart();
-                DataSet dbResult = await GetResultWithCache(queryFile, accCardinality != null);
+                DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
                 CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
 
                 // Parse query plan
@@ -217,7 +219,7 @@ namespace ExperimentSuite.Controllers
                 if (accCardinality == null)
                 {
                     timer = TimerHelper.GetWatchAndStart();
-                    CacheCardinalities(analysisResult, queryFile);
+                    CacheCardinalities(analysisResult, text);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
                 }
                 else
