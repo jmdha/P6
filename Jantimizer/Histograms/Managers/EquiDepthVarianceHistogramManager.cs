@@ -31,11 +31,7 @@ namespace Histograms.Managers
             return histogram;
         }
 
-        protected override async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
-        {
-            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramEquiDepthVariance).Name }, histogram);
-        }
+        protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash) =>
+            new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramEquiDepthVariance).Name };
     }
 }

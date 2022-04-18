@@ -1,0 +1,14 @@
+﻿{
+  "DoPreCleanup": false,
+  "DoSetup": true,
+  "DoInserts": false,
+  "DoAnalyse": false,
+  "DoPostCleanup": false,
+  "DoMakeHistograms": false,
+  "DoRunTests": false,
+  "DoMakeReport": false,
+  "Properties": {
+    "Database": null,
+    "Schema": null
+  }
+}

@@ -1,0 +1,2 @@
+﻿TRUNCATE TABLE flows;
+TRUNCATE TABLE transactions;

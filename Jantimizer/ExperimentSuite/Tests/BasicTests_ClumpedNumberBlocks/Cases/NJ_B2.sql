@@ -1,0 +1,1 @@
+﻿SELECT * FROM a JOIN b ON b.v > a.v

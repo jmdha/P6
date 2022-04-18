@@ -107,7 +107,11 @@ namespace Histograms.Caches
         {
             var returnList = new List<CacheItem>();
             foreach (var key in HistogramCacheDict.Keys)
-                returnList.Add(new CacheItem(key, HistogramCacheDict[key].ToString(), nameof(HistogramCacher)));
+            {
+                var content = HistogramCacheDict[key].ToString();
+                if (content != null)
+                    returnList.Add(new CacheItem(key, content, nameof(HistogramCacher)));
+            }
             return returnList;
         }
     }

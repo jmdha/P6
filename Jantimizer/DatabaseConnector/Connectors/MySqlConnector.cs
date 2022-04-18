@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using DatabaseConnector.Exceptions;
+using MySqlConnector;
 using System.Data;
 using System.Text;
 using Tools.Models;
@@ -7,6 +8,9 @@ namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
+        private int _maxAttempts = 10;
+        private int _timeoutMs = 500;
+
         public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
         }
@@ -28,6 +32,49 @@ namespace DatabaseConnector.Connectors
 
             return sb.ToString();
         }
+
+        #region Overrides
+        public override async Task<DataSet> CallQueryAsync(string query)
+        {
+            for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
+            {
+                try
+                {
+                    return await base.CallQueryAsync(query);
+                }
+                catch (DatabaseConnectorErrorLogException ex)
+                {
+                    if (ex.ActualException.Message != "SSL Authentication Error")
+                        throw ex;
+
+                    await Task.Delay(_timeoutMs);
+                }
+            }
+
+            throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
+        }
+
+        public override DataSet CallQuery(string query)
+        {
+            for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
+            {
+                try
+                {
+                    return base.CallQuery(query);
+                }
+                catch (DatabaseConnectorErrorLogException ex)
+                {
+                    if (ex.ActualException.Message != "SSL Authentication Error")
+                        throw ex;
+
+                    Thread.Sleep(_timeoutMs);
+                }
+            }
+
+            throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
+        }
+
+        #endregion
 
         #region AnalyseQuery
 
