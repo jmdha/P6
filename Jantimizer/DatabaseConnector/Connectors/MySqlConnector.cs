@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using DatabaseConnector.Exceptions;
+using MySqlConnector;
 using System.Data;
 using System.Text;
 using Tools.Models;
@@ -7,6 +8,9 @@ namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
+        private int _timeoutCounter = 0;
+        private int _maxTimeout = 10;
+
         public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
         }
@@ -28,6 +32,96 @@ namespace DatabaseConnector.Connectors
 
             return sb.ToString();
         }
+
+        #region Overrides
+
+        public override async Task<DataSet> CallQueryAsync(string query)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection())
+                {
+                    conn.ConnectionString = BuildConnectionString();
+                    await conn.OpenAsync();
+                    using (var cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        cmd.CommandText = query;
+
+                        using (var sqlAdapter = new MySqlDataAdapter())
+                        {
+                            sqlAdapter.SelectCommand = cmd;
+                            DataSet dt = new DataSet();
+                            await Task.Run(() => sqlAdapter.Fill(dt));
+
+                            return dt;
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Message.ToString() == "SSL Authentication Error")
+                {
+                    _timeoutCounter++;
+                    if (_timeoutCounter > _maxTimeout)
+                        throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
+                    await Task.Delay(500);
+                    return await CallQueryAsync(query);
+                }
+                else
+                    throw new DatabaseConnectorErrorLogException(ex, Name, query);
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseConnectorErrorLogException(ex, Name, query);
+            }
+        }
+
+        public override DataSet CallQuery(string query)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection())
+                {
+                    conn.ConnectionString = BuildConnectionString();
+                    conn.Open();
+                    using (var cmd = new MySqlCommand())
+                    {
+                        cmd.Connection = conn;
+                        cmd.CommandText = query;
+
+                        using (var sqlAdapter = new MySqlDataAdapter())
+                        {
+                            sqlAdapter.SelectCommand = cmd;
+                            DataSet dt = new DataSet();
+                            sqlAdapter.Fill(dt);
+
+                            return dt;
+                        }
+                    }
+                }
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Message.ToString() == "SSL Authentication Error")
+                {
+                    _timeoutCounter++;
+                    if (_timeoutCounter > _maxTimeout)
+                        throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
+                    Thread.Sleep(500);
+                    return CallQuery(query);
+                }
+                else
+                    throw new DatabaseConnectorErrorLogException(ex, Name, query);
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseConnectorErrorLogException(ex, Name, query);
+            }
+        }
+
+        #endregion
 
         #region AnalyseQuery
 
