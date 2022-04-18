@@ -41,7 +41,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
@@ -85,7 +85,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
@@ -125,7 +125,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
