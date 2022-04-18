@@ -47,7 +47,7 @@
     {
       "ExperimentName": "Experiment Two",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -171,7 +171,7 @@
     {
       "ExperimentName": "Covid Funding",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

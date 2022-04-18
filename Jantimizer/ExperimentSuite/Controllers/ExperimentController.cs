@@ -112,7 +112,9 @@ namespace ExperimentSuite.Controllers
         private void SaveToCSV(string path)
         {
             WriteToStatus?.Invoke("Merging results...");
-            CSVMerger.Merge<TestReport, TestReportMap>(path, ResultCSVFileName);
+            CSVMerger.Merge<TestReport, TestReportMap>($"{path}/Results", ResultCSVFileName);
+            CSVMerger.Merge<TestTimeReport, TestTimeReportMap>($"{path}/Times", ResultCSVFileName);
+            CSVMerger.Merge<TestCaseTimeReport, TestCaseTimeReportMap>($"{path}/CaseTimes", ResultCSVFileName);
             WriteToStatus?.Invoke("Merging finished");
         }
 

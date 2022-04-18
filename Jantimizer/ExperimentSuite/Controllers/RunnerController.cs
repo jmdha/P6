@@ -60,6 +60,8 @@ namespace ExperimentSuite.Controllers
         public List<TestCaseTimeReport> CaseTimeResults { get; private set; }
 
         private CSVWriter csvWriter;
+        private CSVWriter csvTimeWriter;
+        private CSVWriter csvCaseTimeWriter;
 
         public RunnerController(string experimentName, string runnerName, string resultPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? dataInsertsFile, FileInfo? dataAnalyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
         {
@@ -75,7 +77,9 @@ namespace ExperimentSuite.Controllers
             Results = new List<TestReport>();
             TimeResults = new List<TestTimeReport>();
             CaseTimeResults = new List<TestCaseTimeReport>();
-            csvWriter = new CSVWriter($"{resultPath}/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
+            csvWriter = new CSVWriter($"{resultPath}/Results/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
+            csvTimeWriter = new CSVWriter($"{resultPath}/Times/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
+            csvCaseTimeWriter = new CSVWriter($"{resultPath}/CaseTimes/{experimentName}", $"{RunData.Name}-{RunnerName}.csv");
         }
 
         public async Task<List<TestReport>> Run()
@@ -86,7 +90,7 @@ namespace ExperimentSuite.Controllers
             PrintTestUpdate?.Invoke("Parsing settings file:", SettingsFile.Name);
             var timer = TimerHelper.GetWatchAndStart();
             ParseTestSettings(SettingsFile);
-            TimeResults.Add(timer.StopAndGetReportFromWatch("Parse Test File"));
+            TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Parse Test File"));
 
             if (IsTrueAndNotNull(RunData.Settings.DoPreCleanup))
             {
@@ -95,7 +99,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Running Pre-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await RunData.Connector.CallQueryAsync(CleanupFile);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Pre Cleanup"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Pre Cleanup"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoSetup))
@@ -105,7 +109,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Running Setup", SetupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await RunData.Connector.CallQueryAsync(SetupFile);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Setup"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Setup"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoInserts))
@@ -115,7 +119,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Inserting Data", DataInsertsFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await RunData.Connector.CallQueryAsync(DataInsertsFile);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Inserts"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Inserts"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoAnalyse))
@@ -125,7 +129,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Analysing Tables", DataAnalyseFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await RunData.Connector.CallQueryAsync(DataAnalyseFile);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Analyse"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Analyse"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoMakeHistograms))
@@ -133,7 +137,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await GenerateHistograms(RunData.HistoManager);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Generate Histograms"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoRunTests))
@@ -141,7 +145,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Begining Test Run for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 Results = await RunQueriesSerial();
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Test run"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Test run"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoPostCleanup))
@@ -151,7 +155,7 @@ namespace ExperimentSuite.Controllers
                 PrintTestUpdate?.Invoke("Running Post-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
                 await RunData.Connector.CallQueryAsync(CleanupFile);
-                TimeResults.Add(timer.StopAndGetReportFromWatch("Post Cleanup"));
+                TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Post Cleanup"));
             }
 
             if (IsTrueAndNotNull(RunData.Settings.DoMakeReport))
@@ -164,11 +168,11 @@ namespace ExperimentSuite.Controllers
                 var timeRepMaker = new ReportMaker();
                 timeRepMaker.GenerateReport(TimeResults);
                 AddToTimeReportPanel?.Invoke(timeRepMaker);
-                SaveResult();
 
                 var caseTimeRepMaker = new ReportMaker();
                 caseTimeRepMaker.GenerateReport(CaseTimeResults);
                 AddToCaseTimeReportPanel?.Invoke(caseTimeRepMaker);
+
                 SaveResult();
             }
 
@@ -192,24 +196,24 @@ namespace ExperimentSuite.Controllers
                 // Get Cache
                 var timer = TimerHelper.GetWatchAndStart();
                 ulong? accCardinality = GetCacheIfThere(queryFile);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Fetch cardinality cache"));
+                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
 
                 // Get DB result (with or without cache)
                 timer = TimerHelper.GetWatchAndStart();
                 DataSet dbResult = await GetResultWithCache(queryFile, accCardinality != null);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Get DB estimation"));
+                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
 
                 // Parse query plan
                 timer = TimerHelper.GetWatchAndStart();
                 AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Parse DB estimation"));
+                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
 
                 // Cache actual cardinalities (if not set)
                 if (accCardinality == null)
                 {
                     timer = TimerHelper.GetWatchAndStart();
                     CacheCardinalities(analysisResult, queryFile);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Cache cardinality"));
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
                 }
                 else
                     analysisResult.ActualCardinality = (ulong)accCardinality;
@@ -217,12 +221,12 @@ namespace ExperimentSuite.Controllers
                 // Parse SQL file
                 timer = TimerHelper.GetWatchAndStart();
                 List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Parse SQL file"));
+                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
                 
                 // Get Optimisers prediction
                 timer = TimerHelper.GetWatchAndStart();
                 OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(queryFile.Name, "Optimiser"));
+                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                 // Make test report
                 testCases.Add(
@@ -267,6 +271,8 @@ namespace ExperimentSuite.Controllers
         private void SaveResult()
         {
             csvWriter.Write<TestReport, TestReportMap>(Results, true);
+            csvTimeWriter.Write<TestTimeReport, TestTimeReportMap>(TimeResults, true);
+            csvCaseTimeWriter.Write<TestCaseTimeReport, TestCaseTimeReportMap>(CaseTimeResults, true);
         }
 
         private void ParseTestSettings(FileInfo file)

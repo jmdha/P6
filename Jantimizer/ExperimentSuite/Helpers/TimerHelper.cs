@@ -17,16 +17,16 @@ namespace ExperimentSuite.Helpers
             return watch;
         }
 
-        public static TestTimeReport StopAndGetReportFromWatch(this Stopwatch watch, string name)
+        public static TestTimeReport StopAndGetReportFromWatch(this Stopwatch watch, string expName, string dbName, string testName, string name)
         {
             watch.Stop();
-            return new TestTimeReport(name, watch.Elapsed);
+            return new TestTimeReport(dbName, testName, expName, name, watch.ElapsedMilliseconds);
         }
 
-        public static TestCaseTimeReport StopAndGetCaseReportFromWatch(this Stopwatch watch, string caseName, string name)
+        public static TestCaseTimeReport StopAndGetCaseReportFromWatch(this Stopwatch watch, string expName, string dbName, string testName, string caseName, string name)
         {
             watch.Stop();
-            return new TestCaseTimeReport(caseName, name, watch.Elapsed);
+            return new TestCaseTimeReport(dbName, testName, expName, caseName, name, watch.ElapsedMilliseconds);
         }
     }
 }
