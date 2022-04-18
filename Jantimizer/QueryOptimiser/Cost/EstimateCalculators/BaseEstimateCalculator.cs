@@ -61,11 +61,17 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
                 List<IntermediateBucket> overlap = new List<IntermediateBucket>();
                 if (relation.Type == RelationType.Type.And)
+                {
                     overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
+                    references = GetOverlappingReferences(leftReferences, rightReferences);
+                }
                 else if (relation.Type == RelationType.Type.Or)
+                {
                     overlap = leftBuckets.Concat(rightBuckets).ToList();
+                    references = leftReferences.Concat(rightReferences).ToList();
+                }
 
-                references = GetOverlappingReferences(leftReferences, rightReferences);
+                
                 return overlap;
             }
             else
