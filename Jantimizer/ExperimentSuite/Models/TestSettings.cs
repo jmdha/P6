@@ -24,6 +24,20 @@ namespace ExperimentSuite.Models
         {
         }
 
+        public TestSettings(ConnectionProperties? properties)
+        {
+            DoPreCleanup = true;
+            DoSetup = true;
+            DoInserts = true;
+            DoAnalyse = true;
+            DoPostCleanup = true;
+            DoMakeHistograms = true;
+            DoRunTests = true;
+            DoMakeReport = true;
+            DoMakeTimeReport = true;
+            Properties = properties;
+        }
+
         public TestSettings(bool? doPreCleanup, bool? doSetup, bool? doInserts, bool? doAnalyse, bool? doPostCleanup, bool? doMakeHistograms, bool? doRunTests, bool? doMakeReport, bool? doMakeTimeReport, ConnectionProperties? properties)
         {
             DoPreCleanup = doPreCleanup;

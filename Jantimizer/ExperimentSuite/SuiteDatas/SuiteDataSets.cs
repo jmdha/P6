@@ -36,7 +36,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 mySQLParserManager.QueryParsers.Add(additionalParser);
             var mySQLModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, mySQLConnectionProperties),
+                new TestSettings(mySQLConnectionProperties),
                 "Default",
                 "MYSQL",
                 mySQLConnector,
@@ -60,7 +60,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 mySQLParserManager.QueryParsers.Add(additionalParser);
             var mySQLModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, mySQLConnectionProperties),
+                new TestSettings(mySQLConnectionProperties),
                 "EquiDepth",
                 "MYSQL",
                 mySQLConnector,
@@ -84,7 +84,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 mySQLParserManager.QueryParsers.Add(additionalParser);
             var mySQLModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, mySQLConnectionProperties),
+                new TestSettings(mySQLConnectionProperties),
                 "EquiDepthVariance",
                 "MYSQL",
                 mySQLConnector,
@@ -112,7 +112,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, postConnectionProperties),
+                new TestSettings(postConnectionProperties),
                 "Default",
                 "POSGRESQL",
                 postConnector,
@@ -136,7 +136,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, postConnectionProperties),
+                new TestSettings(postConnectionProperties),
                 "EquiDepth",
                 "POSGRESQL",
                 postConnector,
@@ -160,7 +160,7 @@ namespace ExperimentSuite.SuiteDatas
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
-                new TestSettings(true, true, true, true, true, true, true, true, postConnectionProperties),
+                new TestSettings(postConnectionProperties),
                 "EquiDepthVariance",
                 "POSGRESQL",
                 postConnector,
