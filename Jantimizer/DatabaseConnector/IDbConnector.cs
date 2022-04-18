@@ -14,6 +14,7 @@ namespace DatabaseConnector
         public ConnectionProperties ConnectionProperties { get; set; }
 
         public bool CheckConnection();
+        public Task<bool> CheckConnectionAsync();
 
         public string GetConnectionString();
 

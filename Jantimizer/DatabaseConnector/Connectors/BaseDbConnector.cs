@@ -10,9 +10,8 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public abstract class BaseDbConnector<Connector, Command, Adapter> : IDbConnector
+    public abstract class BaseDbConnector<Connector, Adapter> : IDbConnector
         where Connector : DbConnection, new()
-        where Command : DbCommand, new()
         where Adapter : DbDataAdapter, new()
     {
         public string Name { get; set; }
@@ -43,6 +42,23 @@ namespace DatabaseConnector.Connectors
             }
         }
 
+        public async Task<bool> CheckConnectionAsync()
+        {
+            using (var conn = new Connector())
+            {
+                try
+                {
+                    conn.ConnectionString = GetConnectionString();
+                    await conn.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
 
         public abstract string GetConnectionString();
 
@@ -58,28 +74,20 @@ namespace DatabaseConnector.Connectors
             try
             {
                 DataSet dt = new DataSet();
-                using (var conn = new Connector())
+                await using (var conn = new Connector())
                 {
                     conn.ConnectionString = GetConnectionString();
                     await conn.OpenAsync();
-                    using (var cmd = new Command())
+                    await using (var cmd = conn.CreateCommand())
                     {
-                        cmd.Connection = conn;
                         cmd.CommandText = query;
-
+                        
                         using (var sqlAdapter = new Adapter())
                         {
                             sqlAdapter.SelectCommand = cmd;
-                            
                             await Task.Run(() => sqlAdapter.Fill(dt));
-
-                            sqlAdapter.Dispose();
                         }
-
-                        await cmd.DisposeAsync();
                     }
-
-                    await conn.DisposeAsync();
                 }
                 return dt;
             }
@@ -103,15 +111,13 @@ namespace DatabaseConnector.Connectors
                 {
                     conn.ConnectionString = GetConnectionString();
                     conn.Open();
-                    using (var cmd = new Command())
+                    using (var cmd = conn.CreateCommand())
                     {
-                        cmd.Connection = conn;
                         cmd.CommandText = query;
 
                         using (var sqlAdapter = new Adapter())
                         {
                             sqlAdapter.SelectCommand = cmd;
-
                             sqlAdapter.Fill(dt);
                         }
                     }

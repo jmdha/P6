@@ -6,7 +6,7 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand, NpgsqlDataAdapter>
+    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlDataAdapter>
     {
         public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
