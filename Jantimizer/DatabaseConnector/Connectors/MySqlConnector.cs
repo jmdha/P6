@@ -8,7 +8,6 @@ namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
-        private int _timeoutCounter = 0;
         private int _maxAttempts = 10;
         private int _timeoutMs = 500;
 
@@ -37,7 +36,7 @@ namespace DatabaseConnector.Connectors
         #region Overrides
         public override async Task<DataSet> CallQueryAsync(string query)
         {
-            for(int attemptCounter=0; attemptCounter < _maxAttempts; attemptCounter++)
+            for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
             {
                 try
                 {
@@ -49,6 +48,26 @@ namespace DatabaseConnector.Connectors
                         throw ex;
 
                     await Task.Delay(_timeoutMs);
+                }
+            }
+
+            throw new DatabaseConnectorErrorLogException(new Exception("MySQL timed out too many times with the SSL error!"), Name, query);
+        }
+
+        public override DataSet CallQuery(string query)
+        {
+            for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
+            {
+                try
+                {
+                    return base.CallQuery(query);
+                }
+                catch (DatabaseConnectorErrorLogException ex)
+                {
+                    if (ex.ActualException.Message != "SSL Authentication Error")
+                        throw ex;
+
+                    Thread.Sleep(_timeoutMs);
                 }
             }
 
