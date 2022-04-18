@@ -36,6 +36,9 @@ namespace ExperimentSuite.Controllers
         public delegate void AddToReportPanelHandler(UIElement element);
         public event AddToReportPanelHandler? AddToReportPanel;
 
+        public delegate void AddToTimeReportPanelHandler(UIElement element);
+        public event AddToTimeReportPanelHandler? AddToTimeReportPanel;
+
         public delegate void PrintTestUpdateHandler(string left, string right);
         public event PrintTestUpdateHandler? PrintTestUpdate;
 
@@ -132,7 +135,9 @@ namespace ExperimentSuite.Controllers
             if (IsTrueAndNotNull(RunData.Settings.DoMakeReport))
             {
                 PrintTestUpdate?.Invoke("Making Report", RunData.Name);
-                AddToReportPanel?.Invoke(new ReportMaker(Results));
+                var repMaker = new ReportMaker();
+                repMaker.GenerateReport(Results);
+                AddToReportPanel?.Invoke(repMaker);
                 SaveResult();
             }
 

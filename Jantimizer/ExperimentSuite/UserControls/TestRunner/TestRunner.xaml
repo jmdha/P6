@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ExperimentSuite.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
     <Grid x:Name="RunnerGrid" Background="Gray" Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
@@ -17,6 +17,8 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="130"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
@@ -35,6 +37,9 @@
 
         <Label Content="Report" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"/>
         <StackPanel x:Name="ReportPanel" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Background="LightGray" Margin="5"/>
+
+        <Label Content="Run Timing" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4"/>
+        <StackPanel x:Name="TimeReportPanel" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Background="LightGray" Margin="5"/>
 
         <Button x:Name="CollapseButton" Content="Collapse" Margin="5" Grid.Column="3" Click="CollapseButton_Click"/>
     </Grid>
