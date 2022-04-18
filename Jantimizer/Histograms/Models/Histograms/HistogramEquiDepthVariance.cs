@@ -37,7 +37,7 @@ namespace Histograms.Models
                     if (valueStart == null || valueEnd == null)
                         throw new ArgumentNullException("Read bucket value was invalid!");
 
-                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, bucket.StandardDeviation, (int)valueEnd - (int)valueStart));
+                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, bucket.StandardDeviation, Convert.ToDouble(valueEnd) - Convert.ToDouble(valueStart)));
                 }
             }
         }
@@ -62,16 +62,16 @@ namespace Histograms.Models
                 mean = mean / countValue;
                 for (int bIter = bStart; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
                 {
-                    variance += Math.Pow(Convert.ToDouble(sorted[bIter]) - (double)mean, 2);
+                    variance += Math.Pow(Convert.ToDouble(sorted[bIter]) - mean, 2);
                 }
                 if (countValue > 1 && variance != 0)
-                    standardDeviation = Math.Sqrt((double)variance / countValue);
+                    standardDeviation = Math.Sqrt(variance / countValue);
                 else
                     variance = 0;
                 if (variance < 0)
                     variance = 0;
 
-                Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean, standardDeviation, (int)endValue - (int)startValue));
+                Buckets.Add(new HistogramBucketVariance(startValue, endValue, countValue, variance, mean, standardDeviation, Convert.ToDouble(endValue) - Convert.ToDouble(startValue)));
             }
         }
 
@@ -80,7 +80,7 @@ namespace Histograms.Models
             var retObj = new HistogramEquiDepthVariance(TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
                 if (bucket is IHistogramBucketVariance vari)
-                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.StandardDeviation, (int)vari.ValueEnd - (int)vari.ValueStart));
+                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.StandardDeviation, Convert.ToDouble(vari.ValueEnd) - Convert.ToDouble(vari.ValueStart)));
             return retObj;
         }
     }
