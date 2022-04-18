@@ -34,30 +34,7 @@ namespace Histograms.Managers
             return histogram;
         }
 
-        internal async Task<IHistogram?> GetHistogramFromCacheOrNull(string tableName, string attributeName)
-        {
-            if (HistogramCacher.Instance == null)
-                return null;
-            string hash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-            var retVal = HistogramCacher.Instance.GetValueOrNull(new string[] { tableName, attributeName, hash, Depth.ToString() });
-            return retVal;
-        }
-
-        protected override async Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
-        {
-            var cacheHisto = await GetHistogramFromCacheOrNull(tableName, attributeName);
-
-            if (cacheHisto != null)
-                return cacheHisto;
-
-            return null;
-        }
-
-        protected override async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
-        {
-            string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.AddToCacheIfNotThere(new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramMinDepth).Name }, histogram);
-        }
+        protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash) =>
+            new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramMinDepth).Name };
     }
 }
