@@ -72,14 +72,12 @@ namespace DatabaseConnectorTests.Connectors
         }
 
         [TestMethod]
-        [ExpectedException(typeof(Exception), "MySQL timed out too many times with the SSL error!")]
+        [ExpectedException(typeof(MySqlException))]
         public async Task Cant_CallQuery_IfServerNotExist()
         {
             // ARRANGE
             var properties = new ConnectionProperties(new SecretsItem("a", "b", "nonexistinghost", 3306), "aaa", "bbb");
             DatabaseConnector.Connectors.MySqlConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
-            connector._timeoutMs = 1;
-            connector._maxTimeout = 1;
 
             // ACT
             try

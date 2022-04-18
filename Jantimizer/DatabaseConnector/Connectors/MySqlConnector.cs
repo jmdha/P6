@@ -1,19 +1,16 @@
 ﻿using DatabaseConnector.Exceptions;
 using MySqlConnector;
 using System.Data;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Tools.Models;
-
-[assembly:InternalsVisibleTo("DatabaseConnectorTests")]
 
 namespace DatabaseConnector.Connectors
 {
     public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
     {
         private int _timeoutCounter = 0;
-        internal int _maxTimeout = 10;
-        internal int _timeoutMs = 500;
+        private int _maxTimeout = 10;
+        private int _timeoutMs = 500;
 
         public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
@@ -65,8 +62,7 @@ namespace DatabaseConnector.Connectors
             }
             catch (MySqlException ex)
             {
-                // "SSL Authentication Error" error number
-                if (ex.Number == 1042)
+                if (ex.Message == "SSL Authentication Error")
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
@@ -109,8 +105,7 @@ namespace DatabaseConnector.Connectors
             }
             catch (MySqlException ex)
             {
-                // "SSL Authentication Error" error number
-                if (ex.Number == 1042)
+                if (ex.Message == "SSL Authentication Error")
                 {
                     _timeoutCounter++;
                     if (_timeoutCounter > _maxTimeout)
