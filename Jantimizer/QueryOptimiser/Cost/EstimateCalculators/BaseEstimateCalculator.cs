@@ -58,14 +58,15 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 List<Tuple<TableReferenceNode, string>> rightReferences = new List<Tuple<TableReferenceNode, string>>();
                 List<IntermediateBucket> leftBuckets = GetBucketMatches(relation.LeftRelation, table, ref leftReferences);
                 List<IntermediateBucket> rightBuckets = GetBucketMatches(relation.RightRelation, table, ref rightReferences);
+
+                List<IntermediateBucket> overlap = new List<IntermediateBucket>();
                 if (relation.Type == RelationType.Type.And)
-                {
-                    var overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
-                    references = GetOverlappingReferences(leftReferences, rightReferences);
-                    return overlap;
-                }
-                
-                return new List<IntermediateBucket>();
+                    overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
+                else if (relation.Type == RelationType.Type.Or)
+                    overlap = leftBuckets.Concat(rightBuckets).ToList();
+
+                references = GetOverlappingReferences(leftReferences, rightReferences);
+                return overlap;
             }
             else
                 throw new ArgumentException("Missing noderelation type " + relation.ToString());

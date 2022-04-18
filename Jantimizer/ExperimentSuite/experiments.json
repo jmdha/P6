@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -39,7 +39,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
@@ -81,13 +81,13 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
       "ExperimentName": "World Happiness 2022",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -121,7 +121,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10
+        "BucketSize": 256
       }
     },
     {
