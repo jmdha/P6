@@ -102,8 +102,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                         List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
                         information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i], 
                             JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[i], 
-                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[i], leftBuckets[j]))));
+                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j], 
+                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
                         buckets.Add(new IntermediateBucket(information));
                     }
                     else
