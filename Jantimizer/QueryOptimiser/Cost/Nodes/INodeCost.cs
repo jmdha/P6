@@ -13,6 +13,6 @@ namespace QueryOptimiser.Cost.Nodes
 {
     internal interface INodeCost<NodeType> where NodeType : INode
     {
-        internal long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket);
+        internal long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket);
     }
 }

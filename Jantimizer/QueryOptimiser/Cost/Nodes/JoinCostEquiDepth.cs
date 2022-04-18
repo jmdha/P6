@@ -12,9 +12,9 @@ namespace QueryOptimiser.Cost.Nodes.EquiDepth
 {
     internal class JoinCostEquiDepth : BaseJoinCost
     {
-        public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
-            return leftBucket.Count * rightBucket.Count;
+            return bucket.Count;
         }
     }
 }
