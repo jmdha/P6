@@ -197,55 +197,57 @@ namespace ExperimentSuite.Controllers
             foreach (var queryFile in CaseFiles)
             {
                 UpdateRunnerProgressBar?.Invoke(value++);
-
-                string text = File.ReadAllText(queryFile.FullName);
-
-                // Get Cache
-                var timer = TimerHelper.GetWatchAndStart();
-                ulong? accCardinality = GetCacheIfThere(text);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
-
-                // Get DB result (with or without cache)
-                timer = TimerHelper.GetWatchAndStart();
-                DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
-
-                // Parse query plan
-                timer = TimerHelper.GetWatchAndStart();
-                AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
-
-                // Cache actual cardinalities (if not set)
-                if (accCardinality == null)
+                using (var reader = new StreamReader(queryFile.FullName))
                 {
+                    string text = await reader.ReadToEndAsync();
+
+                    // Get Cache
+                    var timer = TimerHelper.GetWatchAndStart();
+                    ulong? accCardinality = GetCacheIfThere(text);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
+
+                    // Get DB result (with or without cache)
                     timer = TimerHelper.GetWatchAndStart();
-                    CacheCardinalities(analysisResult, text);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
+                    DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
+
+                    // Parse query plan
+                    timer = TimerHelper.GetWatchAndStart();
+                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
+
+                    // Cache actual cardinalities (if not set)
+                    if (accCardinality == null)
+                    {
+                        timer = TimerHelper.GetWatchAndStart();
+                        CacheCardinalities(analysisResult, text);
+                        CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
+                    }
+                    else
+                        analysisResult.ActualCardinality = (ulong)accCardinality;
+
+                    // Parse SQL file
+                    timer = TimerHelper.GetWatchAndStart();
+                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
+
+                    // Get Optimisers prediction
+                    timer = TimerHelper.GetWatchAndStart();
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+
+                    // Make test report
+                    testCases.Add(
+                        new TestReport(
+                            ExperimentName,
+                            RunnerName,
+                            queryFile.Name,
+                            RunData.Name,
+                            analysisResult.EstimatedCardinality,
+                            analysisResult.ActualCardinality,
+                            jantimiserResult.EstTotalCardinality)
+                        );
                 }
-                else
-                    analysisResult.ActualCardinality = (ulong)accCardinality;
-
-                // Parse SQL file
-                timer = TimerHelper.GetWatchAndStart();
-                List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
-                
-                // Get Optimisers prediction
-                timer = TimerHelper.GetWatchAndStart();
-                OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
-
-                // Make test report
-                testCases.Add(
-                    new TestReport(
-                        ExperimentName, 
-                        RunnerName, 
-                        queryFile.Name, 
-                        RunData.Name, 
-                        analysisResult.EstimatedCardinality, 
-                        analysisResult.ActualCardinality, 
-                        jantimiserResult.EstTotalCardinality)
-                    );
             }
             UpdateRunnerProgressBar?.Invoke(max);
             return testCases;

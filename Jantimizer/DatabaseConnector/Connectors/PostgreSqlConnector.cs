@@ -11,6 +11,7 @@ namespace DatabaseConnector.Connectors
     {
         public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
+            NpgsqlConnection.ClearAllPools();
         }
 
         public override string GetConnectionString()
