@@ -15,17 +15,13 @@ namespace HistogramsTests.Stubs
 
         public BaseHistogramManagerStub(IDataGatherer dataGatherer) : base(dataGatherer) { }
 
-        protected override Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
-        {
-            throw new NotImplementedException();
-        }
 
         protected override Task<IHistogram> CreateHistogramForAttribute(string attributeName, string tableName)
         {
             throw new NotImplementedException();
         }
 
-        protected override Task<IHistogram?> GetCachedHistogramOrNull(string tableName, string attributeName)
+        protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash)
         {
             throw new NotImplementedException();
         }
