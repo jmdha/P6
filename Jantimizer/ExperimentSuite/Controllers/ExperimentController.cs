@@ -90,6 +90,10 @@ namespace ExperimentSuite.Controllers
                             rootResultPath);
                         await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
                         delDict.Clear();
+                        connectorSet.Clear();
+
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
 
                         RemoveElement?.Invoke(awaitingLable);
                     }

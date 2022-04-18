@@ -6,7 +6,7 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlDataAdapter>
+    public class MySqlConnector : BaseDbConnector<MySqlConnection>
     {
         private int _maxAttempts = 10;
         private int _timeoutMs = 500;
@@ -37,6 +37,7 @@ namespace DatabaseConnector.Connectors
                 sb.Append($"Database={ConnectionProperties.Database};");
 
             CurrentConnectionString = sb.ToString();
+            sb.Clear();
 
             return CurrentConnectionString;
         }

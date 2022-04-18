@@ -10,9 +10,8 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public abstract class BaseDbConnector<Connector, Adapter> : IDbConnector
+    public abstract class BaseDbConnector<Connector> : IDbConnector
         where Connector : DbConnection, new()
-        where Adapter : DbDataAdapter, new()
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
@@ -74,6 +73,7 @@ namespace DatabaseConnector.Connectors
             try
             {
                 DataSet dt = new DataSet();
+                dt.EnforceConstraints = false;
                 await using (var conn = new Connector())
                 {
                     conn.ConnectionString = GetConnectionString();
@@ -81,14 +81,18 @@ namespace DatabaseConnector.Connectors
                     await using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = query;
-                        
-                        using (var sqlAdapter = new Adapter())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            sqlAdapter.SelectCommand = cmd;
-                            await Task.Run(() => sqlAdapter.Fill(dt));
+                            do
+                            {
+                                dt.Tables.Add();
+                                dt.Tables[dt.Tables.Count - 1].Load(reader);
+                            }
+                            while (!reader.IsClosed);
                         }
                     }
                 }
+
                 return dt;
             }
             catch (Exception ex)
@@ -114,11 +118,14 @@ namespace DatabaseConnector.Connectors
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = query;
-
-                        using (var sqlAdapter = new Adapter())
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            sqlAdapter.SelectCommand = cmd;
-                            sqlAdapter.Fill(dt);
+                            do
+                            {
+                                dt.Tables.Add();
+                                dt.Tables[dt.Tables.Count - 1].Load(reader);
+                            }
+                            while (!reader.IsClosed);
                         }
                     }
                 }

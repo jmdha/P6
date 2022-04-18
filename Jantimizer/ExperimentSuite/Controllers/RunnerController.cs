@@ -41,7 +41,7 @@ namespace ExperimentSuite.Controllers
 
         public string ExperimentName { get; }
         public string RunnerName { get; }
-        public SuiteData RunData { get; }
+        public SuiteData RunData { get; private set; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo? SetupFile { get; private set; }
         public FileInfo? DataInsertsFile { get; private set; }
@@ -140,6 +140,7 @@ namespace ExperimentSuite.Controllers
 
             ToggleVisibility?.Invoke(true);
             SetTestNameColor?.Invoke(Brushes.Green);
+
             return Results;
         }
 
@@ -238,12 +239,18 @@ namespace ExperimentSuite.Controllers
 
         public void Dispose()
         {
+            UpdateHistogramProgressBar = null;
+            UpdateRunnerProgressBar = null;
+            SetTestNameColor = null;
+            ToggleVisibility = null;
+            AddToReportPanel = null;
+            PrintTestUpdate = null;
+            CaseFiles.Clear();
             SetupFile = null;
             DataInsertsFile = null;
             DataAnalyseFile = null;
             CleanupFile = null;
-            CaseFiles.Clear();
-            Results.Clear();
+            RunData = null;
         }
     }
 }
