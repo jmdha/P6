@@ -7,6 +7,7 @@
   "DoMakeHistograms": true,
   "DoRunTests": true,
   "DoMakeReport": true,
+  "DoMakeTimeReport": true,
   "Properties": {
     "Database": "postgres",
     "Schema": "worldhappiness"

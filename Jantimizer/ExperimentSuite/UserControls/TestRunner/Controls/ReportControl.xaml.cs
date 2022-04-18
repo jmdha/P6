@@ -21,13 +21,12 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class ReportMaker : UserControl
     {
-        public ReportMaker(List<TestReport> reportLines)
+        public ReportMaker()
         {
             InitializeComponent();
-            GenerateReport(reportLines);
         }
 
-        public void GenerateReport(List<TestReport> reportLines)
+        public void GenerateReport<T>(List<T> reportLines)
         {
             MainGrid.ItemsSource = reportLines;
         }

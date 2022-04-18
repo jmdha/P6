@@ -17,13 +17,28 @@ namespace ExperimentSuite.Models
         public bool? DoMakeHistograms { get; set; }
         public bool? DoRunTests { get; set; }
         public bool? DoMakeReport { get; set; }
+        public bool? DoMakeTimeReport { get; set; }
         public ConnectionProperties? Properties { get; set; }
 
         public TestSettings()
         {
         }
 
-        public TestSettings(bool? doPreCleanup, bool? doSetup, bool? doInserts, bool? doAnalyse, bool? doPostCleanup, bool? doMakeHistograms, bool? doRunTests, bool? doMakeReport, ConnectionProperties? properties)
+        public TestSettings(ConnectionProperties? properties)
+        {
+            DoPreCleanup = true;
+            DoSetup = true;
+            DoInserts = true;
+            DoAnalyse = true;
+            DoPostCleanup = true;
+            DoMakeHistograms = true;
+            DoRunTests = true;
+            DoMakeReport = true;
+            DoMakeTimeReport = true;
+            Properties = properties;
+        }
+
+        public TestSettings(bool? doPreCleanup, bool? doSetup, bool? doInserts, bool? doAnalyse, bool? doPostCleanup, bool? doMakeHistograms, bool? doRunTests, bool? doMakeReport, bool? doMakeTimeReport, ConnectionProperties? properties)
         {
             DoPreCleanup = doPreCleanup;
             DoSetup = doSetup;
@@ -33,6 +48,7 @@ namespace ExperimentSuite.Models
             DoMakeHistograms = doMakeHistograms;
             DoRunTests = doRunTests;
             DoMakeReport = doMakeReport;
+            DoMakeTimeReport = doMakeTimeReport;
             Properties = properties;
         }
 
@@ -46,6 +62,7 @@ namespace ExperimentSuite.Models
             DoMakeHistograms = settings.DoMakeHistograms;
             DoRunTests = settings.DoRunTests;
             DoMakeReport = settings.DoMakeReport;
+            DoMakeTimeReport = settings.DoMakeTimeReport;
             if (Properties != null && settings.Properties != null)
                 Properties.Update(settings.Properties);
         }

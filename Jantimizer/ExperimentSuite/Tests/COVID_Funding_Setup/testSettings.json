@@ -7,6 +7,7 @@
   "DoMakeHistograms": false,
   "DoRunTests": false,
   "DoMakeReport": false,
+  "DoMakeTimeReport": false,
   "Properties": {
     "Database": null,
     "Schema": null
