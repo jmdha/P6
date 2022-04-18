@@ -1,217 +1,7 @@
 ﻿{
   "Experiments": [
     {
-      "ExperimentName": "Experiment One",
-      "RunParallel": true,
-      "RunExperiment": false,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        }
-      ],
-      "RunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks"
-          ]
-        }
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 10
-      }
-    },
-    {
-      "ExperimentName": "Experiment One_min",
-      "RunParallel": true,
-      "RunExperiment": true,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "MinDepth",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "MinDepth",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        }
-      ],
-      "RunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "MinDepth",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "MinDepth",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks"
-          ]
-        }
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 10
-      }
-    },
-    {
-      "ExperimentName": "Experiment Two",
-      "RunParallel": true,
-      "RunExperiment": true,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepthVariance",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepthVariance",
-          "TestFiles": [
-            "BasicTests_SetupTables"
-          ]
-        }
-      ],
-      "RunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepthVariance",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepthVariance",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks"
-          ]
-        }
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 10
-      }
-    },
-    {
-      "ExperimentName": "World Happiness 2022",
-      "RunParallel": true,
-      "RunExperiment": false,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "WorldHappiness_With_GDP_Setup"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "WorldHappiness_With_GDP_Setup"
-          ]
-        }
-      ],
-      "RunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "WorldHappiness_With_GDP"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "WorldHappiness_With_GDP"
-          ]
-        }
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 10
-      }
-    },
-    {
-      "ExperimentName": "Census 2013",
-      "RunParallel": true,
-      "RunExperiment": false,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "Census_2013_Setup"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "Census_2013_Setup"
-          ]
-        }
-      ],
-      "RunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "Census_2013"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "Census_2013"
-          ]
-        }
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 512
-      }
-    },
-    {
-      "ExperimentName": "Covid Funding",
+      "ExperimentName": "Experiment One - Base EquiDepth",
       "RunParallel": true,
       "RunExperiment": true,
       "PreRunData": [
@@ -219,6 +9,9 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
             "COVID_Funding_Setup"
           ]
         },
@@ -226,6 +19,9 @@
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
             "COVID_Funding_Setup"
           ]
         }
@@ -235,6 +31,11 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
             "COVID_Funding"
           ]
         },
@@ -242,12 +43,129 @@
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
             "COVID_Funding"
           ]
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 512
+        "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "Experiment Two - Variance",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepthVariance",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepthVariance",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepthVariance",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepthVariance",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
+      }
+    },
+    {
+      "ExperimentName": "Experiment Three - MinDepth",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 10
       }
     }
   ]
