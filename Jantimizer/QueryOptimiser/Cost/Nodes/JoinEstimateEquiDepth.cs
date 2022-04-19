@@ -13,9 +13,9 @@ using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    internal class JoinEstimateEquiDepth : BaseJoinCost
+    internal class JoinEstimateEquiDepth : INodeCost<JoinNode>
     {
-        public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
+        public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
             return bucket.Count;
         }

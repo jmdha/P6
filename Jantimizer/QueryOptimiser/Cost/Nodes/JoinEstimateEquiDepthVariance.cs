@@ -13,9 +13,9 @@ using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    internal class JoinEstimateEquiDepthVariance : BaseJoinCost
+    internal class JoinEstimateEquiDepthVariance : INodeCost<JoinNode>
     {
-        public override long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
+        public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
             HistogramBucketVariance vBucket = (HistogramBucketVariance)bucket;
             HistogramBucketVariance vComparisonBucket = (HistogramBucketVariance)comparisonBucket;
