@@ -6,12 +6,12 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand>
+    public class MyConnector : BaseDbConnector<MySqlConnection, MySqlCommand>
     {
         private int _maxAttempts = 10;
         private int _timeoutMs = 500;
 
-        public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
+        public MyConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
         }
 

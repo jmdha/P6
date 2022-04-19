@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Tools.Caches;
 using Tools.Models;
 using DatabaseConnector;
+using DatabaseConnector.Connectors;
 
 namespace Histograms.DataGatherers
 {
@@ -24,7 +25,7 @@ namespace Histograms.DataGatherers
         public override async Task<IEnumerable<string>> GetTableNamesInSchema()
         {
             var returnRows = new DataSet();
-            using (var connector = new DatabaseConnector.Connectors.MySqlConnector(ConnectionProperties))
+            using (var connector = new MyConnector(ConnectionProperties))
                 returnRows = await connector.CallQueryAsync($"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = database();");
             if (returnRows.Tables.Count == 0)
                 throw new NoNullAllowedException("Unexpected no result from database");
@@ -37,7 +38,7 @@ namespace Histograms.DataGatherers
         public override async Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName)
         {
             var returnRows = new DataSet();
-            using (var connector = new DatabaseConnector.Connectors.MySqlConnector(ConnectionProperties))
+            using (var connector = new MyConnector(ConnectionProperties))
                 returnRows = await connector.CallQueryAsync($"SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = database() AND TABLE_NAME = '{tableName}';");
             if (returnRows.Tables.Count == 0)
                 throw new NoNullAllowedException("Unexpected no result from database");
@@ -50,7 +51,7 @@ namespace Histograms.DataGatherers
         public override async Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName)
         {
             var sortedGroupsDs = new DataSet();
-            using (var connector = new DatabaseConnector.Connectors.MySqlConnector(ConnectionProperties))
+            using (var connector = new MyConnector(ConnectionProperties))
                 sortedGroupsDs = await connector.CallQueryAsync(@$"
                     SELECT
                         `{attributeName}` AS val,
@@ -66,7 +67,7 @@ namespace Histograms.DataGatherers
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
             var columnHash = new DataSet();
-            using (var connector = new DatabaseConnector.Connectors.MySqlConnector(ConnectionProperties))
+            using (var connector = new MyConnector(ConnectionProperties))
                 columnHash = await connector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5(`{attributeName}`))) as hash FROM `{tableName}`;");
             if (columnHash.Tables.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
@@ -82,7 +83,7 @@ namespace Histograms.DataGatherers
         public override async Task<Type> GetAttributeType(string tableName, string attributeName)
         {
             var result = new DataSet();
-            using (var connector = new DatabaseConnector.Connectors.MySqlConnector(ConnectionProperties))
+            using (var connector = new MyConnector(ConnectionProperties))
                 result = await connector.CallQueryAsync($"SELECT `{attributeName}` FROM `{tableName}` LIMIT 1;");
             if (result.Tables.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
