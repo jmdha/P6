@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryOptimiser.Helpers
 {
-    public class BucketHelper
+    internal static class BucketHelper
     {
         internal static IntermediateBucket Merge(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {

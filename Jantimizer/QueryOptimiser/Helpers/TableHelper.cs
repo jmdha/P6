@@ -7,23 +7,19 @@ using System.Threading.Tasks;
 
 namespace QueryOptimiser.Helpers
 {
-    public class TableHelper
+    internal static class TableHelper
     {
-        public static IntermediateTable Join(IntermediateTable it1, IntermediateTable it2)
+        internal static IntermediateTable Join(IntermediateTable it1, IntermediateTable it2)
         {
             IntermediateTable it = new IntermediateTable();
             TableAttribute? tableAttribute = null;
             foreach (var refe in it1.References)
-            {
-                it.References.Add(new TableAttribute(refe.Table, refe.Attribute));
-            }
+                it.References.Add(refe);
+            
             foreach (var refe in it2.References)
             {
                 if (it.References.Contains(refe))
-                {
-                    if (it.References.Contains(refe))
-                        tableAttribute = refe;
-                }
+                    tableAttribute = refe;
                 else
                     it.References.Add(refe);
             }
@@ -33,7 +29,7 @@ namespace QueryOptimiser.Helpers
                 return JoinWithoutOverlap(it, it1, it2);
         }
 
-        private static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2, TableAttribute tableAttribute)
+        internal static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2, TableAttribute tableAttribute)
         {
             foreach (var bucket1 in it1.Buckets)
             {
@@ -50,7 +46,7 @@ namespace QueryOptimiser.Helpers
             return it;
         }
 
-        private static IntermediateTable JoinWithoutOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2)
+        internal static IntermediateTable JoinWithoutOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2)
         {
             foreach (var bucket1 in it1.Buckets)
                 foreach (var bucket2 in it2.Buckets)
