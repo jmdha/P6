@@ -6,7 +6,7 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class MySqlConnector : BaseDbConnector<MySqlConnection>
+    public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand>
     {
         private int _maxAttempts = 10;
         private int _timeoutMs = 500;
@@ -43,6 +43,10 @@ namespace DatabaseConnector.Connectors
         }
 
         #region Overrides
+
+        internal override MySqlConnection GetConnector(string connectionString) => new MySqlConnection(connectionString);
+        internal override MySqlCommand GetCommand(string query, MySqlConnection conn) => new MySqlCommand(query, conn);
+
         public override async Task<DataSet> CallQueryAsync(string query)
         {
             for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
@@ -150,6 +154,11 @@ namespace DatabaseConnector.Connectors
             if (query.ToUpper().StartsWith("ANALYZE "))
                 query = query.ToUpper().Replace("ANALYZE ", "");
             return query;
+        }
+
+        public override void Dispose()
+        {
+            
         }
     }
 }

@@ -98,7 +98,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Cleanup file was null!");
                 PrintTestUpdate?.Invoke("Running Pre-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(CleanupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(CleanupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Pre Cleanup"));
             }
 
@@ -108,7 +109,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Setup file was null!");
                 PrintTestUpdate?.Invoke("Running Setup", SetupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(SetupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(SetupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Setup"));
             }
 
@@ -118,7 +120,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Inserts file was null!");
                 PrintTestUpdate?.Invoke("Inserting Data", DataInsertsFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(DataInsertsFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(DataInsertsFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Inserts"));
             }
 
@@ -128,7 +131,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Analyse file was null!");
                 PrintTestUpdate?.Invoke("Analysing Tables", DataAnalyseFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(DataAnalyseFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(DataAnalyseFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Analyse"));
             }
 
@@ -154,7 +158,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Cleanup file was null!");
                 PrintTestUpdate?.Invoke("Running Post-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(CleanupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(CleanupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Post Cleanup"));
             }
 
@@ -256,10 +261,13 @@ namespace ExperimentSuite.Controllers
         private async Task<DataSet> GetResultWithCache(string queryFileText, bool usingCache)
         {
             DataSet dbResult;
-            if (usingCache)
-                dbResult = await RunData.Connector.ExplainQueryAsync(queryFileText);
-            else
-                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFileText);
+            using (var connector = RunData.Connector)
+            {
+                if (usingCache)
+                    dbResult = await connector.ExplainQueryAsync(queryFileText);
+                else
+                    dbResult = await connector.AnalyseExplainQueryAsync(queryFileText);
+            }
             return dbResult;
         }
 

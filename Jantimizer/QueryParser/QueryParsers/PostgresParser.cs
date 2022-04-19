@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Tools.Models;
 
 [assembly: InternalsVisibleTo("QueryParserTest")]
 
@@ -16,20 +17,21 @@ namespace QueryParser.QueryParsers
 {
     public class PostgresParser : IQueryParser
     {
-        private PostgreSqlConnector? Connector { get; set; }
+        private ConnectionProperties? ConnectorProperties { get; set; }
 
-        public PostgresParser(PostgreSqlConnector? connector = null)
+        public PostgresParser(ConnectionProperties? connectorProperties = null)
         {
-            Connector = connector;
+            ConnectorProperties = connectorProperties;
         }
 
         public bool DoesQueryMatch(string query)
         {
-            if (Connector == null)
+            if (ConnectorProperties == null)
                 throw new ArgumentNullException("Connector was not set for the query parser!");
             try
             {
-                Connector.ExplainQuery(query);
+                using (var connector = new PostgreSqlConnector(ConnectorProperties))
+                    connector.ExplainQuery(query);
                 return true;
             }
             catch
@@ -40,11 +42,12 @@ namespace QueryParser.QueryParsers
 
         public async Task<bool> DoesQueryMatchAsync(string query)
         {
-            if (Connector == null)
+            if (ConnectorProperties == null)
                 throw new ArgumentNullException("Connector was not set for the query parser!");
             try
             {
-                await Connector.ExplainQueryAsync(query);
+                using (var connector = new PostgreSqlConnector(ConnectorProperties))
+                    await connector.ExplainQueryAsync(query);
                 return true;
             }
             catch
@@ -196,9 +199,11 @@ namespace QueryParser.QueryParsers
 
         internal async Task<string> GetPGExplainationTextBlockAsync(string query)
         {
-            if (Connector == null)
+            if (ConnectorProperties == null)
                 throw new ArgumentNullException("Connector was not set for the query parser!");
-            var explanation = await Connector.ExplainQueryAsync(query);
+            var explanation = new DataSet();
+            using (var connector = new PostgreSqlConnector(ConnectorProperties))
+                explanation = await connector.ExplainQueryAsync(query);
             var rawRows = explanation.Tables[0].Rows;
 
             var stringRows = new List<string>();

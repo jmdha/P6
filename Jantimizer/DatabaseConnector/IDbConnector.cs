@@ -8,7 +8,7 @@ using Tools.Models;
 
 namespace DatabaseConnector
 {
-    public interface IDbConnector
+    public interface IDbConnector : IDisposable
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }

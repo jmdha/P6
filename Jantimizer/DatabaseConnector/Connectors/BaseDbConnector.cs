@@ -10,8 +10,9 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public abstract class BaseDbConnector<Connector> : IDbConnector
-        where Connector : DbConnection, new()
+    public abstract class BaseDbConnector<Connector, Command> : IDbConnector, IDisposable
+        where Connector : DbConnection
+        where Command : DbCommand
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
@@ -26,11 +27,10 @@ namespace DatabaseConnector.Connectors
 
         public bool CheckConnection()
         {
-            using (var conn = new Connector())
+            using (var conn = GetConnector(GetConnectionString()))
             {
                 try
                 {
-                    conn.ConnectionString = GetConnectionString();
                     conn.Open();
                     return true;
                 }
@@ -43,11 +43,10 @@ namespace DatabaseConnector.Connectors
 
         public async Task<bool> CheckConnectionAsync()
         {
-            using (var conn = new Connector())
+            using (var conn = GetConnector(GetConnectionString()))
             {
                 try
                 {
-                    conn.ConnectionString = GetConnectionString();
                     await conn.OpenAsync();
                     return true;
                 }
@@ -63,6 +62,9 @@ namespace DatabaseConnector.Connectors
 
         #region CallQuery
 
+        internal abstract Connector GetConnector(string connectionString);
+        internal abstract Command GetCommand(string query, Connector conn);
+
         public async Task<DataSet> CallQueryAsync(FileInfo sqlFile)
         {
             using (var reader = new StreamReader(sqlFile.FullName))
@@ -74,11 +76,10 @@ namespace DatabaseConnector.Connectors
             {
                 DataSet dt = new DataSet();
                 dt.EnforceConstraints = false;
-                await using (var conn = new Connector())
+                await using (var conn = GetConnector(GetConnectionString()))
                 {
-                    conn.ConnectionString = GetConnectionString();
                     await conn.OpenAsync();
-                    await using (var cmd = conn.CreateCommand())
+                    await using (var cmd = GetCommand(query, conn))
                     {
                         cmd.CommandText = query;
                         using (var reader = await cmd.ExecuteReaderAsync())
@@ -111,11 +112,10 @@ namespace DatabaseConnector.Connectors
             try 
             {
                 DataSet dt = new DataSet();
-                using (var conn = new Connector())
+                using (var conn = GetConnector(GetConnectionString()))
                 {
-                    conn.ConnectionString = GetConnectionString();
                     conn.Open();
-                    using (var cmd = conn.CreateCommand())
+                    using (var cmd = GetCommand(query, conn))
                     {
                         cmd.CommandText = query;
                         using (var reader = cmd.ExecuteReader())
@@ -163,6 +163,8 @@ namespace DatabaseConnector.Connectors
         public abstract Task<DataSet> AnalyseExplainQueryAsync(string query);
         public DataSet AnalyseExplainQuery(FileInfo sqlFile) => AnalyseExplainQuery(File.ReadAllText(sqlFile.FullName));
         public abstract DataSet AnalyseExplainQuery(string query);
+
+        public abstract void Dispose();
 
         #endregion
     }

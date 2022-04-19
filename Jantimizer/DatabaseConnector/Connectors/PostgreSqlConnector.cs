@@ -1,17 +1,17 @@
 ﻿using DatabaseConnector.Exceptions;
 using Npgsql;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
 using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection>
+    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand>
     {
         public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
-            NpgsqlConnection.ClearAllPools();
         }
 
         public override string GetConnectionString()
@@ -45,66 +45,8 @@ namespace DatabaseConnector.Connectors
 
         #region Overrides
 
-        public override async Task<DataSet> CallQueryAsync(string query)
-        {
-            try
-            {
-                DataSet dt = new DataSet();
-                dt.EnforceConstraints = false;
-                await using (NpgsqlConnection conn = new NpgsqlConnection(GetConnectionString()))
-                {
-                    await conn.OpenAsync();
-                    await using (var cmd = new NpgsqlCommand(query, conn))
-                    {
-                        using (var reader = await cmd.ExecuteReaderAsync())
-                        {
-                            do
-                            {
-                                dt.Tables.Add();
-                                dt.Tables[dt.Tables.Count - 1].Load(reader);
-                            }
-                            while (!reader.IsClosed);
-                        }
-                    }
-                }
-
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseConnectorErrorLogException(ex, Name, query);
-            }
-        }
-
-        public override DataSet CallQuery(string query)
-        {
-            try
-            {
-                DataSet dt = new DataSet();
-                using (NpgsqlConnection conn = new NpgsqlConnection(GetConnectionString()))
-                {
-                    conn.Open();
-                    using (var cmd = new NpgsqlCommand(query, conn))
-                    {
-                        cmd.CommandText = query;
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            do
-                            {
-                                dt.Tables.Add();
-                                dt.Tables[dt.Tables.Count - 1].Load(reader);
-                            }
-                            while (!reader.IsClosed);
-                        }
-                    }
-                }
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw new DatabaseConnectorErrorLogException(ex, Name, query);
-            }
-        }
+        internal override NpgsqlConnection GetConnector(string connectionString) => new NpgsqlConnection(connectionString);
+        internal override NpgsqlCommand GetCommand(string query, NpgsqlConnection conn) => new NpgsqlCommand(query, conn);
 
         #endregion
 
@@ -173,6 +115,11 @@ namespace DatabaseConnector.Connectors
             if (query.ToUpper().StartsWith("ANALYZE "))
                 query = query.ToUpper().Replace("ANALYZE ", "");
             return query;
+        }
+
+        public override void Dispose()
+        {
+            NpgsqlConnection.ClearAllPools();
         }
     }
 }
