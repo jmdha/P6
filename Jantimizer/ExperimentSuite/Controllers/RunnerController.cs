@@ -20,7 +20,7 @@ using Tools.Services;
 
 namespace ExperimentSuite.Controllers
 {
-    internal class RunnerController
+    internal class RunnerController : IDisposable
     {
         public delegate void UpdateHistogramProgressBarHandler(double value, double max = 0);
         public event UpdateHistogramProgressBarHandler? UpdateHistogramProgressBar;
@@ -48,13 +48,13 @@ namespace ExperimentSuite.Controllers
 
         public string ExperimentName { get; }
         public string RunnerName { get; }
-        public SuiteData RunData { get; }
+        public SuiteData RunData { get; private set; }
         public FileInfo SettingsFile { get; private set; }
         public FileInfo? SetupFile { get; private set; }
         public FileInfo? DataInsertsFile { get; private set; }
         public FileInfo? DataAnalyseFile { get; private set; }
         public FileInfo? CleanupFile { get; private set; }
-        public IEnumerable<FileInfo> CaseFiles { get; private set; }
+        public List<FileInfo> CaseFiles { get; private set; }
         public List<TestReport> Results { get; private set; }
         public List<TestTimeReport> TimeResults { get; private set; }
         public List<TestCaseTimeReport> CaseTimeResults { get; private set; }
@@ -63,7 +63,7 @@ namespace ExperimentSuite.Controllers
         private CSVWriter csvTimeWriter;
         private CSVWriter csvCaseTimeWriter;
 
-        public RunnerController(string experimentName, string runnerName, string resultPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? dataInsertsFile, FileInfo? dataAnalyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public RunnerController(string experimentName, string runnerName, string resultPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? dataInsertsFile, FileInfo? dataAnalyseFile, FileInfo? cleanupFile, List<FileInfo> caseFiles)
         {
             ExperimentName = experimentName;
             RunnerName = runnerName;
@@ -98,7 +98,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Cleanup file was null!");
                 PrintTestUpdate?.Invoke("Running Pre-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(CleanupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(CleanupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Pre Cleanup"));
             }
 
@@ -108,7 +109,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Setup file was null!");
                 PrintTestUpdate?.Invoke("Running Setup", SetupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(SetupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(SetupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Setup"));
             }
 
@@ -118,7 +120,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Inserts file was null!");
                 PrintTestUpdate?.Invoke("Inserting Data", DataInsertsFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(DataInsertsFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(DataInsertsFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Inserts"));
             }
 
@@ -128,7 +131,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Analyse file was null!");
                 PrintTestUpdate?.Invoke("Analysing Tables", DataAnalyseFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(DataAnalyseFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(DataAnalyseFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Analyse"));
             }
 
@@ -154,7 +158,8 @@ namespace ExperimentSuite.Controllers
                     throw new IOException("Cleanup file was null!");
                 PrintTestUpdate?.Invoke("Running Post-Cleanup", CleanupFile.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Connector.CallQueryAsync(CleanupFile);
+                using (var connector = RunData.Connector)
+                    await connector.CallQueryAsync(CleanupFile);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Post Cleanup"));
             }
 
@@ -184,6 +189,7 @@ namespace ExperimentSuite.Controllers
 
             ToggleVisibility?.Invoke(true);
             SetTestNameColor?.Invoke(Brushes.Green);
+
             return Results;
         }
 
@@ -196,79 +202,86 @@ namespace ExperimentSuite.Controllers
             foreach (var queryFile in CaseFiles)
             {
                 UpdateRunnerProgressBar?.Invoke(value++);
-
-                // Get Cache
-                var timer = TimerHelper.GetWatchAndStart();
-                ulong? accCardinality = GetCacheIfThere(queryFile);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
-
-                // Get DB result (with or without cache)
-                timer = TimerHelper.GetWatchAndStart();
-                DataSet dbResult = await GetResultWithCache(queryFile, accCardinality != null);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
-
-                // Parse query plan
-                timer = TimerHelper.GetWatchAndStart();
-                AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
-
-                // Cache actual cardinalities (if not set)
-                if (accCardinality == null)
+                using (var reader = new StreamReader(queryFile.FullName))
                 {
+                    string text = await reader.ReadToEndAsync();
+
+                    // Get Cache
+                    var timer = TimerHelper.GetWatchAndStart();
+                    ulong? accCardinality = GetCacheIfThere(text);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
+
+                    // Get DB result (with or without cache)
                     timer = TimerHelper.GetWatchAndStart();
-                    CacheCardinalities(analysisResult, queryFile);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
+                    DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
+
+                    // Parse query plan
+                    timer = TimerHelper.GetWatchAndStart();
+                    AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
+
+                    // Cache actual cardinalities (if not set)
+                    if (accCardinality == null)
+                    {
+                        timer = TimerHelper.GetWatchAndStart();
+                        CacheCardinalities(analysisResult, text);
+                        CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
+                    }
+                    else
+                        analysisResult.ActualCardinality = (ulong)accCardinality;
+
+                    // Parse SQL file
+                    timer = TimerHelper.GetWatchAndStart();
+                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
+
+                    // Get Optimisers prediction
+                    timer = TimerHelper.GetWatchAndStart();
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+
+                    // Make test report
+                    testCases.Add(
+                        new TestReport(
+                            ExperimentName,
+                            RunnerName,
+                            queryFile.Name,
+                            RunData.Name,
+                            analysisResult.EstimatedCardinality,
+                            analysisResult.ActualCardinality,
+                            jantimiserResult.EstTotalCardinality)
+                        );
                 }
-                else
-                    analysisResult.ActualCardinality = (ulong)accCardinality;
-
-                // Parse SQL file
-                timer = TimerHelper.GetWatchAndStart();
-                List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(File.ReadAllText(queryFile.FullName), false);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
-                
-                // Get Optimisers prediction
-                timer = TimerHelper.GetWatchAndStart();
-                OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
-
-                // Make test report
-                testCases.Add(
-                    new TestReport(
-                        ExperimentName, 
-                        RunnerName, 
-                        queryFile.Name, 
-                        RunData.Name, 
-                        analysisResult.EstimatedCardinality, 
-                        analysisResult.ActualCardinality, 
-                        jantimiserResult.EstTotalCardinality)
-                    );
             }
             UpdateRunnerProgressBar?.Invoke(max);
             return testCases;
         }
 
-        private async Task<DataSet> GetResultWithCache(FileInfo queryFile, bool usingCache)
+        private async Task<DataSet> GetResultWithCache(string queryFileText, bool usingCache)
         {
             DataSet dbResult;
-            if (usingCache)
-                dbResult = await RunData.Connector.ExplainQueryAsync(queryFile);
-            else
-                dbResult = await RunData.Connector.AnalyseExplainQueryAsync(queryFile);
+            using (var connector = RunData.Connector)
+            {
+                if (usingCache)
+                    dbResult = await connector.ExplainQueryAsync(queryFileText);
+                else
+                    dbResult = await connector.AnalyseExplainQueryAsync(queryFileText);
+            }
             return dbResult;
         }
 
-        private void CacheCardinalities(AnalysisResult analysisResult, FileInfo queryFile)
+        private void CacheCardinalities(AnalysisResult analysisResult, string queryFileText)
         {
             if (QueryPlanCacher.Instance != null)
-                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { File.ReadAllText(queryFile.FullName), RunnerName }, analysisResult.ActualCardinality);
+                QueryPlanCacher.Instance.AddToCacheIfNotThere(new string[] { queryFileText, RunnerName }, analysisResult.ActualCardinality);
         }
 
-        private ulong? GetCacheIfThere(FileInfo queryFile)
+        private ulong? GetCacheIfThere(string queryFileText)
         {
             ulong? accCardinality = null;
             if (QueryPlanCacher.Instance != null)
-                accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { File.ReadAllText(queryFile.FullName), RunnerName });
+                accCardinality = QueryPlanCacher.Instance.GetValueOrNull(new string[] { queryFileText, RunnerName });
             return accCardinality;
         }
 
@@ -308,6 +321,22 @@ namespace ExperimentSuite.Controllers
                 UpdateHistogramProgressBar?.Invoke(value++);
             }
             UpdateHistogramProgressBar?.Invoke(max);
+        }
+
+        public void Dispose()
+        {
+            UpdateHistogramProgressBar = null;
+            UpdateRunnerProgressBar = null;
+            SetTestNameColor = null;
+            ToggleVisibility = null;
+            AddToReportPanel = null;
+            PrintTestUpdate = null;
+            CaseFiles.Clear();
+            SetupFile = null;
+            DataInsertsFile = null;
+            DataAnalyseFile = null;
+            CleanupFile = null;
+            RunData = null;
         }
     }
 }

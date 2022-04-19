@@ -6,17 +6,23 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class MySqlConnector : BaseDbConnector<MySqlConnection, MySqlCommand, MySqlDataAdapter>
+    public class MyConnector : BaseDbConnector<MySqlConnection, MySqlCommand>
     {
         private int _maxAttempts = 10;
         private int _timeoutMs = 500;
 
-        public MySqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
+        public MyConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "MySQL")
         {
         }
 
-        public override string BuildConnectionString()
+        public override string GetConnectionString()
         {
+            int checkHash = ConnectionProperties.GetHashCode();
+            if (checkHash == CurrentConnectionStringHash)
+                return CurrentConnectionString;
+
+            CurrentConnectionStringHash = checkHash;
+
             if (ConnectionProperties.Secrets == null)
                 throw new ArgumentNullException("Error, base connection properties was not set!");
 
@@ -30,10 +36,17 @@ namespace DatabaseConnector.Connectors
             if (ConnectionProperties.Database != null)
                 sb.Append($"Database={ConnectionProperties.Database};");
 
-            return sb.ToString();
+            CurrentConnectionString = sb.ToString();
+            sb.Clear();
+
+            return CurrentConnectionString;
         }
 
         #region Overrides
+
+        internal override MySqlConnection GetConnector(string connectionString) => new MySqlConnection(connectionString);
+        internal override MySqlCommand GetCommand(string query, MySqlConnection conn) => new MySqlCommand(query, conn);
+
         public override async Task<DataSet> CallQueryAsync(string query)
         {
             for (int attemptCounter = 0; attemptCounter < _maxAttempts; attemptCounter++)
@@ -141,6 +154,11 @@ namespace DatabaseConnector.Connectors
             if (query.ToUpper().StartsWith("ANALYZE "))
                 query = query.ToUpper().Replace("ANALYZE ", "");
             return query;
+        }
+
+        public override void Dispose()
+        {
+            MySqlConnection.ClearAllPools();
         }
     }
 }

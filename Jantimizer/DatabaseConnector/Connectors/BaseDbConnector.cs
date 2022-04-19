@@ -10,13 +10,14 @@ using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public abstract class BaseDbConnector<Connector, Command, Adapter> : IDbConnector
-        where Connector : DbConnection, new()
-        where Command : DbCommand, new()
-        where Adapter : DbDataAdapter, new()
+    public abstract class BaseDbConnector<Connector, Command> : IDbConnector, IDisposable
+        where Connector : DbConnection
+        where Command : DbCommand
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
+        internal string CurrentConnectionString = "";
+        internal int CurrentConnectionStringHash = -1;
 
         public BaseDbConnector(ConnectionProperties connectionProperties, string name)
         {
@@ -26,11 +27,10 @@ namespace DatabaseConnector.Connectors
 
         public bool CheckConnection()
         {
-            using (var conn = new Connector())
+            using (var conn = GetConnector(GetConnectionString()))
             {
                 try
                 {
-                    conn.ConnectionString = BuildConnectionString();
                     conn.Open();
                     return true;
                 }
@@ -41,66 +41,95 @@ namespace DatabaseConnector.Connectors
             }
         }
 
+        public async Task<bool> CheckConnectionAsync()
+        {
+            using (var conn = GetConnector(GetConnectionString()))
+            {
+                try
+                {
+                    await conn.OpenAsync();
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
-        public abstract string BuildConnectionString();
+
+        public abstract string GetConnectionString();
 
         #region CallQuery
 
-        public async Task<DataSet> CallQueryAsync(FileInfo sqlFile) => await CallQueryAsync(File.ReadAllText(sqlFile.FullName));
+        internal abstract Connector GetConnector(string connectionString);
+        internal abstract Command GetCommand(string query, Connector conn);
+
+        public async Task<DataSet> CallQueryAsync(FileInfo sqlFile)
+        {
+            using (var reader = new StreamReader(sqlFile.FullName))
+                return await CallQueryAsync(await reader.ReadToEndAsync());
+        }
         public virtual async Task<DataSet> CallQueryAsync(string query)
         {
             try
             {
-                using (var conn = new Connector())
+                DataSet dt = new DataSet();
+                dt.EnforceConstraints = false;
+                await using (var conn = GetConnector(GetConnectionString()))
                 {
-                    conn.ConnectionString = BuildConnectionString();
                     await conn.OpenAsync();
-                    using (var cmd = new Command())
+                    await using (var cmd = GetCommand(query, conn))
                     {
-                        cmd.Connection = conn;
                         cmd.CommandText = query;
-
-                        using (var sqlAdapter = new Adapter())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
-                            await Task.Run(() => sqlAdapter.Fill(dt));
-
-                            return dt;
+                            do
+                            {
+                                dt.Tables.Add();
+                                dt.Tables[dt.Tables.Count - 1].Load(reader);
+                            }
+                            while (!reader.IsClosed);
                         }
                     }
                 }
+
+                return dt;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new DatabaseConnectorErrorLogException(ex, Name, query);
             }
         }
 
-        public DataSet CallQuery(FileInfo sqlFile) => CallQuery(File.ReadAllText(sqlFile.FullName));
+        public DataSet CallQuery(FileInfo sqlFile)
+        {
+            using (var reader = new StreamReader(sqlFile.FullName))
+                return CallQuery(reader.ReadToEnd());
+        }
         public virtual DataSet CallQuery(string query)
         {
             try 
-            { 
-                using (var conn = new Connector())
+            {
+                DataSet dt = new DataSet();
+                using (var conn = GetConnector(GetConnectionString()))
                 {
-                    conn.ConnectionString = BuildConnectionString();
                     conn.Open();
-                    using (var cmd = new Command())
+                    using (var cmd = GetCommand(query, conn))
                     {
-                        cmd.Connection = conn;
                         cmd.CommandText = query;
-
-                        using (var sqlAdapter = new Adapter())
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            sqlAdapter.SelectCommand = cmd;
-                            DataSet dt = new DataSet();
-                            sqlAdapter.Fill(dt);
-
-                            return dt;
+                            do
+                            {
+                                dt.Tables.Add();
+                                dt.Tables[dt.Tables.Count - 1].Load(reader);
+                            }
+                            while (!reader.IsClosed);
                         }
                     }
                 }
+                return dt;
             }
             catch (Exception ex)
             {
@@ -134,6 +163,8 @@ namespace DatabaseConnector.Connectors
         public abstract Task<DataSet> AnalyseExplainQueryAsync(string query);
         public DataSet AnalyseExplainQuery(FileInfo sqlFile) => AnalyseExplainQuery(File.ReadAllText(sqlFile.FullName));
         public abstract DataSet AnalyseExplainQuery(string query);
+
+        public abstract void Dispose();
 
         #endregion
     }

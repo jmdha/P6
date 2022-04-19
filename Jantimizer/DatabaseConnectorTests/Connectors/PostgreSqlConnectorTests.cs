@@ -38,7 +38,7 @@ namespace DatabaseConnectorTests.Connectors
         public void Cant_CheckConnection_IfNotPossible()
         {
             // ARRANGE
-            var properties = new ConnectionProperties(new SecretsItem("a", "b", "-1", -1), "-1", "-1");
+            var properties = new ConnectionProperties(new SecretsItem("a", "b", "-1", 1), "-1", "-1");
             IDbConnector connector = new DatabaseConnector.Connectors.PostgreSqlConnector(properties);
 
             // ACT

@@ -8,14 +8,15 @@ using Tools.Models;
 
 namespace DatabaseConnector
 {
-    public interface IDbConnector
+    public interface IDbConnector : IDisposable
     {
         public string Name { get; set; }
         public ConnectionProperties ConnectionProperties { get; set; }
 
         public bool CheckConnection();
+        public Task<bool> CheckConnectionAsync();
 
-        public string BuildConnectionString();
+        public string GetConnectionString();
 
         public Task<DataSet> CallQueryAsync(FileInfo sqlFile);
         public Task<DataSet> CallQueryAsync(string query);

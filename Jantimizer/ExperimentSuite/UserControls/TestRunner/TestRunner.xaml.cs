@@ -40,7 +40,7 @@ namespace ExperimentSuite.UserControls
         public double CollapsedSize { get; } = 30;
         public double ExpandedSize { get; } = double.NaN;
 
-        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, IEnumerable<FileInfo> caseFiles)
+        public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, List<FileInfo> caseFiles)
         {
             controller = new RunnerController(
                 experimentName,
@@ -74,6 +74,7 @@ namespace ExperimentSuite.UserControls
             if (RunnerStartedEvent != null)
                 RunnerStartedEvent.Invoke(this);
             await controller.Run();
+            controller.Dispose();
         }
 
         private void UpdateHistogramProgressBar(double value, double max = 0)

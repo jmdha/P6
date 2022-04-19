@@ -1,19 +1,27 @@
-﻿using Npgsql;
+﻿using DatabaseConnector.Exceptions;
+using Npgsql;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Text;
 using Tools.Models;
 
 namespace DatabaseConnector.Connectors
 {
-    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand, NpgsqlDataAdapter>
+    public class PostgreSqlConnector : BaseDbConnector<NpgsqlConnection, NpgsqlCommand>
     {
         public PostgreSqlConnector(ConnectionProperties connectionProperties) : base(connectionProperties, "PostgreSQL")
         {
         }
 
-        public override string BuildConnectionString()
+        public override string GetConnectionString()
         {
+            int checkHash = ConnectionProperties.GetHashCode();
+            if (checkHash == CurrentConnectionStringHash)
+                return CurrentConnectionString;
+
+            CurrentConnectionStringHash = checkHash;
+
             if (ConnectionProperties.Secrets == null)
                 throw new ArgumentNullException("Error, base connection properties was not set!");
 
@@ -29,9 +37,18 @@ namespace DatabaseConnector.Connectors
             if (ConnectionProperties.Schema != null)
                 sb.Append($"SearchPath={ConnectionProperties.Schema};");
 
-            return sb.ToString();
+            CurrentConnectionString = sb.ToString();
+            sb.Clear();
+
+            return CurrentConnectionString;
         }
 
+        #region Overrides
+
+        internal override NpgsqlConnection GetConnector(string connectionString) => new NpgsqlConnection(connectionString);
+        internal override NpgsqlCommand GetCommand(string query, NpgsqlConnection conn) => new NpgsqlCommand(query, conn);
+
+        #endregion
 
         #region AnalyseQuery
 
@@ -98,6 +115,11 @@ namespace DatabaseConnector.Connectors
             if (query.ToUpper().StartsWith("ANALYZE "))
                 query = query.ToUpper().Replace("ANALYZE ", "");
             return query;
+        }
+
+        public override void Dispose()
+        {
+            NpgsqlConnection.ClearAllPools();
         }
     }
 }

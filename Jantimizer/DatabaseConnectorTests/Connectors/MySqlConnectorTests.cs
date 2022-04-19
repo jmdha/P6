@@ -24,7 +24,7 @@ namespace DatabaseConnectorTests.Connectors
             var properties = new ConnectionProperties(new SecretsItem(username, password, server, port), database, schema);
 
             // ACT
-            IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
+            IDbConnector connector = new DatabaseConnector.Connectors.MyConnector(properties);
 
             // ASSERT
             Assert.AreEqual(properties, connector.ConnectionProperties);
@@ -39,7 +39,7 @@ namespace DatabaseConnectorTests.Connectors
         {
             // ARRANGE
             var properties = new ConnectionProperties(new SecretsItem("a", "b", "-1", -1), "-1", "-1");
-            IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
+            IDbConnector connector = new DatabaseConnector.Connectors.MyConnector(properties);
 
             // ACT
             var result = connector.CheckConnection();
@@ -58,7 +58,7 @@ namespace DatabaseConnectorTests.Connectors
         {
             // ARRANGE
             var properties = new ConnectionProperties(new SecretsItem("a","b", "-1", -1),"-1","-1");
-            IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
+            IDbConnector connector = new DatabaseConnector.Connectors.MyConnector(properties);
 
             // ACT
             try
@@ -77,7 +77,7 @@ namespace DatabaseConnectorTests.Connectors
         {
             // ARRANGE
             var properties = new ConnectionProperties(new SecretsItem("a", "b", "nonexistinghost", 3306), "aaa", "bbb");
-            IDbConnector connector = new DatabaseConnector.Connectors.MySqlConnector(properties);
+            IDbConnector connector = new DatabaseConnector.Connectors.MyConnector(properties);
 
             // ACT
             try

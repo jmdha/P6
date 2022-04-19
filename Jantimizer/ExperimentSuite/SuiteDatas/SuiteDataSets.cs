@@ -26,7 +26,7 @@ namespace ExperimentSuite.SuiteDatas
         public static SuiteData GetMySQLSD_Default(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
+            var mySQLConnector = new DatabaseConnector.Connectors.MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties), 
@@ -50,7 +50,7 @@ namespace ExperimentSuite.SuiteDatas
         public static SuiteData GetMySQLSD_EquiDepth(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
+            var mySQLConnector = new DatabaseConnector.Connectors.MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
@@ -74,7 +74,7 @@ namespace ExperimentSuite.SuiteDatas
         public static SuiteData GetMySQLSD_EquiDepthVariance(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
+            var mySQLConnector = new DatabaseConnector.Connectors.MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthVarianceHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
@@ -97,7 +97,7 @@ namespace ExperimentSuite.SuiteDatas
         public static SuiteData GetMySQLSD_MinDepth(JsonObject optionalTestSettings, IQueryParser? additionalParser = null)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new DatabaseConnector.Connectors.MySqlConnector(mySQLConnectionProperties);
+            var mySQLConnector = new DatabaseConnector.Connectors.MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MinDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
@@ -131,7 +131,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -155,7 +155,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -179,7 +179,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepthVariance(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -202,7 +202,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(

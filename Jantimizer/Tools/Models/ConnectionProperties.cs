@@ -35,5 +35,19 @@ namespace Tools.Models
             Database = settings.Database;
             Schema = settings.Schema;
         }
+
+        public override int GetHashCode()
+        {
+            int schemaValue = 0;
+            int databaseValue = 0;
+            int secretsValue = 0;
+            if (Schema != null)
+                schemaValue = Schema.GetHashCode();
+            if (Database != null)
+                databaseValue = Database.GetHashCode();
+            if (Secrets != null)
+                secretsValue = Secrets.GetHashCode();
+            return schemaValue + databaseValue + secretsValue;
+        }
     }
 }
