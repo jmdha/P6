@@ -4,14 +4,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryOptimiserTest;
 using QueryParser.Models;
 using System;
-using QueryOptimiserTest.Stubs;
 using QueryOptimiser.Cost.Nodes;
 using Histograms.Models;
 
 namespace QueryOptimiserTest.Cost.Nodes
 {
     [TestClass]
-    public class JoinEstimateEquiDepthTest
+    public class JoinEstimateEquiDepthTests
     {
         [TestMethod]
         [DataRow(ComparisonType.Type.Equal, 10, 10, 10)]

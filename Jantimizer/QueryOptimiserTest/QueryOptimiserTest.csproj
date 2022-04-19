@@ -20,4 +20,8 @@
     <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Stubs\" />
+  </ItemGroup>
+
 </Project>
