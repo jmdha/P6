@@ -20,5 +20,10 @@ namespace Tools.Models
             Server = server;
             Port = port;
         }
+
+        public override int GetHashCode()
+        {
+           return Username.GetHashCode() + Password.GetHashCode() + Server.GetHashCode() + Port;
+        }
     }
 }
