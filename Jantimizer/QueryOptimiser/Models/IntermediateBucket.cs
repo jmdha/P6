@@ -3,22 +3,23 @@ using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models;
+
+[assembly:InternalsVisibleTo("QueryOptimiserTest")]
 
 namespace QueryOptimiser.Models
 {
     public class IntermediateBucket
     {
-        internal Dictionary<TableReferenceNode, Dictionary<string, BucketEstimate>> Buckets { get; } = new Dictionary<TableReferenceNode, Dictionary<string, BucketEstimate>>();
+        // Table, Attribute, Bucket estimate
+        internal MultiDictionary<string, string, BucketEstimate> Buckets { get; } = new MultiDictionary<string, string, BucketEstimate>();
 
-        internal IntermediateBucket() { }
-        internal IntermediateBucket(List<Tuple<TableReferenceNode, string, BucketEstimate>> buckets)
-        {
-            AddBuckets(buckets);
-        }
+        public IntermediateBucket() { }
 
-        internal IntermediateBucket(IntermediateBucket bucket1, IntermediateBucket bucket2)
+        public IntermediateBucket(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
             AddBuckets(bucket1);
             AddBuckets(bucket2);
@@ -27,25 +28,27 @@ namespace QueryOptimiser.Models
         internal static IntermediateBucket Merge(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
             IntermediateBucket bucket = new IntermediateBucket();
-            foreach (var tableRef in bucket1.Buckets)
-                foreach (var attribute in tableRef.Value)
-                    bucket.AddBucketIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
-            foreach (var tableRef in bucket2.Buckets)
-                foreach (var attribute in tableRef.Value)
-                    bucket.AddBucketIgnoreDuplicates(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
+            foreach (var tableRef in bucket1.Buckets.Keys)
+                foreach (var attributeRef in bucket1.Buckets[tableRef])
+                    bucket.AddBucketIgnoreDuplicates(tableRef, attributeRef, bucket1.Buckets[tableRef, attributeRef]);
+            foreach (var tableRef in bucket2.Buckets.Keys)
+                foreach (var attributeRef in bucket2.Buckets[tableRef])
+                    bucket.AddBucketIgnoreDuplicates(tableRef, attributeRef, bucket2.Buckets[tableRef, attributeRef]);
             return bucket;
         }
 
         internal static List<IntermediateBucket> MergeOnOverlap(List<IntermediateBucket> buckets1, List<IntermediateBucket> buckets2)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            foreach (var bucket in buckets1) {
-                foreach (var tableRef in bucket.Buckets) {
-                    foreach (var attribute in tableRef.Value) {
+            foreach (var bucket1 in buckets1) {
+                foreach (var table in bucket1.Buckets.Keys) {
+                    foreach (var attribute in bucket1.Buckets[table]) {
                         foreach (var bucket2 in buckets2) {
-                            if (DoesOverlap(tableRef.Key, attribute.Key, bucket, bucket2))
+                            if (DoesOverlap(table, attribute, bucket1, bucket2))
                             {
-                                buckets.Add(MergeOnOverlap(bucket, bucket2));
+                                var newBucket = new IntermediateBucket();
+                                newBucket.AddBucket(table, attribute, bucket1.Buckets[table, attribute]);
+                                buckets.Add(newBucket);
                                 continue;
                             }
                         }
@@ -55,20 +58,10 @@ namespace QueryOptimiser.Models
             return buckets;
         }
 
-        internal static IntermediateBucket MergeOnOverlap(IntermediateBucket bucket1, IntermediateBucket bucket2)
+        internal static bool DoesOverlap(string table, string attribute, IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
-            IntermediateBucket bucket = new IntermediateBucket();
-            foreach (var tableRef in bucket1.Buckets)
-                foreach (var attribute in tableRef.Value)
-                    if (DoesOverlap(tableRef.Key, attribute.Key, bucket1, bucket2))
-                        bucket.AddBucket(Tuple.Create(tableRef.Key, attribute.Key, attribute.Value));
-            return bucket;
-        }
-
-        internal static bool DoesOverlap(TableReferenceNode node, string attribute, IntermediateBucket bucket1, IntermediateBucket bucket2)
-        {
-            if (bucket1.DoesContain(node, attribute) && bucket2.DoesContain(node, attribute)) {
-                if (bucket1.GetBucket(node, attribute) == bucket2.GetBucket(node, attribute))
+            if (bucket1.Buckets.DoesContain(table, attribute) && bucket2.Buckets.DoesContain(table, attribute)) {
+                if (bucket1.GetBucket(table, attribute) == bucket2.GetBucket(table, attribute))
                     return true;
                 else
                     return false;
@@ -76,56 +69,39 @@ namespace QueryOptimiser.Models
                 return false;
         }
 
-        internal IHistogramBucket GetBucket(TableReferenceNode node, string attribute)
+        internal IHistogramBucket GetBucket(string tableRef, string attributeRef)
         {
-            return Buckets[node][attribute].Bucket;
+            return Buckets[tableRef, attributeRef].Bucket;
         }
 
-        internal bool DoesContain(TableReferenceNode node, string attribute)
-        {
-            return (Buckets.ContainsKey(node) && Buckets[node].ContainsKey(attribute));
-        }
-
-        internal long GetCount()
+        internal long GetEstimateOfAllBuckets()
         {
             long count = 1;
-            foreach (var bucket in Buckets)
-                foreach (var attribute in bucket.Value)
-                    count *= attribute.Value.Estimate;
+            foreach (var table in Buckets.Keys)
+                foreach (var attribute in Buckets[table])
+                    count *= Buckets[table, attribute].Estimate;
             return count;
         }
 
-        private void AddBuckets(IntermediateBucket bucket)
+        internal void AddBuckets(IntermediateBucket bucket)
         {
-            foreach (var refe in bucket.Buckets)
-                foreach (var refedBucket in refe.Value)
-                    AddBucket(new Tuple<TableReferenceNode, string, BucketEstimate>(refe.Key, refedBucket.Key, refedBucket.Value));
+            foreach (var table in bucket.Buckets.Keys)
+                foreach (var attribute in bucket.Buckets[table])
+                    AddBucket(table, attribute, bucket.Buckets[table, attribute]);
         }
 
-        private void AddBuckets(List<Tuple<TableReferenceNode, string, BucketEstimate>> buckets)
+        internal void AddBucket(string table, string attribute, BucketEstimate bucket)
         {
-            foreach (var bucket in buckets)
-            {
-                AddBucket(bucket);
-            }
-        }
-
-        private void AddBucket(Tuple<TableReferenceNode, string, BucketEstimate> bucket)
-        {
-            if (!Buckets.ContainsKey(bucket.Item1))
-                Buckets.Add(bucket.Item1, new Dictionary<string, BucketEstimate>());
-            if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
-                Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
+            if (!Buckets.DoesContain(table, attribute))
+                Buckets.Add(table, attribute, bucket);
             else
                 throw new ArgumentException("Can not add the same bucket twice");
         }
 
-        private void AddBucketIgnoreDuplicates(Tuple<TableReferenceNode, string, BucketEstimate> bucket)
+        internal void AddBucketIgnoreDuplicates(string table, string attribute, BucketEstimate bucket)
         {
-            if (!Buckets.ContainsKey(bucket.Item1))
-                Buckets.Add(bucket.Item1, new Dictionary<string, BucketEstimate>());
-            if (!Buckets[bucket.Item1].ContainsKey(bucket.Item2))
-                Buckets[bucket.Item1].Add(bucket.Item2, bucket.Item3);
+            if (!Buckets.DoesContain(table, attribute))
+                Buckets.Add(table, attribute, bucket);
         }
     }
 }

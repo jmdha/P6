@@ -104,19 +104,32 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 for (int j = rightCutoff; j < rightBuckets.Length; j++)
                 {
                     if (DoesMatch(leftBuckets[i], rightBuckets[j]))
-                    {
-                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i], 
-                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j], 
-                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
-                        buckets.Add(new IntermediateBucket(information));
-                    }
+                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
                     else
                         rightCutoff = Math.Max(0, j - 1);
                 }
             }
             return buckets;
+        }
+
+        private IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        {
+            var newBucket = new IntermediateBucket();
+            newBucket.AddBucket(
+                predicate.LeftTable.Alias, predicate.LeftAttribute,
+                new BucketEstimate(
+                    leftBucket,
+                    JoinCost.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
+                    )
+                );
+            newBucket.AddBucket(
+                predicate.RightTable.Alias, predicate.RightAttribute,
+                new BucketEstimate(
+                    rightBucket,
+                    JoinCost.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
+                    )
+                );
+            return newBucket;
         }
 
         private List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
@@ -164,14 +177,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                             break;
                     }
                     if (match)
-                    {
-                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i],
-                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j],
-                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
-                        buckets.Add(new IntermediateBucket(information));
-                    } 
+                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
                     else
                         rightCutoff = Math.Max(0, j - 1);
                 }
@@ -255,17 +261,17 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 if (table.DoesContain(node.RightTable, node.RightAttribute))
                     return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable, node.LeftAttribute), 
-                        table.GetBuckets(node.RightTable, node.RightAttribute));
+                        table.GetBuckets(node.LeftTable.Alias, node.LeftAttribute), 
+                        table.GetBuckets(node.RightTable.Alias, node.RightAttribute));
                 else
                     return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable, node.LeftAttribute), 
+                        table.GetBuckets(node.LeftTable.Alias, node.LeftAttribute), 
                         HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
             }
             else if (table.DoesContain(node.RightTable, node.RightAttribute))
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
-                        table.GetBuckets(node.RightTable, node.RightAttribute));
+                        table.GetBuckets(node.RightTable.Alias, node.RightAttribute));
             else
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,

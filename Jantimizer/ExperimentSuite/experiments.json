@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - Base EquiDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -103,7 +103,7 @@
     {
       "ExperimentName": "Experiment Three - MinDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

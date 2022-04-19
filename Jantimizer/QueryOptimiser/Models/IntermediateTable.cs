@@ -37,7 +37,7 @@ namespace QueryOptimiser.Models
         {
             long estimate = 0;
             foreach (IntermediateBucket bucket in Buckets)
-                estimate += bucket.GetCount();
+                estimate += bucket.GetEstimateOfAllBuckets();
             return estimate;
         }
 
@@ -46,18 +46,19 @@ namespace QueryOptimiser.Models
             return (References.ContainsKey(refNode) && References[refNode].Contains(attribute));
         }
 
-        public List<IHistogramBucket> GetBuckets(TableReferenceNode node, string attribute)
+        public List<IHistogramBucket> GetBuckets(string table, string attribute)
         {
             List<IHistogramBucket> buckets = new List<IHistogramBucket>();
             foreach (IntermediateBucket bucket in Buckets)
-                buckets.Add(bucket.GetBucket(node, attribute));
+                buckets.Add(bucket.GetBucket(table, attribute));
             return buckets;
         }
 
         public static IntermediateTable Join(IntermediateTable it1, IntermediateTable it2) 
         {
             IntermediateTable it = new IntermediateTable();
-            Tuple<TableReferenceNode, string>? overlap = null;
+            string? table = null;
+            string? attribute = null;
             foreach(var refe in it1.References)
             {
                 it.References.Add(refe.Key, refe.Value);
@@ -66,29 +67,30 @@ namespace QueryOptimiser.Models
             {
                 if (it.References.ContainsKey(refe.Key))
                 {
-                    foreach (var attribute in refe.Value)
-                        if (it.DoesContain(refe.Key, attribute))
-                            overlap = new Tuple<TableReferenceNode, string>(refe.Key, attribute);
+                    table = refe.Key.Alias;
+                    foreach (var att in refe.Value)
+                        if (it.DoesContain(refe.Key, att))
+                            attribute = att;
                 } else
                     it.References.Add(refe.Key, refe.Value);
             }
-            if (overlap != null)
-                return JoinWithOverlap(it, it1, it2, overlap);
+            if (table != null && attribute != null)
+                return JoinWithOverlap(it, it1, it2, table, attribute);
             else
                 return JoinWithoutOverlap(it, it1, it2);
         }
 
-        private static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2, Tuple<TableReferenceNode, string> overlap)
+        private static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2, string table, string attribute)
         {
             foreach (var bucket1 in it1.Buckets)
             {
-                if (!bucket1.DoesContain(overlap.Item1, overlap.Item2))
+                if (!bucket1.Buckets.DoesContain(table, attribute))
                     continue;
                 foreach (var bucket2 in it2.Buckets)
                 {
-                    if (!bucket2.DoesContain(overlap.Item1, overlap.Item2))
+                    if (!bucket2.Buckets.DoesContain(table, attribute))
                         continue;
-                    if (IntermediateBucket.DoesOverlap(overlap.Item1, overlap.Item2, bucket1, bucket2))
+                    if (IntermediateBucket.DoesOverlap(table, attribute, bucket1, bucket2))
                        it.Buckets.Add(IntermediateBucket.Merge(bucket1, bucket2));
                 }
             }
