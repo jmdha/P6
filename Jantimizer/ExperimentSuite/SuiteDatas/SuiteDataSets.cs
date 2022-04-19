@@ -131,7 +131,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -155,7 +155,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -179,7 +179,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepthVariance(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
@@ -202,7 +202,7 @@ namespace ExperimentSuite.SuiteDatas
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
-            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnector) });
+            var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
                 postParserManager.QueryParsers.Add(additionalParser);
             var postgresModel = new SuiteData(
