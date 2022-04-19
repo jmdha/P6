@@ -261,9 +261,9 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             var leftTableAttribute = new TableAttribute(node.LeftTable.Alias, node.LeftAttribute);
             var rightTableAttribute = new TableAttribute(node.RightTable.Alias, node.RightAttribute);
 
-            if (table.DoesContain(leftTableAttribute))
+            if (table.References.Contains(leftTableAttribute))
             {
-                if (table.DoesContain(rightTableAttribute))
+                if (table.References.Contains(rightTableAttribute))
                     return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         table.GetBuckets(leftTableAttribute), 
                         table.GetBuckets(rightTableAttribute));
@@ -272,7 +272,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                         table.GetBuckets(leftTableAttribute), 
                         HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
             }
-            else if (table.DoesContain(rightTableAttribute))
+            else if (table.References.Contains(rightTableAttribute))
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
                         table.GetBuckets(rightTableAttribute));

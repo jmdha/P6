@@ -12,26 +12,22 @@ namespace QueryOptimiser.Models
 {
     public class IntermediateTable
     {
-        // Dictionary of table references to attributes.
+        // HashSet of table references to attributes.
         // Used as a reference as to what tables have been joined in order to create table
-        // Table, List of attributes
-        internal HashSet<TableAttribute> _References { get; } = new HashSet<TableAttribute>();
+        internal HashSet<TableAttribute> References { get; }
         internal List<IntermediateBucket> Buckets { get; }
 
         public IntermediateTable()
         {
             Buckets = new List<IntermediateBucket>();
+            References = new HashSet<TableAttribute>();
         }
 
         public IntermediateTable(List<IntermediateBucket> buckets, List<TableAttribute> references) {
             Buckets = buckets;
+            References = new HashSet<TableAttribute>();
             foreach (var reference in references)
-            {
-                if (!_References.Contains(reference)) {
-                    _References.Add(reference);
-                    continue;
-                }
-            }
+                References.Add(reference);
         }
 
         public long GetRowEstimate()
@@ -40,11 +36,6 @@ namespace QueryOptimiser.Models
             foreach (IntermediateBucket bucket in Buckets)
                 estimate += bucket.GetEstimateOfAllBuckets();
             return estimate;
-        }
-
-        public bool DoesContain(TableAttribute tableAttribute)
-        {
-            return _References.Contains(tableAttribute);
         }
 
         public List<IHistogramBucket> GetBuckets(TableAttribute tableAttribute)

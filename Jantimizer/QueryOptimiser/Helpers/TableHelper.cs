@@ -13,19 +13,19 @@ namespace QueryOptimiser.Helpers
         {
             IntermediateTable it = new IntermediateTable();
             TableAttribute? tableAttribute = null;
-            foreach (var refe in it1._References)
+            foreach (var refe in it1.References)
             {
-                it._References.Add(new TableAttribute(refe.Table, refe.Attribute));
+                it.References.Add(new TableAttribute(refe.Table, refe.Attribute));
             }
-            foreach (var refe in it2._References)
+            foreach (var refe in it2.References)
             {
-                if (it._References.Contains(refe))
+                if (it.References.Contains(refe))
                 {
-                    if (it.DoesContain(refe))
+                    if (it.References.Contains(refe))
                         tableAttribute = refe;
                 }
                 else
-                    it._References.Add(refe);
+                    it.References.Add(refe);
             }
             if (tableAttribute != null)
                 return JoinWithOverlap(it, it1, it2, tableAttribute);
