@@ -8,35 +8,36 @@ using QueryOptimiserTest.Stubs;
 using QueryOptimiser.Cost.Nodes;
 using Histograms.Models;
 
-namespace CostEquiDepthTest;
-
-[TestClass]
-public class JoinEstimateEquiDepthVarianceTest
+namespace CostEquiDepthTest
 {
-    [TestMethod]
-    [DataRow(ComparisonType.Type.Equal, 10, 10, 0, 0, 0, 0, 10)]
-    [DataRow(ComparisonType.Type.Less, 10, 10, 0, 0, 0, 0, 10)]
-    [DataRow(ComparisonType.Type.More, 10, 10, 0, 0, 0, 0, 10)]
-    [DataRow(ComparisonType.Type.EqualOrLess, 10, 10, 0, 0, 0, 0, 10)]
-    [DataRow(ComparisonType.Type.EqualOrMore, 10, 10, 0, 0, 0, 0, 10)]
-    [DataRow(ComparisonType.Type.Equal, 100, 100, 25, 25, 25, 25, 100)]
-    [DataRow(ComparisonType.Type.Equal, 100, 100, 10, 50, 10, 0, 100)]
-    [DataRow(ComparisonType.Type.Equal, 100, 100, 25, 100, 100, 100, 25)]
-    [DataRow(ComparisonType.Type.Equal, 100, 100, 100, 100, 25, 100, 25)]
-    [DataRow(ComparisonType.Type.Equal, 100, 50, 25, 10, 100, 50, 80)]
-    
-    public void BucketEstimateTest(ComparisonType.Type predicate, int aAmount, int bAmount, double aStd, double bStd, double aRange, double bRange, int expectedEstimate)
+    [TestClass]
+    public class JoinEstimateEquiDepthVarianceTest
     {
-        // ARRANGE
-        IHistogramBucket leftBucket = new HistogramBucketVariance(0, 0, aAmount, 0, 0, aStd, aRange);
-        IHistogramBucket rightBucket = new HistogramBucketVariance(0, 0, bAmount, 0, 0, bStd, bRange);
+        [TestMethod]
+        [DataRow(ComparisonType.Type.Equal, 10, 10, 0, 0, 0, 0, 10)]
+        [DataRow(ComparisonType.Type.Less, 10, 10, 0, 0, 0, 0, 10)]
+        [DataRow(ComparisonType.Type.More, 10, 10, 0, 0, 0, 0, 10)]
+        [DataRow(ComparisonType.Type.EqualOrLess, 10, 10, 0, 0, 0, 0, 10)]
+        [DataRow(ComparisonType.Type.EqualOrMore, 10, 10, 0, 0, 0, 0, 10)]
+        [DataRow(ComparisonType.Type.Equal, 100, 100, 25, 25, 25, 25, 100)]
+        [DataRow(ComparisonType.Type.Equal, 100, 100, 10, 50, 10, 0, 100)]
+        [DataRow(ComparisonType.Type.Equal, 100, 100, 25, 100, 100, 100, 25)]
+        [DataRow(ComparisonType.Type.Equal, 100, 100, 100, 100, 25, 100, 25)]
+        [DataRow(ComparisonType.Type.Equal, 100, 50, 25, 10, 100, 50, 80)]
 
-        var joinCost = new JoinEstimateEquiDepthVariance();
+        public void BucketEstimateTest(ComparisonType.Type predicate, int aAmount, int bAmount, double aStd, double bStd, double aRange, double bRange, int expectedEstimate)
+        {
+            // ARRANGE
+            IHistogramBucket leftBucket = new HistogramBucketVariance(0, 0, aAmount, 0, 0, aStd, aRange);
+            IHistogramBucket rightBucket = new HistogramBucketVariance(0, 0, bAmount, 0, 0, bStd, bRange);
 
-        // ACT
-        long estimate = joinCost.GetBucketEstimate(predicate, leftBucket, rightBucket);
+            var joinCost = new JoinEstimateEquiDepthVariance();
 
-        // ASSERTs
-        Assert.AreEqual(expectedEstimate, estimate);
+            // ACT
+            long estimate = joinCost.GetBucketEstimate(predicate, leftBucket, rightBucket);
+
+            // ASSERTs
+            Assert.AreEqual(expectedEstimate, estimate);
+        }
     }
 }
