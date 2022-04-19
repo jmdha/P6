@@ -9,8 +9,6 @@ using Histograms.Models;
 using DatabaseConnector;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("QueryOptimiserTest")]
-
 namespace QueryOptimiser.Cost.Nodes
 {
     internal class JoinEstimateEquiDepth : INodeCost<JoinNode>

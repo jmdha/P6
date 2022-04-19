@@ -8,7 +8,7 @@ using QueryOptimiserTest.Stubs;
 using QueryOptimiser.Cost.Nodes;
 using Histograms.Models;
 
-namespace CostEquiDepthTest
+namespace QueryOptimiserTest.Cost.Nodes
 {
     [TestClass]
     public class JoinEstimateEquiDepthVarianceTest
