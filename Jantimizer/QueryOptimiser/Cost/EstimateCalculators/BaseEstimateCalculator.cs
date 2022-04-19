@@ -1,6 +1,7 @@
 ﻿using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 using System;
@@ -40,7 +41,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
 
             List<IntermediateBucket> buckets;
-            List<Tuple<TableReferenceNode, string>> references = new List<Tuple<TableReferenceNode, string>>();
+            List<TableAttribute> references = new List<TableAttribute>();
 
             buckets = GetBucketMatches(node.Relation, table, ref references);
 
@@ -48,21 +49,21 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
        
         #region Matches
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
+        private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<TableAttribute> references)
         {
             if (relation.Type == RelationType.Type.Predicate && relation.LeafPredicate != null)
                 return GetBucketMatches(relation.LeafPredicate, table, ref references);
             else if (relation.LeftRelation != null && relation.RightRelation != null)
             {
-                List<Tuple<TableReferenceNode, string>> leftReferences = new List<Tuple<TableReferenceNode, string>>();
-                List<Tuple<TableReferenceNode, string>> rightReferences = new List<Tuple<TableReferenceNode, string>>();
+                List<TableAttribute> leftReferences = new List<TableAttribute>();
+                List<TableAttribute> rightReferences = new List<TableAttribute>();
                 List<IntermediateBucket> leftBuckets = GetBucketMatches(relation.LeftRelation, table, ref leftReferences);
                 List<IntermediateBucket> rightBuckets = GetBucketMatches(relation.RightRelation, table, ref rightReferences);
 
                 List<IntermediateBucket> overlap = new List<IntermediateBucket>();
                 if (relation.Type == RelationType.Type.And)
                 {
-                    overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
+                    overlap = BucketHelper.MergeOnOverlap(leftBuckets, rightBuckets);
                     references = GetOverlappingReferences(leftReferences, rightReferences);
                 }
                 else if (relation.Type == RelationType.Type.Or)
@@ -78,14 +79,14 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 throw new ArgumentException("Missing noderelation type " + relation.ToString());
         }
 
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
+        private List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<TableAttribute> references)
         {
             Tuple<List<IHistogramBucket>, List<IHistogramBucket>> bucketPair = GetBucketPair(predicate, table);
             Tuple<IHistogramBucket[], IHistogramBucket[]> bounds = GetBucketBounds(predicate, bucketPair.Item1, bucketPair.Item2);
 
             if (bounds.Item1.Length > 0 && bounds.Item2.Length > 0) {
-                references.Add(new Tuple<TableReferenceNode, string>(predicate.LeftTable, predicate.LeftAttribute ));
-                references.Add(new Tuple<TableReferenceNode, string>(predicate.RightTable, predicate.RightAttribute ));
+                references.Add(new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute));
+                references.Add(new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute));
             } else
                 return new List<IntermediateBucket>();
 
@@ -116,14 +117,14 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             var newBucket = new IntermediateBucket();
             newBucket.AddBucket(
-                predicate.LeftTable.Alias, predicate.LeftAttribute,
+                new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute),
                 new BucketEstimate(
                     leftBucket,
                     JoinCost.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
                     )
                 );
             newBucket.AddBucket(
-                predicate.RightTable.Alias, predicate.RightAttribute,
+                new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute),
                 new BucketEstimate(
                     rightBucket,
                     JoinCost.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
@@ -257,40 +258,37 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         #endregion
         private Tuple<List<IHistogramBucket>, List<IHistogramBucket>> GetBucketPair(JoinPredicate node, IntermediateTable table)
         {
-            if (table.DoesContain(node.LeftTable, node.LeftAttribute))
+            var leftTableAttribute = new TableAttribute(node.LeftTable.Alias, node.LeftAttribute);
+            var rightTableAttribute = new TableAttribute(node.RightTable.Alias, node.RightAttribute);
+
+            if (table.DoesContain(leftTableAttribute))
             {
-                if (table.DoesContain(node.RightTable, node.RightAttribute))
+                if (table.DoesContain(rightTableAttribute))
                     return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable.Alias, node.LeftAttribute), 
-                        table.GetBuckets(node.RightTable.Alias, node.RightAttribute));
+                        table.GetBuckets(leftTableAttribute), 
+                        table.GetBuckets(rightTableAttribute));
                 else
                     return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable.Alias, node.LeftAttribute), 
+                        table.GetBuckets(leftTableAttribute), 
                         HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
             }
-            else if (table.DoesContain(node.RightTable, node.RightAttribute))
+            else if (table.DoesContain(rightTableAttribute))
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
-                        table.GetBuckets(node.RightTable.Alias, node.RightAttribute));
+                        table.GetBuckets(rightTableAttribute));
             else
                 return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
                         HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
                         HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
         }
 
-        private List<Tuple<TableReferenceNode, string>> GetOverlappingReferences(List<Tuple<TableReferenceNode, string>> leftReferences, List<Tuple<TableReferenceNode, string>> rightReferences)
+        private List<TableAttribute> GetOverlappingReferences(List<TableAttribute> leftReferences, List<TableAttribute> rightReferences)
         {
-            List<Tuple<TableReferenceNode, string>> overlappingReferences = new List<Tuple<TableReferenceNode, string>>();
+            List<TableAttribute> overlappingReferences = new List<TableAttribute>();
             foreach (var leftReference in leftReferences)
-            {
                 foreach (var rightReference in rightReferences)
-                {
-                    if (leftReference.Item1 == rightReference.Item1 && leftReference.Item2 == rightReference.Item2)
-                    {
+                    if (leftReference.Equals(rightReference))
                         overlappingReferences.Add(leftReference);
-                    }
-                }
-            }
             return overlappingReferences;
         }
     }

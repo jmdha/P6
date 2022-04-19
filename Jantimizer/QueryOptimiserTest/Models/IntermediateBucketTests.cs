@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Histograms.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 using System;
@@ -12,18 +13,198 @@ namespace QueryOptimiserTest.Models
     [TestClass]
     public class IntermediateBucketTests
     {
-        #region Constructor
+        #region AddBucket
+
         [TestMethod]
-        public void Can_AddTwoOtherBuckets()
+        [DataRow("a", "b", 0, 1, 10, 5)]
+        [DataRow("a", "a", 0, 1, 10, -1)]
+        [DataRow("aAVBB", "_", 10, 11, 1, 35415315)]
+        public void Can_AddBucket(string table, string attribute, int valueStart, int valueEnd, int count, long estimate)
         {
             // ARRANGE
-            IntermediateBucket b1 = new IntermediateBucket();
-            IntermediateBucket b2 = new IntermediateBucket();
-
+            IntermediateBucket ibucket = new IntermediateBucket();
+            IHistogramBucket bucket = new HistogramBucket(valueStart, valueEnd, count);
+            BucketEstimate ebucket = new BucketEstimate(bucket, estimate);
+            TableAttribute refe = new TableAttribute(table, attribute);
 
             // ACT
+            ibucket.AddBucket(refe, ebucket);
 
             // ASSERT
+            Assert.AreEqual(ebucket, ibucket.Buckets[refe]);
+        }
+
+        [TestMethod]
+        [DataRow("a", "b")]
+        [DataRow("a", "a")]
+        [DataRow("aAVBB", "_")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Cant_AddBucket_IfAlreadyThere(string table, string attribute)
+        {
+            // ARRANGE
+            IntermediateBucket ibucket = new IntermediateBucket();
+            IHistogramBucket bucket = new HistogramBucket(0, 1, 1);
+            BucketEstimate ebucket = new BucketEstimate(bucket, 1);
+            TableAttribute refe = new TableAttribute(table, attribute);
+            ibucket.AddBucket(refe, ebucket);
+
+            // ACT
+            ibucket.AddBucket(refe, ebucket);
+        }
+
+        [TestMethod]
+        [DataRow("a", "b")]
+        [DataRow("a", "a")]
+        [DataRow("aAVBB", "_")]
+        public void Can_AddBucket_IfAlreadyThere_IfSetToNotThrow(string table, string attribute)
+        {
+            // ARRANGE
+            IntermediateBucket ibucket = new IntermediateBucket();
+            IHistogramBucket bucket = new HistogramBucket(0, 1, 1);
+            BucketEstimate ebucket = new BucketEstimate(bucket, 1);
+            TableAttribute refe = new TableAttribute(table, attribute);
+            ibucket.AddBucket(refe, ebucket, false);
+
+            // ACT
+            ibucket.AddBucket(refe, ebucket, false);
+
+            // ASSERT
+            Assert.AreEqual(ebucket, ibucket.Buckets[refe]);
+        }
+
+        #endregion
+
+        #region Constructor
+
+        [TestMethod]
+        public void Can_Constructor_AddBuckets_NoDuplicates()
+        {
+            // ARRANGE
+            IntermediateBucket ibucket1 = new IntermediateBucket();
+            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+            TableAttribute refe1 = new TableAttribute("a", "b");
+
+            ibucket1.AddBucket(refe1, ebucket1);
+
+            IntermediateBucket ibucket2 = new IntermediateBucket();
+            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+            TableAttribute refe2 = new TableAttribute("c", "d");
+
+            ibucket2.AddBucket(refe2, ebucket2);
+
+            // ACT
+            var newIBucket = new IntermediateBucket(ibucket1, ibucket2);
+
+            // ASSERT
+            Assert.AreEqual(2, newIBucket.Buckets.Keys.Count);
+            Assert.AreEqual(ebucket1, newIBucket.Buckets[refe1]);
+            Assert.AreEqual(ebucket2, newIBucket.Buckets[refe2]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Cant_Constructor_AddBuckets_Duplicates()
+        {
+            // ARRANGE
+            IntermediateBucket ibucket1 = new IntermediateBucket();
+            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+            TableAttribute refe1 = new TableAttribute("a", "b");
+
+            ibucket1.AddBucket(refe1, ebucket1);
+
+            IntermediateBucket ibucket2 = new IntermediateBucket();
+            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+            TableAttribute refe2 = new TableAttribute("a", "b");
+
+            ibucket2.AddBucket(refe2, ebucket2);
+
+            // ACT
+            new IntermediateBucket(ibucket1, ibucket2);
+        }
+
+        #endregion
+
+        #region AddBuckets
+
+        [TestMethod]
+        public void Can_AddBuckets_NoDuplicates()
+        {
+            // ARRANGE
+            IntermediateBucket ibucket1 = new IntermediateBucket();
+            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+            TableAttribute refe1 = new TableAttribute("a", "b");
+            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+            TableAttribute refe2 = new TableAttribute("c", "d");
+
+            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucket(refe2, ebucket2);
+
+            IntermediateBucket ibucket2 = new IntermediateBucket();
+
+            // ACT
+            ibucket2.AddBuckets(ibucket1);
+
+            // ASSERT
+            Assert.AreEqual(2, ibucket1.Buckets.Keys.Count);
+            Assert.AreEqual(ebucket1, ibucket1.Buckets[refe1]);
+            Assert.AreEqual(ebucket2, ibucket1.Buckets[refe2]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Cant_AddBuckets_Duplicates()
+        {
+            // ARRANGE
+            IntermediateBucket ibucket1 = new IntermediateBucket();
+            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+            TableAttribute refe1 = new TableAttribute("a", "b");
+            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+            TableAttribute refe2 = new TableAttribute("a", "b");
+
+            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucket(refe2, ebucket2);
+
+            IntermediateBucket ibucket2 = new IntermediateBucket();
+
+            // ACT
+            ibucket2.AddBuckets(ibucket1);
+        }
+
+        #endregion
+
+        #region GetEstimateOfAllBuckets
+
+        [TestMethod]
+        [DataRow(1, 2, 2)]
+        [DataRow(2, 2, 4)]
+        [DataRow(2, 10, 20)]
+        public void Cant_GetEstimateOfAllBuckets(long est1, long est2, long expEst)
+        {
+            // ARRANGE
+            IntermediateBucket ibucket1 = new IntermediateBucket();
+            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+            BucketEstimate ebucket1 = new BucketEstimate(bucket1, est1);
+            TableAttribute refe1 = new TableAttribute("a", "b");
+            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+            BucketEstimate ebucket2 = new BucketEstimate(bucket2, est2);
+            TableAttribute refe2 = new TableAttribute("c", "d");
+
+            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucket(refe2, ebucket2);
+
+            // ACT
+            var result = ibucket1.GetEstimateOfAllBuckets();
+
+            // ASSERT
+            Assert.AreEqual(expEst, result);
         }
 
         #endregion

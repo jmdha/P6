@@ -4,6 +4,7 @@ using Histograms.Models;
 using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Exceptions;
+using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 
@@ -36,7 +37,7 @@ namespace QueryOptimiser
                     if (intermediateTable.Buckets.Count == 0)
                         intermediateTable = newTable;
                     else
-                        intermediateTable = IntermediateTable.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
+                        intermediateTable = TableHelper.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
                 }
             }
             catch (Exception ex)
