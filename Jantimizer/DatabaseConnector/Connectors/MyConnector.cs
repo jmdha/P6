@@ -158,7 +158,7 @@ namespace DatabaseConnector.Connectors
 
         public override void Dispose()
         {
-            
+            MySqlConnection.ClearAllPools();
         }
     }
 }
