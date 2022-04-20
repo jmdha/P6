@@ -146,33 +146,33 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     switch (predicate.ComType)
                     {
                         case ComparisonType.Type.Less:
-                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) < 0)
+                            if (leftBuckets[i].ValueEnd.IsLessThan(rightBuckets[j].ValueStart))
                                 match = true;
-                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) < 0)
+                            else if (leftBuckets[i].ValueStart.IsLessThan(rightBuckets[j].ValueEnd))
                                 match = true;
                             else
                                 match = false;
                             break;
                         case ComparisonType.Type.EqualOrLess:
-                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) <= 0)
+                            if (leftBuckets[i].ValueEnd.IsLessThanOrEqual(rightBuckets[j].ValueStart))
                                 match = true;
-                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) <= 0)
+                            else if (leftBuckets[i].ValueStart.IsLessThanOrEqual(rightBuckets[j].ValueEnd))
                                 match = true;
                             else
                                 match = false;
                             break;
                         case ComparisonType.Type.More:
-                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) > 0)
+                            if (leftBuckets[i].ValueStart.IsLargerThan(rightBuckets[j].ValueEnd))
                                 match = true;
-                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) > 0)
+                            else if (leftBuckets[i].ValueEnd.IsLargerThan(rightBuckets[j].ValueStart))
                                 match = true;
                             else
                                 match = false;
                             break;
                         case ComparisonType.Type.EqualOrMore:
-                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) >= 0)
+                            if (leftBuckets[i].ValueStart.IsLargerThanOrEqual(rightBuckets[j].ValueEnd))
                                 match = true;
-                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) >= 0)
+                            else if (leftBuckets[i].ValueEnd.IsLargerThanOrEqual(rightBuckets[j].ValueStart))
                                 match = true;
                             else
                                 match = false;
@@ -189,11 +189,12 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
         internal bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
-            if ((rightBucket.ValueStart.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueStart.CompareTo(leftBucket.ValueEnd) <= 0) ||
-                (rightBucket.ValueEnd.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueEnd.CompareTo(leftBucket.ValueEnd) <= 0))
+            if ((rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueEnd)) ||
+                (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd)))
                 return true;
             return false;
         }
+
         #endregion
         #region Bounds
         internal PairBucketList GetBucketBounds(ComparisonType.Type predicateType, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
@@ -240,11 +241,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
 
-                if ((value.CompareTo(buckets[mid].ValueStart) >= 0) &&
-                    (value.CompareTo(buckets[mid].ValueEnd) <= 0))
+                if ((value.IsLargerThanOrEqual(buckets[mid].ValueStart)) &&
+                    (value.IsLessThanOrEqual(buckets[mid].ValueEnd)))
                     return mid;
 
-                if (value.CompareTo(buckets[mid].ValueEnd) < 0)
+                if (value.IsLessThan(buckets[mid].ValueEnd))
                     return GetMatchBucketIndex(buckets, lowerIndexBound, mid - 1, value);
 
                 return GetMatchBucketIndex(buckets, mid + 1, upperIndexBound, value);
