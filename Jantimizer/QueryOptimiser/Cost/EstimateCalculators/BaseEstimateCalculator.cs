@@ -207,6 +207,23 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
         #region Bounds
 
+        /// <summary>
+        /// To get new lists from left and right buckets depending on predicate
+        /// <code>
+        ///    Bucket ranges example (For "MoreOrEqual" Predicate):
+        ///        |==|  is a bucket
+        ///     
+        ///    v leftStart        v leftEnd
+        ///    |==========||======|                      = leftBuckets
+        ///    
+        ///    v rightStart           v rightEnd
+        ///    |==========||==========||==============|  = rightBuckets
+        /// </code>
+        /// </summary>
+        /// <param name="predicateType"></param>
+        /// <param name="leftBuckets"></param>
+        /// <param name="rightBuckets"></param>
+        /// <returns></returns>
         internal PairBucketList GetBucketBounds(ComparisonType.Type predicateType, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             int leftStart = 0;
@@ -214,22 +231,34 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             int rightStart = 0;
             int rightEnd = rightBuckets.Count - 1;
 
+            // First bucket
+            // Left:    |===|
+            // Right:     |===|
             if (leftBuckets[0].ValueStart.IsLessThan(rightBuckets[0].ValueStart))
             {
                 if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
                     leftStart = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[0].ValueStart);
             }
+            // First bucket
+            // Left:      |===|
+            // Right:   |===|
             else if (leftBuckets[0].ValueStart.IsLargerThan(rightBuckets[0].ValueStart))
             {
                 if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
                     rightStart = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[0].ValueStart);
             }
 
+            // Last bucket
+            // Left:      |===|
+            // Right:   |===|
             if (leftBuckets[leftBuckets.Count - 1].ValueEnd.IsLargerThan(rightBuckets[rightBuckets.Count - 1].ValueEnd))
             {
                 if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
                     leftEnd = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[rightBuckets.Count - 1].ValueEnd);
             }
+            // Last bucket
+            // Left:    |===|
+            // Right:     |===|
             else if (leftBuckets[leftBuckets.Count - 1].ValueEnd.IsLessThan(rightBuckets[rightBuckets.Count - 1].ValueEnd))
             {
                 if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
@@ -250,6 +279,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             if (upperIndexBound >= lowerIndexBound)
             {
                 int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
+                if (mid >= buckets.Count)
+                    return -1;
 
                 if ((value.IsLargerThanOrEqual(buckets[mid].ValueStart)) &&
                     (value.IsLessThanOrEqual(buckets[mid].ValueEnd)))
