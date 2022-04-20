@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - Base EquiDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -19,10 +19,7 @@
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_SetupTables",
-            "WorldHappiness_With_GDP_Setup",
-            "Census_2013_Setup",
-            "COVID_Funding_Setup"
+            "BasicTests_SetupTables"
           ]
         }
       ],
@@ -31,24 +28,14 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
-            "Census_2013",
-            "COVID_Funding"
+            "BasicTests_RandomNumberBlocks"
           ]
         },
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
-            "Census_2013",
-            "COVID_Funding"
+            "BasicTests_RandomNumberBlocks"
           ]
         }
       ],
@@ -65,20 +52,14 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_SetupTables",
-            "WorldHappiness_With_GDP_Setup",
-            "Census_2013_Setup",
-            "COVID_Funding_Setup"
+            "BasicTests_SetupTables"
           ]
         },
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_SetupTables",
-            "WorldHappiness_With_GDP_Setup",
-            "Census_2013_Setup",
-            "COVID_Funding_Setup"
+            "BasicTests_SetupTables"
           ]
         }
       ],
@@ -87,24 +68,14 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
-            "Census_2013",
-            "COVID_Funding"
+            "BasicTests_RandomNumberBlocks"
           ]
         },
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
-            "Census_2013",
-            "COVID_Funding"
+            "BasicTests_RandomNumberBlocks"
           ]
         }
       ],
@@ -115,7 +86,7 @@
     {
       "ExperimentName": "Experiment Three - MinDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

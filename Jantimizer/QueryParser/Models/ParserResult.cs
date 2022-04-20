@@ -11,6 +11,7 @@ namespace QueryParser.QueryParsers
     {
         public Dictionary<string, TableReferenceNode> Tables { get; set; } = new();
         public List<JoinNode> Joins { get; set; } = new();
+        public List<FilterNode> Filters { get; set; } = new();
 
         public ParserResult() { }
 
@@ -20,6 +21,16 @@ namespace QueryParser.QueryParsers
                 throw new NullReferenceException($"No table {alias}");
 
             return Tables[alias];
+        }
+
+        public List<INode> GetNodes()
+        {
+            List<INode> nodes = new List<INode>();
+
+            nodes.AddRange(Joins);
+            nodes.AddRange(Filters);
+
+            return nodes;
         }
     }
 }

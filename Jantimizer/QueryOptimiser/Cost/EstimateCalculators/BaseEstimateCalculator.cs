@@ -27,8 +27,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             if (node is JoinNode joinNode)
             {
                 return EstimateJoinTable(joinNode, intermediateTable);
-            }
-            else
+            } else if (node is FilterNode filterNode)
+            {
+                return EstimateFilterTable(filterNode, intermediateTable);
+            } else
             {
                 throw new ArgumentException("Non handled node type " + node.ToString());
             }
@@ -45,6 +47,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             buckets = GetBucketMatches(node.Relation, table, ref references);
 
             return new IntermediateTable(buckets, references);
+        }
+
+        private IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable table)
+        {
+            return new IntermediateTable();
         }
        
         #region Matches

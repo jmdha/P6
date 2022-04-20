@@ -22,7 +22,7 @@ namespace QueryParser.QueryParsers
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public List<INode> ParseQuery(string query);
-        public Task<List<INode>> ParseQueryAsync(string query);
+        public ParserResult ParseQuery(string query);
+        public Task<ParserResult> ParseQueryAsync(string query);
     }
 }
