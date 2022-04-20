@@ -43,5 +43,22 @@ namespace QueryOptimiser.Models
             if (!Buckets.DoesContain(tableAttribute))
                 Buckets.Add(tableAttribute, bucket);
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is IntermediateBucket bucket)
+            {
+                foreach (var tableAttribute in Buckets.Keys)
+                    if (!bucket.Buckets.DoesContain(tableAttribute))
+                        return false;
+                return true;
+            }
+            return false;   
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Buckets);
+        }
     }
 }

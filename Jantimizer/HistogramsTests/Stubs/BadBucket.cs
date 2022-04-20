@@ -14,5 +14,7 @@ namespace HistogramsTests.Stubs
         public IComparable ValueEnd => throw new NotImplementedException();
 
         public long Count => throw new NotImplementedException();
+
+        public Guid BucketId => throw new NotImplementedException();
     }
 }

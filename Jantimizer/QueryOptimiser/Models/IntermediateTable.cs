@@ -41,8 +41,11 @@ namespace QueryOptimiser.Models
         public List<IHistogramBucket> GetBuckets(TableAttribute tableAttribute)
         {
             List<IHistogramBucket> buckets = new List<IHistogramBucket>();
-            foreach (IntermediateBucket bucket in Buckets)
-                buckets.Add(bucket.Buckets[tableAttribute].Bucket);
+            foreach (var interBucket in Buckets)
+                foreach (var bucketKeys in interBucket.Buckets.Keys)
+                    if (bucketKeys.Equals(tableAttribute))
+                        buckets.Add(interBucket.Buckets[bucketKeys].Bucket);
+            buckets = buckets.DistinctBy(x => x.BucketId).ToList();
             return buckets;
         }
     }

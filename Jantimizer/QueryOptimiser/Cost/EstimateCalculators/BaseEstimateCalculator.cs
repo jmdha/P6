@@ -64,7 +64,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     overlap.References.AddRange(leftMatches.References);
                     overlap.References.AddRange(rightMatches.References);
                 }
-                
+
                 return overlap;
             }
             else
@@ -194,11 +194,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             // Right Bucket:   |======|
             // Left Bucket:       |======|
             if (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            // Right bucket is entirely within Left bucket
-            // Right Bucket:   |======|
-            // Left Bucket:  |===========|
-            if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
                 return true;
             // Left bucket is entirely within Right bucket
             // Right Bucket: |===========|
