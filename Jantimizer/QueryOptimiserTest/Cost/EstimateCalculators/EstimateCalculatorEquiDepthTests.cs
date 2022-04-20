@@ -567,5 +567,15 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         }
 
         #endregion
+
+        #region MakeNewIntermediateBucket
+
+        [TestMethod]
+        public void Can_MakeNewIntermediateBucket()
+        {
+
+        }
+
+        #endregion
     }
 }

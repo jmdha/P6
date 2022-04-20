@@ -110,26 +110,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return buckets;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
-        {
-            var newBucket = new IntermediateBucket();
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
-                new BucketEstimate(
-                    leftBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
-                    )
-                );
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
-                new BucketEstimate(
-                    rightBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
-                    )
-                );
-            return newBucket;
-        }
-
         internal List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
@@ -181,6 +161,26 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 }
             }
             return buckets;
+        }
+
+        internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        {
+            var newBucket = new IntermediateBucket();
+            newBucket.AddBucketIfNotThere(
+                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
+                new BucketEstimate(
+                    leftBucket,
+                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
+                    )
+                );
+            newBucket.AddBucketIfNotThere(
+                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
+                new BucketEstimate(
+                    rightBucket,
+                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
+                    )
+                );
+            return newBucket;
         }
 
         internal bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
