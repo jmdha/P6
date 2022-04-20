@@ -11,14 +11,19 @@ namespace QueryParser.Models
         public TableReferenceNode TableReference { get; set; }
         public string AttributeName { get; set; }
         public ComparisonType.Type ComType { get; set; }
-        public string Constant { get; set; }
+        public IComparable Constant { get; set; }
 
-        public FilterNode(TableReferenceNode tableReference, string attributeName, ComparisonType.Type comType, string constant)
+        public FilterNode(TableReferenceNode tableReference, string attributeName, ComparisonType.Type comType, IComparable constant)
         {
             TableReference = tableReference;
             AttributeName = attributeName;
             ComType = comType;
             Constant = constant;
+        }
+
+        public override string ToString()
+        {
+            return $"{TableReference.Alias}.{AttributeName} {ComType} {Constant}";
         }
     }
 }
