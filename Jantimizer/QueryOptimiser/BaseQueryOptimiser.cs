@@ -13,7 +13,7 @@ namespace QueryOptimiser
     public abstract class BaseQueryOptimiser : IQueryOptimiser
     {
         public IHistogramManager HistogramManager { get; }
-        public IEstimateCalculator EstimateCalculator { get; internal set; }
+        public abstract IEstimateCalculator EstimateCalculator { get; internal set; }
 
         public BaseQueryOptimiser(IHistogramManager histogramManager)
         {
