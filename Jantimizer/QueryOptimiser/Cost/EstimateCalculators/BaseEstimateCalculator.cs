@@ -200,6 +200,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             // Left Bucket:  |===========|
             if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
                 return true;
+            // Left bucket is entirely within Right bucket
+            // Right Bucket: |===========|
+            // Left Bucket:     |=====|
+            if (rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueEnd))
+                return true;
             return false;
         }
 
