@@ -20,10 +20,6 @@ namespace QueryOptimiser
             HistogramManager = histogramManager;
         }
 
-        /// <summary>
-        /// Reorders a querys join order according to the cost of each join operation
-        /// </summary>
-        /// <returns></returns>
         public OptimiserResult OptimiseQuery(List<INode> nodes)
         {
             IntermediateTable intermediateTable = new IntermediateTable();
