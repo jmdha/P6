@@ -13,9 +13,9 @@ namespace QueryOptimiser.Helpers
         {
             IntermediateBucket bucket = new IntermediateBucket();
             foreach (var tableAttribute in bucket1.Buckets.Keys)
-                bucket.AddBucket(tableAttribute, bucket1.Buckets[tableAttribute], false);
+                bucket.AddBucketIfNotThere(tableAttribute, bucket1.Buckets[tableAttribute]);
             foreach (var tableAttribute in bucket2.Buckets.Keys)
-                bucket.AddBucket(tableAttribute, bucket2.Buckets[tableAttribute], false);
+                bucket.AddBucketIfNotThere(tableAttribute, bucket2.Buckets[tableAttribute]);
             return bucket;
         }
 
@@ -31,7 +31,7 @@ namespace QueryOptimiser.Helpers
                         if (DoesOverlap(tableAttribute, bucket1, bucket2))
                         {
                             var newBucket = new IntermediateBucket();
-                            newBucket.AddBucket(tableAttribute, bucket1.Buckets[tableAttribute]);
+                            newBucket.AddBucketIfNotThere(tableAttribute, bucket1.Buckets[tableAttribute]);
                             buckets.Add(newBucket);
                             continue;
                         }

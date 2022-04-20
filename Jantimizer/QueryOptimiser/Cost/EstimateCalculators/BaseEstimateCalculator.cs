@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 
 namespace QueryOptimiser.Cost.EstimateCalculators
 {
@@ -64,8 +65,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 }
                 else if (relation.Type == RelationType.Type.Or)
                 {
-                    overlap = leftBuckets.Concat(rightBuckets).ToList();
-                    references = leftReferences.Concat(rightReferences).ToList();
+                    overlap.AddRange(leftBuckets);
+                    overlap.AddRange(rightBuckets);
+                    references.AddRange(leftReferences);
+                    references.AddRange(rightReferences);
                 }
                 
                 return overlap;
@@ -76,28 +79,31 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
         internal List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<TableAttribute> references)
         {
-            Tuple<List<IHistogramBucket>, List<IHistogramBucket>> bucketPair = GetBucketPair(predicate, table);
-            Tuple<IHistogramBucket[], IHistogramBucket[]> bounds = GetBucketBounds(predicate, bucketPair.Item1, bucketPair.Item2);
+            PairBucketList bucketPair = GetBucketPair(
+                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
+                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
+                table);
+            PairBucketList bounds = GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
-            if (bounds.Item1.Length > 0 && bounds.Item2.Length > 0) {
-                references.Add(new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute));
-                references.Add(new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute));
+            if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0) {
+                references.Add(new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute));
+                references.Add(new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute));
             } else
                 return new List<IntermediateBucket>();
 
             if (predicate.ComType == ComparisonType.Type.Equal)
-                return GetEqualityMatches(predicate, bounds.Item1, bounds.Item2);
+                return GetEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
             else
-                return GetInEqualityMatches(predicate, bounds.Item1, bounds.Item2);
+                return GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
         }
 
-        internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
             int rightCutoff = 0;
-            for (int i = 0; i < leftBuckets.Length; i++)
+            for (int i = 0; i < leftBuckets.Count; i++)
             {
-                for (int j = rightCutoff; j < rightBuckets.Length; j++)
+                for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
                     if (DoesMatch(leftBuckets[i], rightBuckets[j]))
                         buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
@@ -111,15 +117,15 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             var newBucket = new IntermediateBucket();
-            newBucket.AddBucket(
-                new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute),
+            newBucket.AddBucketIfNotThere(
+                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
                 new BucketEstimate(
                     leftBucket,
                     JoinCost.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
                     )
                 );
-            newBucket.AddBucket(
-                new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute),
+            newBucket.AddBucketIfNotThere(
+                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
                 new BucketEstimate(
                     rightBucket,
                     JoinCost.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
@@ -128,11 +134,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return newBucket;
         }
 
-        internal List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        internal List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = rightBuckets.Length - 1;
-            for (int i = leftBuckets.Length - 1; i >= 0; i--)
+            int rightCutoff = rightBuckets.Count - 1;
+            for (int i = leftBuckets.Count - 1; i >= 0; i--)
             {
                 for (int j = rightCutoff; j >= 0; j--)
                 {
@@ -190,7 +196,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
         #endregion
         #region Bounds
-        internal Tuple<IHistogramBucket[], IHistogramBucket[]> GetBucketBounds(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
+        internal PairBucketList GetBucketBounds(ComparisonType.Type predicateType, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             int leftStart = 0;
             int leftEnd = leftBuckets.Count - 1;
@@ -199,36 +205,33 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
             if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) < 0)
             {
-                if (predicate.ComType != ComparisonType.Type.Less && predicate.ComType != ComparisonType.Type.EqualOrLess)
+                if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
                     leftStart = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[0].ValueStart);
             }
             else if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) > 0)
             {
-                if (predicate.ComType != ComparisonType.Type.More && predicate.ComType != ComparisonType.Type.EqualOrMore)
+                if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
                     rightStart = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[0].ValueStart);
             }
 
             if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) > 0)
             {
-                if (predicate.ComType != ComparisonType.Type.More && predicate.ComType != ComparisonType.Type.EqualOrMore)
+                if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
                     leftEnd = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[rightBuckets.Count - 1].ValueEnd);
             }
             else if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) < 0)
             {
-                if (predicate.ComType != ComparisonType.Type.Less && predicate.ComType != ComparisonType.Type.EqualOrLess)
+                if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
                     rightEnd = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[leftBuckets.Count - 1].ValueEnd);
             }
 
             if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
-                return new Tuple<IHistogramBucket[], IHistogramBucket[]>(new IHistogramBucket[] { }, new IHistogramBucket[] { });
+                return new PairBucketList();
 
             Range leftBucketMatchRange = new Range(leftStart, leftEnd + 1);
             Range rightBucketMatchRange = new Range(rightStart, rightEnd + 1);
 
-            IHistogramBucket[] leftBucketMatch = leftBuckets.ToArray()[leftBucketMatchRange];
-            IHistogramBucket[] rightBucketMatch = rightBuckets.ToArray()[rightBucketMatchRange];
-
-            return new Tuple<IHistogramBucket[], IHistogramBucket[]>(leftBucketMatch, rightBucketMatch);
+            return new PairBucketList(leftBuckets.GetRange(leftBucketMatchRange), rightBuckets.GetRange(rightBucketMatchRange));
         }
 
         internal int GetMatchBucketIndex(List<IHistogramBucket> buckets, int lowerIndexBound, int upperIndexBound, IComparable value)
@@ -251,30 +254,27 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
 
         #endregion
-        internal Tuple<List<IHistogramBucket>, List<IHistogramBucket>> GetBucketPair(JoinPredicate node, IntermediateTable table)
+        internal PairBucketList GetBucketPair(TableAttribute leftTableAttribute, TableAttribute rightTableAttribute, IntermediateTable table)
         {
-            var leftTableAttribute = new TableAttribute(node.LeftTable.Alias, node.LeftAttribute);
-            var rightTableAttribute = new TableAttribute(node.RightTable.Alias, node.RightAttribute);
-
             if (table.References.Contains(leftTableAttribute))
             {
                 if (table.References.Contains(rightTableAttribute))
-                    return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
+                    return new PairBucketList(
                         table.GetBuckets(leftTableAttribute), 
                         table.GetBuckets(rightTableAttribute));
                 else
-                    return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(leftTableAttribute), 
-                        HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
+                    return new PairBucketList(
+                        table.GetBuckets(leftTableAttribute),
+                        GetHistogram(rightTableAttribute).Buckets);
             }
             else if (table.References.Contains(rightTableAttribute))
-                return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
+                return new PairBucketList(
+                        GetHistogram(leftTableAttribute).Buckets,
                         table.GetBuckets(rightTableAttribute));
             else
-                return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
-                        HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
+                return new PairBucketList(
+                        GetHistogram(leftTableAttribute).Buckets,
+                        GetHistogram(rightTableAttribute).Buckets);
         }
 
         internal List<TableAttribute> GetOverlappingReferences(List<TableAttribute> leftReferences, List<TableAttribute> rightReferences)
@@ -285,6 +285,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     if (leftReference.Equals(rightReference))
                         overlappingReferences.Add(leftReference);
             return overlappingReferences;
+        }
+
+        internal IHistogram GetHistogram(TableAttribute tableAttribute)
+        {
+            return HistogramManager.GetHistogram(tableAttribute.Table, tableAttribute.Attribute);
         }
     }
 }

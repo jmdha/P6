@@ -24,14 +24,14 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
             TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             // ACT
             var result = BucketHelper.Merge(ibucket1, ibucket2);
@@ -51,14 +51,14 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             // ACT
             var result = BucketHelper.Merge(ibucket1, ibucket2);
@@ -81,14 +81,14 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
             TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             // ACT
             var result = BucketHelper.MergeOnOverlap(
@@ -108,12 +108,12 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             // ACT
             var result = BucketHelper.MergeOnOverlap(
@@ -136,15 +136,15 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
             TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket1.AddBucket(refe1, ebucket1);
-            ibucket1.AddBucket(refe2, ebucket2);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe2, ebucket2);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe3 = new TableAttribute("a", "b");
             TableAttribute refe4 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucket(refe3, ebucket1);
-            ibucket2.AddBucket(refe4, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe3, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe4, ebucket2);
 
             // ACT
             var result = BucketHelper.MergeOnOverlap(
@@ -168,13 +168,13 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
 
-            ibucket2.AddBucket(refe1, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe1, ebucket2);
 
             // ACT
             var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
@@ -192,14 +192,14 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
             TableAttribute refe2 = new TableAttribute("b", "c");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             // ACT
             var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
@@ -217,14 +217,14 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             IntermediateBucket ibucket2 = new IntermediateBucket();
             IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             // ACT
             var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);

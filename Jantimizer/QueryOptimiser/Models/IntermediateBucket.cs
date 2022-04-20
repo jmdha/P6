@@ -20,8 +20,8 @@ namespace QueryOptimiser.Models
 
         public IntermediateBucket(IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
-            AddBuckets(bucket1);
-            AddBuckets(bucket2);
+            AddBucketsIfNotThere(bucket1);
+            AddBucketsIfNotThere(bucket2);
         }
 
         internal long GetEstimateOfAllBuckets()
@@ -32,19 +32,16 @@ namespace QueryOptimiser.Models
             return count;
         }
 
-        internal void AddBuckets(IntermediateBucket bucket)
+        internal void AddBucketsIfNotThere(IntermediateBucket bucket)
         {
             foreach (var tableAttribute in bucket.Buckets.Keys)
-                AddBucket(tableAttribute, bucket.Buckets[tableAttribute]);
+                AddBucketIfNotThere(tableAttribute, bucket.Buckets[tableAttribute]);
         }
 
-        internal void AddBucket(TableAttribute tableAttribute, BucketEstimate bucket, bool throwOnDuplicate = true)
+        internal void AddBucketIfNotThere(TableAttribute tableAttribute, BucketEstimate bucket)
         {
             if (!Buckets.DoesContain(tableAttribute))
                 Buckets.Add(tableAttribute, bucket);
-            else
-                if (throwOnDuplicate)
-                    throw new ArgumentException("Can not add the same bucket twice");
         }
     }
 }

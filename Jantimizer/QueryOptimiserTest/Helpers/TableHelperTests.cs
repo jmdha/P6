@@ -24,7 +24,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -36,7 +36,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
             TableAttribute refe2 = new TableAttribute("b", "b");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket2 },
@@ -60,7 +60,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -72,7 +72,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket2 },
@@ -96,7 +96,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -106,7 +106,7 @@ namespace QueryOptimiserTest.Helpers
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -134,7 +134,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -144,7 +144,7 @@ namespace QueryOptimiserTest.Helpers
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe2 = new TableAttribute("b", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -172,7 +172,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -182,7 +182,7 @@ namespace QueryOptimiserTest.Helpers
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -210,7 +210,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -220,7 +220,7 @@ namespace QueryOptimiserTest.Helpers
             IntermediateBucket ibucket2 = new IntermediateBucket();
             TableAttribute refe2 = new TableAttribute("b", "b");
 
-            ibucket2.AddBucket(refe2, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -252,7 +252,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
             var table1 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket1 },
@@ -264,7 +264,7 @@ namespace QueryOptimiserTest.Helpers
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
             TableAttribute refe2 = new TableAttribute("b", "b");
 
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
             var table2 = new IntermediateTable(
                 new List<IntermediateBucket>() { ibucket2 },

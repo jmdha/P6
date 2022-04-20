@@ -72,8 +72,8 @@ namespace QueryOptimiserTest.Models
             BucketEstimate ebucket2 = new BucketEstimate(bucket2, b2Est);
             TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
-            ibucket2.AddBucket(refe2, ebucket2);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
 
             List<IntermediateBucket> buckets = new List<IntermediateBucket>() {
@@ -114,10 +114,10 @@ namespace QueryOptimiserTest.Models
             TableAttribute refe3 = new TableAttribute("e", "f");
             TableAttribute refe4 = new TableAttribute("g", "h");
 
-            ibucket1.AddBucket(refe1, ebucket1);
-            ibucket1.AddBucket(refe2, ebucket2);
-            ibucket2.AddBucket(refe3, ebucket3);
-            ibucket2.AddBucket(refe4, ebucket4);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe2, ebucket2);
+            ibucket2.AddBucketIfNotThere(refe3, ebucket3);
+            ibucket2.AddBucketIfNotThere(refe4, ebucket4);
 
             List<IntermediateBucket> buckets = new List<IntermediateBucket>() {
                 ibucket1,
@@ -151,7 +151,7 @@ namespace QueryOptimiserTest.Models
             BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
             TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucket(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
 
             List<IntermediateBucket> buckets = new List<IntermediateBucket>() {
@@ -181,8 +181,8 @@ namespace QueryOptimiserTest.Models
             TableAttribute refe1 = new TableAttribute("a", "b");
             TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket1.AddBucket(refe1, ebucket1);
-            ibucket1.AddBucket(refe2, ebucket2);
+            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+            ibucket1.AddBucketIfNotThere(refe2, ebucket2);
 
             List<IntermediateBucket> buckets = new List<IntermediateBucket>() {
                 ibucket1
