@@ -1135,12 +1135,6 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
 
         #endregion
 
-        #region GetBucketMatchesFromRelation
-
-
-
-        #endregion
-
         #region Private Test Methods
 
         private HistogramManagerStub MakeBasicHistogramManager(TableAttribute tableAtt1, TableAttribute tableAtt2, IHistogramBucket testHistogram1Bucket1, IHistogramBucket testHistogram1Bucket2, IHistogramBucket testHistogram2Bucket1, IHistogramBucket testHistogram2Bucket2)
