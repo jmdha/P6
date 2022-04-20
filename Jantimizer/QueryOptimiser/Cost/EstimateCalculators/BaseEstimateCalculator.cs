@@ -36,20 +36,20 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             if (node.Relation == null)
                 throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
 
-            BucketMatches bucketMatches = GetBucketMatches(node.Relation, table);
+            BucketMatches bucketMatches = GetBucketMatchesFromRelation(node.Relation, table);
             return new IntermediateTable(bucketMatches.Buckets, bucketMatches.References);
         }
 
         #region Matches
 
-        internal BucketMatches GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table)
+        internal BucketMatches GetBucketMatchesFromRelation(JoinPredicateRelation relation, IntermediateTable table)
         {
             if (relation.Type == RelationType.Type.Predicate && relation.LeafPredicate != null)
-                return GetBucketMatches(relation.LeafPredicate, table);
+                return GetBucketMatchesFromPredicate(relation.LeafPredicate, table);
             else if (relation.LeftRelation != null && relation.RightRelation != null)
             {
-                BucketMatches leftMatches = GetBucketMatches(relation.LeftRelation, table);
-                BucketMatches rightMatches = GetBucketMatches(relation.RightRelation, table);
+                BucketMatches leftMatches = GetBucketMatchesFromRelation(relation.LeftRelation, table);
+                BucketMatches rightMatches = GetBucketMatchesFromRelation(relation.RightRelation, table);
 
                 BucketMatches overlap = new BucketMatches();
                 if (relation.Type == RelationType.Type.And)
@@ -71,7 +71,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 throw new ArgumentException("Missing noderelation type " + relation.ToString());
         }
 
-        internal BucketMatches GetBucketMatches(JoinPredicate predicate, IntermediateTable table)
+        internal BucketMatches GetBucketMatchesFromPredicate(JoinPredicate predicate, IntermediateTable table)
         {
             BucketMatches returnMatches = new BucketMatches();
             PairBucketList bucketPair = GetBucketPair(
@@ -104,7 +104,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     if (DoesMatch(leftBuckets[i], rightBuckets[j]))
                         buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
                     else
+                    {
                         rightCutoff = Math.Max(0, j - 1);
+                        break;
+                    }
                 }
             }
             return buckets;
@@ -113,10 +116,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         internal List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = rightBuckets.Count - 1;
-            for (int i = leftBuckets.Count - 1; i >= 0; i--)
+            int rightCutoff = 0;
+            for (int i = 0; i < leftBuckets.Count; i++)
             {
-                for (int j = rightCutoff; j >= 0; j--)
+                for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
                     bool match = true;
                     switch (predicate.ComType)
@@ -157,7 +160,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     if (match)
                         buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
                     else
+                    {
                         rightCutoff = Math.Max(0, j - 1);
+                        break;
+                    }
                 }
             }
             return buckets;
@@ -274,6 +280,14 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return new PairBucketList(leftBuckets.GetRange(leftBucketMatchRange), rightBuckets.GetRange(rightBucketMatchRange));
         }
 
+        /// <summary>
+        /// Binary Search
+        /// </summary>
+        /// <param name="buckets"></param>
+        /// <param name="lowerIndexBound"></param>
+        /// <param name="upperIndexBound"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         internal int GetMatchBucketIndex(List<IHistogramBucket> buckets, int lowerIndexBound, int upperIndexBound, IComparable value)
         {
             if (upperIndexBound >= lowerIndexBound)

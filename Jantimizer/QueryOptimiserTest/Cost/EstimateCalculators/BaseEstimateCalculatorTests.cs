@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace QueryOptimiserTest.Cost.EstimateCalculators
 {
     [TestClass]
-    public class EstimateCalculatorEquiDepthTests
+    public class BaseEstimateCalculatorTests
     {
         #region DoesMatch
 
@@ -121,7 +121,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         #endregion
 
         #region GetHistogram
-        
+
         [TestMethod]
         [DataRow("a", "b")]
         [DataRow("ABA", "v")]
@@ -573,7 +573,602 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         [TestMethod]
         public void Can_MakeNewIntermediateBucket()
         {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v > b.v",
+                ComparisonType.Type.More);
+            IHistogramBucket leftBucket = new HistogramBucket(0, 10, 5);
+            IHistogramBucket rightBucket = new HistogramBucket(10, 20, 5);
 
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.MakeNewIntermediateBucket(predicate, leftBucket, rightBucket);
+
+            // ASSERT
+            Assert.AreEqual(leftBucket, result.Buckets[new TableAttribute("a", "v")].Bucket);
+            Assert.AreEqual(rightBucket, result.Buckets[new TableAttribute("b", "v")].Bucket);
+            Assert.IsTrue(result.Buckets.Keys.Contains(new TableAttribute("a", "v")));
+            Assert.IsTrue(result.Buckets.Keys.Contains(new TableAttribute("b", "v")));
+        }
+
+        #endregion
+
+        #region GetInEqualityMatches
+
+        [TestMethod]
+        [DataRow(
+            // Left buckets
+            new int[] { 1,  11, 21 },
+            new int[] { 10, 20, 30 },
+            // Right buckets
+            new int[] { 1, 6,  31 },
+            new int[] { 5, 30, 50 },
+            4)]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 3, 5 },
+            new int[] { 2, 4, 6 },
+            // Right buckets
+            new int[] { 1,  11, 21 },
+            new int[] { 10, 20, 30 },
+            3)]
+        public void Can_GetInEqualityMatches_More(int[] leftFrom, int[] leftTo, int[] rightFrom, int[] rightTo, int expIntermediateBucketCount)
+        {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v > b.v",
+                ComparisonType.Type.More);
+            var bucketsLeft = new List<IHistogramBucket>();
+            var bucketsRight = new List<IHistogramBucket>();
+            for (int i = 0; i < leftFrom.Length; i++)
+                bucketsLeft.Add(new HistogramBucket(leftFrom[i], leftTo[i], 1));
+            for (int i = 0; i < rightFrom.Length; i++)
+                bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
+
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
+
+            // ASSERT
+            Assert.AreEqual(expIntermediateBucketCount, result.Count);
+        }
+
+        [TestMethod]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            // Right buckets
+            new int[] { 2, 11, 31 },
+            new int[] { 10, 30, 50 },
+            4)]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 3, 5 },
+            new int[] { 2, 20, 6 },
+            // Right buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            3)]
+        public void Can_GetInEqualityMatches_MoreOrEqual(int[] leftFrom, int[] leftTo, int[] rightFrom, int[] rightTo, int expIntermediateBucketCount)
+        {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v >= b.v",
+                ComparisonType.Type.EqualOrMore);
+            var bucketsLeft = new List<IHistogramBucket>();
+            var bucketsRight = new List<IHistogramBucket>();
+            for (int i = 0; i < leftFrom.Length; i++)
+                bucketsLeft.Add(new HistogramBucket(leftFrom[i], leftTo[i], 1));
+            for (int i = 0; i < rightFrom.Length; i++)
+                bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
+
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
+
+            // ASSERT
+            Assert.AreEqual(expIntermediateBucketCount, result.Count);
+        }
+
+        [TestMethod]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            // Right buckets
+            new int[] { 2, 11, 31 },
+            new int[] { 10, 30, 50 },
+            3)]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 3, 5 },
+            new int[] { 2, 20, 6 },
+            // Right buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            9)]
+        public void Can_GetInEqualityMatches_Less(int[] leftFrom, int[] leftTo, int[] rightFrom, int[] rightTo, int expIntermediateBucketCount)
+        {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v < b.v",
+                ComparisonType.Type.Less);
+            var bucketsLeft = new List<IHistogramBucket>();
+            var bucketsRight = new List<IHistogramBucket>();
+            for (int i = 0; i < leftFrom.Length; i++)
+                bucketsLeft.Add(new HistogramBucket(leftFrom[i], leftTo[i], 1));
+            for (int i = 0; i < rightFrom.Length; i++)
+                bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
+
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
+
+            // ASSERT
+            Assert.AreEqual(expIntermediateBucketCount, result.Count);
+        }
+
+        [TestMethod]
+        [DataRow(
+            // Left buckets
+            new int[] { 9, 11, 21 },
+            new int[] { 10, 20, 30 },
+            // Right buckets
+            new int[] { 2, 10, 31 },
+            new int[] { 9, 30, 32 },
+            3)]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 11, 5 },
+            new int[] { 10, 20, 6 },
+            // Right buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 5, 20, 30 },
+            6)]
+        public void Can_GetInEqualityMatches_LessOrEqual(int[] leftFrom, int[] leftTo, int[] rightFrom, int[] rightTo, int expIntermediateBucketCount)
+        {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v <= b.v",
+                ComparisonType.Type.EqualOrLess);
+            var bucketsLeft = new List<IHistogramBucket>();
+            var bucketsRight = new List<IHistogramBucket>();
+            for (int i = 0; i < leftFrom.Length; i++)
+                bucketsLeft.Add(new HistogramBucket(leftFrom[i], leftTo[i], 1));
+            for (int i = 0; i < rightFrom.Length; i++)
+                bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
+
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
+
+            // ASSERT
+            Assert.AreEqual(expIntermediateBucketCount, result.Count);
+        }
+
+        #endregion
+
+        #region GetEqualityMatches
+
+        [TestMethod]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            // Right buckets
+            new int[] { 1, 6, 31 },
+            new int[] { 5, 30, 50 },
+            4)]
+        [DataRow(
+            // Left buckets
+            new int[] { 1, 3, 5 },
+            new int[] { 2, 4, 6 },
+            // Right buckets
+            new int[] { 1, 11, 21 },
+            new int[] { 10, 20, 30 },
+            3)]
+        public void Can_GetEqualityMatches(int[] leftFrom, int[] leftTo, int[] rightFrom, int[] rightTo, int expIntermediateBucketCount)
+        {
+            // ARRANGE
+            JoinPredicate predicate = new JoinPredicate(
+                new TableReferenceNode(0, "a", "a"),
+                "v",
+                new TableReferenceNode(1, "b", "b"),
+                "v",
+                "a.v > b.v",
+                ComparisonType.Type.More);
+            var bucketsLeft = new List<IHistogramBucket>();
+            var bucketsRight = new List<IHistogramBucket>();
+            for (int i = 0; i < leftFrom.Length; i++)
+                bucketsLeft.Add(new HistogramBucket(leftFrom[i], leftTo[i], 1));
+            for (int i = 0; i < rightFrom.Length; i++)
+                bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
+
+            var estimator = new EstimateCalculatorEquiDepth(new HistogramManagerStub());
+
+            // ACT
+            var result = estimator.GetEqualityMatches(predicate, bucketsLeft, bucketsRight);
+
+            // ASSERT
+            Assert.AreEqual(expIntermediateBucketCount, result.Count);
+        }
+
+        #endregion
+
+        #region GetBucketMatchesFromPredicate
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_Equal_1()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(10, 20, 10),
+                new HistogramBucket(21, 40, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.Equal);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(2, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_Equal_2()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.Equal);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(1, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_More_1()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(5, 13, 10),
+                new HistogramBucket(14, 30, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.More);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(3, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_More_2()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(12, 13, 10),
+                new HistogramBucket(14, 30, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.More);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(2, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_MoreOrEqual_1()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(10, 13, 10),
+                new HistogramBucket(14, 30, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.EqualOrMore);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(3, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_MoreOrEqual_2()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(20, 25, 10),
+                new HistogramBucket(23, 40, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.EqualOrMore);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(1, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_Less_1()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(20, 25, 10),
+                new HistogramBucket(23, 40, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.Less);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(4, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_Less_2()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(10, 30, 10),
+                new HistogramBucket(31, 40, 10),
+                new HistogramBucket(20, 25, 10),
+                new HistogramBucket(23, 40, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.Less);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(2, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_LessOrEqual_1()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(0, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(0, 1, 10),
+                new HistogramBucket(2, 20, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.EqualOrLess);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(2, result.References.Count);
+            Assert.AreEqual(2, result.Buckets.Count);
+        }
+
+        [TestMethod]
+        public void Can_GetBucketMatchesFromPredicate_LessOrEqual_2()
+        {
+            // ARRANGE
+            var tableAtt1 = new TableAttribute("a", "v");
+            var tableAtt2 = new TableAttribute("b", "v");
+
+            HistogramManagerStub manager = MakeBasicHistogramManager(
+                tableAtt1,
+                tableAtt2,
+                new HistogramBucket(5, 10, 10),
+                new HistogramBucket(11, 20, 10),
+                new HistogramBucket(0, 1, 10),
+                new HistogramBucket(2, 3, 10));
+
+            JoinPredicate predicate = MakeBasicJoinPredicate(
+                tableAtt1,
+                tableAtt2,
+                ComparisonType.Type.EqualOrLess);
+
+            var table = new IntermediateTable();
+            var estimator = new EstimateCalculatorEquiDepth(manager);
+
+            // ACT
+            var result = estimator.GetBucketMatchesFromPredicate(predicate, table);
+
+            // ASSERT
+            Assert.AreEqual(0, result.References.Count);
+            Assert.AreEqual(0, result.Buckets.Count);
+        }
+
+        #endregion
+
+        #region GetBucketMatchesFromRelation
+
+
+
+        #endregion
+
+        #region Private Test Methods
+
+        private HistogramManagerStub MakeBasicHistogramManager(TableAttribute tableAtt1, TableAttribute tableAtt2, IHistogramBucket testHistogram1Bucket1, IHistogramBucket testHistogram1Bucket2, IHistogramBucket testHistogram2Bucket1, IHistogramBucket testHistogram2Bucket2)
+        {
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            testHistogram1.Buckets.Add(testHistogram1Bucket1);
+            testHistogram1.Buckets.Add(testHistogram1Bucket2);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            testHistogram2.Buckets.Add(testHistogram2Bucket1);
+            testHistogram2.Buckets.Add(testHistogram2Bucket2);
+
+            HistogramManagerStub manager = new HistogramManagerStub();
+            manager.TestStorage.Add(testHistogram1);
+            manager.TestStorage.Add(testHistogram2);
+
+            return manager;
+        }
+
+        private JoinPredicate MakeBasicJoinPredicate(TableAttribute tableAtt1, TableAttribute tableAtt2, ComparisonType.Type compType)
+        {
+            return new JoinPredicate(
+                new TableReferenceNode(0, tableAtt1.Table, tableAtt1.Table),
+                tableAtt1.Attribute,
+                new TableReferenceNode(1, tableAtt2.Table, tableAtt2.Table),
+                tableAtt2.Attribute,
+                $"{tableAtt1.Table}.{tableAtt1.Attribute} {ComparisonType.GetOperatorString(compType)} {tableAtt2.Table}.{tableAtt2.Attribute}",
+                compType
+                );
         }
 
         #endregion
