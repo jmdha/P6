@@ -10,6 +10,8 @@ namespace QueryOptimiserTest.Stubs
 {
     public class HistogramManagerStub : IHistogramManager
     {
+        public List<IHistogram> TestStorage { get; set; } = new List<IHistogram>();
+
         public List<string> Tables => throw new NotImplementedException();
 
         public List<string> Attributes => throw new NotImplementedException();
@@ -31,7 +33,11 @@ namespace QueryOptimiserTest.Stubs
 
         public IHistogram GetHistogram(string table, string attribute)
         {
-            throw new NotImplementedException();
+            foreach (IHistogram histogram in TestStorage)
+                if (histogram.AttributeName == attribute)
+                    if (histogram.TableName == table)
+                        return histogram;
+            throw new KeyNotFoundException();
         }
 
         public List<IHistogram> GetHistogramsByAttribute(string attribute)
