@@ -321,112 +321,120 @@ namespace QueryParsers
         [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 = b.v2)\n",
-			 ComparisonType.Type.Equal,
+             ComparisonType.Type.Equal,
              "a.v1 = b.v2"
         )]
-		[DataRow(
+        [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 > b.v2)\n",
-			 ComparisonType.Type.More,
+             ComparisonType.Type.More,
              "a.v1 > b.v2"
         )]
-		[DataRow(
+        [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 < b.v2)\n",
-			 ComparisonType.Type.Less,
+             ComparisonType.Type.Less,
              "a.v1 < b.v2"
         )]
-		[DataRow(
+        [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 >= b.v2)\n",
-			 ComparisonType.Type.EqualOrMore,
+             ComparisonType.Type.EqualOrMore,
              "a.v1 >= b.v2"
         )]
-		[DataRow(
+        [DataRow(
              $"        ->  Index Scan using comp_cast_type_pkey on comp_cast_type a  (cost=0.13..0.15 rows=1 width=4)\n" +
              $"              Index Cond: (v1 <= b.v2)\n",
-			 ComparisonType.Type.EqualOrLess,
+             ComparisonType.Type.EqualOrLess,
              "a.v1 <= b.v2"
         )]
         public void Can_InsertConditions(string explainResults, ComparisonType.Type type, string predicate) {
             // ARRANGE
-			PostgresParser parser = new PostgresParser();
-			ParserResult result = new ParserResult();
-			result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
-			result.Tables.Add("b", new TableReferenceNode(0, "b", "b"));
+            PostgresParser parser = new PostgresParser();
+            ParserResult result = new ParserResult();
+            result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
+            result.Tables.Add("b", new TableReferenceNode(0, "b", "b"));
 
             // ACT
             parser.InsertConditions(explainResults, ref result);
 
             // ASSERT
             Assert.AreEqual(1, result.Joins.Count);
-			Assert.IsNotNull(result.Joins[0].Relation);
-			Assert.IsNotNull(result.Joins[0].Relation.LeafPredicate);
-			Assert.IsNull(result.Joins[0].Relation.LeftRelation);
-			Assert.IsNull(result.Joins[0].Relation.RightRelation);
+            Assert.IsNotNull(result.Joins[0].Relation);
+            Assert.IsNotNull(result.Joins[0].Relation.LeafPredicate);
+            Assert.IsNull(result.Joins[0].Relation.LeftRelation);
+            Assert.IsNull(result.Joins[0].Relation.RightRelation);
             Assert.AreEqual(predicate, result.Joins[0].Predicate);
-			Assert.AreEqual("a", result.Joins[0].Relation!.LeafPredicate!.LeftTable.Alias);
-			Assert.AreEqual("b", result.Joins[0].Relation!.LeafPredicate!.RightTable.Alias);
-			Assert.AreEqual("v1", result.Joins[0].Relation!.LeafPredicate!.LeftAttribute);
-			Assert.AreEqual("v2", result.Joins[0].Relation!.LeafPredicate!.RightAttribute);
-			Assert.AreEqual(type, result.Joins[0].Relation!.LeafPredicate!.ComType);
+            Assert.AreEqual("a", result.Joins[0].Relation!.LeafPredicate!.LeftTable.Alias);
+            Assert.AreEqual("b", result.Joins[0].Relation!.LeafPredicate!.RightTable.Alias);
+            Assert.AreEqual("v1", result.Joins[0].Relation!.LeafPredicate!.LeftAttribute);
+            Assert.AreEqual("v2", result.Joins[0].Relation!.LeafPredicate!.RightAttribute);
+            Assert.AreEqual(type, result.Joins[0].Relation!.LeafPredicate!.ComType);
         }
         #endregion
 
         #region InsertFilters
         [TestMethod]
         [DataRow(
-			$"->  Index Scan using title_pkey on title a  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"->  Index Scan using title_pkey on title a  (cost=0.43..0.85 rows=1 width=21)\n" +
             $"  Filter: (v1 = 0)\n",
-			"a",
-			ComparisonType.Type.Equal,
+            "a",
+            ComparisonType.Type.Equal,
             "v1",
-			"0"
+            "0"
         )]
-		[DataRow(
-			$"->  Index Scan using title_pkey on title b  (cost=0.43..0.85 rows=1 width=21)\n" +
+        [DataRow(
+            $"->  Index Scan using title_pkey on title b  (cost=0.43..0.85 rows=1 width=21)\n" +
             $"  Filter: (v2 <= 1)\n",
-			"b",
-			ComparisonType.Type.EqualOrLess,
+            "b",
+            ComparisonType.Type.EqualOrLess,
             "v2",
-			"1"
+            "1"
         )]
-		[DataRow(
-			$"->  Index Scan using title_pkey on title c  (cost=0.43..0.85 rows=1 width=21)\n" +
+        [DataRow(
+            $"->  Index Scan using title_pkey on title c  (cost=0.43..0.85 rows=1 width=21)\n" +
             $"  Filter: (v3 >= 2)\n",
-			"c",
-			ComparisonType.Type.EqualOrMore,
+            "c",
+            ComparisonType.Type.EqualOrMore,
             "v3",
-			"2"
+            "2"
         )]
-		[DataRow(
-			$"->  Index Scan using title_pkey on title d  (cost=0.43..0.85 rows=1 width=21)\n" +
+        [DataRow(
+            $"->  Index Scan using title_pkey on title d  (cost=0.43..0.85 rows=1 width=21)\n" +
             $"  Filter: (v4 < 3)\n",
-			"d",
-			ComparisonType.Type.Less,
+            "d",
+            ComparisonType.Type.Less,
             "v4",
-			"3"
+            "3"
         )]
-		[DataRow(
-			$"->  Index Scan using title_pkey on title e  (cost=0.43..0.85 rows=1 width=21)\n" +
+        [DataRow(
+            $"->  Index Scan using title_pkey on title e  (cost=0.43..0.85 rows=1 width=21)\n" +
             $"  Filter: (v5 > 4)\n",
-			"e",
-			ComparisonType.Type.More,
+            "e",
+            ComparisonType.Type.More,
             "v5",
-			"4"
+            "4"
+        )]
+        [DataRow(
+            $"->  Index Scan using title_pkey on title e  (cost=0.43..0.85 rows=1 width=21)\n" +
+            $"  Filter: (v5 = '4'::text)\n",
+            "e",
+            ComparisonType.Type.Equal,
+            "v5",
+            "4"
         )]
         public void Can_InsertFilters(string explainResults, string tableAlias, ComparisonType.Type type, string attribute, string constant) {
-			PostgresParser parser = new PostgresParser(null);
-			ParserResult result = new ParserResult();
-			TableReferenceNode tRefNode = new TableReferenceNode(0, tableAlias, tableAlias);
-			result.Tables.Add(tableAlias, tRefNode);
+            PostgresParser parser = new PostgresParser(null);
+            ParserResult result = new ParserResult();
+            TableReferenceNode tRefNode = new TableReferenceNode(0, tableAlias, tableAlias);
+            result.Tables.Add(tableAlias, tRefNode);
             parser.InsertFilters(explainResults, ref result);
-			Assert.IsNotNull(result.Tables[tableAlias]);
-			Assert.AreEqual(1, result.Tables[tableAlias].Filters.Count);
-			Assert.AreEqual(tRefNode, result.Tables[tableAlias].Filters[0].TableReference);
-			Assert.AreEqual(type, result.Tables[tableAlias].Filters[0].ComType);
-			Assert.AreEqual(attribute, result.Tables[tableAlias].Filters[0].AttributeName);
-			Assert.AreEqual(constant, result.Tables[tableAlias].Filters[0].Constant);
+            Assert.IsNotNull(result.Tables[tableAlias]);
+            Assert.AreEqual(1, result.Tables[tableAlias].Filters.Count);
+            Assert.AreEqual(tRefNode, result.Tables[tableAlias].Filters[0].TableReference);
+            Assert.AreEqual(type, result.Tables[tableAlias].Filters[0].ComType);
+            Assert.AreEqual(attribute, result.Tables[tableAlias].Filters[0].AttributeName);
+            Assert.AreEqual(constant, result.Tables[tableAlias].Filters[0].Constant.ToString());
         }
         #endregion
 
