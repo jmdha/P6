@@ -10,10 +10,10 @@ using QueryParser.Models;
 
 namespace QueryOptimiser
 {
-    public partial class BaseQueryOptimiser : IQueryOptimiser
+    public abstract class BaseQueryOptimiser : IQueryOptimiser
     {
-        public IHistogramManager HistogramManager { get; set; }
-        public IEstimateCalculator EstimateCalculator { get; set; }
+        public IHistogramManager HistogramManager { get; }
+        public IEstimateCalculator EstimateCalculator { get; internal set; }
 
         public BaseQueryOptimiser(IHistogramManager histogramManager)
         {
@@ -28,7 +28,6 @@ namespace QueryOptimiser
         {
             IntermediateTable intermediateTable = new IntermediateTable();
             
-            List<ValuedNode> valuedNodes = new List<ValuedNode>();
             try
             {
                 for (int i = 0; i < nodes.Count; i++)
@@ -46,7 +45,7 @@ namespace QueryOptimiser
             }
             
 
-            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), valuedNodes);
+            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate());
         }
     }
 }

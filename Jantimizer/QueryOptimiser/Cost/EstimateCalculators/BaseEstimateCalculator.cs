@@ -48,21 +48,21 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 return GetBucketMatches(relation.LeafPredicate, table);
             else if (relation.LeftRelation != null && relation.RightRelation != null)
             {
-                BucketMatches leftBuckets = GetBucketMatches(relation.LeftRelation, table);
-                BucketMatches rightBuckets = GetBucketMatches(relation.RightRelation, table);
+                BucketMatches leftMatches = GetBucketMatches(relation.LeftRelation, table);
+                BucketMatches rightMatches = GetBucketMatches(relation.RightRelation, table);
 
                 BucketMatches overlap = new BucketMatches();
                 if (relation.Type == RelationType.Type.And)
                 {
-                    overlap.Buckets = BucketHelper.MergeOnOverlap(leftBuckets.Buckets, rightBuckets.Buckets);
-                    overlap.References = GetOverlappingReferences(leftBuckets.References, rightBuckets.References);
+                    overlap.Buckets = BucketHelper.MergeOnOverlap(leftMatches.Buckets, rightMatches.Buckets);
+                    overlap.References = GetOverlappingReferences(leftMatches.References, rightMatches.References);
                 }
                 else if (relation.Type == RelationType.Type.Or)
                 {
-                    overlap.Buckets.AddRange(leftBuckets.Buckets);
-                    overlap.Buckets.AddRange(rightBuckets.Buckets);
-                    overlap.References.AddRange(leftBuckets.References);
-                    overlap.References.AddRange(rightBuckets.References);
+                    overlap.Buckets.AddRange(leftMatches.Buckets);
+                    overlap.Buckets.AddRange(rightMatches.Buckets);
+                    overlap.References.AddRange(leftMatches.References);
+                    overlap.References.AddRange(rightMatches.References);
                 }
                 
                 return overlap;
