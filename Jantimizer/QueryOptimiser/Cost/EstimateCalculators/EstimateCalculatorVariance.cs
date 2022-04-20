@@ -10,10 +10,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 {
     internal class EstimateCalculatorVariance : BaseEstimateCalculator
     {
-        internal override INodeCost<JoinNode> JoinCost { get; set; }
+        public override INodeCost<JoinNode> NodeCostCalculator { get; set; }
 
         public EstimateCalculatorVariance(IHistogramManager manager) : base(manager) {
-            JoinCost = new JoinEstimateEquiDepthVariance();
+            NodeCostCalculator = new JoinEstimateEquiDepthVariance();
         }
     }
 }

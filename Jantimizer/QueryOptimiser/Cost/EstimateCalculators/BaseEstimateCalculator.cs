@@ -16,7 +16,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
     public abstract class BaseEstimateCalculator : IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
-        internal abstract INodeCost<JoinNode> JoinCost { get; set; }
+        public abstract INodeCost<JoinNode> NodeCostCalculator { get; set; }
 
         internal BaseEstimateCalculator(IHistogramManager manager)
         {
@@ -117,14 +117,14 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
                 new BucketEstimate(
                     leftBucket,
-                    JoinCost.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
+                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
                     )
                 );
             newBucket.AddBucketIfNotThere(
                 new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
                 new BucketEstimate(
                     rightBucket,
-                    JoinCost.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
+                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
                     )
                 );
             return newBucket;
@@ -185,8 +185,20 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
         internal bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
-            if ((rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueEnd)) ||
-                (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd)))
+            // Right bucket start index is within Left bucket range
+            // Right Bucket:      |======|
+            // Left Bucket:    |======|
+            if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueEnd))
+                return true;
+            // Right bucket end index is within Left bucket range
+            // Right Bucket:   |======|
+            // Left Bucket:       |======|
+            if (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
+                return true;
+            // Right bucket is entirely within Left bucket
+            // Right Bucket:   |======|
+            // Left Bucket:  |===========|
+            if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
                 return true;
             return false;
         }
