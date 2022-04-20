@@ -115,7 +115,7 @@ namespace QueryParser.QueryParsers
             return match.Groups["tableName"].Value;
         }
 
-        internal static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
+        internal static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond|Merge Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
         internal void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
