@@ -5,6 +5,7 @@ using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
 using QueryParser.Models;
+using QueryParser.QueryParsers;
 
 namespace QueryOptimiser
 {
@@ -13,6 +14,6 @@ namespace QueryOptimiser
         public IHistogramManager HistogramManager { get; }
         public IEstimateCalculator EstimateCalculator { get; }
 
-        public OptimiserResult OptimiseQuery(List<INode> nodes);
+        public OptimiserResult OptimiseQuery(ParserResult parserResult);
     }
 }

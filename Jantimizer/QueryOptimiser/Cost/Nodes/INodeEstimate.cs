@@ -7,15 +7,12 @@ using QueryParser.Models;
 using Histograms;
 using Histograms.Models;
 using DatabaseConnector;
+using QueryOptimiser.Models;
 using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    public class JoinEstimateEquiDepth : INodeCost<JoinNode>
+    public interface INodeEstimate<NodeType> where NodeType : INode
     {
-        public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
-        {
-            return bucket.Count;
-        }
     }
 }

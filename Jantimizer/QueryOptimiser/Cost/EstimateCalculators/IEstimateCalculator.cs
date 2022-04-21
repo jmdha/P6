@@ -16,7 +16,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators
     public interface IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; }
-        public INodeCost<JoinNode> NodeCostCalculator { get; }
+        public IJoinEstimate JoinEstimator { get; }
+        public IFilterEstimate FilterEstimator { get; }
 
         public IntermediateTable EstimateIntermediateTable(INode node, IntermediateTable intermediateTable);
     }

@@ -16,8 +16,9 @@ namespace QueryOptimiser.Cost.EstimateCalculators
     public abstract class BaseEstimateCalculator : IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
-        public abstract INodeCost<JoinNode> NodeCostCalculator { get; set; }
-        public abstract MatchFinder<JoinNode> Matcher { get; set; }
+        public abstract IJoinEstimate JoinEstimator { get; set; }
+        public abstract IFilterEstimate FilterEstimator { get; set; }
+        public abstract MatchFinder Matcher { get; set; }
 
         internal BaseEstimateCalculator(IHistogramManager manager)
         {
@@ -28,10 +29,22 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             if (node is JoinNode joinNode)
                 return EstimateJoinTable(joinNode, intermediateTable);
+            else if (node is FilterNode filterNode)
+                return EstimateFilterTable(filterNode, intermediateTable);
             else
                 throw new ArgumentException("Non handled node type " + node.ToString());
         }
 
+        #region Filter
+        internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
+        {
+            List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.Alias, node.AttributeName), intermediateTable);
+            List<IntermediateBucket> intermediateBuckets = Matcher.GetMatches(node, buckets);
+            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.Alias, node.AttributeName) });
+        }
+        #endregion
+
+        #region Join
         internal IntermediateTable EstimateJoinTable(JoinNode node, IntermediateTable table)
         {
             if (node.Relation == null)
@@ -93,28 +106,21 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 returnMatches.Buckets = Matcher.GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
             return returnMatches;
         }
+        #endregion
+
+        internal List<IHistogramBucket> GetBuckets(TableAttribute tableAttribute, IntermediateTable table)
+        {
+            if (table.References.Contains(tableAttribute))
+                return table.GetBuckets(tableAttribute);
+            else
+                return GetHistogram(tableAttribute).Buckets;
+        }
 
         internal PairBucketList GetBucketPair(TableAttribute leftTableAttribute, TableAttribute rightTableAttribute, IntermediateTable table)
         {
-            if (table.References.Contains(leftTableAttribute))
-            {
-                if (table.References.Contains(rightTableAttribute))
-                    return new PairBucketList(
-                        table.GetBuckets(leftTableAttribute), 
-                        table.GetBuckets(rightTableAttribute));
-                else
-                    return new PairBucketList(
-                        table.GetBuckets(leftTableAttribute),
-                        GetHistogram(rightTableAttribute).Buckets);
-            }
-            else if (table.References.Contains(rightTableAttribute))
-                return new PairBucketList(
-                        GetHistogram(leftTableAttribute).Buckets,
-                        table.GetBuckets(rightTableAttribute));
-            else
-                return new PairBucketList(
-                        GetHistogram(leftTableAttribute).Buckets,
-                        GetHistogram(rightTableAttribute).Buckets);
+            List<IHistogramBucket> leftBuckets = GetBuckets(leftTableAttribute, table);
+            List<IHistogramBucket> rightBuckets = GetBuckets(rightTableAttribute, table);
+            return new PairBucketList(leftBuckets, rightBuckets);
         }
 
         internal List<TableAttribute> GetOverlappingReferences(List<TableAttribute> leftReferences, List<TableAttribute> rightReferences)

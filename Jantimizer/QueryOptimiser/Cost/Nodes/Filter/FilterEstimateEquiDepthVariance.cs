@@ -11,16 +11,15 @@ using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    public class JoinEstimateEquiDepthVariance : INodeCost<JoinNode>
+    public class FilterEstimateEquiDepthVariance : IFilterEstimate
     {
-        public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
+        public long GetBucketEstimate(ComparisonType.Type comparisonType, IComparable constant, IHistogramBucket bucket)
         {
-            if (bucket is HistogramBucketVariance vBucket && comparisonBucket is HistogramBucketVariance vComparisonBucket)
+            if (bucket is HistogramBucketVariance vBucket)
             {
                 double bucketCertainty = GetBucketCertainty(vBucket);
-                double comparisonBucketCertainty = GetBucketCertainty(vComparisonBucket);
 
-                double certainty = GetTotalCertainty(bucketCertainty, comparisonBucketCertainty);
+                double certainty = GetTotalCertainty(bucketCertainty, 1);
 
                 long estimate = (long)(certainty * vBucket.Count);
                 if (estimate == 0)
@@ -29,7 +28,7 @@ namespace QueryOptimiser.Cost.Nodes
                     return estimate;
             } else
             {
-                return new JoinEstimateEquiDepth().GetBucketEstimate(predicate, bucket, comparisonBucket);
+                return new FilterEstimateEquiDepth().GetBucketEstimate(comparisonType, constant, bucket);
             }
         }
 

@@ -10,12 +10,14 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 {
     internal class EstimateCalculatorEquiDepth : BaseEstimateCalculator
     {
-        public override INodeCost<JoinNode> NodeCostCalculator { get; set; }
-        public override MatchFinder<JoinNode> Matcher { get; set; }
+        public override IJoinEstimate JoinEstimator { get; set; }
+        public override IFilterEstimate FilterEstimator { get; set; }
+        public override MatchFinder Matcher { get; set; }
 
         public EstimateCalculatorEquiDepth(IHistogramManager manager) : base(manager) {
-            NodeCostCalculator = new JoinEstimateEquiDepth();
-            Matcher = new MatchFinder<JoinNode>(NodeCostCalculator);
+            JoinEstimator = new JoinEstimateEquiDepth();
+            FilterEstimator = new FilterEstimateEquiDepth();
+            Matcher = new MatchFinder(JoinEstimator, FilterEstimator);
         }
     }
 }

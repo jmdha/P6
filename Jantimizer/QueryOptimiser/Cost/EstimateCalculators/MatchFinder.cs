@@ -12,13 +12,54 @@ using Tools.Helpers;
 
 namespace QueryOptimiser.Cost.EstimateCalculators
 {
-    public class MatchFinder<T> where T : INode
+    public class MatchFinder
     {
-        internal INodeCost<T> NodeCostCalculator { get; set; }
-
-        public MatchFinder(INodeCost<T> nodeCostCalculator)
+        internal enum MatchType
         {
-            NodeCostCalculator = nodeCostCalculator;
+            Undefined,
+            Overlap, // If the match is via overlap
+            Match, // If there is a match but there is no overlap
+            None
+        }
+
+        internal IJoinEstimate JoinEstimator { get; set; }
+        internal IFilterEstimate FilterEstimator { get; set; }
+
+        public MatchFinder(IJoinEstimate joinEstimator, IFilterEstimate filterEstimator)
+        {
+            JoinEstimator = joinEstimator;
+            FilterEstimator = filterEstimator;
+        }
+
+        internal List<IntermediateBucket> GetMatches(FilterNode node, List<IHistogramBucket> buckets)
+        {
+            switch (node.ComType)
+            {
+                case ComparisonType.Type.Equal:
+                    return GetEqualityMatches(node, buckets);
+                case ComparisonType.Type.Less:
+                case ComparisonType.Type.More:
+                case ComparisonType.Type.EqualOrMore:
+                case ComparisonType.Type.EqualOrLess:
+                    return GetEqualityMatches(node, buckets);
+                default:
+                    throw new ArgumentException($"Invalid comparison type {node.ToString()}");
+            }
+        }
+
+        internal List<IntermediateBucket> GetEqualityMatches(FilterNode node, List<IHistogramBucket> buckets)
+        {
+            List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
+            bool matches = false;
+            for (int i = 0; i < buckets.Count; i++)
+            {
+                if (DoesOverlap(node.Constant, buckets[i])) {
+                    matches = true;
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+                } else if (matches)
+                    break;
+            }
+            return intermediateBuckets;
         }
 
         internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
@@ -29,7 +70,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
-                    if (DoesMatch(leftBuckets[i], rightBuckets[j]))
+                    if (DoesOverlap(leftBuckets[i], rightBuckets[j]))
                         buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
                     else
                     {
@@ -39,6 +80,21 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 }
             }
             return buckets;
+        }
+
+        internal List<IntermediateBucket> GetInEqualityMatches(FilterNode node, List<IHistogramBucket> buckets)
+        {
+            List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
+            bool matches = false;
+            for (int i = 0; i < buckets.Count; i++)
+            {
+                bool overlappingMatch = false;
+                bool match = false;
+                
+                if (overlappingMatch)
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+            }
+            return intermediateBuckets;
         }
 
         /// <summary>
@@ -128,6 +184,19 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return buckets;
         }
 
+        internal IntermediateBucket MakeNewIntermediateBucket(ComparisonType.Type comparisonType, IComparable constant, TableAttribute tableAttribute, IHistogramBucket bucket)
+        {
+            var newBucket = new IntermediateBucket();
+            newBucket.AddBucketIfNotThere(
+                tableAttribute,
+                new BucketEstimate(
+                    bucket,
+                    FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket)
+                    )
+                );
+            return newBucket;
+        }
+
         internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             var newBucket = new IntermediateBucket();
@@ -135,20 +204,70 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
                 new BucketEstimate(
                     leftBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
+                    JoinEstimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
                     )
                 );
             newBucket.AddBucketIfNotThere(
                 new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
                 new BucketEstimate(
                     rightBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
+                    JoinEstimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
                     )
                 );
             return newBucket;
         }
 
-        internal bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        internal MatchType DoesMatch(ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
+        {
+            switch (comType)
+            {
+                case ComparisonType.Type.Less:
+                    if (constant.IsLessThan(bucket.ValueStart))
+                        return MatchType.Match;
+                    else if (constant.IsLessThan(bucket.ValueEnd))
+                        return MatchType.Overlap;
+                    else
+                        return MatchType.None;
+                case ComparisonType.Type.EqualOrLess:
+                    if (constant.IsLessThanOrEqual(bucket.ValueStart))
+                        return MatchType.Match;
+                    else if (constant.IsLessThanOrEqual(bucket.ValueEnd))
+                        return MatchType.Overlap;
+                    else
+                        return MatchType.None;
+                case ComparisonType.Type.More:
+                    if (constant.IsLargerThan(bucket.ValueEnd))
+                        return MatchType.Match;
+                    else if (constant.IsLargerThan(bucket.ValueStart))
+                        return MatchType.Overlap;
+                    else
+                        return MatchType.None;
+                case ComparisonType.Type.EqualOrMore:
+                    if (constant.IsLargerThanOrEqual(bucket.ValueEnd))
+                        return MatchType.Match;
+                    else if (constant.IsLargerThanOrEqual(bucket.ValueStart))
+                        return MatchType.Overlap;
+                    else
+                        return MatchType.None;
+                default:
+                    return MatchType.Undefined;
+            }
+        }
+
+        /// <summary>
+        ///    Returns true if the constant is inside the bounds of the bucket
+        /// </summary>
+        /// <param name="constant"></param>
+        /// <param name="bucket"></param>
+        /// <returns></returns>
+        internal bool DoesOverlap(IComparable constant, IHistogramBucket bucket)
+        {
+            if (bucket.ValueStart.IsLessThanOrEqual(constant) && bucket.ValueEnd.IsLargerThanOrEqual(constant))
+                return true;
+            return false;
+        }
+
+        internal bool DoesOverlap(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             // Right bucket start index is within Left bucket range
             // Right Bucket:      |======|
