@@ -5,7 +5,6 @@ using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
 using QueryParser.Models;
-using QueryParser.QueryParsers;
 
 namespace QueryOptimiser
 {
@@ -14,10 +13,6 @@ namespace QueryOptimiser
         public IHistogramManager HistogramManager { get; }
         public IEstimateCalculator EstimateCalculator { get; }
 
-        /// <summary>
-        /// Reorders a querys join order according to the cost of each join operation
-        /// </summary>
-        /// <returns></returns>
-        public OptimiserResult OptimiseQuery(ParserResult result);
+        public OptimiserResult OptimiseQuery(List<INode> nodes);
     }
 }

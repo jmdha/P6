@@ -6,21 +6,24 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public class FilterNode : INode
+    public class FilterNode
     {
-        public int Id { get; internal set; }
         public TableReferenceNode TableReference { get; set; }
         public string AttributeName { get; set; }
         public ComparisonType.Type ComType { get; set; }
-        public string Constant { get; set; }
+        public IComparable Constant { get; set; }
 
-        public FilterNode(int id, TableReferenceNode tableReference, string attributeName, ComparisonType.Type comType, string constant)
+        public FilterNode(TableReferenceNode tableReference, string attributeName, ComparisonType.Type comType, IComparable constant)
         {
-            Id = id;
             TableReference = tableReference;
             AttributeName = attributeName;
             ComType = comType;
             Constant = constant;
+        }
+
+        public override string ToString()
+        {
+            return $"{TableReference.Alias}.{AttributeName} {ComType} {Constant}";
         }
     }
 }

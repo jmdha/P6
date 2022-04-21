@@ -16,6 +16,7 @@
                     throw new IndexOutOfRangeException("Count for a bucket cannot be less than 0!");
                 count = value;
             } }
+        public Guid BucketId { get; internal set; }
 
         public HistogramBucket(IComparable valueStart, IComparable valueEnd, long count)
         {
@@ -29,11 +30,28 @@
             _valueEnd = null!; // Suppress warning for _valueEnd "not being set"
             ValueEnd = valueEnd;
             Count = count;
+            BucketId = Guid.NewGuid();
         }
 
         public override string? ToString()
         {
-            return $"Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}]";
+            return $"Id: [{BucketId}] Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}]";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is HistogramBucket bucket &&
+                   EqualityComparer<IComparable>.Default.Equals(ValueStart, bucket.ValueStart) &&
+                   EqualityComparer<IComparable>.Default.Equals(_valueEnd, bucket._valueEnd) &&
+                   EqualityComparer<IComparable>.Default.Equals(ValueEnd, bucket.ValueEnd) &&
+                   count == bucket.count &&
+                   Count == bucket.Count &&
+                   BucketId == bucket.BucketId;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ValueStart, _valueEnd, ValueEnd, count, Count, BucketId);
         }
     }
 }

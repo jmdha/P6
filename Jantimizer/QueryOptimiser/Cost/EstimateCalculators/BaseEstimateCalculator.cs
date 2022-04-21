@@ -1,6 +1,7 @@
 ﻿using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.Nodes;
+using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 using System;
@@ -8,14 +9,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 
 namespace QueryOptimiser.Cost.EstimateCalculators
 {
     public abstract class BaseEstimateCalculator : IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
-
-        internal abstract INodeCost<JoinNode> JoinCost { get; set; }
+        public abstract INodeCost<JoinNode> NodeCostCalculator { get; set; }
+        public abstract MatchFinder<JoinNode> Matcher { get; set; }
 
         internal BaseEstimateCalculator(IHistogramManager manager)
         {
@@ -25,274 +27,109 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         public IntermediateTable EstimateIntermediateTable(INode node, IntermediateTable intermediateTable)
         {
             if (node is JoinNode joinNode)
-            {
                 return EstimateJoinTable(joinNode, intermediateTable);
-            } else if (node is FilterNode filterNode)
-            {
-                return EstimateFilterTable(filterNode, intermediateTable);
-            } else
-            {
+            else
                 throw new ArgumentException("Non handled node type " + node.ToString());
-            }
         }
 
-        private IntermediateTable EstimateJoinTable(JoinNode node, IntermediateTable table)
+        internal IntermediateTable EstimateJoinTable(JoinNode node, IntermediateTable table)
         {
             if (node.Relation == null)
                 throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
 
-            List<IntermediateBucket> buckets;
-            List<Tuple<TableReferenceNode, string>> references = new List<Tuple<TableReferenceNode, string>>();
-
-            buckets = GetBucketMatches(node.Relation, table, ref references);
-
-            return new IntermediateTable(buckets, references);
+            BucketMatches bucketMatches = GetBucketMatchesFromRelation(node.Relation, table);
+            return new IntermediateTable(bucketMatches.Buckets, bucketMatches.References);
         }
 
-        private IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable table)
-        {
-            return new IntermediateTable();
-        }
-       
-        #region Matches
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicateRelation relation, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
+        internal BucketMatches GetBucketMatchesFromRelation(JoinPredicateRelation relation, IntermediateTable table)
         {
             if (relation.Type == RelationType.Type.Predicate && relation.LeafPredicate != null)
-                return GetBucketMatches(relation.LeafPredicate, table, ref references);
+                return GetBucketMatchesFromPredicate(relation.LeafPredicate, table);
             else if (relation.LeftRelation != null && relation.RightRelation != null)
             {
-                List<Tuple<TableReferenceNode, string>> leftReferences = new List<Tuple<TableReferenceNode, string>>();
-                List<Tuple<TableReferenceNode, string>> rightReferences = new List<Tuple<TableReferenceNode, string>>();
-                List<IntermediateBucket> leftBuckets = GetBucketMatches(relation.LeftRelation, table, ref leftReferences);
-                List<IntermediateBucket> rightBuckets = GetBucketMatches(relation.RightRelation, table, ref rightReferences);
+                BucketMatches leftMatches = GetBucketMatchesFromRelation(relation.LeftRelation, table);
+                BucketMatches rightMatches = GetBucketMatchesFromRelation(relation.RightRelation, table);
 
-                List<IntermediateBucket> overlap = new List<IntermediateBucket>();
+                BucketMatches overlap = new BucketMatches();
                 if (relation.Type == RelationType.Type.And)
                 {
-                    overlap = IntermediateBucket.MergeOnOverlap(leftBuckets, rightBuckets);
-                    references = GetOverlappingReferences(leftReferences, rightReferences);
+                    overlap.Buckets = BucketHelper.MergeOnOverlap(leftMatches.Buckets, rightMatches.Buckets);
+                    overlap.References = GetOverlappingReferences(leftMatches.References, rightMatches.References);
                 }
                 else if (relation.Type == RelationType.Type.Or)
                 {
-                    overlap = leftBuckets.Concat(rightBuckets).ToList();
-                    references = leftReferences.Concat(rightReferences).ToList();
+                    overlap.Buckets.AddRange(leftMatches.Buckets);
+                    overlap.Buckets.AddRange(rightMatches.Buckets);
+                    overlap.References.AddRange(leftMatches.References);
+                    overlap.References.AddRange(rightMatches.References);
                 }
 
-                
                 return overlap;
             }
             else
                 throw new ArgumentException("Missing noderelation type " + relation.ToString());
         }
 
-        private List<IntermediateBucket> GetBucketMatches(JoinPredicate predicate, IntermediateTable table, ref List<Tuple<TableReferenceNode, string>> references)
+        internal BucketMatches GetBucketMatchesFromPredicate(JoinPredicate predicate, IntermediateTable table)
         {
-            Tuple<List<IHistogramBucket>, List<IHistogramBucket>> bucketPair = GetBucketPair(predicate, table);
-            Tuple<IHistogramBucket[], IHistogramBucket[]> bounds = GetBucketBounds(predicate, bucketPair.Item1, bucketPair.Item2);
+            BucketMatches returnMatches = new BucketMatches();
+            PairBucketList bucketPair = GetBucketPair(
+                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
+                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
+                table);
+            PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
-            if (bounds.Item1.Length > 0 && bounds.Item2.Length > 0) {
-                references.Add(new Tuple<TableReferenceNode, string>(predicate.LeftTable, predicate.LeftAttribute ));
-                references.Add(new Tuple<TableReferenceNode, string>(predicate.RightTable, predicate.RightAttribute ));
-            } else
-                return new List<IntermediateBucket>();
+            if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0)
+            {
+                returnMatches.References.Add(new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute));
+                returnMatches.References.Add(new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute));
+            }
+            else
+                return returnMatches;
 
             if (predicate.ComType == ComparisonType.Type.Equal)
-                return GetEqualityMatches(predicate, bounds.Item1, bounds.Item2);
+                returnMatches.Buckets = Matcher.GetEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
             else
-                return GetInEqualityMatches(predicate, bounds.Item1, bounds.Item2);
+                returnMatches.Buckets = Matcher.GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
+            return returnMatches;
         }
 
-        private List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
+        internal PairBucketList GetBucketPair(TableAttribute leftTableAttribute, TableAttribute rightTableAttribute, IntermediateTable table)
         {
-            List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = 0;
-            for (int i = 0; i < leftBuckets.Length; i++)
+            if (table.References.Contains(leftTableAttribute))
             {
-                for (int j = rightCutoff; j < rightBuckets.Length; j++)
-                {
-                    if (DoesMatch(leftBuckets[i], rightBuckets[j]))
-                    {
-                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i], 
-                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j], 
-                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
-                        buckets.Add(new IntermediateBucket(information));
-                    }
-                    else
-                        rightCutoff = Math.Max(0, j - 1);
-                }
-            }
-            return buckets;
-        }
-
-        private List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, IHistogramBucket[] leftBuckets, IHistogramBucket[] rightBuckets)
-        {
-            List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = rightBuckets.Length - 1;
-            for (int i = leftBuckets.Length - 1; i >= 0; i--)
-            {
-                for (int j = rightCutoff; j >= 0; j--)
-                {
-                    bool match = true;
-                    switch (predicate.ComType)
-                    {
-                        case ComparisonType.Type.Less:
-                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) < 0)
-                                match = true;
-                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) < 0)
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.EqualOrLess:
-                            if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) <= 0)
-                                match = true;
-                            else if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) <= 0)
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.More:
-                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) > 0)
-                                match = true;
-                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) > 0)
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.EqualOrMore:
-                            if (leftBuckets[i].ValueStart.CompareTo(rightBuckets[j].ValueEnd) >= 0)
-                                match = true;
-                            else if (leftBuckets[i].ValueEnd.CompareTo(rightBuckets[j].ValueStart) >= 0)
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                    }
-                    if (match)
-                    {
-                        List<Tuple<TableReferenceNode, string, BucketEstimate>> information = new List<Tuple<TableReferenceNode, string, BucketEstimate>>();
-                        information.Add(Tuple.Create(predicate.LeftTable, predicate.LeftAttribute, new BucketEstimate(leftBuckets[i],
-                            JoinCost.GetBucketEstimate(predicate.ComType, leftBuckets[i], rightBuckets[j]))));
-                        information.Add(Tuple.Create(predicate.RightTable, predicate.RightAttribute, new BucketEstimate(rightBuckets[j],
-                            JoinCost.GetBucketEstimate(predicate.ComType, rightBuckets[j], leftBuckets[i]))));
-                        buckets.Add(new IntermediateBucket(information));
-                    } 
-                    else
-                        rightCutoff = Math.Max(0, j - 1);
-                }
-            }
-            return buckets;
-        }
-
-        private bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
-        {
-            if ((rightBucket.ValueStart.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueStart.CompareTo(leftBucket.ValueEnd) <= 0) ||
-                (rightBucket.ValueEnd.CompareTo(leftBucket.ValueStart) >= 0 && rightBucket.ValueEnd.CompareTo(leftBucket.ValueEnd) <= 0))
-                return true;
-            return false;
-        }
-        #endregion
-        #region Bounds
-        private Tuple<IHistogramBucket[], IHistogramBucket[]> GetBucketBounds(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
-        {
-            int leftStart = 0;
-            int leftEnd = leftBuckets.Count - 1;
-            int rightStart = 0;
-            int rightEnd = rightBuckets.Count - 1;
-
-            if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) < 0)
-            {
-                if (predicate.ComType != ComparisonType.Type.Less && predicate.ComType != ComparisonType.Type.EqualOrLess)
-                    leftStart = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[0].ValueStart);
-            }
-            else if (leftBuckets[0].ValueStart.CompareTo(rightBuckets[0].ValueStart) > 0)
-            {
-                if (predicate.ComType != ComparisonType.Type.More && predicate.ComType != ComparisonType.Type.EqualOrMore)
-                    rightStart = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[0].ValueStart);
-            }
-
-            if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) > 0)
-            {
-                if (predicate.ComType != ComparisonType.Type.More && predicate.ComType != ComparisonType.Type.EqualOrMore)
-                    leftEnd = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[rightBuckets.Count - 1].ValueEnd);
-            }
-            else if (leftBuckets[leftBuckets.Count - 1].ValueEnd.CompareTo(rightBuckets[rightBuckets.Count - 1].ValueEnd) < 0)
-            {
-                if (predicate.ComType != ComparisonType.Type.Less && predicate.ComType != ComparisonType.Type.EqualOrLess)
-                    rightEnd = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[leftBuckets.Count - 1].ValueEnd);
-            }
-
-            if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
-                return new Tuple<IHistogramBucket[], IHistogramBucket[]>(new IHistogramBucket[] { }, new IHistogramBucket[] { });
-
-            Range leftBucketMatchRange = new Range(leftStart, leftEnd + 1);
-            Range rightBucketMatchRange = new Range(rightStart, rightEnd + 1);
-
-            IHistogramBucket[] leftBucketMatch = leftBuckets.ToArray()[leftBucketMatchRange];
-            IHistogramBucket[] rightBucketMatch = rightBuckets.ToArray()[rightBucketMatchRange];
-
-            return new Tuple<IHistogramBucket[], IHistogramBucket[]>(leftBucketMatch, rightBucketMatch);
-        }
-
-        private int GetMatchBucketIndex(List<IHistogramBucket> buckets, int lowerIndexBound, int upperIndexBound, IComparable value)
-        {
-            if (upperIndexBound >= lowerIndexBound)
-            {
-                int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
-
-                if ((value.CompareTo(buckets[mid].ValueStart) >= 0) &&
-                    (value.CompareTo(buckets[mid].ValueEnd) <= 0))
-                    return mid;
-
-                if (value.CompareTo(buckets[mid].ValueEnd) < 0)
-                    return GetMatchBucketIndex(buckets, lowerIndexBound, mid - 1, value);
-
-                return GetMatchBucketIndex(buckets, mid + 1, upperIndexBound, value);
-            }
-
-            return -1;
-        }
-
-        #endregion
-        private Tuple<List<IHistogramBucket>, List<IHistogramBucket>> GetBucketPair(JoinPredicate node, IntermediateTable table)
-        {
-            if (table.DoesContain(node.LeftTable, node.LeftAttribute))
-            {
-                if (table.DoesContain(node.RightTable, node.RightAttribute))
-                    return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable, node.LeftAttribute), 
-                        table.GetBuckets(node.RightTable, node.RightAttribute));
+                if (table.References.Contains(rightTableAttribute))
+                    return new PairBucketList(
+                        table.GetBuckets(leftTableAttribute), 
+                        table.GetBuckets(rightTableAttribute));
                 else
-                    return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        table.GetBuckets(node.LeftTable, node.LeftAttribute), 
-                        HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
+                    return new PairBucketList(
+                        table.GetBuckets(leftTableAttribute),
+                        GetHistogram(rightTableAttribute).Buckets);
             }
-            else if (table.DoesContain(node.RightTable, node.RightAttribute))
-                return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
-                        table.GetBuckets(node.RightTable, node.RightAttribute));
+            else if (table.References.Contains(rightTableAttribute))
+                return new PairBucketList(
+                        GetHistogram(leftTableAttribute).Buckets,
+                        table.GetBuckets(rightTableAttribute));
             else
-                return new Tuple<List<IHistogramBucket>, List<IHistogramBucket>>(
-                        HistogramManager.GetHistogram(node.LeftTable.TableName, node.LeftAttribute).Buckets,
-                        HistogramManager.GetHistogram(node.RightTable.TableName, node.RightAttribute).Buckets);
+                return new PairBucketList(
+                        GetHistogram(leftTableAttribute).Buckets,
+                        GetHistogram(rightTableAttribute).Buckets);
         }
 
-        private List<Tuple<TableReferenceNode, string>> GetOverlappingReferences(List<Tuple<TableReferenceNode, string>> leftReferences, List<Tuple<TableReferenceNode, string>> rightReferences)
+        internal List<TableAttribute> GetOverlappingReferences(List<TableAttribute> leftReferences, List<TableAttribute> rightReferences)
         {
-            List<Tuple<TableReferenceNode, string>> overlappingReferences = new List<Tuple<TableReferenceNode, string>>();
+            List<TableAttribute> overlappingReferences = new List<TableAttribute>();
             foreach (var leftReference in leftReferences)
-            {
                 foreach (var rightReference in rightReferences)
-                {
-                    if (leftReference.Item1 == rightReference.Item1 && leftReference.Item2 == rightReference.Item2)
-                    {
+                    if (leftReference.Equals(rightReference))
                         overlappingReferences.Add(leftReference);
-                    }
-                }
-            }
             return overlappingReferences;
+        }
+
+        internal IHistogram GetHistogram(TableAttribute tableAttribute)
+        {
+            return HistogramManager.GetHistogram(tableAttribute.Table, tableAttribute.Attribute);
         }
     }
 }

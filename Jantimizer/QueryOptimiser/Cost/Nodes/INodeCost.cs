@@ -10,12 +10,10 @@ using DatabaseConnector;
 using QueryOptimiser.Models;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("QueryOptimiserTest")]
-
 namespace QueryOptimiser.Cost.Nodes
 {
-    internal interface INodeCost<NodeType> where NodeType : INode
+    public interface INodeCost<NodeType> where NodeType : INode
     {
-        internal long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket);
+        public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket);
     }
 }
