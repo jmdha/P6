@@ -13,16 +13,26 @@ namespace ResultsSentinel.Exceptions
     {
         public OptimiserResult Result1 { get; set; }
         public OptimiserResult Result2 { get; set; }
-        public OptimiserSentinelErrorLogException(Exception actualException, OptimiserResult result1, OptimiserResult result2) : base(actualException)
+        public string ExperimentName { get; set; }
+        public string CaseName { get; set; }
+        public string RunnerName { get; set; }
+
+        public OptimiserSentinelErrorLogException(OptimiserResult result1, OptimiserResult result2, string experimentName, string caseName, string runnerName) : base(new Exception())
         {
             Result1 = result1;
             Result2 = result2;
+            ExperimentName = experimentName;
+            CaseName = caseName;
+            RunnerName = runnerName;
         }
 
         public override string GetErrorLogMessage()
         {
             var sb = new StringBuilder();
             sb.AppendLine("Missmatch in OptimiserResults!");
+            sb.AppendLine($"Experiment Name: {ExperimentName}");
+            sb.AppendLine($"Case Name: {CaseName}");
+            sb.AppendLine($"Runner Name: {RunnerName}");
             sb.AppendLine("Result 1 data:");
             sb.AppendLine(Result1.ToString());
             sb.AppendLine("Result 2 data:");

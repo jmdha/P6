@@ -52,10 +52,7 @@ namespace QueryOptimiser.Models
 
         public override int GetHashCode()
         {
-            int hash = 0;
-            foreach (var node in FromNodes)
-                hash += node.GetHashCode();
-            return hash + HashCode.Combine(OptimiserName, HistogramManagerName, EstimateCalculatorName);
+            return HashCode.Combine(OptimiserName, HistogramManagerName, EstimateCalculatorName);
         }
     }
 }

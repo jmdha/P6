@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - Base EquiDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -87,10 +87,6 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
             "Census_2013",
             "COVID_Funding"
           ]
@@ -99,10 +95,6 @@
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepthVariance",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
-            "BasicTests_ClumpedNumberBlocks",
-            "WorldHappiness_With_GDP",
             "Census_2013",
             "COVID_Funding"
           ]
@@ -115,7 +107,7 @@
     {
       "ExperimentName": "Experiment Three - MinDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

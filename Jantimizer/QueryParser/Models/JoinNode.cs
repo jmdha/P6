@@ -57,7 +57,7 @@ namespace QueryParser.Models
 
         public override int GetHashCode()
         {
-            return Predicate.GetHashCode() + Relation.GetHashCode() + HashCode.Combine(Id, Predicate);
+            return Predicate.GetHashCode() + Relation.GetHashCode() + HashCode.Combine(Id, Predicate, ToString());
         }
     }
 }

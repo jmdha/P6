@@ -1,5 +1,6 @@
 ﻿using ExperimentSuite.Controllers;
 using ExperimentSuite.Helpers;
+using ResultsSentinel;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,8 @@ namespace ExperimentSuite
 
         public MainWindow()
         {
+            new OptimiserResultSentinel();
+
             controller = new ExperimentController();
 
             controller.WriteToStatus += WriteToStatus;
@@ -75,6 +78,13 @@ namespace ExperimentSuite
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
         {
             CacheViewerControl.Toggle();
+        }
+
+        private void OptimiserSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (OptimiserResultSentinel.Instance != null)
+                    OptimiserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
         }
     }
 }

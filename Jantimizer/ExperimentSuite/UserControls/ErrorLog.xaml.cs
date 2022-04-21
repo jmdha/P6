@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Tools.Caches;
+using Tools.Exceptions;
 
 namespace ExperimentSuite.UserControls
 {
@@ -25,9 +26,16 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class ErrorLog : Window
     {
-        public ErrorLog()
+        private BaseErrorLogException LogException;
+
+        public ErrorLog(BaseErrorLogException logException)
         {
             InitializeComponent();
+            LogException = logException;
+            ErrorType.Content = LogException.ActualException.GetType().Name;
+            ErrorLabel.Content = LogException.GetErrorLogMessage();
+            ExceptionText.Content = LogException.ActualException.Message;
+            StackTraceTextbox.Text = LogException.ActualException.StackTrace;
             var iconHandle = Properties.Resources.errorIcon;
             this.Icon = ImageHelper.ByteToImage(iconHandle);
             PrintCacheToErrorLog();

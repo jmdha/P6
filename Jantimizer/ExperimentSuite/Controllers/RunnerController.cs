@@ -240,7 +240,7 @@ namespace ExperimentSuite.Controllers
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                    OptimiserSentinel.Instance.CheckResult(jantimiserResult);
+                    OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     // Make test report

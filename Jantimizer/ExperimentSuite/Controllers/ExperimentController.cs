@@ -41,7 +41,6 @@ namespace ExperimentSuite.Controllers
 
         public ExperimentController()
         {
-            new OptimiserSentinel();
         }
 
         public async Task RunExperiments()
@@ -107,12 +106,9 @@ namespace ExperimentSuite.Controllers
             }
             catch (BaseErrorLogException ex)
             {
-                var errorWindow = new ErrorLog();
-                errorWindow.ErrorType.Content = ex.ActualException.GetType().Name;
-                errorWindow.ErrorLabel.Content = ex.GetErrorLogMessage();
-                errorWindow.ExceptionText.Content = ex.ActualException.Message;
-                errorWindow.StackTraceTextbox.Text = ex.ActualException.StackTrace;
-                errorWindow.Show();
+                var errorWindow = new ErrorLog(ex);
+                errorWindow.ShowDialog();
+                throw;
             }
         }
 
