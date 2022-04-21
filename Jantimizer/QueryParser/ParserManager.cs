@@ -18,7 +18,7 @@ namespace QueryParser
             QueryParsers = queryParsers;
         }
 
-        public List<INode> ParseQuery(string query, bool throwIfNotFound = true)
+        public ParserResult ParseQuery(string query, bool throwIfNotFound = true)
         {
             try
             {
@@ -34,10 +34,10 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new List<INode>();
+            return new ParserResult(new List<INode>(), query);
         }
 
-        public async Task<List<INode>> ParseQueryAsync(string query, bool throwIfNotFound = true)
+        public async Task<ParserResult> ParseQueryAsync(string query, bool throwIfNotFound = true)
         {
             try
             {
@@ -53,19 +53,19 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new List<INode>();
+            return new ParserResult(new List<INode>(), query);
         }
 
-        public List<INode> ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
+        public ParserResult ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
         {
             List<INode> nodes = parser.ParseQuery(query);
-            return nodes;
+            return new ParserResult(nodes, query);
         }
 
-        public async Task<List<INode>> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser
+        public async Task<ParserResult> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser
         {
             List<INode> nodes = await parser.ParseQueryAsync(query);
-            return nodes;
+            return new ParserResult(nodes, query);
         }
     }
 }

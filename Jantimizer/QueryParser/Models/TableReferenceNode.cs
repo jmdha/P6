@@ -5,7 +5,6 @@
         public int Id { get; private set; }
         public string TableName { get; set; }
         public string Alias { get; set; }
-
         public List<FilterNode> Filters { get; set; } = new();
 
         public TableReferenceNode(int id, string tableName, string alias)
@@ -33,10 +32,7 @@
 
         public override int GetHashCode()
         {
-            int hash = 0;
-            foreach (var filter in Filters)
-                hash += Filters.GetHashCode();
-            return hash + HashCode.Combine(Id, TableName, Alias);
+            return HashCode.Combine(ToString());
         }
     }
 }

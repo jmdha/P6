@@ -71,16 +71,16 @@ namespace QueryParser.QueryParsers
             return parsed.Joins.Select(j => j as INode).ToList();
         }
 
-        private async Task<ParserResult> GetParserResult(string query)
+        private async Task<ExplainResult> GetParserResult(string query)
         {
             string explanationTextBlock = await GetPGExplainationTextBlockAsync(query);
 
             return AnalyseExplanationText(explanationTextBlock);
         }
 
-        internal ParserResult AnalyseExplanationText(string explanationText)
+        internal ExplainResult AnalyseExplanationText(string explanationText)
         {
-            var result = new ParserResult();
+            var result = new ExplainResult();
 
             InsertTables(explanationText, ref result);
             InsertFilters(explanationText, ref result);
@@ -92,7 +92,7 @@ namespace QueryParser.QueryParsers
 
 
         internal static Regex TableFinder = new Regex(@"->.*?\sScan(?:\susing \w+)?\son\s(?<tableName>\w+)(?:\s(?<alias>\w+))?  \(cost=", RegexOptions.Compiled);
-        internal void InsertTables(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertTables(string queryExplanationTextBlock, ref ExplainResult result)
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
 
@@ -118,7 +118,7 @@ namespace QueryParser.QueryParsers
         }
 
         internal static Regex JoinFinder = new Regex(@"(Join Filter|Hash Cond|Merge Cond): +(?<predicates>.+)?", RegexOptions.Compiled);
-        internal void InsertJoins(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertJoins(string queryExplanationTextBlock, ref ExplainResult result)
         {
             MatchCollection matches = JoinFinder.Matches(queryExplanationTextBlock);
 
@@ -153,7 +153,7 @@ namespace QueryParser.QueryParsers
         );
 
 
-        internal void InsertFilters(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertFilters(string queryExplanationTextBlock, ref ExplainResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -202,7 +202,7 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        internal void InsertConditions(string queryExplanationTextBlock, ref ParserResult result)
+        internal void InsertConditions(string queryExplanationTextBlock, ref ExplainResult result)
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
@@ -254,7 +254,7 @@ namespace QueryParser.QueryParsers
             return string.Join('\n', stringRows);
         }
 
-        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ParserResult result)
+        internal JoinPredicateRelation ExtrapolateRelation(string predicate, ExplainResult result)
         {
             RelationType.Type[] relationTypes = new RelationType.Type[] { RelationType.Type.And, RelationType.Type.Or };
             string[] sides = new string[] {};
@@ -279,7 +279,7 @@ namespace QueryParser.QueryParsers
             return new JoinPredicateRelation(leftRelation, rightRelation, relationType);
         }
 
-        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ParserResult result)
+        internal JoinPredicate ExtrapolateJoinPredicate(string predicate, ExplainResult result)
         {
             var operatorTypes = (ComparisonType.Type[])Enum.GetValues(typeof(ComparisonType.Type));
             string[] predicateSplit = new string[] {};

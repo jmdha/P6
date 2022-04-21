@@ -42,26 +42,5 @@ namespace QueryParser.Models
             }
             return tables;
         }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is JoinPredicateRelation relation &&
-                   EqualityComparer<JoinPredicate?>.Default.Equals(LeafPredicate, relation.LeafPredicate) &&
-                   EqualityComparer<JoinPredicateRelation?>.Default.Equals(LeftRelation, relation.LeftRelation) &&
-                   EqualityComparer<JoinPredicateRelation?>.Default.Equals(RightRelation, relation.RightRelation) &&
-                   Type == relation.Type;
-        }
-
-        public override int GetHashCode()
-        {
-            var hash = 0;
-            if (LeafPredicate != null)
-                hash += LeafPredicate.GetHashCode();
-            if (LeftRelation != null)
-                hash += LeftRelation.GetHashCode();
-            if (RightRelation != null)
-                hash += RightRelation.GetHashCode();
-            return hash + Type.GetHashCode();
-        }
     }
 }
