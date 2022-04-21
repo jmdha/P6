@@ -185,10 +185,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             var newBucket = new IntermediateBucket();
             long count;
-            if (matchType == MatchType.Overlap)
-                count = FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket);
-            else if (matchType == MatchType.Match)
+            if (matchType == MatchType.Match)
                 count = bucket.Count;
+            else if (matchType == MatchType.Overlap)
+                count = FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket);
             else
                 throw new ArgumentException($"Invalid matchtype {matchType}");
 
@@ -202,18 +202,31 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             var newBucket = new IntermediateBucket();
+            long leftCount;
+            long rightCount;
+            if (matchType == MatchType.Match)
+            {
+                leftCount = leftBucket.Count;
+                rightCount = rightBucket.Count;
+            } else if (matchType == MatchType.Overlap)
+            {
+                leftCount = JoinEstimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket);
+                rightCount = JoinEstimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket);
+            } else
+                throw new ArgumentException($"Invalid matchtype {matchType}");
+
             newBucket.AddBucketIfNotThere(
                 new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
                 new BucketEstimate(
                     leftBucket,
-                    JoinEstimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
+                    leftCount
                     )
                 );
             newBucket.AddBucketIfNotThere(
                 new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
                 new BucketEstimate(
                     rightBucket,
-                    JoinEstimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
+                    rightCount
                     )
                 );
             return newBucket;
