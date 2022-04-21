@@ -17,6 +17,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
     {
         public IHistogramManager HistogramManager { get; set; }
         public abstract INodeCost<JoinNode> NodeCostCalculator { get; set; }
+        public abstract MatchFinder<JoinNode> Matcher { get; set; }
 
         internal BaseEstimateCalculator(IHistogramManager manager)
         {
@@ -39,8 +40,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             BucketMatches bucketMatches = GetBucketMatchesFromRelation(node.Relation, table);
             return new IntermediateTable(bucketMatches.Buckets, bucketMatches.References);
         }
-
-        #region Matches
 
         internal BucketMatches GetBucketMatchesFromRelation(JoinPredicateRelation relation, IntermediateTable table)
         {
@@ -78,238 +77,22 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
                 new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
                 table);
-            PairBucketList bounds = GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
+            PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
-            if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0) {
+            if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0)
+            {
                 returnMatches.References.Add(new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute));
                 returnMatches.References.Add(new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute));
-            } else
+            }
+            else
                 return returnMatches;
 
             if (predicate.ComType == ComparisonType.Type.Equal)
-                returnMatches.Buckets = GetEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
+                returnMatches.Buckets = Matcher.GetEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
             else
-                returnMatches.Buckets = GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
+                returnMatches.Buckets = Matcher.GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
             return returnMatches;
         }
-
-        internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
-        {
-            List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = 0;
-            for (int i = 0; i < leftBuckets.Count; i++)
-            {
-                for (int j = rightCutoff; j < rightBuckets.Count; j++)
-                {
-                    if (DoesMatch(leftBuckets[i], rightBuckets[j]))
-                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
-                    else
-                    {
-                        rightCutoff = Math.Max(0, j - 1);
-                        break;
-                    }
-                }
-            }
-            return buckets;
-        }
-
-        internal List<IntermediateBucket> GetInEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
-        {
-            List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = 0;
-            for (int i = 0; i < leftBuckets.Count; i++)
-            {
-                for (int j = rightCutoff; j < rightBuckets.Count; j++)
-                {
-                    bool match = true;
-                    switch (predicate.ComType)
-                    {
-                        case ComparisonType.Type.Less:
-                            if (leftBuckets[i].ValueEnd.IsLessThan(rightBuckets[j].ValueStart))
-                                match = true;
-                            else if (leftBuckets[i].ValueStart.IsLessThan(rightBuckets[j].ValueEnd))
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.EqualOrLess:
-                            if (leftBuckets[i].ValueEnd.IsLessThanOrEqual(rightBuckets[j].ValueStart))
-                                match = true;
-                            else if (leftBuckets[i].ValueStart.IsLessThanOrEqual(rightBuckets[j].ValueEnd))
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.More:
-                            if (leftBuckets[i].ValueStart.IsLargerThan(rightBuckets[j].ValueEnd))
-                                match = true;
-                            else if (leftBuckets[i].ValueEnd.IsLargerThan(rightBuckets[j].ValueStart))
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                        case ComparisonType.Type.EqualOrMore:
-                            if (leftBuckets[i].ValueStart.IsLargerThanOrEqual(rightBuckets[j].ValueEnd))
-                                match = true;
-                            else if (leftBuckets[i].ValueEnd.IsLargerThanOrEqual(rightBuckets[j].ValueStart))
-                                match = true;
-                            else
-                                match = false;
-                            break;
-                    }
-                    if (match)
-                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
-                    else
-                    {
-                        rightCutoff = Math.Max(0, j - 1);
-                        break;
-                    }
-                }
-            }
-            return buckets;
-        }
-
-        internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
-        {
-            var newBucket = new IntermediateBucket();
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
-                new BucketEstimate(
-                    leftBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket)
-                    )
-                );
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
-                new BucketEstimate(
-                    rightBucket,
-                    NodeCostCalculator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket)
-                    )
-                );
-            return newBucket;
-        }
-
-        internal bool DoesMatch(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
-        {
-            // Right bucket start index is within Left bucket range
-            // Right Bucket:      |======|
-            // Left Bucket:    |======|
-            if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            // Right bucket end index is within Left bucket range
-            // Right Bucket:   |======|
-            // Left Bucket:       |======|
-            if (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            // Left bucket is entirely within Right bucket
-            // Right Bucket: |===========|
-            // Left Bucket:     |=====|
-            if (rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            return false;
-        }
-
-        #endregion
-
-        #region Bounds
-
-        /// <summary>
-        /// To get new lists from left and right buckets depending on predicate
-        /// <code>
-        ///    Bucket ranges example (For "MoreOrEqual" Predicate):
-        ///        |==|  is a bucket
-        ///     
-        ///    v leftStart        v leftEnd
-        ///    |==========||======|                      = leftBuckets
-        ///    
-        ///    v rightStart           v rightEnd
-        ///    |==========||==========||==============|  = rightBuckets
-        /// </code>
-        /// </summary>
-        /// <param name="predicateType"></param>
-        /// <param name="leftBuckets"></param>
-        /// <param name="rightBuckets"></param>
-        /// <returns></returns>
-        internal PairBucketList GetBucketBounds(ComparisonType.Type predicateType, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
-        {
-            int leftStart = 0;
-            int leftEnd = leftBuckets.Count - 1;
-            int rightStart = 0;
-            int rightEnd = rightBuckets.Count - 1;
-
-            // First bucket
-            // Left:    |===|
-            // Right:     |===|
-            if (leftBuckets[0].ValueStart.IsLessThan(rightBuckets[0].ValueStart))
-            {
-                if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
-                    leftStart = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[0].ValueStart);
-            }
-            // First bucket
-            // Left:      |===|
-            // Right:   |===|
-            else if (leftBuckets[0].ValueStart.IsLargerThan(rightBuckets[0].ValueStart))
-            {
-                if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
-                    rightStart = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[0].ValueStart);
-            }
-
-            // Last bucket
-            // Left:      |===|
-            // Right:   |===|
-            if (leftBuckets[leftBuckets.Count - 1].ValueEnd.IsLargerThan(rightBuckets[rightBuckets.Count - 1].ValueEnd))
-            {
-                if (predicateType != ComparisonType.Type.More && predicateType != ComparisonType.Type.EqualOrMore)
-                    leftEnd = GetMatchBucketIndex(leftBuckets, 0, leftBuckets.Count - 1, rightBuckets[rightBuckets.Count - 1].ValueEnd);
-            }
-            // Last bucket
-            // Left:    |===|
-            // Right:     |===|
-            else if (leftBuckets[leftBuckets.Count - 1].ValueEnd.IsLessThan(rightBuckets[rightBuckets.Count - 1].ValueEnd))
-            {
-                if (predicateType != ComparisonType.Type.Less && predicateType != ComparisonType.Type.EqualOrLess)
-                    rightEnd = GetMatchBucketIndex(rightBuckets, 0, rightBuckets.Count - 1, leftBuckets[leftBuckets.Count - 1].ValueEnd);
-            }
-
-            if (leftStart == -1 || leftEnd == -1 || rightStart == -1 || rightEnd == -1)
-                return new PairBucketList();
-
-            Range leftBucketMatchRange = new Range(leftStart, leftEnd + 1);
-            Range rightBucketMatchRange = new Range(rightStart, rightEnd + 1);
-
-            return new PairBucketList(leftBuckets.GetRange(leftBucketMatchRange), rightBuckets.GetRange(rightBucketMatchRange));
-        }
-
-        /// <summary>
-        /// Binary Search
-        /// </summary>
-        /// <param name="buckets"></param>
-        /// <param name="lowerIndexBound"></param>
-        /// <param name="upperIndexBound"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        internal int GetMatchBucketIndex(List<IHistogramBucket> buckets, int lowerIndexBound, int upperIndexBound, IComparable value)
-        {
-            if (upperIndexBound >= lowerIndexBound)
-            {
-                int mid = lowerIndexBound + (upperIndexBound - lowerIndexBound) / 2;
-                if (mid >= buckets.Count)
-                    return -1;
-
-                if ((value.IsLargerThanOrEqual(buckets[mid].ValueStart)) &&
-                    (value.IsLessThanOrEqual(buckets[mid].ValueEnd)))
-                    return mid;
-
-                if (value.IsLessThan(buckets[mid].ValueEnd))
-                    return GetMatchBucketIndex(buckets, lowerIndexBound, mid - 1, value);
-
-                return GetMatchBucketIndex(buckets, mid + 1, upperIndexBound, value);
-            }
-
-            return -1;
-        }
-
-        #endregion
 
         internal PairBucketList GetBucketPair(TableAttribute leftTableAttribute, TableAttribute rightTableAttribute, IntermediateTable table)
         {
