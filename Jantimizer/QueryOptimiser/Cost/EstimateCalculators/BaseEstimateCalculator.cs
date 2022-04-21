@@ -38,7 +38,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         #region Filter
         internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
         {
-            List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.Alias, node.AttributeName), intermediateTable);
+            List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.TableName, node.AttributeName), intermediateTable);
             List<IntermediateBucket> intermediateBuckets = Matcher.GetMatches(node, buckets);
             return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.Alias, node.AttributeName) });
         }
