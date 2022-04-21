@@ -60,7 +60,7 @@ namespace QueryParsers
             PostgresParser parser = new PostgresParser();
 
             // ACT
-            ParserResult result = parser.AnalyseExplanationText(explainResults);
+            ExplainResult result = parser.AnalyseExplanationText(explainResults);
 
             // ASSERT
             Assert.AreEqual(1, result.Joins.Count);
@@ -105,7 +105,7 @@ namespace QueryParsers
             PostgresParser parser = new PostgresParser();
 
             // ACT
-            ParserResult result = parser.AnalyseExplanationText(explainResults);
+            ExplainResult result = parser.AnalyseExplanationText(explainResults);
 
             // ASSERT
             Assert.AreEqual(1, result.Joins.Count);
@@ -158,7 +158,7 @@ namespace QueryParsers
             PostgresParser parser = new PostgresParser();
 
             // ACT
-            ParserResult result = parser.AnalyseExplanationText(explainResults);
+            ExplainResult result = parser.AnalyseExplanationText(explainResults);
 
             // ASSERT
             Assert.AreEqual(1, result.Joins.Count);
@@ -212,7 +212,7 @@ namespace QueryParsers
         {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
 
             // ACT
             parser.InsertTables(explainResults, ref result);
@@ -304,7 +304,7 @@ namespace QueryParsers
         {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
 
             // ACT
             parser.InsertTables(explainResults, ref result);
@@ -351,7 +351,7 @@ namespace QueryParsers
         public void Can_InsertConditions(string explainResults, ComparisonType.Type type, string predicate) {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
             result.Tables.Add("a", new TableReferenceNode(0, "a", "a"));
             result.Tables.Add("b", new TableReferenceNode(0, "b", "b"));
 
@@ -425,7 +425,7 @@ namespace QueryParsers
         )]
         public void Can_InsertFilters(string explainResults, string tableAlias, ComparisonType.Type type, string attribute, string constant) {
             PostgresParser parser = new PostgresParser(null);
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
             TableReferenceNode tRefNode = new TableReferenceNode(0, tableAlias, tableAlias);
             result.Tables.Add(tableAlias, tRefNode);
             parser.InsertFilters(explainResults, ref result);
@@ -466,7 +466,7 @@ namespace QueryParsers
         {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
             result.Tables.Add("a", new TableReferenceNode(0, "A", "a"));
             result.Tables.Add("b", new TableReferenceNode(1, "B", "b"));
             result.Tables.Add("c", new TableReferenceNode(2, "C", "c"));
@@ -489,7 +489,7 @@ namespace QueryParsers
         {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
             result.Tables.Add("a", new TableReferenceNode(0, "A", "a"));
             result.Tables.Add("b", new TableReferenceNode(1, "B", "b"));
 
@@ -506,7 +506,7 @@ namespace QueryParsers
         {
             // ARRANGE
             PostgresParser parser = new PostgresParser();
-            ParserResult result = new ParserResult();
+            ExplainResult result = new ExplainResult();
             result.Tables.Add("a", new TableReferenceNode(0, "A", "a"));
             result.Tables.Add("b", new TableReferenceNode(1, "B", "b"));
 

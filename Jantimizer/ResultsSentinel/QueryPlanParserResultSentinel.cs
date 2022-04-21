@@ -8,7 +8,7 @@ namespace ResultsSentinel
     public class QueryPlanParserResultSentinel
     {
         internal Dictionary<int, AnalysisResult> _dict;
-        public static QueryPlanParserResultSentinel Instance;
+        public static QueryPlanParserResultSentinel? Instance;
         public bool IsEnabled = false;
 
         public QueryPlanParserResultSentinel()

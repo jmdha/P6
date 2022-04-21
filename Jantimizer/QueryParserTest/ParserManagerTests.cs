@@ -46,7 +46,7 @@ namespace QueryParserTest
             var result = newManager.ParseQuery("anything");
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturn, result.Nodes);
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace QueryParserTest
             var result = newManager.ParseQuery("anything");
 
             // ASSERT
-            Assert.AreEqual(parser1.ShouldReturn, result);
+            Assert.AreEqual(parser1.ShouldReturn, result.Nodes);
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace QueryParserTest
             var result = newManager.ParseQuery("anything", false);
 
             // ASSERT
-            Assert.IsTrue(result.Count == 0);
+            Assert.IsTrue(result.Nodes.Count == 0);
         }
 
         [TestMethod]
@@ -109,7 +109,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQueryAsync("anything");
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturn, result.Nodes);
         }
 
         [TestMethod]
@@ -128,7 +128,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQueryAsync("anything");
 
             // ASSERT
-            Assert.AreEqual(parser1.ShouldReturn, result);
+            Assert.AreEqual(parser1.ShouldReturn, result.Nodes);
         }
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQueryAsync("anything", false);
 
             // ASSERT
-            Assert.IsTrue(result.Count == 0);
+            Assert.IsTrue(result.Nodes.Count == 0);
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace QueryParserTest
             var result = newManager.ParseQuerySpecific<TestParser>("anything", parser);
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturn, result.Nodes);
         }
 
         #endregion
@@ -192,7 +192,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQuerySpecificAsync<TestParser>("anything", parser);
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturn, result.Nodes);
         }
 
         #endregion

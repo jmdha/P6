@@ -7,7 +7,7 @@ namespace ResultsSentinel
     public class OptimiserResultSentinel
     {
         internal Dictionary<int, OptimiserResult> _dict;
-        public static OptimiserResultSentinel Instance;
+        public static OptimiserResultSentinel? Instance;
         public bool IsEnabled = false;
 
         public OptimiserResultSentinel()

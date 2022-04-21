@@ -20,7 +20,7 @@ namespace QueryParserTest.Models
         public void Can_GetTableRef_IfThere(string alias, string expTableName)
         {
             // ARRANGE
-            var res = new ParserResult();
+            var res = new ExplainResult();
             res.Tables.Add("A", new TableReferenceNode(0, "TableA", "A"));
             res.Tables.Add("B", new TableReferenceNode(1, "TableB", "B"));
             res.Tables.Add("C", new TableReferenceNode(2, "TableC", "C"));
@@ -43,7 +43,7 @@ namespace QueryParserTest.Models
         public void Cant_GetTableRef_IfNotThere(string nonExistingAlias)
         {
             // ARRANGE
-            var res = new ParserResult();
+            var res = new ExplainResult();
             res.Tables.Add("A", new TableReferenceNode(0, "TableA", "A"));
             res.Tables.Add("B", new TableReferenceNode(1, "TableB", "B"));
             res.Tables.Add("C", new TableReferenceNode(2, "TableC", "C"));

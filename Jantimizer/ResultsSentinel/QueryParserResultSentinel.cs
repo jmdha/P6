@@ -9,7 +9,7 @@ namespace ResultsSentinel
     public class QueryParserResultSentinel
     {
         internal Dictionary<int, ParserResult> _dict;
-        public static QueryParserResultSentinel Instance;
+        public static QueryParserResultSentinel? Instance;
         public bool IsEnabled = false;
 
         public QueryParserResultSentinel()
