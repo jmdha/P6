@@ -14,5 +14,12 @@
             TableName = tableName;
             Alias = alias;
         }
+        public override string ToString()
+        {
+            if (Alias == TableName)
+                return TableName;
+
+            return $"{TableName} AS {Alias}";
+        }
     }
 }

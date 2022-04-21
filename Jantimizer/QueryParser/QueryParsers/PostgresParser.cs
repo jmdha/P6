@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Tools.Models;
+using Tools.Regex;
 
 [assembly: InternalsVisibleTo("QueryParserTest")]
 
@@ -143,7 +144,7 @@ namespace QueryParser.QueryParsers
 
                 (?:\s+ Index\ Cond:\ \((?<joinProp>\w+)\ (?<relation>[=<>]{1,2})\ (?<otherAlias>\w+)\.(?<otherProp>\w+)\))?
 
-                (?:\s+Filter:\ \((?<filterProp>\w+)\ (?<filterCondition>[=<>]{1,2})\ (?<filterValue>\d+)\))?
+                (?:\s+Filter:\ \((?<filterProp>\w+)\ (?<filterCondition>[=<>]{1,2})\ (?<filterValue>(?:\d+ | .+::(?<type>\w+)))\))?
             ",
             RegexOptions.Compiled |
             RegexOptions.Multiline |
@@ -162,11 +163,38 @@ namespace QueryParser.QueryParsers
                 
                 var tableRef = result.Tables[GetAliasFromRegexMatch(match)];
 
+                // Get value of special type
+                IComparable value;
+                if (match.Groups["type"].Success)
+                {
+                    string type = match.Groups["type"].Value;
+
+                    string strValue = match.Groups["filterValue"].Value;
+                    strValue = strValue.Substring(0, strValue.Length - $"::{type}".Length);
+
+                    switch (type)
+                    {
+                        case "text":
+                            // Removes quotes around 'value'
+                            string encapsulatedStrValue = strValue;
+                            value = encapsulatedStrValue.Substring(1, encapsulatedStrValue.Length - 2);
+                                
+                            break;
+                        default:
+                            throw new NotImplementedException($"Filters not implemented for type {type}");
+                    }
+                }
+                else
+                {
+                    value = RegexHelperFunctions.GetRegexVal<double>(match, "filterValue");
+                }
+
+
                 tableRef.Filters.Add(new FilterNode(
                     tableReference: tableRef,
                     attributeName: match.Groups["filterProp"].Value,
                     comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),
-                    constant: match.Groups["filterValue"].Value
+                    constant: value
                 ));
             }
         }
