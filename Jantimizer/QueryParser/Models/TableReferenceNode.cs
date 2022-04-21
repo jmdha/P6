@@ -21,5 +21,22 @@
 
             return $"{TableName} AS {Alias}";
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is TableReferenceNode node &&
+                   Id == node.Id &&
+                   TableName == node.TableName &&
+                   Alias == node.Alias &&
+                   EqualityComparer<List<FilterNode>>.Default.Equals(Filters, node.Filters);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            foreach (var filter in Filters)
+                hash += Filters.GetHashCode();
+            return hash + HashCode.Combine(Id, TableName, Alias);
+        }
     }
 }

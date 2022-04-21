@@ -4,6 +4,7 @@ using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -172,13 +173,15 @@ namespace QueryParser.QueryParsers
                     string strValue = match.Groups["filterValue"].Value;
                     strValue = strValue.Substring(0, strValue.Length - $"::{type}".Length);
 
+                    // Removes quotes around 'value'
+                    strValue = strValue.Substring(1, strValue.Length - 2);
                     switch (type)
                     {
                         case "text":
-                            // Removes quotes around 'value'
-                            string encapsulatedStrValue = strValue;
-                            value = encapsulatedStrValue.Substring(1, encapsulatedStrValue.Length - 2);
-                                
+                            value = strValue; 
+                            break;
+                        case "date":
+                            value = DateTime.Parse(strValue, CultureInfo.InvariantCulture);
                             break;
                         default:
                             throw new NotImplementedException($"Filters not implemented for type {type}");

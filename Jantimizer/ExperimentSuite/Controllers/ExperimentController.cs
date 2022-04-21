@@ -3,6 +3,7 @@ using ExperimentSuite.Models;
 using ExperimentSuite.Models.ExperimentParsing;
 using ExperimentSuite.SuiteDatas;
 using ExperimentSuite.UserControls;
+using ResultsSentinel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,7 +40,8 @@ namespace ExperimentSuite.Controllers
         public event UpdateProgressBarHandler? UpdateExperimentProgressBar;
 
         public ExperimentController()
-        { 
+        {
+            new OptimiserSentinel();
         }
 
         public async Task RunExperiments()

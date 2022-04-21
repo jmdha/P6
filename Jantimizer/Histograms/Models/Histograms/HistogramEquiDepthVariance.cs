@@ -83,5 +83,23 @@ namespace Histograms.Models
                     retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.StandardDeviation, Convert.ToDouble(vari.ValueEnd) - Convert.ToDouble(vari.ValueStart)));
             return retObj;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is HistogramEquiDepthVariance variance &&
+                   base.Equals(obj) &&
+                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes) &&
+                   EqualityComparer<List<IHistogramBucket>>.Default.Equals(Buckets, variance.Buckets) &&
+                   TableName == variance.TableName &&
+                   AttributeName == variance.AttributeName &&
+                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes) &&
+                   Depth == variance.Depth &&
+                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(base.GetHashCode(), AcceptedTypes, Buckets, TableName, AttributeName, AcceptedTypes, Depth, AcceptedTypes);
+        }
     }
 }

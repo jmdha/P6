@@ -25,6 +25,7 @@
     <ProjectReference Include="..\PrintUtilities\PrintUtilities.csproj" />
     <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
+    <ProjectReference Include="..\ResultsSentinel\ResultsSentinel.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 

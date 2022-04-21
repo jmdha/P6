@@ -152,5 +152,19 @@ namespace Histograms.Managers
                 sb.AppendLine(histogram.ToString());
             return sb.ToString();
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is BaseHistogramManager manager &&
+                   EqualityComparer<Dictionary<string, Dictionary<string, IHistogram>>>.Default.Equals(Histograms, manager.Histograms) &&
+                   EqualityComparer<List<string>>.Default.Equals(Tables, manager.Tables) &&
+                   EqualityComparer<List<string>>.Default.Equals(Attributes, manager.Attributes) &&
+                   EqualityComparer<IDataGatherer>.Default.Equals(DataGatherer, manager.DataGatherer);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Histograms, Tables, Attributes, DataGatherer);
+        }
     }
 }

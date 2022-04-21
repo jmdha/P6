@@ -6,6 +6,7 @@ using QueryOptimiser.Models;
 using QueryParser.Models;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
+using ResultsSentinel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -239,6 +240,7 @@ namespace ExperimentSuite.Controllers
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                    OptimiserSentinel.Instance.CheckResult(jantimiserResult);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     // Make test report

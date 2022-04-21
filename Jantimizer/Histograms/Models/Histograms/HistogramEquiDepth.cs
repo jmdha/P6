@@ -87,5 +87,21 @@ namespace Histograms.Models
                 retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
             return retObj;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is HistogramEquiDepth depth &&
+                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
+                   EqualityComparer<List<IHistogramBucket>>.Default.Equals(Buckets, depth.Buckets) &&
+                   TableName == depth.TableName &&
+                   AttributeName == depth.AttributeName &&
+                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
+                   Depth == depth.Depth;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(AcceptedTypes, Buckets, TableName, AttributeName, AcceptedTypes, Depth);
+        }
     }
 }

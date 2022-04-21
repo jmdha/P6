@@ -19,5 +19,21 @@
             Condition = condition;
             ComType = type;
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is JoinPredicate predicate &&
+                   EqualityComparer<TableReferenceNode>.Default.Equals(LeftTable, predicate.LeftTable) &&
+                   LeftAttribute == predicate.LeftAttribute &&
+                   EqualityComparer<TableReferenceNode>.Default.Equals(RightTable, predicate.RightTable) &&
+                   RightAttribute == predicate.RightAttribute &&
+                   Condition == predicate.Condition &&
+                   ComType == predicate.ComType;
+        }
+
+        public override int GetHashCode()
+        {
+            return LeftTable.GetHashCode() + RightTable.GetHashCode() + HashCode.Combine(LeftAttribute, RightAttribute, Condition, ComType);
+        }
     }
 }

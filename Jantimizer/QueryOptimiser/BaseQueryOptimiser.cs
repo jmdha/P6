@@ -41,7 +41,7 @@ namespace QueryOptimiser
             }
             
 
-            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate());
+            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
         }
     }
 }
