@@ -54,7 +54,7 @@ namespace ExperimentSuite
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await controller.RunExperiments();
+            //await controller.RunExperiments();
             RunButton.IsEnabled = true;
         }
 
