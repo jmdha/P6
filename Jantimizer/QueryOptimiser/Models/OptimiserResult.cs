@@ -10,12 +10,10 @@ namespace QueryOptimiser.Models
     public class OptimiserResult
     {
         public ulong EstTotalCardinality { get; set; }
-        public List<ValuedNode> EstCardinalities { get; set; }
 
-        public OptimiserResult(ulong estTotalCardinality, List<ValuedNode> estCardinalities)
+        public OptimiserResult(ulong estTotalCardinality)
         {
             EstTotalCardinality = estTotalCardinality;
-            EstCardinalities = estCardinalities;
         }
     }
 }

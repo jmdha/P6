@@ -22,5 +22,7 @@ namespace HistogramsTests.Stubs
         public double StandardDeviation => throw new NotImplementedException();
 
         public double Range => throw new NotImplementedException();
+
+        public Guid BucketId => throw new NotImplementedException();
     }
 }

@@ -11,6 +11,7 @@ namespace QueryOptimiser
 {
     public class QueryOptimiserEquiDepthVariance : BaseQueryOptimiser
     {
+        public override IEstimateCalculator EstimateCalculator { get; internal set; }
         public QueryOptimiserEquiDepthVariance(IHistogramManager histogramManager) : base(histogramManager)
         {
             EstimateCalculator = new EstimateCalculatorVariance(histogramManager);

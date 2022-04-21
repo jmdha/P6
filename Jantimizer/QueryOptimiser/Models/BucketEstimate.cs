@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryOptimiser.Models
 {
-    internal class BucketEstimate
+    public class BucketEstimate
     {
         internal IHistogramBucket Bucket { get; set; }
         internal long Estimate { get; set; }
