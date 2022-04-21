@@ -41,7 +41,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 case ComparisonType.Type.More:
                 case ComparisonType.Type.EqualOrMore:
                 case ComparisonType.Type.EqualOrLess:
-                    return GetEqualityMatches(node, buckets);
+                    return GetInEqualityMatches(node, buckets);
                 default:
                     throw new ArgumentException($"Invalid comparison type {node.ToString()}");
             }
@@ -55,7 +55,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 if (DoesOverlap(node.Constant, buckets[i])) {
                     matches = true;
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(MatchType.Overlap, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
                 } else if (matches)
                     break;
             }
@@ -71,7 +71,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
                     if (DoesOverlap(leftBuckets[i], rightBuckets[j]))
-                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
+                        buckets.Add(MakeNewIntermediateBucket(MatchType.Overlap, predicate, leftBuckets[i], rightBuckets[j]));
                     else
                     {
                         rightCutoff = Math.Max(0, j - 1);
@@ -85,14 +85,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         internal List<IntermediateBucket> GetInEqualityMatches(FilterNode node, List<IHistogramBucket> buckets)
         {
             List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
-            bool matches = false;
             for (int i = 0; i < buckets.Count; i++)
             {
-                bool overlappingMatch = false;
-                bool match = false;
-                
-                if (overlappingMatch)
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+                MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
+                if (type == MatchType.Match || type == MatchType.Overlap)
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(type, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
             }
             return intermediateBuckets;
         }
@@ -136,44 +133,44 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
-                    bool match = true;
+                    MatchType matchType = MatchType.Undefined;
                     switch (predicate.ComType)
                     {
                         case ComparisonType.Type.Less:
                             if (leftBuckets[i].ValueEnd.IsLessThan(rightBuckets[j].ValueStart))
-                                match = true;
+                                matchType = MatchType.Match;
                             else if (leftBuckets[i].ValueStart.IsLessThan(rightBuckets[j].ValueEnd))
-                                match = true;
+                                matchType = MatchType.Overlap;
                             else
-                                match = false;
+                                matchType = MatchType.None;
                             break;
                         case ComparisonType.Type.EqualOrLess:
                             if (leftBuckets[i].ValueEnd.IsLessThanOrEqual(rightBuckets[j].ValueStart))
-                                match = true;
+                                matchType = MatchType.Match;
                             else if (leftBuckets[i].ValueStart.IsLessThanOrEqual(rightBuckets[j].ValueEnd))
-                                match = true;
+                                matchType = MatchType.Overlap;
                             else
-                                match = false;
+                                matchType = MatchType.None;
                             break;
                         case ComparisonType.Type.More:
                             if (leftBuckets[i].ValueStart.IsLargerThan(rightBuckets[j].ValueEnd))
-                                match = true;
+                                matchType = MatchType.Match;
                             else if (leftBuckets[i].ValueEnd.IsLargerThan(rightBuckets[j].ValueStart))
-                                match = true;
+                                matchType = MatchType.Overlap;
                             else
-                                match = false;
+                                matchType = MatchType.None;
                             break;
                         case ComparisonType.Type.EqualOrMore:
                             if (leftBuckets[i].ValueStart.IsLargerThanOrEqual(rightBuckets[j].ValueEnd))
-                                match = true;
+                                matchType = MatchType.Match;
                             else if (leftBuckets[i].ValueEnd.IsLargerThanOrEqual(rightBuckets[j].ValueStart))
-                                match = true;
+                                matchType = MatchType.Overlap;
                             else
-                                match = false;
+                                matchType = MatchType.None;
                             break;
                     }
-                    if (match)
-                        buckets.Add(MakeNewIntermediateBucket(predicate, leftBuckets[i], rightBuckets[j]));
+                    if (matchType == MatchType.Match || matchType == MatchType.Overlap)
+                        buckets.Add(MakeNewIntermediateBucket(matchType, predicate, leftBuckets[i], rightBuckets[j]));
                     else
                     {
                         rightCutoff = Math.Max(0, j - 1);
@@ -184,20 +181,25 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return buckets;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(ComparisonType.Type comparisonType, IComparable constant, TableAttribute tableAttribute, IHistogramBucket bucket)
+        internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, ComparisonType.Type comparisonType, IComparable constant, TableAttribute tableAttribute, IHistogramBucket bucket)
         {
             var newBucket = new IntermediateBucket();
+            long count;
+            if (matchType == MatchType.Overlap)
+                count = FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket);
+            else if (matchType == MatchType.Match)
+                count = bucket.Count;
+            else
+                throw new ArgumentException($"Invalid matchtype {matchType}");
+
             newBucket.AddBucketIfNotThere(
                 tableAttribute,
-                new BucketEstimate(
-                    bucket,
-                    FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket)
-                    )
+                new BucketEstimate(bucket, count)
                 );
             return newBucket;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             var newBucket = new IntermediateBucket();
             newBucket.AddBucketIfNotThere(
