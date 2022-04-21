@@ -9,11 +9,9 @@ using Histograms.Models;
 using DatabaseConnector;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("QueryOptimiserTest")]
-
 namespace QueryOptimiser.Cost.Nodes
 {
-    internal class JoinEstimateEquiDepthVariance : INodeCost<JoinNode>
+    public class JoinEstimateEquiDepthVariance : INodeCost<JoinNode>
     {
         public long GetBucketEstimate(ComparisonType.Type predicate, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
