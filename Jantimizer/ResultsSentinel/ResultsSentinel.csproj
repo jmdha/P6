@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
+    <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 

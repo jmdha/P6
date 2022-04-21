@@ -42,5 +42,23 @@ namespace QueryPlanParser.Models
             return sb;
         }
 
+        public override bool Equals(object? obj)
+        {
+            return obj is AnalysisResultQueryTree tree &&
+                   Name == tree.Name &&
+                   EstimatedCost == tree.EstimatedCost &&
+                   EstimatedCardinality == tree.EstimatedCardinality &&
+                   ActualCardinality == tree.ActualCardinality &&
+                   EqualityComparer<TimeSpan?>.Default.Equals(ActualTime, tree.ActualTime) &&
+                   EqualityComparer<List<AnalysisResultQueryTree>>.Default.Equals(SubQueries, tree.SubQueries);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            foreach(var sub in SubQueries)
+                hash += sub.GetHashCode();
+            return hash + HashCode.Combine(Name, EstimatedCost, EstimatedCardinality, ActualCardinality, ActualTime);
+        }
     }
 }

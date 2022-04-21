@@ -220,6 +220,8 @@ namespace ExperimentSuite.Controllers
                     // Parse query plan
                     timer = TimerHelper.GetWatchAndStart();
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    if (QueryPlanParserResultSentinel.Instance != null)
+                        QueryPlanParserResultSentinel.Instance.CheckResult(analysisResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
 
                     // Cache actual cardinalities (if not set)
@@ -240,7 +242,8 @@ namespace ExperimentSuite.Controllers
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
                     OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
-                    OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
+                    if (OptimiserResultSentinel.Instance != null)
+                        OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     // Make test report

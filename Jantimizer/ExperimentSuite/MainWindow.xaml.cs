@@ -17,6 +17,7 @@ namespace ExperimentSuite
         public MainWindow()
         {
             new OptimiserResultSentinel();
+            new QueryPlanParserResultSentinel();
 
             controller = new ExperimentController();
 
@@ -85,6 +86,13 @@ namespace ExperimentSuite
             if (sender is CheckBox checkBox)
                 if (OptimiserResultSentinel.Instance != null)
                     OptimiserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+        }
+
+        private void QueryPlanSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (QueryPlanParserResultSentinel.Instance != null)
+                    QueryPlanParserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
         }
     }
 }
