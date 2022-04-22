@@ -114,7 +114,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 );
         }
 
-        private BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
+        internal BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
         {
             if (matchType == MatchType.Match)
                 return new BucketEstimate(bucket, bucket.Count);

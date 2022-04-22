@@ -102,7 +102,7 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new List<INode>() { new TestNode(0), new TestNode(1) };
+            parser.ShouldReturn = new ParserResult() { };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
@@ -119,9 +119,9 @@ namespace QueryParserTest
             TestParser parser1 = new TestParser();
             TestParser parser2 = new TestParser();
             parser1.ShouldAccept = true;
-            parser1.ShouldReturn = new List<INode>() { new TestNode(0), new TestNode(1) };
+            parser1.ShouldReturn = new ParserResult { };
             parser2.ShouldAccept = false;
-            parser2.ShouldReturn = new List<INode>() { new TestNode(2), new TestNode(3) };
+            parser2.ShouldReturn = new ParserResult { };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser2, parser1 });
 
             // ACT
@@ -141,7 +141,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQueryAsync("anything", false);
 
             // ASSERT
-            Assert.IsTrue(result.Count == 0);
+            Assert.IsTrue(result.GetNodes().Count == 0);
         }
 
         [TestMethod]
@@ -165,7 +165,7 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new List<INode>() { new TestNode(0), new TestNode(1) };
+            parser.ShouldReturn = new ParserResult { };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
@@ -185,7 +185,7 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new List<INode>() { new TestNode(0), new TestNode(1) };
+            parser.ShouldReturn = new ParserResult { };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT

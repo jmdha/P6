@@ -57,13 +57,11 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
                 if (type == MatchType.Match || type == MatchType.Overlap)
                     intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.Alias, node.AttributeName, type, node.ComType, node.Constant, buckets[i]));
-
-
             }
             return intermediateBuckets;
         }
 
-        private IntermediateBucket MakeNewIntermediateBucket(string tableAlias, string tableAttribute, MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
+        internal IntermediateBucket MakeNewIntermediateBucket(string tableAlias, string tableAttribute, MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
             return MakeNewIntermediateBucket(
                             new List<TableAttribute>() { new TableAttribute(tableAlias, tableAttribute) },
@@ -71,7 +69,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                         );
         }
 
-        private BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
+        internal BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
             if (matchType == MatchType.Match)
                 return new BucketEstimate(bucket, bucket.Count);
