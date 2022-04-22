@@ -38,9 +38,9 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         #region Filter
         internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
         {
-            List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.TableName, node.AttributeName), intermediateTable);
+            List<IHistogramBucket> buckets = GetBuckets(node.TableReference, node.AttributeName, intermediateTable);
             List<IntermediateBucket> intermediateBuckets = FilterMatcher.GetMatches(node, buckets);
-            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.TableName, node.AttributeName) });
+            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.Alias, node.AttributeName) });
         }
         #endregion
 
@@ -87,15 +87,17 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             BucketMatches returnMatches = new BucketMatches();
             PairBucketList bucketPair = GetBucketPair(
-                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
-                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
+                predicate.LeftTable,
+                predicate.LeftAttribute,
+                predicate.RightTable,
+                predicate.RightAttribute,
                 table);
             PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
             if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0)
             {
-                returnMatches.References.Add(new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute));
-                returnMatches.References.Add(new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute));
+                returnMatches.References.Add(new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute));
+                returnMatches.References.Add(new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute));
             }
             else
                 return returnMatches;
@@ -106,18 +108,18 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         }
         #endregion
 
-        internal List<IHistogramBucket> GetBuckets(TableAttribute tableAttribute, IntermediateTable table)
+        internal List<IHistogramBucket> GetBuckets(TableReferenceNode tableRefNode, string attribute, IntermediateTable table)
         {
-            if (table.References.Contains(tableAttribute))
-                return table.GetBuckets(tableAttribute);
+            if (table.References.Contains(new TableAttribute(tableRefNode.Alias, attribute)))
+                return table.GetBuckets(new TableAttribute(tableRefNode.Alias, attribute));
             else
-                return GetHistogram(tableAttribute).Buckets;
+                return GetHistogram(new TableAttribute(tableRefNode.TableName, attribute)).Buckets;
         }
 
-        internal PairBucketList GetBucketPair(TableAttribute leftTableAttribute, TableAttribute rightTableAttribute, IntermediateTable table)
+        internal PairBucketList GetBucketPair(TableReferenceNode leftTableRefNode, string leftAttribute, TableReferenceNode rightTableRefNode, string rightAttribute, IntermediateTable table)
         {
-            List<IHistogramBucket> leftBuckets = GetBuckets(leftTableAttribute, table);
-            List<IHistogramBucket> rightBuckets = GetBuckets(rightTableAttribute, table);
+            List<IHistogramBucket> leftBuckets = GetBuckets(leftTableRefNode, leftAttribute, table);
+            List<IHistogramBucket> rightBuckets = GetBuckets(rightTableRefNode, rightAttribute, table);
             return new PairBucketList(leftBuckets, rightBuckets);
         }
 
@@ -133,7 +135,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 
         internal IHistogram GetHistogram(TableAttribute tableAttribute)
         {
-            return HistogramManager.GetHistogram(tableAttribute.Table, tableAttribute.Attribute);
+            return HistogramManager.GetHistogram(tableAttribute.Name, tableAttribute.Attribute);
         }
     }
 }
