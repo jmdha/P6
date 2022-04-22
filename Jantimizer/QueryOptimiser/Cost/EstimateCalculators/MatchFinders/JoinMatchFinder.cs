@@ -92,42 +92,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             {
                 for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
-                    MatchType matchType = MatchType.Undefined;
-                    switch (predicate.ComType)
-                    {
-                        case ComparisonType.Type.Less:
-                            if (leftBuckets[i].ValueEnd.IsLessThan(rightBuckets[j].ValueStart))
-                                matchType = MatchType.Match;
-                            else if (leftBuckets[i].ValueStart.IsLessThan(rightBuckets[j].ValueEnd))
-                                matchType = MatchType.Overlap;
-                            else
-                                matchType = MatchType.None;
-                            break;
-                        case ComparisonType.Type.EqualOrLess:
-                            if (leftBuckets[i].ValueEnd.IsLessThanOrEqual(rightBuckets[j].ValueStart))
-                                matchType = MatchType.Match;
-                            else if (leftBuckets[i].ValueStart.IsLessThanOrEqual(rightBuckets[j].ValueEnd))
-                                matchType = MatchType.Overlap;
-                            else
-                                matchType = MatchType.None;
-                            break;
-                        case ComparisonType.Type.More:
-                            if (leftBuckets[i].ValueStart.IsLargerThan(rightBuckets[j].ValueEnd))
-                                matchType = MatchType.Match;
-                            else if (leftBuckets[i].ValueEnd.IsLargerThan(rightBuckets[j].ValueStart))
-                                matchType = MatchType.Overlap;
-                            else
-                                matchType = MatchType.None;
-                            break;
-                        case ComparisonType.Type.EqualOrMore:
-                            if (leftBuckets[i].ValueStart.IsLargerThanOrEqual(rightBuckets[j].ValueEnd))
-                                matchType = MatchType.Match;
-                            else if (leftBuckets[i].ValueEnd.IsLargerThanOrEqual(rightBuckets[j].ValueStart))
-                                matchType = MatchType.Overlap;
-                            else
-                                matchType = MatchType.None;
-                            break;
-                    }
+                    MatchType matchType = DoesMatch(predicate.ComType, leftBuckets[i], rightBuckets[j]);
+                    
                     if (matchType == MatchType.Match || matchType == MatchType.Overlap)
                         buckets.Add(MakeNewIntermediateBucket(matchType, predicate, leftBuckets[i], rightBuckets[j]));
                     else

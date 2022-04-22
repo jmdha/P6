@@ -32,33 +32,56 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 
         internal MatchType DoesMatch(ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
+            return DoesMatch(comType, constant, bucket.ValueStart, bucket.ValueEnd);
+        }
+
+        internal MatchType DoesMatch(ComparisonType.Type comType, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
+        {
+            return DoesMatch(comType, leftBucket.ValueStart, leftBucket.ValueEnd, rightBucket.ValueStart, rightBucket.ValueEnd);
+        }
+
+        internal MatchType DoesMatch(ComparisonType.Type comType, IComparable range1Start, IComparable range1End, IComparable range2Start, IComparable range2End)
+        {
+            MatchType startMatch = DoesMatch(comType, range1Start, range2Start, range2End);
+            MatchType endMatch = DoesMatch(comType, range1End, range2Start, range2End);
+
+            if (startMatch == MatchType.Match && endMatch == MatchType.Match)
+                return MatchType.Match;
+            else if (startMatch == MatchType.Overlap || endMatch == MatchType.Overlap)
+                return MatchType.Overlap;
+            else
+                return MatchType.None;
+        }
+
+        internal MatchType DoesMatch(ComparisonType.Type comType, IComparable constant, IComparable rangeStart, IComparable rangeEnd)
+        {
             switch (comType)
             {
                 case ComparisonType.Type.Less:
-                    if (constant.IsLessThan(bucket.ValueStart))
+                    if (constant.IsLessThan(rangeEnd))
                         return MatchType.Match;
-                    else if (constant.IsLessThan(bucket.ValueEnd))
+                    else if (constant.IsLessThan(rangeEnd))
                         return MatchType.Overlap;
                     else
                         return MatchType.None;
                 case ComparisonType.Type.EqualOrLess:
-                    if (constant.IsLessThanOrEqual(bucket.ValueStart))
+                    if (constant.IsLessThanOrEqual(rangeStart))
                         return MatchType.Match;
-                    else if (constant.IsLessThanOrEqual(bucket.ValueEnd))
+                    else if (constant.IsLessThanOrEqual(rangeEnd))
                         return MatchType.Overlap;
                     else
                         return MatchType.None;
                 case ComparisonType.Type.More:
-                    if (constant.IsLargerThan(bucket.ValueEnd))
+                    if (constant.IsLargerThan(rangeEnd))
                         return MatchType.Match;
-                    else if (constant.IsLargerThan(bucket.ValueStart))
+                    else if (constant.IsLargerThan(rangeStart))
                         return MatchType.Overlap;
                     else
                         return MatchType.None;
                 case ComparisonType.Type.EqualOrMore:
-                    if (constant.IsLargerThanOrEqual(bucket.ValueEnd))
+                    if (constant.IsLargerThanOrEqual(rangeEnd))
                         return MatchType.Match;
-                    else if (constant.IsLargerThanOrEqual(bucket.ValueStart))
+                    else if (constant.IsLargerThanOrEqual(rangeStart))
                         return MatchType.Overlap;
                     else
                         return MatchType.None;
