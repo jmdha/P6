@@ -28,7 +28,7 @@ namespace QueryParser.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ToString());
+            return TableReference.GetHashCode() + HashCode.Combine(AttributeName, ComparisonType.GetOperatorString(ComType), Constant);
         }
     }
 }

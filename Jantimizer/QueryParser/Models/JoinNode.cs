@@ -47,17 +47,9 @@ namespace QueryParser.Models
             return $"({Predicate})";
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is JoinNode node &&
-                   Id == node.Id &&
-                   Predicate == node.Predicate &&
-                   EqualityComparer<JoinPredicateRelation>.Default.Equals(Relation, node.Relation);
-        }
-
         public override int GetHashCode()
         {
-            return HashCode.Combine(ToString());
+            return HashCode.Combine(Id, Predicate, Relation.GetHashCode());
         }
     }
 }

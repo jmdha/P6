@@ -48,7 +48,7 @@ namespace QueryParser.QueryParsers
             int hash = 0;
             foreach (var node in Nodes)
                 hash += node.GetHashCode();
-            return hash;
+            return hash + HashCode.Combine(FromQuery);
         }
     }
 }

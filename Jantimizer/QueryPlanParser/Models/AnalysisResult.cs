@@ -42,19 +42,6 @@ namespace QueryPlanParser.Models
             return QueryTree.BuildStringBuilderRec(new StringBuilder(), 0).ToString();
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is AnalysisResult result &&
-                   Name == result.Name &&
-                   EstimatedCost == result.EstimatedCost &&
-                   EstimatedCardinality == result.EstimatedCardinality &&
-                   ActualCardinality == result.ActualCardinality &&
-                   ActualTime.Equals(result.ActualTime) &&
-                   EqualityComparer<AnalysisResultQueryTree>.Default.Equals(QueryTree, result.QueryTree) &&
-                   EqualityComparer<DataSet>.Default.Equals(InputDataset, result.InputDataset) &&
-                   ParserName == result.ParserName;
-        }
-
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, EstimatedCost, EstimatedCardinality, ActualCardinality, ActualTime, ParserName);

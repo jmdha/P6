@@ -1,42 +1,31 @@
 ﻿using QueryOptimiser.Models;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Models;
-using ResultsSentinel.Exceptions;
+using System.Text;
 using Tools.Models.Dictionaries;
 
 namespace ResultsSentinel
 {
-    public class QueryParserResultSentinel
+    public class QueryParserResultSentinel : BaseResultSentinel<ParserResult>
     {
-        internal Dictionary<int, ParserResult> _dict;
         public static QueryParserResultSentinel? Instance;
-        public bool IsEnabled = false;
 
-        public QueryParserResultSentinel()
+        public QueryParserResultSentinel() : base()
         {
-            _dict = new Dictionary<int, ParserResult>();
             Instance = this;
+            Criticality = SentinelCriticality.Low;
         }
 
-        public void CheckResult(ParserResult value, string caseName, string experimentName, string runnerName)
+        public override string GetErrorDescription(ParserResult value1, ParserResult value2)
         {
-            if (IsEnabled)
-            {
-                var hash = value.GetHashCode() + HashCode.Combine(caseName, experimentName, runnerName);
-                if (_dict.ContainsKey(hash))
-                {
-                    var saved = _dict[hash];
-                    if (saved.GetNodesHashCode() != value.GetNodesHashCode())
-                        throw new QueryParserResultSentinelErrorLogException(
-                            saved,
-                            value,
-                            experimentName,
-                            caseName,
-                            runnerName);
-                }
-                else
-                    _dict.Add(hash, value);
-            }
+            var sb = new StringBuilder();
+            sb.AppendLine("Missmatch in ParserResult!");
+            sb.AppendLine("Result 1 data:");
+            sb.AppendLine(value1.ToString());
+            sb.AppendLine("Result 2 data:");
+            sb.AppendLine(value2.ToString());
+
+            return sb.ToString();
         }
     }
 }

@@ -1,41 +1,30 @@
 ﻿using QueryOptimiser.Models;
 using QueryPlanParser.Models;
-using ResultsSentinel.Exceptions;
+using System.Text;
 using Tools.Models.Dictionaries;
 
 namespace ResultsSentinel
 {
-    public class QueryPlanParserResultSentinel
+    public class QueryPlanParserResultSentinel : BaseResultSentinel<AnalysisResult>
     {
-        internal Dictionary<int, AnalysisResult> _dict;
         public static QueryPlanParserResultSentinel? Instance;
-        public bool IsEnabled = false;
 
-        public QueryPlanParserResultSentinel()
+        public QueryPlanParserResultSentinel() : base()
         {
-            _dict = new Dictionary<int, AnalysisResult>();
             Instance = this;
+            Criticality = SentinelCriticality.Low;
         }
 
-        public void CheckResult(AnalysisResult value, string caseName, string experimentName, string runnerName)
+        public override string GetErrorDescription(AnalysisResult value1, AnalysisResult value2)
         {
-            if (IsEnabled)
-            {
-                var hash = value.GetHashCode() + HashCode.Combine(caseName, experimentName, runnerName);
-                if (_dict.ContainsKey(hash))
-                {
-                    var saved = _dict[hash];
-                    if (saved.QueryTree.GetHashCode() != value.QueryTree.GetHashCode())
-                        throw new QueryPlanParserResultSentinelErrorLogException(
-                            saved,
-                            value,
-                            experimentName,
-                            caseName,
-                            runnerName);
-                }
-                else
-                    _dict.Add(hash, value);
-            }
+            var sb = new StringBuilder();
+            sb.AppendLine("Missmatch in AnalysisResult!");
+            sb.AppendLine("Result 1 data:");
+            sb.AppendLine(value1.ToString());
+            sb.AppendLine("Result 2 data:");
+            sb.AppendLine(value2.ToString());
+
+            return sb.ToString();
         }
     }
 }

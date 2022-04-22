@@ -1,9 +1,13 @@
 ﻿using ExperimentSuite.Controllers;
 using ExperimentSuite.Helpers;
+using ExperimentSuite.UserControls.SentinelReportViewer;
 using ResultsSentinel;
+using ResultsSentinel.SentinelLog;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace ExperimentSuite
 {
@@ -12,6 +16,7 @@ namespace ExperimentSuite
     /// </summary>
     public partial class MainWindow : Window
     {
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
         private ExperimentController controller;
 
         public MainWindow()
@@ -73,7 +78,9 @@ namespace ExperimentSuite
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
             RunButton.IsEnabled = false;
+            StartSentinelTimerIfEnabled();
             await controller.RunExperiments();
+            dispatcherTimer.Stop();
             RunButton.IsEnabled = true;
         }
 
@@ -101,6 +108,49 @@ namespace ExperimentSuite
             if (sender is CheckBox checkBox)
                 if (QueryParserResultSentinel.Instance != null)
                     QueryParserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+        }
+
+        private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
+        {
+            var newList = new List<SentinelLogItem>();
+            if (OptimiserResultSentinel.Instance != null)
+                newList.AddRange(OptimiserResultSentinel.Instance.SentinelLog);
+            if (QueryParserResultSentinel.Instance != null)
+                newList.AddRange(QueryParserResultSentinel.Instance.SentinelLog);
+            if (QueryPlanParserResultSentinel.Instance != null)
+                newList.AddRange(QueryPlanParserResultSentinel.Instance.SentinelLog);
+            var sentinelWindow = new SentinelReportViewer(newList);
+            sentinelWindow.Show();
+        }
+
+        private void StartSentinelTimerIfEnabled()
+        {
+            bool any = false;
+            if (!any && OptimiserResultSentinel.Instance != null)
+                any = OptimiserResultSentinel.Instance.IsEnabled;
+            if (!any && QueryParserResultSentinel.Instance != null)
+                any = QueryParserResultSentinel.Instance.IsEnabled;
+            if (!any && QueryPlanParserResultSentinel.Instance != null)
+                any = QueryPlanParserResultSentinel.Instance.IsEnabled;
+
+            if (any)
+            {
+                dispatcherTimer.Tick += dispatcherTimer_Tick;
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Start();
+            }
+        }
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            var count = 0;
+            if (OptimiserResultSentinel.Instance != null)
+                count += OptimiserResultSentinel.Instance.SentinelLog.Count;
+            if (QueryParserResultSentinel.Instance != null)
+                count += QueryParserResultSentinel.Instance.SentinelLog.Count;
+            if (QueryPlanParserResultSentinel.Instance != null)
+                count += QueryPlanParserResultSentinel.Instance.SentinelLog.Count;
+            SentinelViewerButton.Content = $"Sentinels ({count})";
         }
     }
 }

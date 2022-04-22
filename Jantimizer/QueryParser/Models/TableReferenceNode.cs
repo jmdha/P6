@@ -32,7 +32,7 @@
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ToString());
+            return HashCode.Combine(Id, TableName, Alias);
         }
     }
 }

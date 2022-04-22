@@ -42,5 +42,20 @@ namespace QueryParser.Models
             }
             return tables;
         }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            if (LeafPredicate != null)
+                hash += LeafPredicate.GetHashCode();
+            if (LeftRelation != null)
+                hash += LeftRelation.GetHashCode();
+            if (RightRelation != null)
+                hash += RightRelation.GetHashCode();
+            if (Type != RelationType.Type.Predicate)
+                return hash + HashCode.Combine(RelationType.GetRelationString(Type));
+            else
+                return hash + HashCode.Combine("Predicate");
+        }
     }
 }

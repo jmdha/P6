@@ -19,5 +19,10 @@
             Condition = condition;
             ComType = type;
         }
+
+        public override int GetHashCode()
+        {
+            return LeftTable.GetHashCode() + RightTable.GetHashCode() + HashCode.Combine(LeftAttribute, RightAttribute, Condition, ComparisonType.GetOperatorString(ComType));
+        }
     }
 }

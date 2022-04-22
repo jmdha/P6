@@ -40,19 +40,9 @@ namespace QueryOptimiser.Models
             return sb.ToString();
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is OptimiserResult result &&
-                   EstTotalCardinality == result.EstTotalCardinality &&
-                   EqualityComparer<List<INode>>.Default.Equals(FromNodes, result.FromNodes) &&
-                   OptimiserName == result.OptimiserName &&
-                   HistogramManagerName == result.HistogramManagerName &&
-                   EstimateCalculatorName == result.EstimateCalculatorName;
-        }
-
         public override int GetHashCode()
         {
-            return HashCode.Combine(OptimiserName, HistogramManagerName, EstimateCalculatorName);
+            return HashCode.Combine(EstTotalCardinality, OptimiserName, HistogramManagerName, EstimateCalculatorName);
         }
     }
 }

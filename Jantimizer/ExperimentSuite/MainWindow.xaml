@@ -26,6 +26,7 @@
                     <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
@@ -35,8 +36,9 @@
                     <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Click="QueryPlanSentinelCheckbox_Click"/>
                     <CheckBox x:Name="QuerySentinelCheckbox" Content="Enable Query Parser Sentinel" Click="QuerySentinelCheckbox_Click"/>
                 </StackPanel>
-                <Button x:Name="RunButton" Content="Run!" Grid.Column="3" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
-                <Button x:Name="CacheViewerButton" Grid.Column="4" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
+                <Button x:Name="SentinelViewerButton" Content="Sentinels (0)" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>
+                <Button x:Name="RunButton" Content="Run!" Grid.Column="4" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
+                <Button x:Name="CacheViewerButton" Grid.Column="5" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
             </Grid>
 
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
