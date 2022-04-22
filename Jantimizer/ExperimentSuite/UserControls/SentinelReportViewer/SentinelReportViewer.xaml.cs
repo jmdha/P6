@@ -1,4 +1,6 @@
-﻿using ResultsSentinel.SentinelLog;
+﻿using ExperimentSuite.UserControls.SentinelReportViewer.Controls;
+using ResultsSentinel;
+using ResultsSentinel.SentinelLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace ExperimentSuite.UserControls.SentinelReportViewer
 {
@@ -20,10 +23,16 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer
     /// </summary>
     public partial class SentinelReportViewer : Window
     {
-        public SentinelReportViewer(List<SentinelLogItem> reportLines)
+        private List<IResultSentinel> _sentinels;
+
+        public SentinelReportViewer(List<IResultSentinel> reportLines)
         {
             InitializeComponent();
-            MainGrid.ItemsSource = reportLines;
+
+            _sentinels = reportLines;
+
+            foreach (IResultSentinel item in _sentinels)
+                ReportPanel.Children.Add(new SentinelGrid(item.GetType().Name, item));
         }
     }
 }

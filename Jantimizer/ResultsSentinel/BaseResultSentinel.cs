@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ResultsSentinel
 {
-    public enum SentinelCriticality { None, Low, Medium, High }
-    public abstract class BaseResultSentinel<T> where T : notnull
+    public abstract class BaseResultSentinel<T> : IResultSentinel
+        where T : notnull
     {
-        public SentinelCriticality Criticality { get; set; }
+        public SentinelCriticality Criticality { get; internal set; }
         public bool IsEnabled { get; set; } = false;
         public List<SentinelLogItem> SentinelLog { get; }
         internal Dictionary<int, T> _dict;
