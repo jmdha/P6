@@ -1,5 +1,6 @@
 ﻿using Histograms;
 using Histograms.Models;
+using QueryOptimiser.Cost.EstimateCalculators.MatchFinders;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
@@ -16,11 +17,10 @@ namespace QueryOptimiser.Cost.EstimateCalculators
     public abstract class BaseEstimateCalculator : IEstimateCalculator
     {
         public IHistogramManager HistogramManager { get; set; }
-        public abstract IJoinEstimate JoinEstimator { get; set; }
-        public abstract IFilterEstimate FilterEstimator { get; set; }
-        public abstract MatchFinder Matcher { get; set; }
+        public abstract JoinMatchFinder JoinMatcher { get; set; }
+        public abstract FilterMatchFinder FilterMatcher { get; set; }
 
-        internal BaseEstimateCalculator(IHistogramManager manager)
+        public BaseEstimateCalculator(IHistogramManager manager)
         {
             HistogramManager = manager;
         }
@@ -39,7 +39,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
         {
             List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.TableName, node.AttributeName), intermediateTable);
-            List<IntermediateBucket> intermediateBuckets = Matcher.GetMatches(node, buckets);
+            List<IntermediateBucket> intermediateBuckets = FilterMatcher.GetMatches(node, buckets);
             return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.Alias, node.AttributeName) });
         }
         #endregion
@@ -100,10 +100,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             else
                 return returnMatches;
 
-            if (predicate.ComType == ComparisonType.Type.Equal)
-                returnMatches.Buckets = Matcher.GetEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
-            else
-                returnMatches.Buckets = Matcher.GetInEqualityMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
+            returnMatches.Buckets = JoinMatcher.GetMatches(predicate, bounds.LeftBuckets, bounds.RightBuckets);
+
             return returnMatches;
         }
         #endregion

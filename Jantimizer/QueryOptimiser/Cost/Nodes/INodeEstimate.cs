@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    public interface INodeEstimate<NodeType> where NodeType : INode
+    public interface INodeEstimate
     {
     }
 }

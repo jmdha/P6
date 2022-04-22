@@ -1,6 +1,5 @@
 ﻿using Histograms.Models;
 using QueryOptimiser.Cost.Nodes;
-using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
 using QueryParser.Models;
 using System;
@@ -10,56 +9,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Helpers;
 
-namespace QueryOptimiser.Cost.EstimateCalculators
+namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 {
-    public class MatchFinder
+    public class JoinMatchFinder : BaseMatchFinder<IJoinEstimate>
     {
-        internal enum MatchType
+        public JoinMatchFinder(IJoinEstimate estimator) : base(estimator)
         {
-            Undefined,
-            Overlap, // If the match is via overlap
-            Match, // If there is a match but there is no overlap
-            None
         }
 
-        internal IJoinEstimate JoinEstimator { get; set; }
-        internal IFilterEstimate FilterEstimator { get; set; }
-
-        public MatchFinder(IJoinEstimate joinEstimator, IFilterEstimate filterEstimator)
+        internal List<IntermediateBucket> GetMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
-            JoinEstimator = joinEstimator;
-            FilterEstimator = filterEstimator;
-        }
-
-        internal List<IntermediateBucket> GetMatches(FilterNode node, List<IHistogramBucket> buckets)
-        {
-            switch (node.ComType)
+            switch (predicate.ComType)
             {
                 case ComparisonType.Type.Equal:
-                    return GetEqualityMatches(node, buckets);
+                    return GetEqualityMatches(predicate, leftBuckets, rightBuckets);
                 case ComparisonType.Type.Less:
                 case ComparisonType.Type.More:
                 case ComparisonType.Type.EqualOrMore:
                 case ComparisonType.Type.EqualOrLess:
-                    return GetInEqualityMatches(node, buckets);
+                    return GetInEqualityMatches(predicate, leftBuckets, rightBuckets);
                 default:
-                    throw new ArgumentException($"Invalid comparison type {node.ToString()}");
+                    throw new ArgumentException($"Invalid comparison type {predicate.ToString()}");
             }
-        }
-
-        internal List<IntermediateBucket> GetEqualityMatches(FilterNode node, List<IHistogramBucket> buckets)
-        {
-            List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
-            bool matches = false;
-            for (int i = 0; i < buckets.Count; i++)
-            {
-                if (DoesOverlap(node.Constant, buckets[i])) {
-                    matches = true;
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(MatchType.Overlap, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
-                } else if (matches)
-                    break;
-            }
-            return intermediateBuckets;
         }
 
         internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
@@ -80,18 +51,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 }
             }
             return buckets;
-        }
-
-        internal List<IntermediateBucket> GetInEqualityMatches(FilterNode node, List<IHistogramBucket> buckets)
-        {
-            List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
-            for (int i = 0; i < buckets.Count; i++)
-            {
-                MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
-                if (type == MatchType.Match || type == MatchType.Overlap)
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(type, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
-            }
-            return intermediateBuckets;
         }
 
         /// <summary>
@@ -181,24 +140,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             return buckets;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, ComparisonType.Type comparisonType, IComparable constant, TableAttribute tableAttribute, IHistogramBucket bucket)
-        {
-            var newBucket = new IntermediateBucket();
-            long count;
-            if (matchType == MatchType.Match)
-                count = bucket.Count;
-            else if (matchType == MatchType.Overlap)
-                count = FilterEstimator.GetBucketEstimate(comparisonType, constant, bucket);
-            else
-                throw new ArgumentException($"Invalid matchtype {matchType}");
-
-            newBucket.AddBucketIfNotThere(
-                tableAttribute,
-                new BucketEstimate(bucket, count)
-                );
-            return newBucket;
-        }
-
         internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             var newBucket = new IntermediateBucket();
@@ -208,11 +149,13 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             {
                 leftCount = leftBucket.Count;
                 rightCount = rightBucket.Count;
-            } else if (matchType == MatchType.Overlap)
+            }
+            else if (matchType == MatchType.Overlap)
             {
-                leftCount = JoinEstimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket);
-                rightCount = JoinEstimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket);
-            } else
+                leftCount = Estimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket);
+                rightCount = Estimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket);
+            }
+            else
                 throw new ArgumentException($"Invalid matchtype {matchType}");
 
             newBucket.AddBucketIfNotThere(
@@ -230,76 +173,6 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                     )
                 );
             return newBucket;
-        }
-
-        internal MatchType DoesMatch(ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
-        {
-            switch (comType)
-            {
-                case ComparisonType.Type.Less:
-                    if (constant.IsLessThan(bucket.ValueStart))
-                        return MatchType.Match;
-                    else if (constant.IsLessThan(bucket.ValueEnd))
-                        return MatchType.Overlap;
-                    else
-                        return MatchType.None;
-                case ComparisonType.Type.EqualOrLess:
-                    if (constant.IsLessThanOrEqual(bucket.ValueStart))
-                        return MatchType.Match;
-                    else if (constant.IsLessThanOrEqual(bucket.ValueEnd))
-                        return MatchType.Overlap;
-                    else
-                        return MatchType.None;
-                case ComparisonType.Type.More:
-                    if (constant.IsLargerThan(bucket.ValueEnd))
-                        return MatchType.Match;
-                    else if (constant.IsLargerThan(bucket.ValueStart))
-                        return MatchType.Overlap;
-                    else
-                        return MatchType.None;
-                case ComparisonType.Type.EqualOrMore:
-                    if (constant.IsLargerThanOrEqual(bucket.ValueEnd))
-                        return MatchType.Match;
-                    else if (constant.IsLargerThanOrEqual(bucket.ValueStart))
-                        return MatchType.Overlap;
-                    else
-                        return MatchType.None;
-                default:
-                    return MatchType.Undefined;
-            }
-        }
-
-        /// <summary>
-        ///    Returns true if the constant is inside the bounds of the bucket
-        /// </summary>
-        /// <param name="constant"></param>
-        /// <param name="bucket"></param>
-        /// <returns></returns>
-        internal bool DoesOverlap(IComparable constant, IHistogramBucket bucket)
-        {
-            if (bucket.ValueStart.IsLessThanOrEqual(constant) && bucket.ValueEnd.IsLargerThanOrEqual(constant))
-                return true;
-            return false;
-        }
-
-        internal bool DoesOverlap(IHistogramBucket leftBucket, IHistogramBucket rightBucket)
-        {
-            // Right bucket start index is within Left bucket range
-            // Right Bucket:      |======|
-            // Left Bucket:    |======|
-            if (rightBucket.ValueStart.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            // Right bucket end index is within Left bucket range
-            // Right Bucket:   |======|
-            // Left Bucket:       |======|
-            if (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            // Left bucket is entirely within Right bucket
-            // Right Bucket: |===========|
-            // Left Bucket:     |=====|
-            if (rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueEnd))
-                return true;
-            return false;
         }
     }
 }

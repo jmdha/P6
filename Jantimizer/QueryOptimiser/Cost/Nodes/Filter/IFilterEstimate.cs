@@ -12,7 +12,7 @@ using System.Runtime.CompilerServices;
 
 namespace QueryOptimiser.Cost.Nodes
 {
-    public interface IFilterEstimate : INodeEstimate<FilterNode>
+    public interface IFilterEstimate : INodeEstimate
     {
         public long GetBucketEstimate(ComparisonType.Type comparisonType, IComparable constant, IHistogramBucket bucket);
     }
