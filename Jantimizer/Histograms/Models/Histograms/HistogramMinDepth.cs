@@ -34,29 +34,6 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        internal HistogramMinDepth(CachedHistogram histo) : base(histo.HistogramId, histo.TableName, histo.AttributeName)
-        {
-            Depth = histo.Depth;
-            foreach (var bucket in histo.Buckets)
-            {
-                Type? type = Type.GetType(bucket.ValueType);
-                if (type == null)
-                    throw new NullReferenceException("Unexpected null as cache type");
-
-
-                if (type.GetInterface(nameof(IComparable)) != null)
-                {
-                    var valueStart = Convert.ChangeType(bucket.ValueStart, type) as IComparable;
-                    var valueEnd = Convert.ChangeType(bucket.ValueEnd, type) as IComparable;
-
-                    if (valueStart == null || valueEnd == null)
-                        throw new ArgumentNullException("Read bucket value was invalid!");
-
-                    Buckets.Add(new HistogramBucket(bucket.BucketId, valueStart, valueEnd, bucket.Count));
-                }
-            }
-        }
-
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
             GenerateHistogramFromSortedGroups(

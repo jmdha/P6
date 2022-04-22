@@ -71,6 +71,8 @@ namespace Histograms.DataGatherers
         {
             return HashCode.Combine(tableName, attributeName).ToString();
 
+            // Disabled for now, just dont work with some of the larger datasets
+#pragma warning disable CS0162 // Unreachable code detected
             var columnHash = new DataSet();
             using (var connector = new PostgreSqlConnector(ConnectionProperties))
                 columnHash = await connector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::VARCHAR(100)), ',')) as \"hash\" FROM \"{tableName}\";");
@@ -83,6 +85,7 @@ namespace Histograms.DataGatherers
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
             string hashValue = (string)hashRow["hash"];
             return hashValue;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public override async Task<Type> GetAttributeType(string tableName, string attributeName)

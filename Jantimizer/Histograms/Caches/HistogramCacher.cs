@@ -62,47 +62,6 @@ namespace Histograms.Caches
             HistogramCacheDict.Clear();
         }
 
-        public override void LoadCacheFromFile()
-        {
-            if (CacheFile.Exists)
-            {
-                ClearCache();
-                var list = JsonSerializer.Deserialize<List<CachedHistogram>>(File.ReadAllText(CacheFile.FullName));
-                if (list != null)
-                {
-                    foreach (var value in list)
-                    {
-                        switch (value.TypeName)
-                        {
-                            case "HistogramEquiDepth":
-                                HistogramCacheDict.Add(value.Hash, new HistogramEquiDepth(value));
-                                break;
-                            case "HistogramEquiDepthVariance":
-                                HistogramCacheDict.Add(value.Hash, new HistogramEquiDepthVariance(value));
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-        public override void SaveCacheToFile()
-        {
-            List<CachedHistogram> histograms = new List<CachedHistogram>();
-            foreach(var key in HistogramCacheDict.Keys)
-                histograms.Add(new CachedHistogram((dynamic)HistogramCacheDict[key], key));
-
-            string jsonText = JsonSerializer.Serialize(histograms);
-            if (CacheFile.Exists)
-                CacheFile.Delete();
-
-            using (FileStream fs = CacheFile.Create())
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes(jsonText);
-                fs.Write(info, 0, info.Length);
-            }
-        }
-
         public override List<CacheItem> GetAllCacheItems()
         {
             var returnList = new List<CacheItem>();
@@ -113,6 +72,16 @@ namespace Histograms.Caches
                     returnList.Add(new CacheItem(key, content, nameof(HistogramCacher)));
             }
             return returnList;
+        }
+
+        public override void LoadCacheFromFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SaveCacheToFile()
+        {
+            throw new NotImplementedException();
         }
     }
 }

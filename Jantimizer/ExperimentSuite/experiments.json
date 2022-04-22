@@ -2,7 +2,7 @@
   "Experiments": [
     {
       "ExperimentName": "Experiment One - Base EquiDepth",
-      "RunParallel": true,
+      "RunParallel": false,
       "RunExperiment": true,
       "PreRunData": [
         {
@@ -58,7 +58,7 @@
     },
     {
       "ExperimentName": "Experiment Two - Variance",
-      "RunParallel": true,
+      "RunParallel": false,
       "RunExperiment": true,
       "PreRunData": [
         {
@@ -114,7 +114,7 @@
     },
     {
       "ExperimentName": "Experiment Three - MinDepth",
-      "RunParallel": true,
+      "RunParallel": false,
       "RunExperiment": true,
       "PreRunData": [
         {

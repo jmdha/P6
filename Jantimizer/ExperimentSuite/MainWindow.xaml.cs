@@ -20,7 +20,6 @@ namespace ExperimentSuite
     public partial class MainWindow : Window
     {
         private readonly string QueryPlanCacheFile = "query-plan-cache.json";
-        private readonly string HistogramCacheFile = "histogram-cache.json";
 
         private ExperimentController controller;
 
@@ -34,7 +33,7 @@ namespace ExperimentSuite
 
             // Cachers
             new QueryPlanCacher(QueryPlanCacheFile);
-            new HistogramCacher(HistogramCacheFile);
+            new HistogramCacher();
 
             controller = new ExperimentController();
             controller.WriteToStatus += WriteToStatus;

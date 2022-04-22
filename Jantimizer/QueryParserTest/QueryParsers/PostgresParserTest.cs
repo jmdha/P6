@@ -431,7 +431,7 @@ namespace QueryParsers
             parser.InsertFilters(explainResults, ref result);
             Assert.IsNotNull(result.Tables[tableAlias]);
             Assert.AreEqual(1, result.Tables[tableAlias].Filters.Count);
-            Assert.AreEqual(tRefNode, result.Tables[tableAlias].Filters[0].TableReference);
+            Assert.AreEqual(tRefNode.Alias, result.Tables[tableAlias].Filters[0].Alias);
             Assert.AreEqual(type, result.Tables[tableAlias].Filters[0].ComType);
             Assert.AreEqual(attribute, result.Tables[tableAlias].Filters[0].AttributeName);
             Assert.AreEqual(constant, result.Tables[tableAlias].Filters[0].Constant.ToString());
