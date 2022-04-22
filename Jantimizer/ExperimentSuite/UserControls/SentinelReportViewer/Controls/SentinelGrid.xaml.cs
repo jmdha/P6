@@ -23,10 +23,12 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
     /// </summary>
     public partial class SentinelGrid : UserControl
     {
+        private List<SentinelLogItem> _logs;
         private IResultSentinel _sentinel;
         private string _sentinelName;
         private int tickCount = 10;
         private int maxTickCount = 10;
+        private int currentItemCount = 0;
         private DispatcherTimer _sentinelCheckerTimer = new DispatcherTimer();
         public SentinelGrid(string sentinelName, IResultSentinel sentinel)
         {
@@ -36,24 +38,28 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
             SentinelNameLabel.Content = sentinelName;
             _sentinelCheckerTimer.Tick += SentinelChecker_Tick;
             _sentinelCheckerTimer.Interval = new TimeSpan(0, 0, 1);
-            MainDataGrid.ItemsSource = sentinel.SentinelLog;
             _sentinelCheckerTimer.Start();
+            _logs = new List<SentinelLogItem>();
         }
 
         private void SentinelChecker_Tick(object sender, EventArgs e)
         {
             UpdateLabel(tickCount);
             tickCount--;
-            if (tickCount <= 0)
+            if (tickCount < 0)
             {
-                MainDataGrid.Items.Refresh();
+                _logs.Clear();
+                _logs.AddRange(_sentinel.SentinelLog);
+                currentItemCount = _logs.Count;
+                MainDataGrid.ItemsSource = null;
+                MainDataGrid.ItemsSource = _logs;
                 tickCount = maxTickCount;
             }
         }
 
         private void UpdateLabel(int count)
         {
-            SentinelNameLabel.Content = $"{_sentinelName} (Updates in {count} seconds)";
+            SentinelNameLabel.Content = $"{_sentinelName} (Updates in {count} seconds, total of {currentItemCount} log items)";
         }
     }
 }

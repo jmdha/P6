@@ -14,5 +14,7 @@ namespace ResultsSentinel
         public SentinelCriticality Criticality { get; }
         public bool IsEnabled { get; set; }
         public List<SentinelLogItem> SentinelLog { get; }
+
+        public void ClearSentinel();
     }
 }

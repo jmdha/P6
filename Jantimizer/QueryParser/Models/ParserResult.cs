@@ -40,11 +40,6 @@ namespace QueryParser.QueryParsers
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FromQuery);
-        }
-
-        public int GetNodesHashCode()
-        {
             int hash = 0;
             foreach (var node in Nodes)
                 hash += node.GetHashCode();

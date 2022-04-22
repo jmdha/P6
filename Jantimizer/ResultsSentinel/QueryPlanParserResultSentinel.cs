@@ -19,9 +19,9 @@ namespace ResultsSentinel
         {
             var sb = new StringBuilder();
             sb.AppendLine("Missmatch in AnalysisResult!");
-            sb.AppendLine("Result 1 data:");
+            sb.AppendLine("Expected data:");
             sb.AppendLine(value1.ToString());
-            sb.AppendLine("Result 2 data:");
+            sb.AppendLine("Actual Data:");
             sb.AppendLine(value2.ToString());
 
             return sb.ToString();

@@ -32,7 +32,8 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer
             _sentinels = reportLines;
 
             foreach (IResultSentinel item in _sentinels)
-                ReportPanel.Children.Add(new SentinelGrid(item.GetType().Name, item));
+                if (item.IsEnabled)
+                    ReportPanel.Children.Add(new SentinelGrid(item.GetType().Name, item));
         }
     }
 }

@@ -43,6 +43,12 @@ namespace ResultsSentinel
             }
         }
 
+        public void ClearSentinel()
+        {
+            SentinelLog.Clear();
+            _dict.Clear();
+        }
+
         public abstract string GetErrorDescription(T value1, T value2);
     }
 }

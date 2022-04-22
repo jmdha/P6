@@ -2,6 +2,8 @@
 using ExperimentSuite.Helpers;
 using ExperimentSuite.UserControls;
 using ExperimentSuite.UserControls.SentinelReportViewer;
+using Histograms.Caches;
+using QueryPlanParser.Caches;
 using ResultsSentinel;
 using ResultsSentinel.SentinelLog;
 using System;
@@ -17,16 +19,23 @@ namespace ExperimentSuite
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly string QueryPlanCacheFile = "query-plan-cache.json";
+        private readonly string HistogramCacheFile = "histogram-cache.json";
+
         private ExperimentController controller;
 
         public MainWindow()
         {
+            // Sentinels
             new OptimiserResultSentinel();
             new QueryPlanParserResultSentinel();
             new QueryParserResultSentinel();
 
-            controller = new ExperimentController();
+            // Cachers
+            new QueryPlanCacher(QueryPlanCacheFile);
+            new HistogramCacher(HistogramCacheFile);
 
+            controller = new ExperimentController();
             controller.WriteToStatus += WriteToStatus;
             controller.UpdateExperimentProgressBar += UpdateExperimentProgressBar;
             controller.AddNewElement += AddNewElementToTestPanel;
@@ -57,12 +66,6 @@ namespace ExperimentSuite
             TestsPanel.Children.Remove(element);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //await controller.RunExperiments();
-            RunButton.IsEnabled = true;
-        }
-
         private void WriteToStatus(string text)
         {
             StatusTextbox.Text += $"{text}{Environment.NewLine}";
@@ -80,6 +83,7 @@ namespace ExperimentSuite
             OptimiserSentinelCheckbox.IsEnabled = false;
             QueryPlanSentinelCheckbox.IsEnabled = false;
             QuerySentinelCheckbox.IsEnabled = false;
+            ClearSentinelLogs();
             await controller.RunExperiments();
             RunButton.IsEnabled = true;
             OptimiserSentinelCheckbox.IsEnabled = true;
@@ -125,6 +129,16 @@ namespace ExperimentSuite
                 newList.Add(QueryPlanParserResultSentinel.Instance);
             var sentinelWindow = new SentinelReportViewer(newList);
             sentinelWindow.Show();
+        }
+
+        private void ClearSentinelLogs()
+        {
+            if (OptimiserResultSentinel.Instance != null)
+                OptimiserResultSentinel.Instance.ClearSentinel();
+            if (QueryParserResultSentinel.Instance != null)
+                QueryParserResultSentinel.Instance.ClearSentinel();
+            if (QueryPlanParserResultSentinel.Instance != null)
+                QueryPlanParserResultSentinel.Instance.ClearSentinel();
         }
     }
 }

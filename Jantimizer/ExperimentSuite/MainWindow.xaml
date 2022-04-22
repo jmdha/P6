@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ExperimentSuite"
         xmlns:uc="clr-namespace:ExperimentSuite.UserControls"
         mc:Ignorable="d"
-        Title="Jantimiser" Height="750" Width="1600" Loaded="Window_Loaded">
+        Title="Jantimiser" Height="750" Width="1600">
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="70"/>
@@ -30,8 +30,8 @@
                 <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Click="QueryPlanSentinelCheckbox_Click"/>
                 <CheckBox x:Name="QuerySentinelCheckbox" Content="Enable Query Parser Sentinel" Click="QuerySentinelCheckbox_Click"/>
             </StackPanel>
-            <Button x:Name="SentinelViewerButton" Content="Sentinels (0)" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>
-            <Button x:Name="RunButton" Content="Run!" Grid.Column="4" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
+            <Button x:Name="SentinelViewerButton" Content="Sentinel Viewer" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>
+            <Button x:Name="RunButton" Content="Run!" Grid.Column="4" Margin="5" Click="RunButton_Click"/>
             <Button x:Name="CacheViewerButton" Grid.Column="5" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
         </Grid>
 
