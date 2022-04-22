@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ExperimentSuite.Helpers
 {
     public static class TaskRunnerHelper
     {
+        private static bool _haveWarned = false;
         public static async Task RunDelegates(Dictionary<string, List<Func<Task>>> dict, bool runParallel = true)
         {
+            if (!_haveWarned && runParallel)
+            {
+                MessageBox.Show("Warning, running in parallel can cause odd histograms to be generated!");
+                _haveWarned = true;
+            }
             if (runParallel)
                 await RunDelegatesParallel(dict);
             else
