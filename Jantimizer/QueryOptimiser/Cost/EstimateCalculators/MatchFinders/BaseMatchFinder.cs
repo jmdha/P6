@@ -30,6 +30,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             Estimator = estimator;
         }
 
+        #region DoesMatch
         internal MatchType DoesMatch(ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
             return DoesMatch(comType, constant, bucket.ValueStart, bucket.ValueEnd);
@@ -89,7 +90,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                     return MatchType.Undefined;
             }
         }
-
+        #endregion
+        #region DoesOverlap
         /// <summary>
         ///    Returns true if the constant is inside the bounds of the bucket
         /// </summary>
@@ -121,6 +123,20 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             if (rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueEnd))
                 return true;
             return false;
+        }
+        #endregion
+
+        internal IntermediateBucket MakeNewIntermediateBucket(List<TableAttribute> tableAttributes, List<BucketEstimate> bucketEstimates)
+        {
+            if (tableAttributes.Count != bucketEstimates.Count)
+                throw new ArgumentException("Unbalanced intermediate bucket creation");
+
+            var newBucket = new IntermediateBucket();
+
+            for (int i = 0; i < tableAttributes.Count; i++)
+                newBucket.AddBucketIfNotThere(tableAttributes[i], bucketEstimates[i]);
+
+            return newBucket;
         }
     }
 }

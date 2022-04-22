@@ -41,7 +41,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 if (DoesOverlap(node.Constant, buckets[i]))
                 {
                     matches = true;
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(MatchType.Overlap, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.Alias, node.AttributeName, MatchType.Overlap, node.ComType, node.Constant, buckets[i]));
                 }
                 else if (matches)
                     break;
@@ -56,27 +56,29 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             {
                 MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
                 if (type == MatchType.Match || type == MatchType.Overlap)
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(type, node.ComType, node.Constant, new TableAttribute(node.TableReference.Alias, node.AttributeName), buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.Alias, node.AttributeName, type, node.ComType, node.Constant, buckets[i]));
+
+
             }
             return intermediateBuckets;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, ComparisonType.Type comparisonType, IComparable constant, TableAttribute tableAttribute, IHistogramBucket bucket)
+        private IntermediateBucket MakeNewIntermediateBucket(string tableAlias, string tableAttribute, MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
-            var newBucket = new IntermediateBucket();
-            long count;
-            if (matchType == MatchType.Match)
-                count = bucket.Count;
-            else if (matchType == MatchType.Overlap)
-                count = Estimator.GetBucketEstimate(comparisonType, constant, bucket);
-            else
-                throw new ArgumentException($"Invalid matchtype {matchType}");
+            return MakeNewIntermediateBucket(
+                            new List<TableAttribute>() { new TableAttribute(tableAlias, tableAttribute) },
+                            new List<BucketEstimate>() { GetEstimate(matchType, comType, constant, bucket) }
+                        );
+        }
 
-            newBucket.AddBucketIfNotThere(
-                tableAttribute,
-                new BucketEstimate(bucket, count)
-                );
-            return newBucket;
+        private BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
+        {
+            if (matchType == MatchType.Match)
+                return new BucketEstimate(bucket, bucket.Count);
+            else if (matchType == MatchType.Overlap)
+                return new BucketEstimate(bucket, Estimator.GetBucketEstimate(comType, constant, bucket));
+            else
+                throw new ArgumentException($"Invalid matchType{matchType}");
         }
     }
 }

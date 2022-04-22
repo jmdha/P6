@@ -108,37 +108,20 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 
         internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
-            var newBucket = new IntermediateBucket();
-            long leftCount;
-            long rightCount;
+            return MakeNewIntermediateBucket(
+                new List<TableAttribute>() { new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute), new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute) },
+                new List<BucketEstimate>() { GetEstimate(matchType, predicate.ComType, leftBucket, rightBucket), GetEstimate(matchType, predicate.ComType, rightBucket, leftBucket) }
+                );
+        }
+
+        private BucketEstimate GetEstimate(MatchType matchType, ComparisonType.Type comType, IHistogramBucket bucket, IHistogramBucket comparisonBucket)
+        {
             if (matchType == MatchType.Match)
-            {
-                leftCount = leftBucket.Count;
-                rightCount = rightBucket.Count;
-            }
+                return new BucketEstimate(bucket, bucket.Count);
             else if (matchType == MatchType.Overlap)
-            {
-                leftCount = Estimator.GetBucketEstimate(predicate.ComType, leftBucket, rightBucket);
-                rightCount = Estimator.GetBucketEstimate(predicate.ComType, rightBucket, leftBucket);
-            }
+                return new BucketEstimate(bucket, Estimator.GetBucketEstimate(comType, bucket, comparisonBucket));
             else
                 throw new ArgumentException($"Invalid matchtype {matchType}");
-
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.LeftTable.TableName, predicate.LeftAttribute),
-                new BucketEstimate(
-                    leftBucket,
-                    leftCount
-                    )
-                );
-            newBucket.AddBucketIfNotThere(
-                new TableAttribute(predicate.RightTable.TableName, predicate.RightAttribute),
-                new BucketEstimate(
-                    rightBucket,
-                    rightCount
-                    )
-                );
-            return newBucket;
         }
     }
 }
