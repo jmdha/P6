@@ -36,6 +36,9 @@ namespace QueryOptimiser.Cost.EstimateCalculators
             int rightStart = 0;
             int rightEnd = rightBuckets.Count - 1;
 
+            if (leftBuckets.Count == 0 || rightBuckets.Count == 0)
+                return new PairBucketList();
+
             // First bucket
             // Left:    |===|
             // Right:     |===|

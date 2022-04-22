@@ -41,7 +41,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 if (DoesOverlap(node.Constant, buckets[i]))
                 {
                     matches = true;
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.Alias, node.AttributeName, MatchType.Overlap, node.ComType, node.Constant, buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.TableName, node.AttributeName, MatchType.Overlap, node.ComType, node.Constant, buckets[i]));
                 }
                 else if (matches)
                     break;
@@ -56,15 +56,15 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             {
                 MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
                 if (type == MatchType.Match || type == MatchType.Overlap)
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.Alias, node.AttributeName, type, node.ComType, node.Constant, buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.TableReference.TableName, node.AttributeName, type, node.ComType, node.Constant, buckets[i]));
             }
             return intermediateBuckets;
         }
 
-        internal IntermediateBucket MakeNewIntermediateBucket(string tableAlias, string tableAttribute, MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
+        internal IntermediateBucket MakeNewIntermediateBucket(string tableName, string tableAttribute, MatchType matchType, ComparisonType.Type comType, IComparable constant, IHistogramBucket bucket)
         {
             return MakeNewIntermediateBucket(
-                            new List<TableAttribute>() { new TableAttribute(tableAlias, tableAttribute) },
+                            new List<TableAttribute>() { new TableAttribute(tableName, tableAttribute) },
                             new List<BucketEstimate>() { GetEstimate(matchType, comType, constant, bucket) }
                         );
         }

@@ -40,7 +40,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             List<IHistogramBucket> buckets = GetBuckets(new TableAttribute(node.TableReference.TableName, node.AttributeName), intermediateTable);
             List<IntermediateBucket> intermediateBuckets = FilterMatcher.GetMatches(node, buckets);
-            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.Alias, node.AttributeName) });
+            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { new TableAttribute(node.TableReference.TableName, node.AttributeName) });
         }
         #endregion
 
