@@ -208,6 +208,8 @@ namespace ExperimentSuite.Controllers
                 {
                     string text = await reader.ReadToEndAsync();
 
+                    RunData.HistoManager.UsedHistograms.Histograms.Clear();
+
                     // Get Cache
                     var timer = TimerHelper.GetWatchAndStart();
                     ulong? accCardinality = GetCacheIfThere(text);
@@ -248,6 +250,9 @@ namespace ExperimentSuite.Controllers
                     if (OptimiserResultSentinel.Instance != null)
                         OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+
+                    if (HistogramResultSentinel.Instance != null)
+                        HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
 
                     // Make test report
                     testCases.Add(

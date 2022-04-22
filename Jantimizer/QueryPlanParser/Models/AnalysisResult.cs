@@ -8,7 +8,7 @@ using CsvHelper.Configuration.Attributes;
 
 namespace QueryPlanParser.Models
 {
-    public class AnalysisResult
+    public class AnalysisResult : ICloneable
     {
         public string Name { get; }
         public decimal EstimatedCost { get; }
@@ -45,6 +45,14 @@ namespace QueryPlanParser.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, EstimatedCost, EstimatedCardinality, ActualCardinality, ActualTime, ParserName);
+        }
+
+        public object Clone()
+        {
+            var newTree = QueryTree.Clone();
+            if (newTree is AnalysisResultQueryTree clone)
+                return new AnalysisResult(clone, InputDataset, ParserName);
+            throw new InvalidOperationException();
         }
     }
 }

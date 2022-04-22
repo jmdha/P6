@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ResultsSentinel
 {
     public abstract class BaseResultSentinel<T> : IResultSentinel
-        where T : notnull
+        where T : notnull, ICloneable
     {
         public SentinelCriticality Criticality { get; internal set; }
         public bool IsEnabled { get; set; } = false;
@@ -38,8 +38,11 @@ namespace ResultsSentinel
                             GetErrorDescription(saved, value)
                             ));
                 }
-                else
-                    _dict.Add(hash, value);
+                else {
+                    var clone = value.Clone();
+                    if (clone is T cloneValue)
+                        _dict.Add(hash, cloneValue);
+                }
             }
         }
 

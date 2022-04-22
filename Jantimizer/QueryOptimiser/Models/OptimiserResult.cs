@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QueryOptimiser.Models
 {
-    public class OptimiserResult
+    public class OptimiserResult : ICloneable
     {
         public ulong EstTotalCardinality { get; set; }
         public List<INode> FromNodes { get; set; }
@@ -43,6 +43,15 @@ namespace QueryOptimiser.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(EstTotalCardinality, OptimiserName, HistogramManagerName, EstimateCalculatorName);
+        }
+
+        public object Clone()
+        {
+            var newList = new List<INode>();
+            foreach (var node in FromNodes)
+                if (node.Clone() is INode clone)
+                    newList.Add(clone);
+            return new OptimiserResult(EstTotalCardinality, newList, OptimiserName, HistogramManagerName, EstimateCalculatorName);
         }
     }
 }

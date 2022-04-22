@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Histograms.Caches;
+using System.Data;
 using System.Text;
 
 namespace Histograms.Models
@@ -24,9 +25,38 @@ namespace Histograms.Models
 
         public HistogramMinDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
         {
+            HistogramId = Guid.NewGuid();
             Depth = depth;
         }
 
+        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName)
+        {
+            Depth = depth;
+        }
+
+        internal HistogramMinDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
+        {
+            Depth = histo.Depth;
+            HistogramId = histo.HistogramId;
+            foreach (var bucket in histo.Buckets)
+            {
+                Type? type = Type.GetType(bucket.ValueType);
+                if (type == null)
+                    throw new NullReferenceException("Unexpected null as cache type");
+
+
+                if (type.GetInterface(nameof(IComparable)) != null)
+                {
+                    var valueStart = Convert.ChangeType(bucket.ValueStart, type) as IComparable;
+                    var valueEnd = Convert.ChangeType(bucket.ValueEnd, type) as IComparable;
+
+                    if (valueStart == null || valueEnd == null)
+                        throw new ArgumentNullException("Read bucket value was invalid!");
+
+                    Buckets.Add(new HistogramBucket(bucket.BucketId, valueStart, valueEnd, bucket.Count));
+                }
+            }
+        }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
@@ -70,26 +100,16 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramMinDepth(TableName, AttributeName, Depth);
+            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
-                retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+                if (bucket.Clone() is IHistogramBucket acc)
+                    retObj.Buckets.Add(acc);
             return retObj;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is HistogramMinDepth depth &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
-                   EqualityComparer<List<IHistogramBucket>>.Default.Equals(Buckets, depth.Buckets) &&
-                   TableName == depth.TableName &&
-                   AttributeName == depth.AttributeName &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
-                   Depth == depth.Depth;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(AcceptedTypes, Buckets, TableName, AttributeName, AcceptedTypes, Depth);
+            return base.GetHashCode() + HashCode.Combine(Depth);
         }
     }
 }

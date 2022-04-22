@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.QueryParsers
 {
-    public class ParserResult
+    public class ParserResult : ICloneable
     {
         public List<INode> Nodes { get; set; }
         public string FromQuery { get; set; }
@@ -44,6 +44,15 @@ namespace QueryParser.QueryParsers
             foreach (var node in Nodes)
                 hash += node.GetHashCode();
             return hash + HashCode.Combine(FromQuery);
+        }
+
+        public object Clone()
+        {
+            var newList = new List<INode>();
+            foreach(var node in Nodes)
+                if (node.Clone() is INode clone)
+                    newList.Add(clone);
+            return new ParserResult(newList, FromQuery);
         }
     }
 }

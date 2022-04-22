@@ -3,8 +3,9 @@ using System.Text;
 
 namespace Histograms.Models
 {
-    public abstract class BaseHistogram : IHistogram
+    public abstract class BaseHistogram : IHistogram, ICloneable
     {
+        public Guid HistogramId { get; internal set; }
         public abstract List<TypeCode> AcceptedTypes { get; }
         public List<IHistogramBucket> Buckets { get; }
         public string TableName { get; }
@@ -12,6 +13,14 @@ namespace Histograms.Models
 
         public BaseHistogram(string tableName, string attributeName)
         {
+            TableName = tableName;
+            AttributeName = attributeName;
+            Buckets = new List<IHistogramBucket>();
+        }
+
+        public BaseHistogram(Guid histogramId, string tableName, string attributeName)
+        {
+            HistogramId = histogramId;
             TableName = tableName;
             AttributeName = attributeName;
             Buckets = new List<IHistogramBucket>();
@@ -36,6 +45,8 @@ namespace Histograms.Models
         public override string? ToString()
         {
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"\t Histogram ID {HistogramId}");
+            sb.AppendLine($"\t Type {this.GetType().Name}");
             sb.AppendLine($"\t Data for attribute {TableName}.{AttributeName}:");
             foreach (var bucket in Buckets)
             {
@@ -45,5 +56,15 @@ namespace Histograms.Models
         }
 
         public abstract object Clone();
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            foreach (var type in AcceptedTypes)
+                hash += type.GetHashCode();
+            foreach (var bucket in Buckets)
+                hash += bucket.GetHashCode();
+            return hash + HashCode.Combine(TableName, AttributeName, HistogramId);
+        }
     }
 }

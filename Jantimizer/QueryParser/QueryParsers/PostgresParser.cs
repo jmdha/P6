@@ -19,6 +19,7 @@ namespace QueryParser.QueryParsers
 {
     public class PostgresParser : IQueryParser
     {
+        int _filterIdCounter = 0;
         private ConnectionProperties? ConnectorProperties { get; set; }
 
         public PostgresParser(ConnectionProperties? connectorProperties = null)
@@ -60,6 +61,7 @@ namespace QueryParser.QueryParsers
 
         public List<INode> ParseQuery(string query)
         {
+            _filterIdCounter = 0;
             var parsed = GetParserResult(query);
             parsed.Wait();
             return parsed.Result.Joins.Select(j => j as INode).ToList();
@@ -67,6 +69,7 @@ namespace QueryParser.QueryParsers
 
         public async Task<List<INode>> ParseQueryAsync(string query)
         {
+            _filterIdCounter = 0;
             var parsed = await GetParserResult(query);
             return parsed.Joins.Select(j => j as INode).ToList();
         }
@@ -194,6 +197,7 @@ namespace QueryParser.QueryParsers
 
 
                 tableRef.Filters.Add(new FilterNode(
+                    id: _filterIdCounter,
                     tableReference: tableRef,
                     attributeName: match.Groups["filterProp"].Value,
                     comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),

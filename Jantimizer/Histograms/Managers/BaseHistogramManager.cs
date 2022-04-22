@@ -2,6 +2,7 @@
 using Histograms.Caches;
 using Histograms.DataGatherers;
 using Histograms.Models;
+using Histograms.Models.Histograms;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,8 +16,7 @@ namespace Histograms.Managers
     public abstract class BaseHistogramManager : IHistogramManager
     {
         private Dictionary<string, Dictionary<string, IHistogram>> Histograms { get; set; } = new Dictionary<string, Dictionary<string, IHistogram>>();
-
-
+        public HistogramSet UsedHistograms { get; }
         public List<string> Tables => Histograms.Select(x => x.Key).ToList();
         public List<string> Attributes
         {
@@ -34,6 +34,7 @@ namespace Histograms.Managers
         protected IDataGatherer DataGatherer { get; set; }
         public BaseHistogramManager(IDataGatherer dataGatherer)
         {
+            UsedHistograms = new HistogramSet();
             DataGatherer = dataGatherer;
         }
 
@@ -70,6 +71,7 @@ namespace Histograms.Managers
         public void ClearHistograms()
         {
             Histograms.Clear();
+            UsedHistograms.Histograms.Clear();
         }
 
         public IHistogram GetHistogram(string tableName, string attributeName)
@@ -85,6 +87,8 @@ namespace Histograms.Managers
             if (!table.TryGetValue(attributeName, out histogram!))
                 throw new KeyNotFoundException($"Attribute '{attributeName}' not found for table '{tableName}'");
 
+            UsedHistograms.AddHistogram(histogram);
+
             return histogram;
         }
 
@@ -94,16 +98,21 @@ namespace Histograms.Managers
             if (!Histograms.ContainsKey(table))
                 return new List<IHistogram>();
 
-            return Histograms[table].Values.ToList();
+            var histograms = Histograms[table].Values.ToList();
+            UsedHistograms.AddHistograms(histograms);
+
+            return histograms;
         }
         public List<IHistogram> GetHistogramsByAttribute(string attribute)
         {
-            return Histograms
+            var histograms = Histograms
                 .Select(tableDict => tableDict.Value)
                 .Select(table => (IEnumerable<IHistogram>)table.Values.ToList())
                 .Aggregate((histograms, histogram) => histogram.Union(histograms))
                 .Where(histogram => histogram.AttributeName == attribute)
                 .ToList();
+            UsedHistograms.AddHistograms(histograms);
+            return histograms;
         }
 
         protected abstract Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName);
@@ -114,6 +123,10 @@ namespace Histograms.Managers
         {
             if (HistogramCacher.Instance == null)
                 return null;
+
+            tableName = tableName.ToLower();
+            attributeName = attributeName.ToLower();
+
             string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
             var cacheHisto = HistogramCacher.Instance.GetValueOrNull(GetCacheHashString(tableName, attributeName, columnHash));
 
@@ -122,6 +135,9 @@ namespace Histograms.Managers
 
         protected async Task CacheHistogram(string tableName, string attributeName, IHistogram histogram)
         {
+            tableName = tableName.ToLower();
+            attributeName = attributeName.ToLower();
+
             string columnHash = await DataGatherer.GetTableAttributeColumnHash(tableName, attributeName);
             if (HistogramCacher.Instance != null)
                 HistogramCacher.Instance.AddToCacheIfNotThere(GetCacheHashString(tableName, attributeName, columnHash), histogram);
@@ -148,23 +164,10 @@ namespace Histograms.Managers
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Recorded Histograms:");
-            foreach (var histogram in Histograms)
-                sb.AppendLine(histogram.ToString());
+            foreach (var table in Histograms.Keys)
+                foreach (var attribute in Histograms[table].Keys)
+                    sb.AppendLine(Histograms[table][attribute].ToString());
             return sb.ToString();
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is BaseHistogramManager manager &&
-                   EqualityComparer<Dictionary<string, Dictionary<string, IHistogram>>>.Default.Equals(Histograms, manager.Histograms) &&
-                   EqualityComparer<List<string>>.Default.Equals(Tables, manager.Tables) &&
-                   EqualityComparer<List<string>>.Default.Equals(Attributes, manager.Attributes) &&
-                   EqualityComparer<IDataGatherer>.Default.Equals(DataGatherer, manager.DataGatherer);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Histograms, Tables, Attributes, DataGatherer);
         }
     }
 }

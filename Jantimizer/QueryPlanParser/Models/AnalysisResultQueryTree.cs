@@ -7,7 +7,7 @@ using CsvHelper.Configuration.Attributes;
 
 namespace QueryPlanParser.Models
 {
-    public class AnalysisResultQueryTree
+    public class AnalysisResultQueryTree : ICloneable
     {
         public string Name { get; }
         public decimal? EstimatedCost { get; }
@@ -48,6 +48,15 @@ namespace QueryPlanParser.Models
             foreach(var sub in SubQueries)
                 hash += sub.GetHashCode();
             return hash + HashCode.Combine(Name, EstimatedCost, EstimatedCardinality, ActualCardinality, ActualTime);
+        }
+
+        public object Clone()
+        {
+            var newTree = new AnalysisResultQueryTree(Name, EstimatedCost, EstimatedCardinality, ActualCardinality, ActualTime);
+            foreach (AnalysisResultQueryTree sub in SubQueries)
+                if (sub.Clone() is AnalysisResultQueryTree clone)
+                    newTree.SubQueries.Add(clone);
+            return newTree;
         }
     }
 }

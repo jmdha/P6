@@ -31,7 +31,7 @@ namespace Histograms.DataGatherers
 
             return returnRows.Tables[0]
                     .AsEnumerable()
-                    .Select(r => (string)r["table_name"]);
+                    .Select(r => ((string)r["table_name"]).ToLower());
         }
 
         public override async Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName)
@@ -44,7 +44,7 @@ namespace Histograms.DataGatherers
 
             return returnRows.Tables[0]
                     .AsEnumerable()
-                    .Select(r => (string)r["column_name"]);
+                    .Select(r => ((string)r["column_name"]).ToLower());
         }
 
 

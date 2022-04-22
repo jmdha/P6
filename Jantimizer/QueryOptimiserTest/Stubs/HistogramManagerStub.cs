@@ -1,5 +1,6 @@
 ﻿using Histograms;
 using Histograms.Models;
+using Histograms.Models.Histograms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace QueryOptimiserTest.Stubs
         public List<string> Tables => throw new NotImplementedException();
 
         public List<string> Attributes => throw new NotImplementedException();
+
+        public HistogramSet UsedHistograms => throw new NotImplementedException();
 
         public void AddHistogram(IHistogram histogram)
         {

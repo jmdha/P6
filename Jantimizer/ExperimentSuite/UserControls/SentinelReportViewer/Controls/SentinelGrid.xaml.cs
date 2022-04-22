@@ -42,7 +42,7 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
             _logs = new List<SentinelLogItem>();
         }
 
-        private void SentinelChecker_Tick(object sender, EventArgs e)
+        private void SentinelChecker_Tick(object? sender, EventArgs e)
         {
             UpdateLabel(tickCount);
             tickCount--;
@@ -59,7 +59,7 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
 
         private void UpdateLabel(int count)
         {
-            SentinelNameLabel.Content = $"{_sentinelName} (Updates in {count} seconds, total of {currentItemCount} log items)";
+            SentinelNameLabel.Content = $"{_sentinelName} (Updates in {count} seconds) (Total of {currentItemCount} log items)";
         }
     }
 }

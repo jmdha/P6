@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public class JoinPredicateRelation
+    public class JoinPredicateRelation : ICloneable
     {
         public JoinPredicate? LeafPredicate { get; internal set; }
         public JoinPredicateRelation? LeftRelation { get; internal set; }
@@ -56,6 +56,31 @@ namespace QueryParser.Models
                 return hash + HashCode.Combine(RelationType.GetRelationString(Type));
             else
                 return hash + HashCode.Combine("Predicate");
+        }
+
+        public object Clone()
+        {
+            if (LeafPredicate != null)
+            {
+                var predicateClone = LeafPredicate.Clone();
+                if (predicateClone is JoinPredicate leafPredicate)
+                    return new JoinPredicateRelation(leafPredicate);
+            }
+            JoinPredicateRelation? rightClone = null;
+            if (RightRelation != null)
+            {
+                var right = RightRelation.Clone();
+                if (right is JoinPredicateRelation rel)
+                    rightClone = rel;
+            }
+            JoinPredicateRelation? leftClone = null;
+            if (LeftRelation != null)
+            {
+                var left = LeftRelation.Clone();
+                if (left is JoinPredicateRelation rel)
+                    leftClone = rel;
+            }
+            return new JoinPredicateRelation(leftClone, rightClone, Type);
         }
     }
 }

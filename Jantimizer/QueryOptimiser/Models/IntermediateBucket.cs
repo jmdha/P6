@@ -58,7 +58,10 @@ namespace QueryOptimiser.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Buckets);
+            int hash = 0;
+            foreach (var tableAttribute in Buckets.Keys)
+                hash += Buckets[tableAttribute].GetHashCode();
+            return hash;
         }
     }
 }

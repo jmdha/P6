@@ -16,10 +16,12 @@ namespace Histograms.Caches
         public int Depth { get; }
         public string TypeName { get; }
         public string Hash { get; }
+        public Guid HistogramId { get; }
 
         [JsonConstructorAttribute]
-        public CachedHistogram(List<CachedBucket> buckets, string tableName, string attributeName, int depth, string typeName, string hash)
+        public CachedHistogram(Guid histogramId, List<CachedBucket> buckets, string tableName, string attributeName, int depth, string typeName, string hash)
         {
+            HistogramId = histogramId;
             Buckets = buckets;
             TableName = tableName;
             AttributeName = attributeName;
@@ -33,6 +35,7 @@ namespace Histograms.Caches
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
                 newBuckets.Add(new CachedBucket((dynamic)bucket));
+            HistogramId = histogram.HistogramId;
             Buckets = newBuckets;
             TableName = histogram.TableName;
             AttributeName = histogram.AttributeName;
@@ -46,6 +49,7 @@ namespace Histograms.Caches
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
                 newBuckets.Add(new CachedBucket((dynamic)bucket));
+            HistogramId = histogram.HistogramId;
             Buckets = newBuckets;
             TableName = histogram.TableName;
             AttributeName = histogram.AttributeName;
@@ -59,6 +63,7 @@ namespace Histograms.Caches
             List<CachedBucket> newBuckets = new List<CachedBucket>();
             foreach (var bucket in histogram.Buckets)
                 newBuckets.Add(new CachedBucket((dynamic)bucket));
+            HistogramId = histogram.HistogramId;
             Buckets = newBuckets;
             TableName = histogram.TableName;
             AttributeName = histogram.AttributeName;

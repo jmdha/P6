@@ -30,6 +30,7 @@ namespace ExperimentSuite
             new OptimiserResultSentinel();
             new QueryPlanParserResultSentinel();
             new QueryParserResultSentinel();
+            new HistogramResultSentinel();
 
             // Cachers
             new QueryPlanCacher(QueryPlanCacheFile);
@@ -83,12 +84,14 @@ namespace ExperimentSuite
             OptimiserSentinelCheckbox.IsEnabled = false;
             QueryPlanSentinelCheckbox.IsEnabled = false;
             QuerySentinelCheckbox.IsEnabled = false;
+            HistogramSentinelCheckbox.IsEnabled = false;
             ClearSentinelLogs();
             await controller.RunExperiments();
             RunButton.IsEnabled = true;
             OptimiserSentinelCheckbox.IsEnabled = true;
             QueryPlanSentinelCheckbox.IsEnabled = true;
             QuerySentinelCheckbox.IsEnabled = true;
+            HistogramSentinelCheckbox.IsEnabled = true;
         }
 
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
@@ -118,6 +121,13 @@ namespace ExperimentSuite
                     QueryParserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
         }
 
+        private void HistogramSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (HistogramResultSentinel.Instance != null)
+                    HistogramResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+        }
+
         private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var newList = new List<IResultSentinel>();
@@ -127,6 +137,8 @@ namespace ExperimentSuite
                 newList.Add(QueryParserResultSentinel.Instance);
             if (QueryPlanParserResultSentinel.Instance != null)
                 newList.Add(QueryPlanParserResultSentinel.Instance);
+            if (HistogramResultSentinel.Instance != null)
+                newList.Add(HistogramResultSentinel.Instance);
             var sentinelWindow = new SentinelReportViewer(newList);
             sentinelWindow.Show();
         }
@@ -139,6 +151,8 @@ namespace ExperimentSuite
                 QueryParserResultSentinel.Instance.ClearSentinel();
             if (QueryPlanParserResultSentinel.Instance != null)
                 QueryPlanParserResultSentinel.Instance.ClearSentinel();
+            if (HistogramResultSentinel.Instance != null)
+                HistogramResultSentinel.Instance.ClearSentinel();
         }
     }
 }

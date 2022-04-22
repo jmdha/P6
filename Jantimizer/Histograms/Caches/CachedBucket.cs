@@ -10,6 +10,7 @@ namespace Histograms.Caches
 {
     public class CachedBucket
     {
+        public Guid BucketId { get; }
         public string ValueStart { get; }
         public string ValueEnd { get; }
         public long Count { get; }
@@ -21,8 +22,9 @@ namespace Histograms.Caches
         public string ValueType { get; }
 
         [JsonConstructorAttribute]
-        public CachedBucket(string valueStart, string valueEnd, long count, double variance, double mean, double standardDeviation, double range, string typeName, string valueType)
+        public CachedBucket(Guid bucketId, string valueStart, string valueEnd, long count, double variance, double mean, double standardDeviation, double range, string typeName, string valueType)
         {
+            BucketId = bucketId;
             ValueStart = valueStart;
             ValueEnd = valueEnd;
             Count = count;
@@ -36,6 +38,7 @@ namespace Histograms.Caches
 
         public CachedBucket(HistogramBucket bucket)
         {
+            BucketId = bucket.BucketId;
             ValueStart = $"{bucket.ValueStart}";
             ValueEnd = $"{bucket.ValueEnd}";
             Count = bucket.Count;
@@ -45,6 +48,7 @@ namespace Histograms.Caches
 
         public CachedBucket(HistogramBucketVariance bucket)
         {
+            BucketId = bucket.BucketId;
             ValueStart = $"{bucket.ValueStart}";
             ValueEnd = $"{bucket.ValueEnd}";
             Count = bucket.Count;

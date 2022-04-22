@@ -21,6 +21,10 @@ namespace Histograms.Models
         {
         }
 
+        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName, depth)
+        {
+        }
+
         internal HistogramEquiDepthVariance(CachedHistogram histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
         {
             foreach (var bucket in histo.Buckets)
@@ -37,7 +41,7 @@ namespace Histograms.Models
                     if (valueStart == null || valueEnd == null)
                         throw new ArgumentNullException("Read bucket value was invalid!");
 
-                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, bucket.StandardDeviation, Convert.ToDouble(valueEnd) - Convert.ToDouble(valueStart)));
+                    Buckets.Add(new HistogramBucketVariance(bucket.BucketId, valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, bucket.StandardDeviation, Convert.ToDouble(valueEnd) - Convert.ToDouble(valueStart)));
                 }
             }
         }
@@ -77,29 +81,11 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepthVariance(TableName, AttributeName, Depth);
+            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
-                if (bucket is IHistogramBucketVariance vari)
-                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.StandardDeviation, Convert.ToDouble(vari.ValueEnd) - Convert.ToDouble(vari.ValueStart)));
+                if (bucket.Clone() is IHistogramBucket acc)
+                    retObj.Buckets.Add(acc);
             return retObj;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is HistogramEquiDepthVariance variance &&
-                   base.Equals(obj) &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes) &&
-                   EqualityComparer<List<IHistogramBucket>>.Default.Equals(Buckets, variance.Buckets) &&
-                   TableName == variance.TableName &&
-                   AttributeName == variance.AttributeName &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes) &&
-                   Depth == variance.Depth &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, variance.AcceptedTypes);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(base.GetHashCode(), AcceptedTypes, Buckets, TableName, AttributeName, AcceptedTypes, Depth, AcceptedTypes);
         }
     }
 }

@@ -25,11 +25,18 @@ namespace Histograms.Models
 
         public HistogramEquiDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
         {
+            HistogramId = Guid.NewGuid();
+            Depth = depth;
+        }
+
+        public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName)
+        {
             Depth = depth;
         }
 
         internal HistogramEquiDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
         {
+            HistogramId = histo.HistogramId;
             Depth = histo.Depth;
             foreach (var bucket in histo.Buckets)
             {
@@ -46,7 +53,7 @@ namespace Histograms.Models
                     if (valueStart == null || valueEnd == null)
                         throw new ArgumentNullException("Read bucket value was invalid!");
 
-                    Buckets.Add(new HistogramBucket(valueStart, valueEnd, bucket.Count));
+                    Buckets.Add(new HistogramBucket(bucket.BucketId, valueStart, valueEnd, bucket.Count));
                 }
             }
         }
@@ -82,26 +89,16 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepth(TableName, AttributeName, Depth);
+            var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
-                retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+                if (bucket.Clone() is IHistogramBucket acc)
+                retObj.Buckets.Add(acc);
             return retObj;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is HistogramEquiDepth depth &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
-                   EqualityComparer<List<IHistogramBucket>>.Default.Equals(Buckets, depth.Buckets) &&
-                   TableName == depth.TableName &&
-                   AttributeName == depth.AttributeName &&
-                   EqualityComparer<List<TypeCode>>.Default.Equals(AcceptedTypes, depth.AcceptedTypes) &&
-                   Depth == depth.Depth;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(AcceptedTypes, Buckets, TableName, AttributeName, AcceptedTypes, Depth);
+            return base.GetHashCode() + HashCode.Combine(Depth);
         }
     }
 }

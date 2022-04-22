@@ -232,5 +232,10 @@ namespace QueryParserTest
         {
             Id = id;
         }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
