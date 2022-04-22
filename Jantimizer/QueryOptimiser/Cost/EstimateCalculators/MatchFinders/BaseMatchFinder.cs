@@ -50,6 +50,8 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 return MatchType.Match;
             else if (startMatch == MatchType.Overlap || endMatch == MatchType.Overlap)
                 return MatchType.Overlap;
+            else if (startMatch == MatchType.Match || endMatch == MatchType.Match)
+                return MatchType.Overlap;
             else
                 return MatchType.None;
         }
@@ -126,7 +128,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
         }
         #endregion
 
-        internal IntermediateBucket MakeNewIntermediateBucket(List<TableAttribute> tableAttributes, List<BucketEstimate> bucketEstimates)
+        protected IntermediateBucket MakeNewIntermediateBucket(List<TableAttribute> tableAttributes, List<BucketEstimate> bucketEstimates)
         {
             if (tableAttributes.Count != bucketEstimates.Count)
                 throw new ArgumentException("Unbalanced intermediate bucket creation");
