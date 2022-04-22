@@ -53,7 +53,7 @@ namespace ExperimentSuite
             TestsPanel.Children.Remove(element);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //await controller.RunExperiments();
             RunButton.IsEnabled = true;

@@ -344,7 +344,6 @@ namespace ExperimentSuite.Controllers
             DataInsertsFile = null;
             DataAnalyseFile = null;
             CleanupFile = null;
-            RunData = null;
         }
     }
 }
