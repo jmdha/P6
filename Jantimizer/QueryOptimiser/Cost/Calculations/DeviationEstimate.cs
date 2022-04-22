@@ -10,12 +10,10 @@ namespace QueryOptimiser.Cost.Calculations
     {
         internal static double GetCertainty(double standardDeviation, double range)
         {
-            double bucketCertainty;
             if (range == 0 || standardDeviation == 0)
-                bucketCertainty = 1;
+                return 1;
             else
-                bucketCertainty = standardDeviation / range;
-            return bucketCertainty;
+                return standardDeviation / range;
         }
 
         internal static double GetComparativeCertainty(double certainty, double comparisonCertainty)

@@ -19,7 +19,7 @@ namespace QueryOptimiser.Cost.Nodes
             if (bucket is HistogramBucketVariance vBucket && comparisonBucket is HistogramBucketVariance vComparisonBucket)
             {
                 double bucketCertainty = DeviationEstimate.GetCertainty(vBucket.StandardDeviation, vBucket.Range);
-                double comparisonBucketCertainty = DeviationEstimate.GetComparativeCertainty(vComparisonBucket.StandardDeviation, vComparisonBucket.Range);
+                double comparisonBucketCertainty = DeviationEstimate.GetCertainty(vComparisonBucket.StandardDeviation, vComparisonBucket.Range);
 
                 double certainty = DeviationEstimate.GetComparativeCertainty(bucketCertainty, comparisonBucketCertainty);
 
