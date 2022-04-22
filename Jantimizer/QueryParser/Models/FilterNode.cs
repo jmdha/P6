@@ -21,6 +21,11 @@ namespace QueryParser.Models
             Constant = constant;
         }
 
+        public override string ToString()
+        {
+            return $"{TableReference.Alias}.{AttributeName} {ComType} {Constant}";
+        }
+
         public override int GetHashCode()
         {
             return HashCode.Combine(ToString());
