@@ -8,16 +8,16 @@ namespace QueryParser.Models
 {
     public class FilterNode : INode
     {
-        public TableReferenceNode TableReference { get; set; }
+        public string Alias { get; set; }
         public string AttributeName { get; set; }
         public ComparisonType.Type ComType { get; set; }
         public IComparable Constant { get; set; }
         public int Id { get; private set; }
 
-        public FilterNode(int id, TableReferenceNode tableReference, string attributeName, ComparisonType.Type comType, IComparable constant)
+        public FilterNode(int id, string alias, string attributeName, ComparisonType.Type comType, IComparable constant)
         {
             Id = id;
-            TableReference = tableReference;
+            Alias = alias;
             AttributeName = attributeName;
             ComType = comType;
             Constant = constant;
@@ -25,20 +25,17 @@ namespace QueryParser.Models
 
         public override string ToString()
         {
-            return $"{TableReference.Alias}.{AttributeName} {ComType} {Constant}";
+            return $"{Alias}.{AttributeName} {ComType} {Constant}";
         }
 
         public override int GetHashCode()
         {
-            return TableReference.GetHashCode() + HashCode.Combine(AttributeName, ComparisonType.GetOperatorString(ComType), Constant);
+            return HashCode.Combine(Id, Alias, AttributeName, ComparisonType.GetOperatorString(ComType), Constant);
         }
 
         public object Clone()
         {
-            var newReference = TableReference.Clone();
-            if (newReference is TableReferenceNode refNode)
-                return new FilterNode(Id, refNode, AttributeName, ComType, Constant);
-            throw new InvalidOperationException();
+            return new FilterNode(Id, Alias, AttributeName, ComType, Constant);
         }
     }
 }

@@ -66,6 +66,8 @@ namespace Histograms.DataGatherers
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
+            return HashCode.Combine(tableName, attributeName).ToString();
+
             var columnHash = new DataSet();
             using (var connector = new MyConnector(ConnectionProperties))
                 columnHash = await connector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5(`{attributeName}`))) as hash FROM `{tableName}`;");

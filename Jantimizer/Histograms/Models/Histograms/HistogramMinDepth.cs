@@ -34,10 +34,9 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        internal HistogramMinDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
+        internal HistogramMinDepth(CachedHistogram histo) : base(histo.HistogramId, histo.TableName, histo.AttributeName)
         {
             Depth = histo.Depth;
-            HistogramId = histo.HistogramId;
             foreach (var bucket in histo.Buckets)
             {
                 Type? type = Type.GetType(bucket.ValueType);

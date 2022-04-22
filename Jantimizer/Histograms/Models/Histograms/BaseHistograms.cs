@@ -13,6 +13,7 @@ namespace Histograms.Models
 
         public BaseHistogram(string tableName, string attributeName)
         {
+            HistogramId = Guid.NewGuid();
             TableName = tableName;
             AttributeName = attributeName;
             Buckets = new List<IHistogramBucket>();

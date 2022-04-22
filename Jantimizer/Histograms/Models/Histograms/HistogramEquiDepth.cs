@@ -34,10 +34,8 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        internal HistogramEquiDepth(CachedHistogram histo) : base(histo.TableName, histo.AttributeName)
+        internal HistogramEquiDepth(CachedHistogram histo) : this(histo.HistogramId, histo.TableName, histo.AttributeName, histo.Depth)
         {
-            HistogramId = histo.HistogramId;
-            Depth = histo.Depth;
             foreach (var bucket in histo.Buckets)
             {
                 Type? type = Type.GetType(bucket.ValueType);
@@ -92,7 +90,7 @@ namespace Histograms.Models
             var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
-                retObj.Buckets.Add(acc);
+                    retObj.Buckets.Add(acc);
             return retObj;
         }
 

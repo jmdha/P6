@@ -198,7 +198,7 @@ namespace QueryParser.QueryParsers
 
                 tableRef.Filters.Add(new FilterNode(
                     id: _filterIdCounter,
-                    tableReference: tableRef,
+                    alias: tableRef.Alias,
                     attributeName: match.Groups["filterProp"].Value,
                     comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),
                     constant: value

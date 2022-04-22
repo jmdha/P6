@@ -8,14 +8,14 @@ namespace Histograms.Models.Histograms
 {
     public class HistogramSet : ICloneable
     {
-        public List<IHistogram> Histograms { get; set; }
+        public Dictionary<int, IHistogram> Histograms { get; set; }
 
         public HistogramSet()
         {
-            Histograms = new List<IHistogram>();
+            Histograms = new Dictionary<int, IHistogram>();
         }
 
-        public HistogramSet(List<IHistogram> histograms)
+        public HistogramSet(Dictionary<int, IHistogram> histograms)
         {
             Histograms = histograms;
         }
@@ -25,8 +25,11 @@ namespace Histograms.Models.Histograms
             foreach (IHistogram histogram in histograms)
             {
                 var clone = histogram.Clone() as IHistogram;
-                if (clone != null)
-                    Histograms.Add(clone);
+                if (clone != null) {
+                    int hash = clone.GetHashCode();
+                    if (!Histograms.ContainsKey(hash))
+                        Histograms.Add(hash, clone);
+                }
             }
         }
 
@@ -34,13 +37,17 @@ namespace Histograms.Models.Histograms
         {
             var clone = histogram.Clone() as IHistogram;
             if (clone != null)
-                Histograms.Add(clone);
+            {
+                int hash = clone.GetHashCode();
+                if (!Histograms.ContainsKey(hash))
+                    Histograms.Add(hash, clone);
+            }
         }
 
         public override int GetHashCode()
         {
             int hash = 0;
-            foreach (IHistogram histogram in Histograms)
+            foreach (IHistogram histogram in Histograms.Values)
                 hash += histogram.GetHashCode();
             return hash;
         }
@@ -48,17 +55,17 @@ namespace Histograms.Models.Histograms
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach(IHistogram histogram in Histograms)
+            foreach(IHistogram histogram in Histograms.Values)
                 sb.Append(histogram.ToString());
             return sb.ToString();
         }
 
         public object Clone()
         {
-            var newList = new List<IHistogram>();
-            foreach (var node in Histograms)
-                if (node.Clone() is IHistogram clone)
-                    newList.Add(clone);
+            var newList = new Dictionary<int, IHistogram>();
+            foreach (var key in Histograms.Keys)
+                if (Histograms[key].Clone() is IHistogram clone)
+                    newList.Add(key, clone);
             return new HistogramSet(newList);
         }
     }

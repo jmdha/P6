@@ -18,6 +18,8 @@ namespace HistogramsTests.Stubs
 
         public List<TypeCode> AcceptedTypes => throw new NotImplementedException();
 
+        public Guid HistogramId => throw new NotImplementedException();
+
         public object Clone()
         {
             throw new NotImplementedException();

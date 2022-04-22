@@ -25,7 +25,7 @@ namespace Histograms.Models
         {
         }
 
-        internal HistogramEquiDepthVariance(CachedHistogram histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
+        internal HistogramEquiDepthVariance(CachedHistogram histo) : this(histo.HistogramId, histo.TableName, histo.AttributeName, histo.Depth)
         {
             foreach (var bucket in histo.Buckets)
             {

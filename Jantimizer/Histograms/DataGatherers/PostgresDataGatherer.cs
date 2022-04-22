@@ -69,9 +69,11 @@ namespace Histograms.DataGatherers
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
+            return HashCode.Combine(tableName, attributeName).ToString();
+
             var columnHash = new DataSet();
             using (var connector = new PostgreSqlConnector(ConnectionProperties))
-                columnHash = await connector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::text), ',')) as \"hash\" FROM \"{tableName}\";");
+                columnHash = await connector.CallQueryAsync($"SELECT md5(string_agg(md5(\"{attributeName}\"::VARCHAR(100)), ',')) as \"hash\" FROM \"{tableName}\";");
             if (columnHash.Tables.Count == 0)
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
             if (columnHash.Tables[0].Rows.Count == 0)

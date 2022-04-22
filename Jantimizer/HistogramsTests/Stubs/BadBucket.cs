@@ -16,5 +16,10 @@ namespace HistogramsTests.Stubs
         public long Count => throw new NotImplementedException();
 
         public Guid BucketId => throw new NotImplementedException();
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
