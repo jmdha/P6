@@ -186,8 +186,8 @@ namespace QueryParser.QueryParsers
                     }
                 }
                 else
-                {
-                    value = RegexHelperFunctions.GetRegexVal<int>(match, "filterValue");
+                                                {
+                    value = RegexHelperFunctions.GetRegexVal<long>(match, "filterValue");
                 }
 
 
