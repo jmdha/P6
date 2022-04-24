@@ -7,6 +7,7 @@ using QueryOptimiser.Exceptions;
 using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
 using QueryParser.Models;
+using QueryParser.QueryParsers;
 
 namespace QueryOptimiser
 {
@@ -20,28 +21,33 @@ namespace QueryOptimiser
             HistogramManager = histogramManager;
         }
 
-        public OptimiserResult OptimiseQuery(List<INode> nodes)
+        public OptimiserResult OptimiseQuery(ParserResult parserResult)
         {
             IntermediateTable intermediateTable = new IntermediateTable();
             
+
             try
             {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    IntermediateTable newTable = EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable);
-                    if (intermediateTable.Buckets.Count == 0)
-                        intermediateTable = newTable;
-                    else
-                        intermediateTable = TableHelper.Join(intermediateTable, EstimateCalculator.EstimateIntermediateTable(nodes[i], intermediateTable));
-                }
+                for (int i = 0; i < parserResult.Filters.Count; i++)
+                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Filters[i], intermediateTable));
+                for (int i = 0; i < parserResult.Joins.Count; i++)
+                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Joins[i], intermediateTable));
             }
             catch (Exception ex)
             {
-                throw new OptimiserErrorLogException(ex, this, nodes);
+                throw new OptimiserErrorLogException(ex, this, parserResult.GetNodes());
             }
             
 
             return new OptimiserResult((ulong)intermediateTable.GetRowEstimate());
+        }
+
+        private IntermediateTable UpdateTable(IntermediateTable formerTable, IntermediateTable newTable)
+        {
+            if (formerTable.Buckets.Count == 0)
+                return newTable;
+            else
+                return TableHelper.Join(formerTable, newTable);
         }
     }
 }

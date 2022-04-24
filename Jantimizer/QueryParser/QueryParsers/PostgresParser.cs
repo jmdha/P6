@@ -57,17 +57,17 @@ namespace QueryParser.QueryParsers
             }
         }
 
-        public List<INode> ParseQuery(string query)
+        public ParserResult ParseQuery(string query)
         {
             var parsed = GetParserResult(query);
             parsed.Wait();
-            return parsed.Result.Joins.Select(j => j as INode).ToList();
+            return parsed.Result;
         }
 
-        public async Task<List<INode>> ParseQueryAsync(string query)
+        public async Task<ParserResult> ParseQueryAsync(string query)
         {
             var parsed = await GetParserResult(query);
-            return parsed.Joins.Select(j => j as INode).ToList();
+            return parsed;
         }
 
         private async Task<ParserResult> GetParserResult(string query)
@@ -156,6 +156,7 @@ namespace QueryParser.QueryParsers
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
+            int id = 0;
             foreach (Match match in matches)
             {
                 if (!match.Groups["filterProp"].Success)
@@ -185,17 +186,19 @@ namespace QueryParser.QueryParsers
                     }
                 }
                 else
-                {
-                    value = RegexHelperFunctions.GetRegexVal<double>(match, "filterValue");
+                                                {
+                    value = RegexHelperFunctions.GetRegexVal<long>(match, "filterValue");
                 }
 
 
-                tableRef.Filters.Add(new FilterNode(
+                result.Filters.Add(new FilterNode(
+                    id: id,
                     tableReference: tableRef,
                     attributeName: match.Groups["filterProp"].Value,
                     comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),
                     constant: value
                 ));
+                id++;
             }
         }
 

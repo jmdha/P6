@@ -424,17 +424,22 @@ namespace QueryParsers
             "4"
         )]
         public void Can_InsertFilters(string explainResults, string tableAlias, ComparisonType.Type type, string attribute, string constant) {
+            // ARRANGE
             PostgresParser parser = new PostgresParser(null);
             ParserResult result = new ParserResult();
             TableReferenceNode tRefNode = new TableReferenceNode(0, tableAlias, tableAlias);
             result.Tables.Add(tableAlias, tRefNode);
+
+            // ACT
             parser.InsertFilters(explainResults, ref result);
+
+            // ASSERT
             Assert.IsNotNull(result.Tables[tableAlias]);
-            Assert.AreEqual(1, result.Tables[tableAlias].Filters.Count);
-            Assert.AreEqual(tRefNode, result.Tables[tableAlias].Filters[0].TableReference);
-            Assert.AreEqual(type, result.Tables[tableAlias].Filters[0].ComType);
-            Assert.AreEqual(attribute, result.Tables[tableAlias].Filters[0].AttributeName);
-            Assert.AreEqual(constant, result.Tables[tableAlias].Filters[0].Constant.ToString());
+            Assert.AreEqual(1, result.Filters.Count);
+            Assert.AreEqual(tRefNode, result.Filters[0].TableReference);
+            Assert.AreEqual(type, result.Filters[0].ComType);
+            Assert.AreEqual(attribute, result.Filters[0].AttributeName);
+            Assert.AreEqual(constant, result.Filters[0].Constant.ToString());
         }
         #endregion
 

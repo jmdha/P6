@@ -4,6 +4,7 @@ using ExperimentSuite.UserControls;
 using Histograms;
 using QueryOptimiser.Models;
 using QueryParser.Models;
+using QueryParser.QueryParsers;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using System;
@@ -233,12 +234,12 @@ namespace ExperimentSuite.Controllers
 
                     // Parse SQL file
                     timer = TimerHelper.GetWatchAndStart();
-                    List<INode> nodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    ParserResult parserResult = await RunData.QueryParserManager.ParseQueryAsync(text, false);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
 
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(nodes);
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(parserResult);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     // Make test report

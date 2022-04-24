@@ -55,7 +55,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             // ASSERT
             for (int i = 0; i < expTables.Length; i++)
             {
-                Assert.AreEqual(expTables[i], result[i].Table);
+                Assert.AreEqual(expTables[i], result[i].Name);
                 Assert.AreEqual(expAttributes[i], result[i].Attribute);
             }
         }
@@ -85,23 +85,29 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
 
         #endregion
 
+        
         #region GetBucketPair
-
+        
         [TestMethod]
         public void Can_GetBucketPair_NoReferences()
         {
             // ARRANGE
-            var tableAtt1 = new TableAttribute("a", "v");
-            var tableAtt2 = new TableAttribute("b", "v");
-            var tableAtt3 = new TableAttribute("c", "v");
-            var tableAtt4 = new TableAttribute("d", "v");
+            var tableAttribute1 = new TableAttribute("a", "v");
+            var tableAttribute2 = new TableAttribute("b", "v");
+            var tableAttribute3 = new TableAttribute("c", "v");
+            var tableAttribute4 = new TableAttribute("d", "v");
 
-            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            var tableRefNode1 = new TableReferenceNode(0, tableAttribute1.Name, tableAttribute1.Name);
+            var tableRefNode2 = new TableReferenceNode(1, tableAttribute2.Name, tableAttribute2.Name);
+            var tableRefNode3 = new TableReferenceNode(2, tableAttribute3.Name, tableAttribute3.Name);
+            var tableRefNode4 = new TableReferenceNode(3, tableAttribute4.Name, tableAttribute4.Name);
+
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAttribute1.Name, tableAttribute1.Attribute, 10);
             IHistogramBucket testHistogram1Bucket1 = new HistogramBucket(0, 10, 10);
             IHistogramBucket testHistogram1Bucket2 = new HistogramBucket(11, 20, 10);
             testHistogram1.Buckets.Add(testHistogram1Bucket1);
             testHistogram1.Buckets.Add(testHistogram1Bucket2);
-            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAttribute2.Name, tableAttribute2.Attribute, 10);
             IHistogramBucket testHistogram2Bucket1 = new HistogramBucket(100, 110, 10);
             IHistogramBucket testHistogram2Bucket2 = new HistogramBucket(111, 120, 10);
             testHistogram2.Buckets.Add(testHistogram2Bucket1);
@@ -115,20 +121,20 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             IHistogramBucket tableHistogramBucket2 = new HistogramBucket(4, 5, 10);
 
             IntermediateBucket tableBucket1 = new IntermediateBucket();
-            tableBucket1.AddBucketIfNotThere(tableAtt3, new BucketEstimate(tableHistogramBucket1, 1));
+            tableBucket1.AddBucketIfNotThere(tableAttribute1, new BucketEstimate(tableHistogramBucket1, 1));
             IntermediateBucket tableBucket2 = new IntermediateBucket();
-            tableBucket2.AddBucketIfNotThere(tableAtt4, new BucketEstimate(tableHistogramBucket2, 1));
+            tableBucket2.AddBucketIfNotThere(tableAttribute2, new BucketEstimate(tableHistogramBucket2, 1));
 
             var table = new IntermediateTable();
             table.Buckets.Add(tableBucket1);
             table.Buckets.Add(tableBucket2);
-            table.References.Add(tableAtt3);
-            table.References.Add(tableAtt4);
+            table.References.Add(tableAttribute3);
+            table.References.Add(tableAttribute4);
 
             var estimator = new EstimateCalculatorEquiDepth(manager);
 
             // ACT
-            var result = estimator.GetBucketPair(tableAtt1, tableAtt2, table);
+            var result = estimator.GetBucketPair(tableRefNode1, tableAttribute1.Attribute, tableRefNode2, tableAttribute2.Attribute, table);
 
             // ASSERT
             Assert.AreEqual(2, result.LeftBuckets.Count);
@@ -143,17 +149,22 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         public void Can_GetBucketPair_LeftReferences()
         {
             // ARRANGE
-            var tableAtt1 = new TableAttribute("a", "v");
-            var tableAtt2 = new TableAttribute("b", "v");
-            var tableAtt3 = new TableAttribute("a", "v");
-            var tableAtt4 = new TableAttribute("d", "v");
+            var tableAttribute1 = new TableAttribute("a", "v");
+            var tableAttribute2 = new TableAttribute("b", "v");
+            var tableAttribute3 = new TableAttribute("a", "v");
+            var tableAttribute4 = new TableAttribute("d", "v");
 
-            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            var tableRefNode1 = new TableReferenceNode(0, tableAttribute1.Name, tableAttribute1.Name);
+            var tableRefNode2 = new TableReferenceNode(1, tableAttribute2.Name, tableAttribute2.Name);
+            var tableRefNode3 = new TableReferenceNode(2, tableAttribute3.Name, tableAttribute3.Name);
+            var tableRefNode4 = new TableReferenceNode(3, tableAttribute4.Name, tableAttribute4.Name);
+
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAttribute1.Name, tableAttribute1.Attribute, 10);
             IHistogramBucket testHistogram1Bucket1 = new HistogramBucket(0, 10, 10);
             IHistogramBucket testHistogram1Bucket2 = new HistogramBucket(11, 20, 10);
             testHistogram1.Buckets.Add(testHistogram1Bucket1);
             testHistogram1.Buckets.Add(testHistogram1Bucket2);
-            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAttribute2.Name, tableAttribute2.Attribute, 10);
             IHistogramBucket testHistogram2Bucket1 = new HistogramBucket(100, 110, 10);
             IHistogramBucket testHistogram2Bucket2 = new HistogramBucket(111, 120, 10);
             testHistogram2.Buckets.Add(testHistogram2Bucket1);
@@ -167,20 +178,20 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             IHistogramBucket tableHistogramBucket2 = new HistogramBucket(4, 5, 10);
 
             IntermediateBucket tableBucket1 = new IntermediateBucket();
-            tableBucket1.AddBucketIfNotThere(tableAtt3, new BucketEstimate(tableHistogramBucket1, 1));
+            tableBucket1.AddBucketIfNotThere(tableAttribute3, new BucketEstimate(tableHistogramBucket1, 1));
             IntermediateBucket tableBucket2 = new IntermediateBucket();
-            tableBucket2.AddBucketIfNotThere(tableAtt4, new BucketEstimate(tableHistogramBucket2, 1));
+            tableBucket2.AddBucketIfNotThere(tableAttribute4, new BucketEstimate(tableHistogramBucket2, 1));
 
             var table = new IntermediateTable();
             table.Buckets.Add(tableBucket1);
             table.Buckets.Add(tableBucket2);
-            table.References.Add(tableAtt3);
-            table.References.Add(tableAtt4);
+            table.References.Add(tableAttribute3);
+            table.References.Add(tableAttribute4);
 
             var estimator = new EstimateCalculatorEquiDepth(manager);
 
             // ACT
-            var result = estimator.GetBucketPair(tableAtt1, tableAtt2, table);
+            var result = estimator.GetBucketPair(tableRefNode1, tableAttribute1.Attribute, tableRefNode2, tableAttribute2.Attribute, table);
 
             // ASSERT
             Assert.AreEqual(1, result.LeftBuckets.Count);
@@ -194,17 +205,22 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         public void Can_GetBucketPair_RightReferences()
         {
             // ARRANGE
-            var tableAtt1 = new TableAttribute("a", "v");
-            var tableAtt2 = new TableAttribute("b", "v");
-            var tableAtt3 = new TableAttribute("c", "v");
-            var tableAtt4 = new TableAttribute("b", "v");
+            var tableAttribute1 = new TableAttribute("a", "v");
+            var tableAttribute2 = new TableAttribute("b", "v");
+            var tableAttribute3 = new TableAttribute("c", "v");
+            var tableAttribute4 = new TableAttribute("b", "v");
 
-            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            var tableRefNode1 = new TableReferenceNode(0, tableAttribute1.Name, tableAttribute1.Name);
+            var tableRefNode2 = new TableReferenceNode(1, tableAttribute2.Name, tableAttribute2.Name);
+            var tableRefNode3 = new TableReferenceNode(2, tableAttribute3.Name, tableAttribute3.Name);
+            var tableRefNode4 = new TableReferenceNode(3, tableAttribute4.Name, tableAttribute4.Name);
+
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAttribute1.Name, tableAttribute1.Attribute, 10);
             IHistogramBucket testHistogram1Bucket1 = new HistogramBucket(0, 10, 10);
             IHistogramBucket testHistogram1Bucket2 = new HistogramBucket(11, 20, 10);
             testHistogram1.Buckets.Add(testHistogram1Bucket1);
             testHistogram1.Buckets.Add(testHistogram1Bucket2);
-            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAttribute2.Name, tableAttribute2.Attribute, 10);
             IHistogramBucket testHistogram2Bucket1 = new HistogramBucket(100, 110, 10);
             IHistogramBucket testHistogram2Bucket2 = new HistogramBucket(111, 120, 10);
             testHistogram2.Buckets.Add(testHistogram2Bucket1);
@@ -218,20 +234,20 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             IHistogramBucket tableHistogramBucket2 = new HistogramBucket(4, 5, 10);
 
             IntermediateBucket tableBucket1 = new IntermediateBucket();
-            tableBucket1.AddBucketIfNotThere(tableAtt3, new BucketEstimate(tableHistogramBucket1, 1));
+            tableBucket1.AddBucketIfNotThere(tableAttribute3, new BucketEstimate(tableHistogramBucket1, 1));
             IntermediateBucket tableBucket2 = new IntermediateBucket();
-            tableBucket2.AddBucketIfNotThere(tableAtt4, new BucketEstimate(tableHistogramBucket2, 1));
+            tableBucket2.AddBucketIfNotThere(tableAttribute4, new BucketEstimate(tableHistogramBucket2, 1));
 
             var table = new IntermediateTable();
             table.Buckets.Add(tableBucket1);
             table.Buckets.Add(tableBucket2);
-            table.References.Add(tableAtt3);
-            table.References.Add(tableAtt4);
+            table.References.Add(tableAttribute3);
+            table.References.Add(tableAttribute4);
 
             var estimator = new EstimateCalculatorEquiDepth(manager);
 
             // ACT
-            var result = estimator.GetBucketPair(tableAtt1, tableAtt2, table);
+            var result = estimator.GetBucketPair(tableRefNode1, tableAttribute1.Attribute, tableRefNode2, tableAttribute2.Attribute, table);
 
             // ASSERT
             Assert.AreEqual(2, result.LeftBuckets.Count);
@@ -245,17 +261,22 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         public void Can_GetBucketPair_BothReferences()
         {
             // ARRANGE
-            var tableAtt1 = new TableAttribute("a", "v");
-            var tableAtt2 = new TableAttribute("b", "v");
-            var tableAtt3 = new TableAttribute("a", "v");
-            var tableAtt4 = new TableAttribute("b", "v");
+            var tableAttribute1 = new TableAttribute("a", "v");
+            var tableAttribute2 = new TableAttribute("b", "v");
+            var tableAttribute3 = new TableAttribute("a", "v");
+            var tableAttribute4 = new TableAttribute("b", "v");
 
-            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            var tableRefNode1 = new TableReferenceNode(0, tableAttribute1.Name, tableAttribute1.Name);
+            var tableRefNode2 = new TableReferenceNode(1, tableAttribute2.Name, tableAttribute2.Name);
+            var tableRefNode3 = new TableReferenceNode(2, tableAttribute3.Name, tableAttribute3.Name);
+            var tableRefNode4 = new TableReferenceNode(3, tableAttribute4.Name, tableAttribute4.Name);
+
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAttribute1.Name, tableAttribute1.Attribute, 10);
             IHistogramBucket testHistogram1Bucket1 = new HistogramBucket(0, 10, 10);
             IHistogramBucket testHistogram1Bucket2 = new HistogramBucket(11, 20, 10);
             testHistogram1.Buckets.Add(testHistogram1Bucket1);
             testHistogram1.Buckets.Add(testHistogram1Bucket2);
-            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAttribute2.Name, tableAttribute2.Attribute, 10);
             IHistogramBucket testHistogram2Bucket1 = new HistogramBucket(100, 110, 10);
             IHistogramBucket testHistogram2Bucket2 = new HistogramBucket(111, 120, 10);
             testHistogram2.Buckets.Add(testHistogram2Bucket1);
@@ -269,20 +290,20 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             IHistogramBucket tableHistogramBucket2 = new HistogramBucket(4, 5, 10);
 
             IntermediateBucket tableBucket1 = new IntermediateBucket();
-            tableBucket1.AddBucketIfNotThere(tableAtt3, new BucketEstimate(tableHistogramBucket1, 1));
+            tableBucket1.AddBucketIfNotThere(tableAttribute3, new BucketEstimate(tableHistogramBucket1, 1));
             IntermediateBucket tableBucket2 = new IntermediateBucket();
-            tableBucket2.AddBucketIfNotThere(tableAtt4, new BucketEstimate(tableHistogramBucket2, 1));
+            tableBucket2.AddBucketIfNotThere(tableAttribute4, new BucketEstimate(tableHistogramBucket2, 1));
 
             var table = new IntermediateTable();
             table.Buckets.Add(tableBucket1);
             table.Buckets.Add(tableBucket2);
-            table.References.Add(tableAtt3);
-            table.References.Add(tableAtt4);
+            table.References.Add(tableAttribute3);
+            table.References.Add(tableAttribute4);
 
             var estimator = new EstimateCalculatorEquiDepth(manager);
 
             // ACT
-            var result = estimator.GetBucketPair(tableAtt1, tableAtt2, table);
+            var result = estimator.GetBucketPair(tableRefNode1, tableAttribute1.Attribute, tableRefNode2, tableAttribute2.Attribute, table);
 
             // ASSERT
             Assert.AreEqual(1, result.LeftBuckets.Count);
@@ -292,7 +313,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         }
 
         #endregion
-
+        
         #region GetBucketMatchesFromPredicate
 
         [TestMethod]
@@ -611,10 +632,10 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
 
         private HistogramManagerStub MakeBasicHistogramManager(TableAttribute tableAtt1, TableAttribute tableAtt2, IHistogramBucket testHistogram1Bucket1, IHistogramBucket testHistogram1Bucket2, IHistogramBucket testHistogram2Bucket1, IHistogramBucket testHistogram2Bucket2)
         {
-            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Table, tableAtt1.Attribute, 10);
+            IHistogram testHistogram1 = new HistogramEquiDepth(tableAtt1.Name, tableAtt1.Attribute, 10);
             testHistogram1.Buckets.Add(testHistogram1Bucket1);
             testHistogram1.Buckets.Add(testHistogram1Bucket2);
-            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Table, tableAtt2.Attribute, 10);
+            IHistogram testHistogram2 = new HistogramEquiDepth(tableAtt2.Name, tableAtt2.Attribute, 10);
             testHistogram2.Buckets.Add(testHistogram2Bucket1);
             testHistogram2.Buckets.Add(testHistogram2Bucket2);
 
@@ -628,11 +649,11 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         private JoinPredicate MakeBasicJoinPredicate(TableAttribute tableAtt1, TableAttribute tableAtt2, ComparisonType.Type compType)
         {
             return new JoinPredicate(
-                new TableReferenceNode(0, tableAtt1.Table, tableAtt1.Table),
+                new TableReferenceNode(0, tableAtt1.Name, tableAtt1.Name),
                 tableAtt1.Attribute,
-                new TableReferenceNode(1, tableAtt2.Table, tableAtt2.Table),
+                new TableReferenceNode(1, tableAtt2.Name, tableAtt2.Name),
                 tableAtt2.Attribute,
-                $"{tableAtt1.Table}.{tableAtt1.Attribute} {ComparisonType.GetOperatorString(compType)} {tableAtt2.Table}.{tableAtt2.Attribute}",
+                $"{tableAtt1.Name}.{tableAtt1.Attribute} {ComparisonType.GetOperatorString(compType)} {tableAtt2.Name}.{tableAtt2.Attribute}",
                 compType
                 );
         }
