@@ -103,28 +103,32 @@ namespace ExperimentSuite
         {
             if (sender is CheckBox checkBox)
                 if (OptimiserResultSentinel.Instance != null)
-                    OptimiserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+                    if (checkBox.IsChecked != null)
+                        OptimiserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void QueryPlanSentinelCheckbox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
                 if (QueryPlanParserResultSentinel.Instance != null)
-                    QueryPlanParserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+                    if (checkBox.IsChecked != null)
+                        QueryPlanParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void QuerySentinelCheckbox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
                 if (QueryParserResultSentinel.Instance != null)
-                    QueryParserResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+                    if (checkBox.IsChecked != null)
+                        QueryParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void HistogramSentinelCheckbox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
                 if (HistogramResultSentinel.Instance != null)
-                    HistogramResultSentinel.Instance.IsEnabled = checkBox.IsEnabled;
+                    if (checkBox.IsChecked != null)
+                        HistogramResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
