@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS world_happiness_2022;
 
 CREATE TABLE world_happiness_2022
 (
-    `rank`                   int,
+    `rank`                   BIGINT,
     country                  varchar(100),
     happiness_score          double,
     whisker_high             double,
@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS yearly_gdp;
 CREATE TABLE yearly_gdp
 (
     country_code varchar(4),
-    year         integer,
+    year         BIGINT,
     gdp          double,
     constraint yearly_gdp_pk
         unique (country_code, year)

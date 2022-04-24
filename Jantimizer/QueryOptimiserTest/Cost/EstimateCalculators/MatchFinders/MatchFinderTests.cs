@@ -10,13 +10,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QueryOptimiser.Cost.EstimateCalculators.MatchFinders;
 
-namespace QueryOptimiserTest.Cost.EstimateCalculators
+namespace QueryOptimiserTest.Cost.EstimateCalculators.MatchFinders
 {
     [TestClass]
     public class MatchFinderTests
     {
-        #region DoesMatch
+        #region DoesOverlap
 
         [TestMethod]
         // Right bucket start index is within Left bucket range
@@ -41,15 +42,15 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         // Left Bucket:     |=====|
         [DataRow(20, 80, 0, 100)]
         [DataRow(1, 99, 0, 100)]
-        public void Can_DoesMatch_TrueCases(int leftStart, int leftEnd, int rightStart, int rightEnd)
+        public void Can_DoesOverlap_TrueCases(int leftStart, int leftEnd, int rightStart, int rightEnd)
         {
             // ARRANGE
             IHistogramBucket leftBucket = new HistogramBucket(leftStart, leftEnd, 1);
             IHistogramBucket rightBucket = new HistogramBucket(rightStart, rightEnd, 1);
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
-            var result = estimator.DoesMatch(leftBucket, rightBucket);
+            var result = estimator.DoesOverlap(leftBucket, rightBucket);
 
             // ASSERT
             Assert.IsTrue(result);
@@ -58,15 +59,15 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
         [TestMethod]
         [DataRow(0, 10, 20, 30)]
         [DataRow(20, 30, 0, 10)]
-        public void Can_DoesMatch_FalseCases(int leftStart, int leftEnd, int rightStart, int rightEnd)
+        public void Can_DoesOverlap_FalseCases(int leftStart, int leftEnd, int rightStart, int rightEnd)
         {
             // ARRANGE
             IHistogramBucket leftBucket = new HistogramBucket(leftStart, leftEnd, 1);
             IHistogramBucket rightBucket = new HistogramBucket(rightStart, rightEnd, 1);
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
-            var result = estimator.DoesMatch(leftBucket, rightBucket);
+            var result = estimator.DoesOverlap(leftBucket, rightBucket);
 
             // ASSERT
             Assert.IsFalse(result);
@@ -85,15 +86,15 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
                 "v",
                 new TableReferenceNode(1, "b", "b"),
                 "v",
-                "a.v > b.v",
-                ComparisonType.Type.More);
+                "a.v < b.v",
+                ComparisonType.Type.Less);
             IHistogramBucket leftBucket = new HistogramBucket(0, 10, 5);
             IHistogramBucket rightBucket = new HistogramBucket(10, 20, 5);
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
-            var result = estimator.MakeNewIntermediateBucket(predicate, leftBucket, rightBucket);
+            var result = estimator.MakeNewIntermediateBucket(JoinMatchFinder.MatchType.Match, predicate, leftBucket, rightBucket);
 
             // ASSERT
             Assert.AreEqual(leftBucket, result.Buckets[new TableAttribute("a", "v")].Bucket);
@@ -140,7 +141,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             for (int i = 0; i < rightFrom.Length; i++)
                 bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
             var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
@@ -183,7 +184,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             for (int i = 0; i < rightFrom.Length; i++)
                 bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
             var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
@@ -226,7 +227,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             for (int i = 0; i < rightFrom.Length; i++)
                 bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
             var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
@@ -269,7 +270,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             for (int i = 0; i < rightFrom.Length; i++)
                 bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
             var result = estimator.GetInEqualityMatches(predicate, bucketsLeft, bucketsRight);
@@ -316,7 +317,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
             for (int i = 0; i < rightFrom.Length; i++)
                 bucketsRight.Add(new HistogramBucket(rightFrom[i], rightTo[i], 1));
 
-            var estimator = new MatchFinder<JoinNode>(new JoinEstimateEquiDepth());
+            var estimator = new JoinMatchFinder(new JoinEstimateEquiDepth());
 
             // ACT
             var result = estimator.GetEqualityMatches(predicate, bucketsLeft, bucketsRight);

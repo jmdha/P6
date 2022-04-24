@@ -4,7 +4,7 @@ SET search_path TO worldhappiness;
 DROP TABLE IF EXISTS world_happiness_2022;
 CREATE TABLE world_happiness_2022
 (
-    rank                     integer,
+    rank                     BIGINT,
     country                  text,
     happiness_score          numeric,
     whisker_high             numeric,
@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS yearly_gdp;
 CREATE TABLE yearly_gdp
 (
     country_code text,
-    year         integer,
+    year         BIGINT,
     gdp          numeric,
     constraint yearly_gdp_pk
         unique (country_code, year)

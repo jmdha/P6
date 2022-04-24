@@ -2,6 +2,7 @@
 using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
+using QueryOptimiser.Cost.EstimateCalculators.MatchFinders;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
 using QueryParser.Models;
@@ -10,12 +11,12 @@ namespace QueryOptimiser.Cost.EstimateCalculators
 {
     internal class EstimateCalculatorVariance : BaseEstimateCalculator
     {
-        public override INodeCost<JoinNode> NodeCostCalculator { get; set; }
-        public override MatchFinder<JoinNode> Matcher { get; set; }
+        public override JoinMatchFinder JoinMatcher { get; set; }
+        public override FilterMatchFinder FilterMatcher { get; set; }
 
-        public EstimateCalculatorVariance(IHistogramManager manager) : base(manager) {
-            NodeCostCalculator = new JoinEstimateEquiDepthVariance();
-            Matcher = new MatchFinder<JoinNode>(NodeCostCalculator);
+        internal EstimateCalculatorVariance(IHistogramManager manager) : base(manager) {
+            JoinMatcher = new JoinMatchFinder(new JoinEstimateEquiDepthVariance());
+            FilterMatcher = new FilterMatchFinder(new FilterEstimateEquiDepthVariance());
         }
     }
 }
