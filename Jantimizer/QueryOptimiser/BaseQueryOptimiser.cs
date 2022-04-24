@@ -25,7 +25,6 @@ namespace QueryOptimiser
         {
             IntermediateTable intermediateTable = new IntermediateTable();
             
-
             try
             {
                 for (int i = 0; i < parserResult.Filters.Count; i++)

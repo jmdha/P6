@@ -12,7 +12,13 @@ namespace QueryParser.QueryParsers
         public Dictionary<string, TableReferenceNode> Tables { get; set; }
         public List<JoinNode> Joins { get; set; }
         public List<FilterNode> Filters { get; set; }
-        public List<INode> Nodes { get; set; }
+        public List<INode> Nodes { get {
+                var newList = new List<INode>();
+                newList.AddRange(Joins);
+                newList.AddRange(Filters);
+                return newList;
+            } 
+        }
         public string FromQuery { get; set; }
 
         public ParserResult()
@@ -20,7 +26,6 @@ namespace QueryParser.QueryParsers
             Tables = new Dictionary<string, TableReferenceNode>();
             Joins = new List<JoinNode>();
             Filters = new List<FilterNode>();
-            Nodes = new List<INode>();
             FromQuery = "";
         }
 
@@ -29,18 +34,11 @@ namespace QueryParser.QueryParsers
             FromQuery = fromQuery;
         }
 
-        public ParserResult(List<INode> nodes, Dictionary<string, TableReferenceNode> tables, string fromQuery)
+        public ParserResult(List<JoinNode> joinNodes, List<FilterNode> filterNodes, Dictionary<string, TableReferenceNode> tables, string fromQuery)
         {
             Tables = tables;
-            Joins = new List<JoinNode>();
-            Filters = new List<FilterNode>();
-            foreach(var node in nodes.Where(x => x.GetType() == typeof(JoinNode)))
-                if (node is JoinNode accNode)
-                    Joins.Add(accNode);
-            foreach (var node in nodes.Where(x => x.GetType() == typeof(FilterNode)))
-                if (node is FilterNode accNode)
-                    Filters.Add(accNode);
-            Nodes = nodes;
+            Joins = joinNodes;
+            Filters = filterNodes;
             FromQuery = fromQuery;
         }
 
@@ -87,15 +85,19 @@ namespace QueryParser.QueryParsers
 
         public object Clone()
         {
-            var newList = new List<INode>();
-            foreach(var node in Nodes)
-                if (node.Clone() is INode clone)
-                    newList.Add(clone);
+            var newJoinList = new List<JoinNode>();
+            foreach(var node in Joins)
+                if (node.Clone() is JoinNode clone)
+                    newJoinList.Add(clone);
+            var newFilterList = new List<FilterNode>();
+            foreach (var node in Filters)
+                if (node.Clone() is FilterNode clone)
+                    newFilterList.Add(clone);
             var newDict = new Dictionary<string, TableReferenceNode>();
             foreach (var key in Tables.Keys)
                 if (Tables[key].Clone() is TableReferenceNode clone)
                     newDict.Add(key, clone);
-            return new ParserResult(newList, newDict, FromQuery);
+            return new ParserResult(newJoinList, newFilterList, newDict, FromQuery);
         }
     }
 }
