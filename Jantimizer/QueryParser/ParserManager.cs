@@ -34,7 +34,7 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new ParserResult();
+            return new ParserResult(query);
         }
 
         public async Task<ParserResult> ParseQueryAsync(string query, bool throwIfNotFound = true)
@@ -53,18 +53,17 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new ParserResult();
+            return new ParserResult(query);
         }
 
         public ParserResult ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser
         {
-            return parser.ParseQuery(query); ;
+            return parser.ParseQuery(query);
         }
 
         public async Task<ParserResult> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser
         {
-            ParserResult result = await parser.ParseQueryAsync(query);
-            return result;
+            return await parser.ParseQueryAsync(query);
         }
     }
 }

@@ -7,6 +7,7 @@ using QueryParser.Models;
 using QueryParser.QueryParsers;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
+using ResultsSentinel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -207,6 +208,8 @@ namespace ExperimentSuite.Controllers
                 {
                     string text = await reader.ReadToEndAsync();
 
+                    RunData.HistoManager.UsedHistograms.Histograms.Clear();
+
                     // Get Cache
                     var timer = TimerHelper.GetWatchAndStart();
                     ulong? accCardinality = GetCacheIfThere(text);
@@ -220,6 +223,8 @@ namespace ExperimentSuite.Controllers
                     // Parse query plan
                     timer = TimerHelper.GetWatchAndStart();
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
+                    if (QueryPlanParserResultSentinel.Instance != null)
+                        QueryPlanParserResultSentinel.Instance.CheckResult(analysisResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
 
                     // Cache actual cardinalities (if not set)
@@ -234,13 +239,20 @@ namespace ExperimentSuite.Controllers
 
                     // Parse SQL file
                     timer = TimerHelper.GetWatchAndStart();
-                    ParserResult parserResult = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    ParserResult resultNodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
+                    if (QueryParserResultSentinel.Instance != null)
+                        QueryParserResultSentinel.Instance.CheckResult(resultNodes, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
 
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(parserResult);
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(resultNodes);
+                    if (OptimiserResultSentinel.Instance != null)
+                        OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+
+                    if (HistogramResultSentinel.Instance != null)
+                        HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
 
                     // Make test report
                     testCases.Add(
@@ -337,7 +349,6 @@ namespace ExperimentSuite.Controllers
             DataInsertsFile = null;
             DataAnalyseFile = null;
             CleanupFile = null;
-            RunData = null;
         }
     }
 }

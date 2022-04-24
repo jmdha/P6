@@ -39,14 +39,14 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new ParserResult() { };
+            parser.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
             var result = newManager.ParseQuery("anything");
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturnJoins, result.Joins);
         }
 
         [TestMethod]
@@ -56,16 +56,16 @@ namespace QueryParserTest
             TestParser parser1 = new TestParser();
             TestParser parser2 = new TestParser();
             parser1.ShouldAccept = true;
-            parser1.ShouldReturn = new ParserResult() { };
+            parser1.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             parser2.ShouldAccept = false;
-            parser2.ShouldReturn = new ParserResult() { };
+            parser2.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(2), new TestJoinNode(3) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser2, parser1 });
 
             // ACT
             var result = newManager.ParseQuery("anything");
 
             // ASSERT
-            Assert.AreEqual(parser1.ShouldReturn, result);
+            Assert.AreEqual(parser1.ShouldReturnJoins, result.Joins);
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace QueryParserTest
             var result = newManager.ParseQuery("anything", false);
 
             // ASSERT
-            Assert.IsTrue(result.GetNodes().Count == 0);
+            Assert.IsTrue(result.Joins.Count == 0);
         }
 
         [TestMethod]
@@ -102,14 +102,14 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new ParserResult() { };
+            parser.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
             var result = await newManager.ParseQueryAsync("anything");
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturnJoins, result.Joins);
         }
 
         [TestMethod]
@@ -119,16 +119,16 @@ namespace QueryParserTest
             TestParser parser1 = new TestParser();
             TestParser parser2 = new TestParser();
             parser1.ShouldAccept = true;
-            parser1.ShouldReturn = new ParserResult { };
+            parser1.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             parser2.ShouldAccept = false;
-            parser2.ShouldReturn = new ParserResult { };
+            parser2.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(2), new TestJoinNode(3) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser2, parser1 });
 
             // ACT
             var result = await newManager.ParseQueryAsync("anything");
 
             // ASSERT
-            Assert.AreEqual(parser1.ShouldReturn, result);
+            Assert.AreEqual(parser1.ShouldReturnJoins, result.Joins);
         }
 
         [TestMethod]
@@ -141,7 +141,7 @@ namespace QueryParserTest
             var result = await newManager.ParseQueryAsync("anything", false);
 
             // ASSERT
-            Assert.IsTrue(result.GetNodes().Count == 0);
+            Assert.IsTrue(result.Joins.Count == 0);
         }
 
         [TestMethod]
@@ -165,14 +165,14 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new ParserResult { };
+            parser.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
             var result = newManager.ParseQuerySpecific<TestParser>("anything", parser);
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturnJoins, result.Joins);
         }
 
         #endregion
@@ -185,14 +185,14 @@ namespace QueryParserTest
             // ARRANGE
             TestParser parser = new TestParser();
             parser.ShouldAccept = true;
-            parser.ShouldReturn = new ParserResult { };
+            parser.ShouldReturnJoins = new List<JoinNode>() { new TestJoinNode(0), new TestJoinNode(1) };
             IParserManager newManager = new ParserManager(new List<IQueryParser>() { parser });
 
             // ACT
             var result = await newManager.ParseQuerySpecificAsync<TestParser>("anything", parser);
 
             // ASSERT
-            Assert.AreEqual(parser.ShouldReturn, result);
+            Assert.AreEqual(parser.ShouldReturnJoins, result.Joins);
         }
 
         #endregion
@@ -201,7 +201,8 @@ namespace QueryParserTest
     internal class TestParser : IQueryParser
     {
         public bool ShouldAccept = false;
-        public ParserResult ShouldReturn = new ParserResult();
+        public List<JoinNode> ShouldReturnJoins = new List<JoinNode>();
+        public List<FilterNode> ShouldReturnFilters = new List<FilterNode>();
 
         public bool DoesQueryMatch(string query)
         {
@@ -215,22 +216,19 @@ namespace QueryParserTest
 
         public ParserResult ParseQuery(string query)
         {
-            return ShouldReturn;
+            return new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query);
         }
 
         public Task<ParserResult> ParseQueryAsync(string query)
         {
-            return Task.Run(() => ShouldReturn);
+            return Task.Run(() => new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query));
         }
     }
 
-    internal class TestNode : INode
+    internal class TestJoinNode : JoinNode
     {
-        public int Id { get; set; }
-
-        public TestNode(int id)
+        public TestJoinNode(int id) : base(id, "", new JoinPredicateRelation(null, null, RelationType.Type.None))
         {
-            Id = id;
         }
     }
 }

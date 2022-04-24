@@ -4,6 +4,7 @@ using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,6 +19,7 @@ namespace QueryParser.QueryParsers
 {
     public class PostgresParser : IQueryParser
     {
+        int _filterIdCounter = 0;
         private ConnectionProperties? ConnectorProperties { get; set; }
 
         public PostgresParser(ConnectionProperties? connectorProperties = null)
@@ -59,14 +61,18 @@ namespace QueryParser.QueryParsers
 
         public ParserResult ParseQuery(string query)
         {
+            _filterIdCounter = 0;
             var parsed = GetParserResult(query);
             parsed.Wait();
+            parsed.Result.FromQuery = query;
             return parsed.Result;
         }
 
         public async Task<ParserResult> ParseQueryAsync(string query)
         {
+            _filterIdCounter = 0;
             var parsed = await GetParserResult(query);
+            parsed.FromQuery = query;
             return parsed;
         }
 
@@ -156,7 +162,6 @@ namespace QueryParser.QueryParsers
         {
             var matches = FilterAndConditionFinder.Matches(queryExplanationTextBlock);
 
-            int id = 0;
             foreach (Match match in matches)
             {
                 if (!match.Groups["filterProp"].Success)
@@ -173,32 +178,34 @@ namespace QueryParser.QueryParsers
                     string strValue = match.Groups["filterValue"].Value;
                     strValue = strValue.Substring(0, strValue.Length - $"::{type}".Length);
 
+                    // Removes quotes around 'value'
+                    strValue = strValue.Substring(1, strValue.Length - 2);
                     switch (type)
                     {
                         case "text":
-                            // Removes quotes around 'value'
-                            string encapsulatedStrValue = strValue;
-                            value = encapsulatedStrValue.Substring(1, encapsulatedStrValue.Length - 2);
-                                
+                            value = strValue; 
+                            break;
+                        case "date":
+                            value = DateTime.Parse(strValue, CultureInfo.InvariantCulture);
                             break;
                         default:
                             throw new NotImplementedException($"Filters not implemented for type {type}");
                     }
                 }
                 else
-                                                {
+                {
                     value = RegexHelperFunctions.GetRegexVal<long>(match, "filterValue");
                 }
 
 
                 result.Filters.Add(new FilterNode(
-                    id: id,
-                    tableReference: tableRef,
+                    id: _filterIdCounter++,
+                    reference: tableRef,
+                    alias: tableRef.Alias,
                     attributeName: match.Groups["filterProp"].Value,
                     comType: ComparisonType.GetOperatorType(match.Groups["filterCondition"].Value),
                     constant: value
                 ));
-                id++;
             }
         }
 

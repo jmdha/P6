@@ -46,5 +46,18 @@ namespace QueryParser.Models
                 
             return $"({Predicate})";
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Predicate, Relation.GetHashCode());
+        }
+
+        public object Clone()
+        {
+            var relationClone = Relation.Clone();
+            if (relationClone is JoinPredicateRelation newRelation)
+                return new JoinNode(Id, Predicate, newRelation);
+            throw new InvalidOperationException();
+        }
     }
 }

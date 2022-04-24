@@ -21,25 +21,8 @@ namespace Histograms.Models
         {
         }
 
-        internal HistogramEquiDepthVariance(CachedHistogram histo) : base(histo.TableName, histo.AttributeName, histo.Depth)
+        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName, depth)
         {
-            foreach (var bucket in histo.Buckets)
-            {
-                Type? type = Type.GetType(bucket.ValueType);
-                if (type == null)
-                    throw new NullReferenceException("Unexpected null as cache type");
-
-                if (type.GetInterface(nameof(IComparable)) != null)
-                {
-                    var valueStart = Convert.ChangeType(bucket.ValueStart, type) as IComparable;
-                    var valueEnd = Convert.ChangeType(bucket.ValueEnd, type) as IComparable;
-
-                    if (valueStart == null || valueEnd == null)
-                        throw new ArgumentNullException("Read bucket value was invalid!");
-
-                    Buckets.Add(new HistogramBucketVariance(valueStart, valueEnd, bucket.Count, bucket.Variance, bucket.Mean, bucket.StandardDeviation, Convert.ToDouble(valueEnd) - Convert.ToDouble(valueStart)));
-                }
-            }
         }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
@@ -77,10 +60,10 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepthVariance(TableName, AttributeName, Depth);
+            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
-                if (bucket is IHistogramBucketVariance vari)
-                    retObj.Buckets.Add(new HistogramBucketVariance(vari.ValueStart, vari.ValueEnd, vari.Count, vari.Variance, vari.Mean, vari.StandardDeviation, Convert.ToDouble(vari.ValueEnd) - Convert.ToDouble(vari.ValueStart)));
+                if (bucket.Clone() is IHistogramBucket acc)
+                    retObj.Buckets.Add(acc);
             return retObj;
         }
     }

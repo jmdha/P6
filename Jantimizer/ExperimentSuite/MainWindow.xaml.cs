@@ -1,33 +1,16 @@
-﻿using DatabaseConnector.Exceptions;
-using ExperimentSuite.Controllers;
+﻿using ExperimentSuite.Controllers;
 using ExperimentSuite.Helpers;
-using ExperimentSuite.Models;
-using ExperimentSuite.Models.ExperimentParsing;
-using ExperimentSuite.SuiteDatas;
 using ExperimentSuite.UserControls;
+using ExperimentSuite.UserControls.SentinelReportViewer;
 using Histograms.Caches;
 using QueryPlanParser.Caches;
+using ResultsSentinel;
+using ResultsSentinel.SentinelLog;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Tools.Caches;
-using Tools.Exceptions;
-using Tools.Helpers;
-using Tools.Services;
+using System.Windows.Threading;
 
 namespace ExperimentSuite
 {
@@ -36,12 +19,23 @@ namespace ExperimentSuite
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly string QueryPlanCacheFile = "query-plan-cache.json";
+
         private ExperimentController controller;
 
         public MainWindow()
         {
-            controller = new ExperimentController();
+            // Sentinels
+            new OptimiserResultSentinel();
+            new QueryPlanParserResultSentinel();
+            new QueryParserResultSentinel();
+            new HistogramResultSentinel();
 
+            // Cachers
+            new QueryPlanCacher(QueryPlanCacheFile);
+            new HistogramCacher();
+
+            controller = new ExperimentController();
             controller.WriteToStatus += WriteToStatus;
             controller.UpdateExperimentProgressBar += UpdateExperimentProgressBar;
             controller.AddNewElement += AddNewElementToTestPanel;
@@ -50,7 +44,6 @@ namespace ExperimentSuite
             InitializeComponent();
             var iconHandle = Properties.Resources.icon;
             this.Icon = ImageHelper.ByteToImage(iconHandle);
-            CacheViewerControl.Toggle(true);
         }
 
         private void UpdateExperimentProgressBar(double value, double max = 0)
@@ -73,12 +66,6 @@ namespace ExperimentSuite
             TestsPanel.Children.Remove(element);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            await controller.RunExperiments();
-            RunButton.IsEnabled = true;
-        }
-
         private void WriteToStatus(string text)
         {
             StatusTextbox.Text += $"{text}{Environment.NewLine}";
@@ -93,13 +80,82 @@ namespace ExperimentSuite
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
             RunButton.IsEnabled = false;
+            OptimiserSentinelCheckbox.IsEnabled = false;
+            QueryPlanSentinelCheckbox.IsEnabled = false;
+            QuerySentinelCheckbox.IsEnabled = false;
+            HistogramSentinelCheckbox.IsEnabled = false;
+            ClearSentinelLogs();
             await controller.RunExperiments();
             RunButton.IsEnabled = true;
+            OptimiserSentinelCheckbox.IsEnabled = true;
+            QueryPlanSentinelCheckbox.IsEnabled = true;
+            QuerySentinelCheckbox.IsEnabled = true;
+            HistogramSentinelCheckbox.IsEnabled = true;
         }
 
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
         {
-            CacheViewerControl.Toggle();
+            var cacheViewer = new CacheViewer();
+            cacheViewer.Show();
+        }
+
+        private void OptimiserSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (OptimiserResultSentinel.Instance != null)
+                    if (checkBox.IsChecked != null)
+                        OptimiserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
+        }
+
+        private void QueryPlanSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (QueryPlanParserResultSentinel.Instance != null)
+                    if (checkBox.IsChecked != null)
+                        QueryPlanParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
+        }
+
+        private void QuerySentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (QueryParserResultSentinel.Instance != null)
+                    if (checkBox.IsChecked != null)
+                        QueryParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
+        }
+
+        private void HistogramSentinelCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkBox)
+                if (HistogramResultSentinel.Instance != null)
+                    if (checkBox.IsChecked != null)
+                        HistogramResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
+        }
+
+        private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
+        {
+            var newList = new List<IResultSentinel>();
+            if (OptimiserResultSentinel.Instance != null)
+                newList.Add(OptimiserResultSentinel.Instance);
+            if (QueryParserResultSentinel.Instance != null)
+                newList.Add(QueryParserResultSentinel.Instance);
+            if (QueryPlanParserResultSentinel.Instance != null)
+                newList.Add(QueryPlanParserResultSentinel.Instance);
+            if (HistogramResultSentinel.Instance != null)
+                newList.Add(HistogramResultSentinel.Instance);
+            var sentinelWindow = new SentinelReportViewer(newList);
+            sentinelWindow.Show();
+        }
+
+        private void ClearSentinelLogs()
+        {
+            if (OptimiserResultSentinel.Instance != null)
+                OptimiserResultSentinel.Instance.ClearSentinel();
+            if (QueryParserResultSentinel.Instance != null)
+                QueryParserResultSentinel.Instance.ClearSentinel();
+            if (QueryPlanParserResultSentinel.Instance != null)
+                QueryPlanParserResultSentinel.Instance.ClearSentinel();
+            if (HistogramResultSentinel.Instance != null)
+                HistogramResultSentinel.Instance.ClearSentinel();
         }
     }
 }

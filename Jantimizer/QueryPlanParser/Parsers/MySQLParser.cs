@@ -26,7 +26,7 @@ namespace QueryPlanParser.Parsers
                 if (resultQueue.Count == 0)
                     throw new BadQueryPlanInputException("Analysis got no rows!");
 
-                return new AnalysisResult(RunAnalysis(resultQueue));
+                return new AnalysisResult(RunAnalysis(resultQueue), planData, this.GetType().Name);
             }
             catch (Exception ex)
             {

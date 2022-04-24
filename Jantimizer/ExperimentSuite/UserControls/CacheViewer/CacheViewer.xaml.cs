@@ -22,11 +22,9 @@ namespace ExperimentSuite.UserControls
     /// <summary>
     /// Interaction logic for CacheViewer.xaml
     /// </summary>
-    public partial class CacheViewer : UserControl, ICollapsable
+    public partial class CacheViewer : Window
     {
         private CacheController controller;
-        public double CollapsedSize { get; } = 0;
-        public double ExpandedSize { get; }
 
         public CacheViewer()
         {
@@ -34,24 +32,7 @@ namespace ExperimentSuite.UserControls
             controller.ClearViewPanel += ClearDataPanel;
 
             InitializeComponent();
-            ExpandedSize = MaxWidth;
             controller.LoadCachesFromFile();
-        }
-
-        public void Toggle()
-        {
-            if (Width == CollapsedSize)
-                Width = ExpandedSize;
-            else
-                Width = CollapsedSize;
-        }
-
-        public void Toggle(bool collapse)
-        {
-            if (collapse)
-                Width = CollapsedSize;
-            else
-                Width = ExpandedSize;
         }
 
         private void ClearDataPanel()

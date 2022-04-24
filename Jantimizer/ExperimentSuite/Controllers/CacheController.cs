@@ -11,9 +11,6 @@ namespace ExperimentSuite.Controllers
 {
     internal class CacheController
     {
-        private readonly string QueryPlanCacheFile = "query-plan-cache.json";
-        private readonly string HistogramCacheFile = "histogram-cache.json";
-
         public delegate void ClearViewPanelHandler();
         public event ClearViewPanelHandler? ClearViewPanel;
 
@@ -53,8 +50,10 @@ namespace ExperimentSuite.Controllers
 
         public void LoadCachesFromFile()
         {
-            new QueryPlanCacher(QueryPlanCacheFile);
-            new HistogramCacher(HistogramCacheFile);
+            if (QueryPlanCacher.Instance != null)
+                QueryPlanCacher.Instance.LoadCacheFromFile();
+            if (HistogramCacher.Instance != null)
+                HistogramCacher.Instance.LoadCacheFromFile();
         }
     }
 }

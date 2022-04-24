@@ -12,12 +12,31 @@
             TableName = tableName;
             Alias = alias;
         }
+
         public override string ToString()
         {
             if (Alias == TableName)
                 return TableName;
 
             return $"{TableName} AS {Alias}";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is TableReferenceNode node &&
+                   Id == node.Id &&
+                   TableName == node.TableName &&
+                   Alias == node.Alias;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, TableName, Alias);
+        }
+
+        public object Clone()
+        {
+            return new TableReferenceNode(Id, TableName, Alias);
         }
     }
 }

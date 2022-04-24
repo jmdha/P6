@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Histograms.Caches;
+using System.Data;
 using System.Text;
 
 namespace Histograms.Models
@@ -24,9 +25,14 @@ namespace Histograms.Models
 
         public HistogramMinDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
         {
+            HistogramId = Guid.NewGuid();
             Depth = depth;
         }
 
+        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName)
+        {
+            Depth = depth;
+        }
 
         protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
@@ -70,10 +76,16 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramMinDepth(TableName, AttributeName, Depth);
+            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, Depth);
             foreach (var bucket in Buckets)
-                retObj.Buckets.Add(new HistogramBucket(bucket.ValueStart, bucket.ValueEnd, bucket.Count));
+                if (bucket.Clone() is IHistogramBucket acc)
+                    retObj.Buckets.Add(acc);
             return retObj;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() + HashCode.Combine(Depth);
         }
     }
 }

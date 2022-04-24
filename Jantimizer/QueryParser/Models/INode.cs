@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QueryParser.Models
 {
-    public interface INode
+    public interface INode : ICloneable
     {
         public int Id { get; }
     }

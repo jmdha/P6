@@ -6,38 +6,38 @@
         xmlns:local="clr-namespace:ExperimentSuite"
         xmlns:uc="clr-namespace:ExperimentSuite.UserControls"
         mc:Ignorable="d"
-        Title="Jantimiser" Height="750" Width="1600" Loaded="Window_Loaded">
+        Title="Jantimiser" Height="750" Width="1600">
     <Grid x:Name="MainGrid">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="70"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="100"/>
-                </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
 
-                <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
-                <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="1" Margin="5"/>
-                <Button x:Name="RunButton" Content="Run!" Grid.Column="2" Margin="5" IsEnabled="False" Click="RunButton_Click"/>
-                <Button x:Name="CacheViewerButton" Grid.Column="4" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
-            </Grid>
-
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel x:Name="TestsPanel"/>
-            </ScrollViewer>
+            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
+            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="1" Margin="5"/>
+            <StackPanel Grid.Column="2" Margin="2">
+                <CheckBox x:Name="OptimiserSentinelCheckbox" Content="Enable Optimiser Result Sentinel" Checked="OptimiserSentinelCheckbox_Click" Unchecked="OptimiserSentinelCheckbox_Click"/>
+                <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Checked="QueryPlanSentinelCheckbox_Click" Unchecked="QueryPlanSentinelCheckbox_Click"/>
+                <CheckBox x:Name="QuerySentinelCheckbox" Content="Enable Query Parser Sentinel" Checked="QuerySentinelCheckbox_Click" Unchecked="QuerySentinelCheckbox_Click"/>
+                <CheckBox x:Name="HistogramSentinelCheckbox" Content="Enable Histogram Sentinel" Checked="HistogramSentinelCheckbox_Click" Unchecked="HistogramSentinelCheckbox_Click"/>
+            </StackPanel>
+            <Button x:Name="SentinelViewerButton" Content="Sentinel Viewer" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>
+            <Button x:Name="RunButton" Content="Run!" Grid.Column="4" Margin="5" Click="RunButton_Click"/>
+            <Button x:Name="CacheViewerButton" Grid.Column="5" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
         </Grid>
 
-        <uc:CacheViewer x:Name="CacheViewerControl" Grid.Column="1"/>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="TestsPanel"/>
+        </ScrollViewer>
     </Grid>
 </Window>

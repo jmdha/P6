@@ -1,6 +1,6 @@
 ﻿namespace Histograms.Models
 {
-    public interface IHistogramBucket
+    public interface IHistogramBucket : ICloneable
     {
         public Guid BucketId { get; }
         public IComparable ValueStart { get; }

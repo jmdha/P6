@@ -33,25 +33,34 @@
             BucketId = Guid.NewGuid();
         }
 
-        public override string? ToString()
+        public HistogramBucket(Guid bucketId, IComparable valueStart, IComparable valueEnd, long count)
         {
-            return $"Id: [{BucketId}] Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}]";
+            if (valueStart is null)
+                throw new ArgumentNullException(nameof(valueStart));
+            if (valueEnd is null)
+                throw new ArgumentNullException(nameof(valueEnd));
+
+            ValueStart = valueStart;
+
+            _valueEnd = null!; // Suppress warning for _valueEnd "not being set"
+            ValueEnd = valueEnd;
+            Count = count;
+            BucketId = bucketId;
         }
 
-        public override bool Equals(object? obj)
+        public override string? ToString()
         {
-            return obj is HistogramBucket bucket &&
-                   EqualityComparer<IComparable>.Default.Equals(ValueStart, bucket.ValueStart) &&
-                   EqualityComparer<IComparable>.Default.Equals(_valueEnd, bucket._valueEnd) &&
-                   EqualityComparer<IComparable>.Default.Equals(ValueEnd, bucket.ValueEnd) &&
-                   count == bucket.count &&
-                   Count == bucket.Count &&
-                   BucketId == bucket.BucketId;
+            return $"Id: [{BucketId}], Type:[{this.GetType().Name}], Start: [{ValueStart}], End: [{ValueEnd}], Count: [{Count}]";
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(ValueStart, _valueEnd, ValueEnd, count, Count, BucketId);
+            return HashCode.Combine(ValueStart, ValueEnd, Count, BucketId);
+        }
+
+        public virtual object Clone()
+        {
+            return new HistogramBucket(BucketId, ValueStart, ValueEnd, Count);
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Histograms.DataGatherers
 
             return returnRows.Tables[0]
                     .AsEnumerable()
-                    .Select(r => (string)r["TABLE_NAME"]);
+                    .Select(r => ((string)r["TABLE_NAME"]).ToLower());
         }
 
         public override async Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName)
@@ -45,7 +45,7 @@ namespace Histograms.DataGatherers
 
             return returnRows.Tables[0]
                     .AsEnumerable()
-                    .Select(r => (string)r["COLUMN_NAME"]);
+                    .Select(r => ((string)r["COLUMN_NAME"]).ToLower());
         }
 
         public override async Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName)
@@ -66,6 +66,10 @@ namespace Histograms.DataGatherers
 
         public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
         {
+            return HashCode.Combine(tableName, attributeName).ToString();
+
+            // Disabled for now, just dont work with some of the larger datasets
+#pragma warning disable CS0162 // Unreachable code detected
             var columnHash = new DataSet();
             using (var connector = new MyConnector(ConnectionProperties))
                 columnHash = await connector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5(`{attributeName}`))) as hash FROM `{tableName}`;");
@@ -78,6 +82,7 @@ namespace Histograms.DataGatherers
                 throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
             string hashValue = (string)hashRow["hash"];
             return hashValue;
+#pragma warning restore CS0162 // Unreachable code detected
         }
 
         public override async Task<Type> GetAttributeType(string tableName, string attributeName)
