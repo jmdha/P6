@@ -35,11 +35,11 @@ namespace QueryOptimiser
             }
             catch (Exception ex)
             {
-                throw new OptimiserErrorLogException(ex, this, parserResult.GetNodes());
+                throw new OptimiserErrorLogException(ex, this, parserResult.Nodes);
             }
             
 
-            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
+            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), parserResult.Nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
         }
 
         private IntermediateTable UpdateTable(IntermediateTable formerTable, IntermediateTable newTable)

@@ -213,14 +213,14 @@ namespace QueryParserTest
             return Task.Run(() => ShouldAccept);
         }
 
-        public List<INode> ParseQuery(string query)
+        public ParserResult ParseQuery(string query)
         {
-            return ShouldReturn;
+            return new ParserResult(ShouldReturn, new Dictionary<string, TableReferenceNode>(), query);
         }
 
-        public Task<List<INode>> ParseQueryAsync(string query)
+        public Task<ParserResult> ParseQueryAsync(string query)
         {
-            return Task.Run(() => ShouldReturn);
+            return Task.Run(() => new ParserResult(ShouldReturn, new Dictionary<string, TableReferenceNode>(), query));
         }
     }
 
