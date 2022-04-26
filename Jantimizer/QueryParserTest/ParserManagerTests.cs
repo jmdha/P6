@@ -216,12 +216,12 @@ namespace QueryParserTest
 
         public ParserResult ParseQuery(string query)
         {
-            return new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query);
+            return new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query, "");
         }
 
         public Task<ParserResult> ParseQueryAsync(string query)
         {
-            return Task.Run(() => new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query));
+            return Task.Run(() => new ParserResult(ShouldReturnJoins, ShouldReturnFilters, new Dictionary<string, TableReferenceNode>(), query, ""));
         }
     }
 
