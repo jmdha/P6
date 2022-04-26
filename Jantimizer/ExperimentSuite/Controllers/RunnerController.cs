@@ -203,6 +203,9 @@ namespace ExperimentSuite.Controllers
             UpdateRunnerProgressBar?.Invoke(value, max);
             foreach (var queryFile in CaseFiles)
             {
+                while (SyncHelper.IsPaused)
+                    await Task.Delay(100);
+
                 UpdateRunnerProgressBar?.Invoke(value++);
                 using (var reader = new StreamReader(queryFile.FullName))
                 {

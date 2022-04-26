@@ -156,7 +156,19 @@ namespace ExperimentSuite
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (sender is Button button)
+            {
+                if (SyncHelper.IsPaused)
+                {
+                    SyncHelper.IsPaused = false;
+                    button.Content = "Pause";
+                }
+                else
+                {
+                    SyncHelper.IsPaused = true;
+                    button.Content = "Continue";
+                }
+            }
         }
     }
 }
