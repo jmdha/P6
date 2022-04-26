@@ -32,7 +32,7 @@ namespace QueryParser.Models
 
         public override int GetHashCode()
         {
-            return TableReference.GetHashCode() + HashCode.Combine(Id, Alias, AttributeName, ComparisonType.GetOperatorString(ComType), Constant);
+            return TableReference.GetHashCode() + HashCode.Combine(Alias, AttributeName, ComparisonType.GetOperatorString(ComType), Constant);
         }
 
         public object Clone()

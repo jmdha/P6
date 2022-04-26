@@ -31,7 +31,8 @@
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, TableName, Alias);
+            int hash = HashCode.Combine(TableName, Alias);
+            return hash;
         }
 
         public object Clone()

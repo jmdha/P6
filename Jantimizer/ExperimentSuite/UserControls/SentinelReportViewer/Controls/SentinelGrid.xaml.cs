@@ -55,8 +55,8 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
                     currentItemCount = _logs.Count;
                     MainDataGrid.ItemsSource = null;
                     MainDataGrid.ItemsSource = _logs;
-                    tickCount = maxTickCount;
                 }
+                tickCount = maxTickCount;
             }
         }
 
