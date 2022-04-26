@@ -13,15 +13,20 @@ namespace ExperimentSuite.Helpers
     {
         public static ImageSource ByteToImage(byte[] imageData)
         {
+            ImageSource imgSrc = ByteToBmpImage(imageData) as ImageSource;
+
+            return imgSrc;
+        }
+
+        public static BitmapImage ByteToBmpImage(byte[] imageData)
+        {
             BitmapImage biImg = new BitmapImage();
             MemoryStream ms = new MemoryStream(imageData);
             biImg.BeginInit();
             biImg.StreamSource = ms;
             biImg.EndInit();
 
-            ImageSource imgSrc = biImg as ImageSource;
-
-            return imgSrc;
+            return biImg;
         }
     }
 }

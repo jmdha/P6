@@ -27,9 +27,6 @@ namespace ExperimentSuite.Controllers
         private readonly string ResultCSVFileName = "result.csv";
         private readonly string CaseFolderName = "Cases/";
 
-        public delegate void WriteToStatusHandler(string text);
-        public event WriteToStatusHandler? WriteToStatus;
-
         public delegate void AddTestRunnerHandler(UIElement element, int index = -1);
         public event AddTestRunnerHandler? AddNewElement;
 
@@ -58,15 +55,14 @@ namespace ExperimentSuite.Controllers
                 {
                     if (experiment.RunExperiment)
                     {
-                        UpdateExperimentProgressBar?.Invoke(value++);
+                        value++;
+                        UpdateExperimentProgressBar?.Invoke(value);
                         AddNewElement?.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
                         // Find fitting suite data
-                        WriteToStatus?.Invoke("Setting up suite datas...");
-                        var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
+                          var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
                         // Setup labels
-                        WriteToStatus?.Invoke($"Running experiment {experiment.ExperimentName}");
                         var awaitingLable = GetSeperatorLabel("Waiting...", 14);
                         AddNewElement?.Invoke(awaitingLable, 1);
 
@@ -98,10 +94,8 @@ namespace ExperimentSuite.Controllers
 
                         RemoveElement?.Invoke(awaitingLable);
                     }
-                    WriteToStatus?.Invoke($"Experiment {experiment.ExperimentName} finished!");
                 }
                 UpdateExperimentProgressBar?.Invoke(max);
-                WriteToStatus?.Invoke("All experiments complete!");
                 SaveToCSV(rootResultPath);
             }
             catch (BaseErrorLogException ex)
@@ -122,7 +116,6 @@ namespace ExperimentSuite.Controllers
 
         private ExperimentList GetExperimentListFromFile()
         {
-            WriteToStatus?.Invoke("Parsing experiment list...");
             var experimentsFile = IOHelper.GetFile(ExperimentsFile);
             var expList = JsonParsingHelper.ParseJson<ExperimentList>(File.ReadAllText(experimentsFile.FullName));
             return expList;
@@ -130,11 +123,9 @@ namespace ExperimentSuite.Controllers
 
         private void SaveToCSV(string path)
         {
-            WriteToStatus?.Invoke("Merging results...");
             CSVMerger.Merge<TestReport, TestReportMap>($"{path}/Results", ResultCSVFileName);
             CSVMerger.Merge<TestTimeReport, TestTimeReportMap>($"{path}/Times", ResultCSVFileName);
             CSVMerger.Merge<TestCaseTimeReport, TestCaseTimeReportMap>($"{path}/CaseTimes", ResultCSVFileName);
-            WriteToStatus?.Invoke("Merging finished");
         }
 
         private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)

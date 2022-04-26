@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using WpfAnimatedGif;
 
 namespace ExperimentSuite
 {
@@ -36,7 +37,6 @@ namespace ExperimentSuite
             new HistogramCacher();
 
             controller = new ExperimentController();
-            controller.WriteToStatus += WriteToStatus;
             controller.UpdateExperimentProgressBar += UpdateExperimentProgressBar;
             controller.AddNewElement += AddNewElementToTestPanel;
             controller.RemoveElement += RemoveElementFromTestPanel;
@@ -66,11 +66,6 @@ namespace ExperimentSuite
             TestsPanel.Children.Remove(element);
         }
 
-        private void WriteToStatus(string text)
-        {
-            StatusTextbox.Text += $"{text}{Environment.NewLine}";
-        }
-
         private void StatusTextbox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (sender is TextBox textBox)
@@ -82,11 +77,13 @@ namespace ExperimentSuite
             RunButton.IsEnabled = false;
             PauseButton.IsEnabled = true;
             SentinelsPanel.IsEnabled = false;
+            ToggelGif(true);
             ClearSentinelLogs();
             await controller.RunExperiments();
             RunButton.IsEnabled = true;
             PauseButton.IsEnabled = false;
             SentinelsPanel.IsEnabled = true;
+            ToggelGif(false);
         }
 
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
@@ -162,12 +159,28 @@ namespace ExperimentSuite
                 {
                     SyncHelper.IsPaused = false;
                     button.Content = "Pause";
+                    ToggelGif(true);
                 }
                 else
                 {
                     SyncHelper.IsPaused = true;
                     button.Content = "Continue";
+                    ToggelGif(false);
                 }
+            }
+        }
+
+        private void ToggelGif(bool toState)
+        {
+            if (toState)
+            {
+                var loadingIconHandle = Properties.Resources.Loading_icon;
+                ImageBehavior.SetAnimatedSource(LoadingImage, ImageHelper.ByteToBmpImage(loadingIconHandle));
+            }
+            else
+            {
+                var gifController = ImageBehavior.GetAnimationController(LoadingImage);
+                gifController.Dispose();
             }
         }
     }

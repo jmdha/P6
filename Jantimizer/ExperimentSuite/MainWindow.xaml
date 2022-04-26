@@ -15,7 +15,7 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="100"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="100"/>
@@ -24,7 +24,7 @@
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
-            <TextBox x:Name="StatusTextbox" VerticalScrollBarVisibility="Visible" Margin="5" TextChanged="StatusTextbox_TextChanged"/>
+            <Image x:Name="LoadingImage"/>
             <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="1" Margin="5"/>
             <StackPanel x:Name="SentinelsPanel" Grid.Column="2" Margin="2">
                 <CheckBox x:Name="OptimiserSentinelCheckbox" Content="Enable Optimiser Result Sentinel" Checked="OptimiserSentinelCheckbox_Click" Unchecked="OptimiserSentinelCheckbox_Click"/>
