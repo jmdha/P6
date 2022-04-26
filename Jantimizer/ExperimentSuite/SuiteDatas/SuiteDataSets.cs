@@ -101,7 +101,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MinDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                JsonHelper.GetValue<int>(optionalTestSettings, "MinBucketSize"));
             var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
             var mySQLParserManager = new ParserManager(new List<IQueryParser>() { });
             if (additionalParser != null)
@@ -200,7 +200,7 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new MinDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                JsonHelper.GetValue<int>(optionalTestSettings, "MinBucketSize"));
             var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
             var postParserManager = new ParserManager(new List<IQueryParser>() { new PostgresParser(postConnectionProperties) });
             if (additionalParser != null)
