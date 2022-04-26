@@ -23,15 +23,35 @@ The real datasets are:
   * Consisting of one large table with a lot of data from a census.
 * [**COVID-19 Funding**](https://data.world/hdx/e24de323-ed64-4c33-8eda-dace55d107b9) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/COVID_Funding_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/COVID_Funding_Setup/setup.posgresql.sql) for table definitions)
   * Two tables with data regarding organisational funding for COVID-19
-* [**World happiness 2022**](https://www.kaggle.com/datasets/mathurinache/world-happiness-report-2022) with [GDP data](https://data.worldbank.org/indicator/Ny.Gdp.Mktp.Cd) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_with_GDP_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_with_GDP_Setup/setup.posgresql.sql) for table definitions)
+* [**World happiness 2022**](https://www.kaggle.com/datasets/mathurinache/world-happiness-report-2022) with [GDP data](https://data.worldbank.org/indicator/Ny.Gdp.Mktp.Cd) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.posgresql.sql) for table definitions)
   * Consisting 3 Tables one with large one with survey data, one with countries and one yearly GDP
+
+## Setup
+You need to setup the two database systems (or alternatively disable them in the [`experiments.json` file](/Jantimizer/ExperimentSuite/experiments.json)).
+The current tests are setup to use default users for PostgreSQL and MySQL.
+
+MySQL: Username: `root` password `password`
+
+PostgrSQL: Username: `postgre` password `password`
+
+These can be changed in the secrets file (See [the readme](/Jantimizer/ExperimentSuite/README.md) for more info).
 
 ## Views
 The program consist of 3 main views, the main view, the Sentinel Viewer and the Cache Viewer.
 The main view is the one shown when the program starts.
 This has options to turn on/off sentinels and a run button.
-If you press said button the program will start running through all the experiments defined in the [`experiments.json` file](/Jantimizer/ExperimentSuite/README.md)
+If you press said button the program will start running through all the experiments defined in the [`experiments.json` file](/Jantimizer/ExperimentSuite/experiments.json) (See [the readme](/Jantimizer/ExperimentSuite/README.md) for more info)
 
 ### Sentinel Viewer
+Result sentinels are there to make sure that the database systems get the same result between runs.
+This is an additional safety check, to make sure the results are actually correct.
+See [ResultsSentinel](/Jantimizer/ResultsSentinel/README.md) for more info.
 
 ### Cache Viewer
+This program makes use of caches to reduce execution times for tests.
+There are two caches one for Histograms and one for Actual Cardinalities from the database systems.
+
+The Actual Cardinalities are saved to a cache file during runtime (and is loaded automatically on next launch).
+However the histograms are regenerated each time to program launches.
+
+What is saved in these caches can be seen in the Cache Viewer, consisting of a MD5 hash of the data as well as the data itself.
