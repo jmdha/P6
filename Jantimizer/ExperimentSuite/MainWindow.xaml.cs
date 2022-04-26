@@ -80,17 +80,13 @@ namespace ExperimentSuite
         private async void RunButton_Click(object sender, RoutedEventArgs e)
         {
             RunButton.IsEnabled = false;
-            OptimiserSentinelCheckbox.IsEnabled = false;
-            QueryPlanSentinelCheckbox.IsEnabled = false;
-            QuerySentinelCheckbox.IsEnabled = false;
-            HistogramSentinelCheckbox.IsEnabled = false;
+            PauseButton.IsEnabled = true;
+            SentinelsPanel.IsEnabled = false;
             ClearSentinelLogs();
             await controller.RunExperiments();
             RunButton.IsEnabled = true;
-            OptimiserSentinelCheckbox.IsEnabled = true;
-            QueryPlanSentinelCheckbox.IsEnabled = true;
-            QuerySentinelCheckbox.IsEnabled = true;
-            HistogramSentinelCheckbox.IsEnabled = true;
+            PauseButton.IsEnabled = false;
+            SentinelsPanel.IsEnabled = true;
         }
 
         private void CacheViewerButton_Click(object sender, RoutedEventArgs e)
@@ -156,6 +152,11 @@ namespace ExperimentSuite
                 QueryPlanParserResultSentinel.Instance.ClearSentinel();
             if (HistogramResultSentinel.Instance != null)
                 HistogramResultSentinel.Instance.ClearSentinel();
+        }
+
+        private void PauseButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
