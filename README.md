@@ -55,3 +55,7 @@ The Actual Cardinalities are saved to a cache file during runtime (and is loaded
 However the histograms are regenerated each time to program launches.
 
 What is saved in these caches can be seen in the Cache Viewer, consisting of a MD5 hash of the data as well as the data itself.
+
+# Flow
+A general flowchart of how the tests are run can be seen below. This is for each connector.
+![flow drawio](https://user-images.githubusercontent.com/22596587/165300166-b8815196-00d8-490d-8f18-0a1b3c549ec8.png)
