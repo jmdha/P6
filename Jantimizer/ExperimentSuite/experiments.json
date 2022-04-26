@@ -165,7 +165,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "MinBucketSize": 256
+        "BucketSize": 256
       }
     }
   ]
