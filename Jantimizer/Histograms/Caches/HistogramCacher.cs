@@ -76,12 +76,18 @@ namespace Histograms.Caches
 
         public override void LoadCacheFromFile()
         {
-            throw new NotImplementedException();
+            if (UseCacheFile)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public override void SaveCacheToFile()
         {
-            throw new NotImplementedException();
+            if (UseCacheFile)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
