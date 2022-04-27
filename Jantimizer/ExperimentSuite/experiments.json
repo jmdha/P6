@@ -31,14 +31,18 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks"
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         },
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks"
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ConstantNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks"
           ]
         }
       ],
