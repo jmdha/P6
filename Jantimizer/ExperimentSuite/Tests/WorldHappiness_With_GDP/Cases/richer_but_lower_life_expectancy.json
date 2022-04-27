@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 (C1.gdp_per_capita > C2.gdp_per_capita AND C1.life_expectancy < C2.life_expectancy)",
+  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.gdp_per_capita > C2.gdp_per_capita AND C1.life_expectancy < C2.life_expectancy)",
   "DoRun": true,
   "JoinNodes": [
     {
