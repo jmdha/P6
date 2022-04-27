@@ -16,6 +16,10 @@ namespace QueryOptimiser.Models
         // Used as a reference as to what tables have been joined in order to create table
         internal HashSet<TableAttribute> References { get; }
         internal List<IntermediateBucket> Buckets { get; }
+        internal long RowEstimate
+        {
+            get => GetRowEstimate();
+        }
 
         public IntermediateTable()
         {
@@ -30,11 +34,11 @@ namespace QueryOptimiser.Models
                 References.Add(reference);
         }
 
-        public long GetRowEstimate()
+        private long GetRowEstimate()
         {
             long estimate = 0;
             foreach (IntermediateBucket bucket in Buckets)
-                estimate += bucket.GetEstimateOfAllBuckets();
+                estimate += bucket.RowEstimate;
             return estimate;
         }
 

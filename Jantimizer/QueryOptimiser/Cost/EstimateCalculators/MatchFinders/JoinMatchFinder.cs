@@ -36,18 +36,12 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
         internal List<IntermediateBucket> GetEqualityMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
             List<IntermediateBucket> buckets = new List<IntermediateBucket>();
-            int rightCutoff = 0;
             for (int i = 0; i < leftBuckets.Count; i++)
             {
-                for (int j = rightCutoff; j < rightBuckets.Count; j++)
+                for (int j = 0; j < rightBuckets.Count; j++)
                 {
                     if (DoesOverlap(leftBuckets[i], rightBuckets[j]))
                         buckets.Add(MakeNewIntermediateBucket(MatchType.Overlap, predicate, leftBuckets[i], rightBuckets[j]));
-                    else
-                    {
-                        rightCutoff = Math.Max(0, j - 1);
-                        break;
-                    }
                 }
             }
             return buckets;

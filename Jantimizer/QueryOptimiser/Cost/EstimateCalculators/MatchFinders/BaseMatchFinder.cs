@@ -119,10 +119,15 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             // Left Bucket:       |======|
             if (rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLessThanOrEqual(leftBucket.ValueEnd))
                 return true;
-            // Left bucket is entirely within Right bucket
-            // Right Bucket: |===========|
-            // Left Bucket:     |=====|
-            if (rightBucket.ValueStart.IsLessThanOrEqual(leftBucket.ValueStart) && rightBucket.ValueEnd.IsLargerThanOrEqual(leftBucket.ValueEnd))
+            // Right bucket start index is within Left bucket range
+            // Right Bucket:      |======|
+            // Left Bucket:    |======|
+            if (leftBucket.ValueStart.IsLargerThanOrEqual(rightBucket.ValueStart) && leftBucket.ValueStart.IsLessThanOrEqual(rightBucket.ValueEnd))
+                return true;
+            // Right bucket end index is within Left bucket range
+            // Right Bucket:   |======|
+            // Left Bucket:       |======|
+            if (leftBucket.ValueEnd.IsLargerThanOrEqual(rightBucket.ValueStart) && leftBucket.ValueEnd.IsLessThanOrEqual(rightBucket.ValueEnd))
                 return true;
             return false;
         }

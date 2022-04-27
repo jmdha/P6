@@ -30,7 +30,11 @@ namespace QueryOptimiser
                 for (int i = 0; i < parserResult.Filters.Count; i++)
                     intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Filters[i], intermediateTable));
                 for (int i = 0; i < parserResult.Joins.Count; i++)
-                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Joins[i], intermediateTable));
+                {
+                    IntermediateTable tempTable = EstimateCalculator.EstimateIntermediateTable(parserResult.Joins[i], intermediateTable);
+                    intermediateTable = UpdateTable(intermediateTable, tempTable);
+                }
+                    
             }
             catch (Exception ex)
             {
@@ -38,7 +42,7 @@ namespace QueryOptimiser
             }
             
 
-            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), parserResult.Nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
+            return new OptimiserResult((ulong)intermediateTable.RowEstimate, parserResult.Nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
         }
 
         private IntermediateTable UpdateTable(IntermediateTable formerTable, IntermediateTable newTable)

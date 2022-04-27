@@ -87,7 +87,7 @@ namespace QueryOptimiserTest.Models
             var table = new IntermediateTable(buckets, references);
 
             // ACT
-            var result = table.GetRowEstimate();
+            var result = table.RowEstimate;
 
             // ASSERT
             Assert.AreEqual(expEst, result);
@@ -132,7 +132,7 @@ namespace QueryOptimiserTest.Models
             var table = new IntermediateTable(buckets, references);
 
             // ACT
-            var result = table.GetRowEstimate();
+            var result = table.RowEstimate;
 
             // ASSERT
             Assert.AreEqual(expEst, result);

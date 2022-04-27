@@ -15,6 +15,7 @@ namespace QueryOptimiser.Models
     public class IntermediateBucket
     {
         internal DualDictionary<TableAttribute, BucketEstimate> Buckets { get; } = new DualDictionary<TableAttribute, BucketEstimate>();
+        internal long RowEstimate { get => GetEstimateOfAllBuckets(); }
 
         public IntermediateBucket() { }
 
@@ -24,7 +25,7 @@ namespace QueryOptimiser.Models
             AddBucketsIfNotThere(bucket2);
         }
 
-        internal long GetEstimateOfAllBuckets()
+        private long GetEstimateOfAllBuckets()
         {
             long count = 1;
             foreach (var tableAttribute in Buckets.Keys)

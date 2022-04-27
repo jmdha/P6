@@ -142,7 +142,7 @@ namespace QueryOptimiserTest.Models
             ibucket1.AddBucketIfNotThere(refe2, ebucket2);
 
             // ACT
-            var result = ibucket1.GetEstimateOfAllBuckets();
+            var result = ibucket1.RowEstimate;
 
             // ASSERT
             Assert.AreEqual(expEst, result);
