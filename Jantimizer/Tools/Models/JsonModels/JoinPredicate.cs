@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tools.Models.JsonModels
 {
-    public class JoinPredicate
+    public class JoinPredicate : ICloneable
     {
         public TableAttribute LeftAttribute { get; set; }
         public TableAttribute RightAttribute { get; set; }
@@ -18,12 +18,14 @@ namespace Tools.Models.JsonModels
             RightAttribute = rightAttribute;
             ComType = comType;
         }
+
         public JoinPredicate()
         {
             LeftAttribute = new TableAttribute();
             RightAttribute = new TableAttribute();
             ComType = "";
         }
+
         public ComparisonType.Type GetComType()
         {
             return ComparisonType.GetOperatorType(ComType);
@@ -40,6 +42,14 @@ namespace Tools.Models.JsonModels
         public override int GetHashCode()
         {
             return LeftAttribute.GetHashCode() + RightAttribute.GetHashCode() + HashCode.Combine(ComType);
+        }
+
+        public object Clone()
+        {
+            if (LeftAttribute.Clone() is TableAttribute left)
+                if (RightAttribute.Clone() is TableAttribute right)
+                    return new JoinPredicate(left, right, ComType);
+            throw new ArgumentNullException("Could not clone");
         }
     }
 }

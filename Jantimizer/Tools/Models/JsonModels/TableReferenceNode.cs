@@ -1,6 +1,6 @@
 ﻿namespace Tools.Models.JsonModels
 {
-    public class TableReferenceNode : INode
+    public class TableReferenceNode : INode, ICloneable
     {
         public string TableName { get; set; }
         public string Alias { get; set; }

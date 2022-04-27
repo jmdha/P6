@@ -27,7 +27,14 @@ namespace Tools.Models.JsonModels
 
         public object Clone()
         {
-            throw new NotImplementedException();
+            var newList = new List<JoinPredicate>();
+            foreach(var pred in Predicates)
+                if (pred.Clone() is JoinPredicate clone)
+                    newList.Add(clone);
+            if (LeftTable.Clone() is TableReferenceNode left)
+                if (RightTable.Clone() is TableReferenceNode right)
+                    return new JoinNode(left, right, newList);
+            throw new ArgumentNullException("Could not clone");
         }
 
         public override bool Equals(object? obj)
@@ -40,7 +47,10 @@ namespace Tools.Models.JsonModels
 
         public override int GetHashCode()
         {
-            return LeftTable.GetHashCode() + RightTable.GetHashCode() + Predicates.GetHashCode();
+            int hash = 0;
+            foreach (var pred in Predicates)
+                hash += pred.GetHashCode();
+            return hash + LeftTable.GetHashCode() + RightTable.GetHashCode();
         }
     }
 }
