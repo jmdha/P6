@@ -11,6 +11,7 @@ namespace Tools.Models.JsonModels
     {
         public List<JoinNode> JoinNodes { get; set; }
         public string EquivalentSQLQuery { get; set; }
+        public bool DoRun { get; set; }
         public List<INode> Nodes { get {
                 var newList = new List<INode>();
                 newList.AddRange(JoinNodes);
@@ -22,12 +23,14 @@ namespace Tools.Models.JsonModels
         {
             JoinNodes = new List<JoinNode>();
             EquivalentSQLQuery = "";
+            DoRun = false;
         }
 
-        public JsonQuery(List<JoinNode> joinNodes, string equivalentSQLQuery)
+        public JsonQuery(List<JoinNode> joinNodes, string equivalentSQLQuery, bool doRun)
         {
             JoinNodes = joinNodes;
             EquivalentSQLQuery = equivalentSQLQuery;
+            DoRun = doRun;
         }
 
         public JsonQuery(string fileText)
@@ -37,6 +40,7 @@ namespace Tools.Models.JsonModels
             {
                 JoinNodes = jsonQuery.JoinNodes;
                 EquivalentSQLQuery = jsonQuery.EquivalentSQLQuery;
+                DoRun = jsonQuery.DoRun;
             }
             else
                 throw new JsonException("Could not parse the json file!");

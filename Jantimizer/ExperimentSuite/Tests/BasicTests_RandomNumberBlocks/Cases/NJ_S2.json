@@ -1,6 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON (a.v > b.v AND a.v < 50)",
-  "DoRun": false,
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON b.v < a.v",
+  "DoRun": true,
   "JoinNodes": [
     {
       "Predicates": [
@@ -20,20 +20,6 @@
               },
               "Attribute": "v"
             }
-          },
-          "ComType": ">"
-        },
-        {
-          "LeftAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "a"
-              },
-              "Attribute": "v"
-            }
-          },
-          "RightAttribute": {
-            "ConstantValue": "50"
           },
           "ComType": "<"
         }

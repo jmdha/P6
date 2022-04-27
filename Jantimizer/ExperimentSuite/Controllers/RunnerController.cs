@@ -210,6 +210,8 @@ namespace ExperimentSuite.Controllers
                 using (var reader = new StreamReader(queryFile.FullName))
                 {
                     var jsonQuery = new JsonQuery(await reader.ReadToEndAsync());
+                    if (!jsonQuery.DoRun)
+                        continue;
                     RunData.HistoManager.UsedHistograms.Histograms.Clear();
 
                     // Get Cache

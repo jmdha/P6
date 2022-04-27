@@ -1,6 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM (a JOIN b ON (a.v > b.v AND a.v < 50)) JOIN c ON (a.v < c.v AND b.v < c.v)",
-  "DoRun": false,
+  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON b.v < a.v) JOIN c ON c.v < b.v) JOIN d ON d.v < c.v",
+  "DoRun": true,
   "JoinNodes": [
     {
       "Predicates": [
@@ -21,19 +21,28 @@
               "Attribute": "v"
             }
           },
-          "ComType": ">"
-        },
+          "ComType": "<"
+        }
+      ]
+    },
+    {
+      "Predicates": [
         {
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "a"
+                "TableName": "c"
               },
               "Attribute": "v"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "50"
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
           },
           "ComType": "<"
         }
@@ -45,26 +54,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "a"
-              },
-              "Attribute": "v"
-            }
-          },
-          "RightAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "c"
-              },
-              "Attribute": "v"
-            }
-          },
-          "ComType": "<"
-        },
-        {
-          "LeftAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "b"
+                "TableName": "d"
               },
               "Attribute": "v"
             }
