@@ -29,19 +29,19 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             if (node is JoinNode joinNode)
                 return EstimateJoinTable(joinNode, intermediateTable);
-            else if (node is FilterNode filterNode)
-                return EstimateFilterTable(filterNode, intermediateTable);
+            //else if (node is FilterNode filterNode)
+            //    return EstimateFilterTable(filterNode, intermediateTable);
             else
                 throw new ArgumentException("Non handled node type " + node.ToString());
         }
 
         #region Filter
-        internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
-        {
-            List<IHistogramBucket> buckets = GetBuckets(node.FilterAttribute, intermediateTable);
-            List<IntermediateBucket> intermediateBuckets = FilterMatcher.GetMatches(node, buckets);
-            return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { node.FilterAttribute });
-        }
+        //internal IntermediateTable EstimateFilterTable(FilterNode node, IntermediateTable intermediateTable)
+        //{
+        //    List<IHistogramBucket> buckets = GetBuckets(node.FilterAttribute, intermediateTable);
+        //    List<IntermediateBucket> intermediateBuckets = FilterMatcher.GetMatches(node, buckets);
+        //    return new IntermediateTable(intermediateBuckets, new List<TableAttribute>() { node.FilterAttribute });
+        //}
         #endregion
 
         #region Join

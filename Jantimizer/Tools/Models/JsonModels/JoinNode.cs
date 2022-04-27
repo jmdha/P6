@@ -57,5 +57,18 @@ namespace Tools.Models.JsonModels
                 hash += table.GetHashCode();
             return hash;
         }
+
+        public override string? ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("Tables used: [");
+            foreach (var table in Tables)
+                sb.Append($" {table} ");
+            sb.AppendLine("]");
+            sb.AppendLine("Predicates:");
+            foreach(var pred in Predicates)
+                sb.AppendLine(pred.ToString());
+            return sb.ToString();
+        }
     }
 }

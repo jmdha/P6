@@ -38,5 +38,14 @@ namespace Tools.Models.JsonModels
                 return new PredicateNode(ConstantValue);
             throw new ArgumentException("Could not clone");
         }
+
+        public override string? ToString()
+        {
+            if (Attribute != null)
+                return $"Attribute: {Attribute}";
+            if (ConstantValue != null)
+                return $"Constant: {ConstantValue}";
+            return "";
+        }
     }
 }

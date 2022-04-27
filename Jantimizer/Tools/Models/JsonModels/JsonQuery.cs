@@ -45,5 +45,16 @@ namespace Tools.Models.JsonModels
             else
                 throw new JsonException("Could not parse the json file!");
         }
+
+        public override string? ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"SQL Equivalent Query: {EquivalentSQLQuery}");
+            sb.AppendLine($"Do run?: {DoRun}");
+            sb.AppendLine($"Nodes ({Nodes.Count}):");
+            foreach (var node in Nodes)
+                sb.AppendLine(node.ToString());
+            return sb.ToString();
+        }
     }
 }

@@ -41,5 +41,10 @@ namespace Tools.Models.JsonModels
                 return new TableAttribute(node, Attribute);
             throw new ArgumentNullException("Could not clone");
         }
+
+        public override string? ToString()
+        {
+            return $"({Table}).{Attribute}";
+        }
     }
 }

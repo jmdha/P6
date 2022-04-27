@@ -51,5 +51,14 @@ namespace Tools.Models.JsonModels
                     return new JoinPredicate(left, right, ComType);
             throw new ArgumentNullException("Could not clone");
         }
+
+        public override string? ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Left Attribute: {LeftAttribute}");
+            sb.AppendLine($"Right Attribute: {RightAttribute}");
+            sb.AppendLine($"Comparison Type: {ComType}");
+            return sb.ToString();
+        }
     }
 }
