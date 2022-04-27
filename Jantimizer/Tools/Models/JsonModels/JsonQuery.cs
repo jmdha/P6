@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Tools.Models.JsonModels
@@ -24,6 +25,19 @@ namespace Tools.Models.JsonModels
             JoinNodes = joinNodes;
             FilterNodes = filterNodes;
             EquivalentSQLQuery = equivalentSQLQuery;
+        }
+
+        public JsonQuery(string fileText)
+        {
+            var jsonQuery = JsonSerializer.Deserialize<JsonQuery>(fileText);
+            if (jsonQuery != null)
+            {
+                JoinNodes = jsonQuery.JoinNodes;
+                FilterNodes = jsonQuery.FilterNodes;
+                EquivalentSQLQuery = jsonQuery.EquivalentSQLQuery;
+            }
+            else
+                throw new JsonException("Could not parse the json file!");
         }
     }
 }
