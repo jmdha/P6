@@ -46,6 +46,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Tests\COVID_Funding\Cases\" />
     <Folder Include="UserControls\CacheViewer\Controls\" />
     <Folder Include="UserControls\TestRunner\Controls\" />
   </ItemGroup>
