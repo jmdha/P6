@@ -49,7 +49,7 @@ namespace QueryParser.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Predicate, Relation.GetHashCode());
+            return Relation.GetHashCode() + HashCode.Combine(Predicate);
         }
 
         public object Clone()

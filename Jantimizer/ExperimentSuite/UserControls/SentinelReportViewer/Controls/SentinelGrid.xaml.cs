@@ -48,11 +48,14 @@ namespace ExperimentSuite.UserControls.SentinelReportViewer.Controls
             tickCount--;
             if (tickCount < 0)
             {
-                _logs.Clear();
-                _logs.AddRange(_sentinel.SentinelLog);
-                currentItemCount = _logs.Count;
-                MainDataGrid.ItemsSource = null;
-                MainDataGrid.ItemsSource = _logs;
+                if (_sentinel.SentinelLog.Count != _logs.Count)
+                {
+                    _logs.Clear();
+                    _logs.AddRange(_sentinel.SentinelLog);
+                    currentItemCount = _logs.Count;
+                    MainDataGrid.ItemsSource = null;
+                    MainDataGrid.ItemsSource = _logs;
+                }
                 tickCount = maxTickCount;
             }
         }

@@ -20,6 +20,7 @@ namespace QueryParser.QueryParsers
             } 
         }
         public string FromQuery { get; set; }
+        public string FromExplain { get; set; }
 
         public ParserResult()
         {
@@ -27,19 +28,22 @@ namespace QueryParser.QueryParsers
             Joins = new List<JoinNode>();
             Filters = new List<FilterNode>();
             FromQuery = "";
+            FromExplain = "";
         }
 
-        public ParserResult(string fromQuery) : this()
+        public ParserResult(string fromQuery, string fromExplain) : this()
         {
             FromQuery = fromQuery;
+            FromExplain = fromExplain;
         }
 
-        public ParserResult(List<JoinNode> joinNodes, List<FilterNode> filterNodes, Dictionary<string, TableReferenceNode> tables, string fromQuery)
+        public ParserResult(List<JoinNode> joinNodes, List<FilterNode> filterNodes, Dictionary<string, TableReferenceNode> tables, string fromQuery, string fromExplain)
         {
             Tables = tables;
             Joins = joinNodes;
             Filters = filterNodes;
             FromQuery = fromQuery;
+            FromExplain = fromExplain;
         }
 
         public TableReferenceNode GetTableRef(string alias)
@@ -56,6 +60,8 @@ namespace QueryParser.QueryParsers
 
             sb.AppendLine("Input Query: ");
             sb.AppendLine(FromQuery);
+            sb.AppendLine("From Explain text: ");
+            sb.AppendLine(FromExplain);
             sb.AppendLine("Nodes:");
             foreach (var node in Nodes)
                 sb.AppendLine($"\t{node}");
@@ -97,7 +103,7 @@ namespace QueryParser.QueryParsers
             foreach (var key in Tables.Keys)
                 if (Tables[key].Clone() is TableReferenceNode clone)
                     newDict.Add(key, clone);
-            return new ParserResult(newJoinList, newFilterList, newDict, FromQuery);
+            return new ParserResult(newJoinList, newFilterList, newDict, FromQuery, FromExplain);
         }
     }
 }

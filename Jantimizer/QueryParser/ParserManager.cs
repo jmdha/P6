@@ -35,7 +35,7 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new ParserResult(query);
+            return new ParserResult(query, "");
         }
 
         public async Task<ParserResult> ParseQueryAsync(JsonQuery query, bool throwIfNotFound = true)
@@ -54,7 +54,7 @@ namespace QueryParser
             }
             if (throwIfNotFound)
                 throw new ParserErrorLogException(new ParserManagerException("Error, no valid parser found for the query!"), QueryParsers, query);
-            return new ParserResult(query);
+            return new ParserResult(query, "");
         }
 
         public ParserResult ParseQuerySpecific<T>(JsonQuery query, T parser) where T : IQueryParser

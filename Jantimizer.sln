@@ -2,31 +2,39 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParser", "Jantimizer\QueryParser\QueryParser.csproj", "{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Jantimizer\Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParserTests", "QueryPlanParserTests\QueryPlanParserTests.csproj", "{96FB8101-5B1B-4B0F-93CC-634E7961F782}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "Jantimizer\QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "DatabaseConnector\DatabaseConnector.csproj", "{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParserTests", "Jantimizer\QueryPlanParserTests\QueryPlanParserTests.csproj", "{96FB8101-5B1B-4B0F-93CC-634E7961F782}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "QueryOptimiser\QueryOptimiser.csproj", "{6BA92D63-FB2E-4283-94A9-898A816CC9E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "Jantimizer\DatabaseConnector\DatabaseConnector.csproj", "{07D2F8BD-EED5-4EA1-BDE8-FA2F8973AFA6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "QueryOptimiserTest\QueryOptimiserTest.csproj", "{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "Jantimizer\QueryOptimiser\QueryOptimiser.csproj", "{6BA92D63-FB2E-4283-94A9-898A816CC9E6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrintUtilities", "PrintUtilities\PrintUtilities.csproj", "{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "Jantimizer\QueryOptimiserTest\QueryOptimiserTest.csproj", "{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Jantimizer\Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "Jantimizer\HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "Jantimizer\DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolsTests", "ToolsTests\ToolsTests.csproj", "{1D7B992B-10E6-4D59-88AC-776DE1F683C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "Jantimizer\QueryParserTest\QueryParserTest.csproj", "{99113765-9490-4A5F-B7F8-96632015C7FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExperimentSuite", "ExperimentSuite\ExperimentSuite.csproj", "{E63110D1-2884-40AA-B48F-AF25D68A49B6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolsTests", "Jantimizer\ToolsTests\ToolsTests.csproj", "{1D7B992B-10E6-4D59-88AC-776DE1F683C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResultsSentinel", "ResultsSentinel\ResultsSentinel.csproj", "{BADBF216-E3D3-4BA5-9E86-435FC0D75A94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExperimentSuite", "Jantimizer\ExperimentSuite\ExperimentSuite.csproj", "{E63110D1-2884-40AA-B48F-AF25D68A49B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResultsSentinel", "Jantimizer\ResultsSentinel\ResultsSentinel.csproj", "{BADBF216-E3D3-4BA5-9E86-435FC0D75A94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{790AB211-E66A-402E-BE92-E4924BFEDCCB}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +42,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,10 +70,6 @@ Global
 		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B09E06B9-86EE-4FE6-A95F-E923B18CD67B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -74,6 +82,10 @@ Global
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
