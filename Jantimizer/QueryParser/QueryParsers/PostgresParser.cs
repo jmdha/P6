@@ -86,6 +86,7 @@ namespace QueryParser.QueryParsers
         internal ParserResult AnalyseExplanationText(string explanationText)
         {
             var result = new ParserResult();
+            result.FromExplain = explanationText;
 
             InsertTables(explanationText, ref result);
             InsertFilters(explanationText, ref result);
