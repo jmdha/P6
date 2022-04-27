@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tools.Models.JsonModels
 {
-    public class TableAttribute
+    public class TableAttribute : ICloneable
     {
         public TableReferenceNode Table { get; set; }
         public string Attribute { get; set; }
@@ -32,6 +32,14 @@ namespace Tools.Models.JsonModels
         public override int GetHashCode()
         {
             return Table.GetHashCode() + HashCode.Combine(Attribute);
+        }
+
+        public object Clone()
+        {
+            var tableClone = Table.Clone();
+            if (tableClone is TableReferenceNode node)
+                return new TableAttribute(node, Attribute);
+            throw new ArgumentNullException("Could not clone");
         }
     }
 }

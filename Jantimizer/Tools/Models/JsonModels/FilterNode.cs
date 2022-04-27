@@ -33,7 +33,10 @@ namespace Tools.Models.JsonModels
 
         public object Clone()
         {
-            throw new NotImplementedException();
+            var tableClone = FilterAttribute.Clone();
+            if (tableClone is TableAttribute node)
+                return new FilterNode(node, ComType, Constant);
+            throw new ArgumentNullException("Could not clone");
         }
 
         public override bool Equals(object? obj)
