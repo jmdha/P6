@@ -1,6 +1,7 @@
 ﻿using QueryOptimiser.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace QueryOptimiser.Helpers
             return buckets;
         }
 
-        internal static bool DoesOverlap(TableAttribute tableAttribute, IntermediateBucket bucket1, IntermediateBucket bucket2)
+        internal static bool DoesOverlap(TableAttributeDictRef tableAttribute, IntermediateBucket bucket1, IntermediateBucket bucket2)
         {
             if (bucket1.Buckets.DoesContain(tableAttribute) && bucket2.Buckets.DoesContain(tableAttribute))
             {

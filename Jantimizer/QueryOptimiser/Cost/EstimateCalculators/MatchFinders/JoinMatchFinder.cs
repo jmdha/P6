@@ -19,7 +19,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 
         internal List<IntermediateBucket> GetMatches(JoinPredicate predicate, List<IHistogramBucket> leftBuckets, List<IHistogramBucket> rightBuckets)
         {
-            switch (predicate.ComType)
+            switch (predicate.GetComType())
             {
                 case ComparisonType.Type.Equal:
                     return GetEqualityMatches(predicate, leftBuckets, rightBuckets);
@@ -92,7 +92,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             {
                 for (int j = rightCutoff; j < rightBuckets.Count; j++)
                 {
-                    MatchType matchType = DoesMatch(predicate.ComType, leftBuckets[i], rightBuckets[j]);
+                    MatchType matchType = DoesMatch(predicate.GetComType(), leftBuckets[i], rightBuckets[j]);
                     
                     if (matchType == MatchType.Match || matchType == MatchType.Overlap)
                         buckets.Add(MakeNewIntermediateBucket(matchType, predicate, leftBuckets[i], rightBuckets[j]));
@@ -110,7 +110,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
         {
             return MakeNewIntermediateBucket(
                 new List<TableAttribute>() { predicate.LeftAttribute, predicate.RightAttribute },
-                new List<BucketEstimate>() { GetEstimate(matchType, predicate.ComType, leftBucket, rightBucket), GetEstimate(matchType, predicate.ComType, rightBucket, leftBucket) }
+                new List<BucketEstimate>() { GetEstimate(matchType, predicate.GetComType(), leftBucket, rightBucket), GetEstimate(matchType, predicate.GetComType(), rightBucket, leftBucket) }
                 );
         }
 

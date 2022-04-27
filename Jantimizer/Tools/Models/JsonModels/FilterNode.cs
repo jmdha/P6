@@ -18,6 +18,12 @@ namespace Tools.Models.JsonModels
             ComType = comType;
             Constant = constant;
         }
+        public FilterNode()
+        {
+            FilterAttribute = new TableAttribute();
+            ComType = ComparisonType.Type.None;
+            Constant = "";
+        }
 
         public object Clone()
         {

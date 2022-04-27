@@ -15,10 +15,17 @@
             TableName = tableName;
             Alias = tableName;
         }
+        public TableReferenceNode()
+        {
+            TableName = "";
+            Alias = "";
+        }
 
         public override string ToString()
         {
             if (Alias == TableName)
+                return TableName;
+            if (Alias == "")
                 return TableName;
 
             return $"{TableName} AS {Alias}";

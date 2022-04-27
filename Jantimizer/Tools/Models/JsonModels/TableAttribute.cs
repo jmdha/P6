@@ -16,5 +16,10 @@ namespace Tools.Models.JsonModels
             Table = table;
             Attribute = attribute;
         }
+        public TableAttribute()
+        {
+            Table = new TableReferenceNode();
+            Attribute = "";
+        }
     }
 }

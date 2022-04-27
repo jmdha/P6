@@ -5,7 +5,6 @@ using QueryOptimiser.Cost.EstimateCalculators;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Exceptions;
 using QueryOptimiser.Models;
-using QueryParser.Models;
 
 namespace QueryOptimiser
 {

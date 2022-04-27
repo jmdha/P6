@@ -18,6 +18,12 @@ namespace Tools.Models.JsonModels
             RightTable = rightTable;
             Predicates = predicates;
         }
+        public JoinNode()
+        {
+            LeftTable = new TableReferenceNode();
+            RightTable = new TableReferenceNode();
+            Predicates = new List<JoinPredicate>();
+        }
 
         public object Clone()
         {

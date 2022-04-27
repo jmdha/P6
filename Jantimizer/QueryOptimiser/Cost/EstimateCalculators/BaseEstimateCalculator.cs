@@ -47,40 +47,27 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         #region Join
         internal IntermediateTable EstimateJoinTable(JoinNode node, IntermediateTable table)
         {
-            if (node.Relation == null)
-                throw new ArgumentException("node relation is not allowed to be null " + node.ToString());
-
-            BucketMatches bucketMatches = GetBucketMatchesFromRelation(node.Relation, table);
+            BucketMatches bucketMatches = GetBucketMatchesFromRelation(node.Predicates, table);
             return new IntermediateTable(bucketMatches.Buckets, bucketMatches.References);
         }
 
-        internal BucketMatches GetBucketMatchesFromRelation(JoinPredicateRelation relation, IntermediateTable table)
+        internal BucketMatches GetBucketMatchesFromRelation(List<JoinPredicate> predicates, IntermediateTable table)
         {
-            if (relation.Type == RelationType.Type.Predicate && relation.LeafPredicate != null)
-                return GetBucketMatchesFromPredicate(relation.LeafPredicate, table);
-            else if (relation.LeftRelation != null && relation.RightRelation != null)
+            if (predicates.Count > 1)
             {
-                BucketMatches leftMatches = GetBucketMatchesFromRelation(relation.LeftRelation, table);
-                BucketMatches rightMatches = GetBucketMatchesFromRelation(relation.RightRelation, table);
+                BucketMatches leftMatches = GetBucketMatchesFromRelation(new List<JoinPredicate>() { predicates[0] }, table);
+                BucketMatches rightMatches = GetBucketMatchesFromRelation(new List<JoinPredicate>(predicates.GetRange(1, predicates.Count - 1)), table);
 
                 BucketMatches overlap = new BucketMatches();
-                if (relation.Type == RelationType.Type.And)
-                {
-                    overlap.Buckets = BucketHelper.MergeOnOverlap(leftMatches.Buckets, rightMatches.Buckets);
-                    overlap.References = GetOverlappingReferences(leftMatches.References, rightMatches.References);
-                }
-                else if (relation.Type == RelationType.Type.Or)
-                {
-                    overlap.Buckets.AddRange(leftMatches.Buckets);
-                    overlap.Buckets.AddRange(rightMatches.Buckets);
-                    overlap.References.AddRange(leftMatches.References);
-                    overlap.References.AddRange(rightMatches.References);
-                }
-
+                overlap.Buckets = BucketHelper.MergeOnOverlap(leftMatches.Buckets, rightMatches.Buckets);
+                overlap.References = GetOverlappingReferences(leftMatches.References, rightMatches.References);
                 return overlap;
             }
-            else
-                throw new ArgumentException("Missing noderelation type " + relation.ToString());
+            else if (predicates.Count == 1)
+            {
+                return GetBucketMatchesFromPredicate(predicates[0], table);
+            }
+            throw new ArgumentException("Could not calculate bucket match!");
         }
 
         internal BucketMatches GetBucketMatchesFromPredicate(JoinPredicate predicate, IntermediateTable table)
@@ -90,7 +77,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators
                 predicate.LeftAttribute,
                 predicate.RightAttribute,
                 table);
-            PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.ComType, bucketPair.LeftBuckets, bucketPair.RightBuckets);
+            PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.GetComType(), bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
             if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0)
             {

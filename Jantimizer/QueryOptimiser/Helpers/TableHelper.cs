@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiser.Helpers
 {
@@ -31,15 +32,16 @@ namespace QueryOptimiser.Helpers
 
         internal static IntermediateTable JoinWithOverlap(IntermediateTable it, IntermediateTable it1, IntermediateTable it2, TableAttribute tableAttribute)
         {
+            var key = new TableAttributeDictRef(tableAttribute.Table.TableName, tableAttribute.Attribute);
             foreach (var bucket1 in it1.Buckets)
             {
-                if (!bucket1.Buckets.DoesContain(tableAttribute))
+                if (!bucket1.Buckets.DoesContain(key))
                     continue;
                 foreach (var bucket2 in it2.Buckets)
                 {
-                    if (!bucket2.Buckets.DoesContain(tableAttribute))
+                    if (!bucket2.Buckets.DoesContain(key))
                         continue;
-                    if (BucketHelper.DoesOverlap(tableAttribute, bucket1, bucket2))
+                    if (BucketHelper.DoesOverlap(key, bucket1, bucket2))
                         it.Buckets.Add(BucketHelper.Merge(bucket1, bucket2));
                 }
             }

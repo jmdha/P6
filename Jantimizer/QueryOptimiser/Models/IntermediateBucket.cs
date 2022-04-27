@@ -1,5 +1,4 @@
 ﻿using Histograms.Models;
-using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.Dictionaries;
+using Tools.Models.JsonModels;
 
 [assembly:InternalsVisibleTo("QueryOptimiserTest")]
 
@@ -14,7 +14,7 @@ namespace QueryOptimiser.Models
 {
     public class IntermediateBucket
     {
-        internal DualDictionary<TableAttribute, BucketEstimate> Buckets { get; } = new DualDictionary<TableAttribute, BucketEstimate>();
+        internal DualDictionary<TableAttributeDictRef, BucketEstimate> Buckets { get; } = new DualDictionary<TableAttributeDictRef, BucketEstimate>();
 
         public IntermediateBucket() { }
 
@@ -40,8 +40,14 @@ namespace QueryOptimiser.Models
 
         internal void AddBucketIfNotThere(TableAttribute tableAttribute, BucketEstimate bucket)
         {
-            if (!Buckets.DoesContain(tableAttribute))
-                Buckets.Add(tableAttribute, bucket);
+            var key = new TableAttributeDictRef(tableAttribute.Table.TableName, tableAttribute.Attribute);
+            AddBucketIfNotThere(key, bucket);
+        }
+
+        internal void AddBucketIfNotThere(TableAttributeDictRef key, BucketEstimate bucket)
+        {
+            if (!Buckets.DoesContain(key))
+                Buckets.Add(key, bucket);
         }
 
         public override bool Equals(object? obj)
