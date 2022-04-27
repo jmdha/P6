@@ -1,6 +1,6 @@
 ﻿# Histograms
 
-There will be an implementation for each of the histogram types and connector type. Histograms can then be made based on the setup SQL file givne.
+There will be an implementation for each of the histogram types and connector type. Histograms can then be made based on the setup SQL file given.
 
 # Example Usage
 
