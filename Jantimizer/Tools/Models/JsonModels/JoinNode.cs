@@ -29,5 +29,18 @@ namespace Tools.Models.JsonModels
         {
             throw new NotImplementedException();
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is JoinNode node &&
+                   EqualityComparer<TableReferenceNode>.Default.Equals(LeftTable, node.LeftTable) &&
+                   EqualityComparer<TableReferenceNode>.Default.Equals(RightTable, node.RightTable) &&
+                   EqualityComparer<List<JoinPredicate>>.Default.Equals(Predicates, node.Predicates);
+        }
+
+        public override int GetHashCode()
+        {
+            return LeftTable.GetHashCode() + RightTable.GetHashCode() + Predicates.GetHashCode();
+        }
     }
 }

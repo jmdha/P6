@@ -21,5 +21,17 @@ namespace Tools.Models.JsonModels
             Table = new TableReferenceNode();
             Attribute = "";
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is TableAttribute attribute &&
+                   EqualityComparer<TableReferenceNode>.Default.Equals(Table, attribute.Table) &&
+                   Attribute == attribute.Attribute;
+        }
+
+        public override int GetHashCode()
+        {
+            return Table.GetHashCode() + HashCode.Combine(Attribute);
+        }
     }
 }

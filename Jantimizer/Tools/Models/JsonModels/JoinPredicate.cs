@@ -28,5 +28,18 @@ namespace Tools.Models.JsonModels
         {
             return ComparisonType.GetOperatorType(ComType);
         }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is JoinPredicate predicate &&
+                   EqualityComparer<TableAttribute>.Default.Equals(LeftAttribute, predicate.LeftAttribute) &&
+                   EqualityComparer<TableAttribute>.Default.Equals(RightAttribute, predicate.RightAttribute) &&
+                   ComType == predicate.ComType;
+        }
+
+        public override int GetHashCode()
+        {
+            return LeftAttribute.GetHashCode() + RightAttribute.GetHashCode() + HashCode.Combine(ComType);
+        }
     }
 }
