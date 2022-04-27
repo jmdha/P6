@@ -1,48 +1,42 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON (a.v >= b.v AND a.v <= b.v)",
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON (a.v > b.v AND a.v < 50)",
   "JoinNodes": [
     {
-      "LeftTable": {
-        "TableName": "a"
-      },
-      "RightTable": {
-        "TableName": "b"
-      },
       "Predicates": [
         {
           "LeftAttribute": {
-            "Table": {
-              "TableName": "a"
-            },
-            "Attribute": "v"
+            "Attribute": {
+              "Table": {
+                "TableName": "a"
+              },
+              "Attribute": "v"
+            }
           },
           "RightAttribute": {
-            "Table": {
-              "TableName": "b"
-            },
-            "Attribute": "v"
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
           },
-          "ComType": ">="
+          "ComType": ">"
         },
         {
           "LeftAttribute": {
-            "Table": {
-              "TableName": "a"
-            },
-            "Attribute": "v"
+            "Attribute": {
+              "Table": {
+                "TableName": "a"
+              },
+              "Attribute": "v"
+            }
           },
           "RightAttribute": {
-            "Table": {
-              "TableName": "b"
-            },
-            "Attribute": "v"
+            "ConstantValue": "50"
           },
-          "ComType": "<="
+          "ComType": "<"
         }
       ]
     }
-  ],
-  "FilterNodes": [
-
   ]
 }

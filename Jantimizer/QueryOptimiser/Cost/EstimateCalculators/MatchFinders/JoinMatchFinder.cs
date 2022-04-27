@@ -109,7 +109,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
         internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             return MakeNewIntermediateBucket(
-                new List<TableAttribute>() { predicate.LeftAttribute, predicate.RightAttribute },
+                new List<TableAttribute>() { predicate.LeftAttribute.Attribute!, predicate.RightAttribute.Attribute! },
                 new List<BucketEstimate>() { GetEstimate(matchType, predicate.GetComType(), leftBucket, rightBucket), GetEstimate(matchType, predicate.GetComType(), rightBucket, leftBucket) }
                 );
         }

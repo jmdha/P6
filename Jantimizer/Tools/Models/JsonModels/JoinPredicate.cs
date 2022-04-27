@@ -8,11 +8,11 @@ namespace Tools.Models.JsonModels
 {
     public class JoinPredicate : ICloneable
     {
-        public TableAttribute LeftAttribute { get; set; }
-        public TableAttribute RightAttribute { get; set; }
+        public PredicateNode LeftAttribute { get; set; }
+        public PredicateNode RightAttribute { get; set; }
         public string ComType { get; set; }
 
-        public JoinPredicate(TableAttribute leftAttribute, TableAttribute rightAttribute, string comType)
+        public JoinPredicate(PredicateNode leftAttribute, PredicateNode rightAttribute, string comType)
         {
             LeftAttribute = leftAttribute;
             RightAttribute = rightAttribute;
@@ -21,8 +21,8 @@ namespace Tools.Models.JsonModels
 
         public JoinPredicate()
         {
-            LeftAttribute = new TableAttribute();
-            RightAttribute = new TableAttribute();
+            LeftAttribute = new PredicateNode();
+            RightAttribute = new PredicateNode();
             ComType = "";
         }
 
@@ -34,8 +34,8 @@ namespace Tools.Models.JsonModels
         public override bool Equals(object? obj)
         {
             return obj is JoinPredicate predicate &&
-                   EqualityComparer<TableAttribute>.Default.Equals(LeftAttribute, predicate.LeftAttribute) &&
-                   EqualityComparer<TableAttribute>.Default.Equals(RightAttribute, predicate.RightAttribute) &&
+                   EqualityComparer<PredicateNode>.Default.Equals(LeftAttribute, predicate.LeftAttribute) &&
+                   EqualityComparer<PredicateNode>.Default.Equals(RightAttribute, predicate.RightAttribute) &&
                    ComType == predicate.ComType;
         }
 
@@ -46,8 +46,8 @@ namespace Tools.Models.JsonModels
 
         public object Clone()
         {
-            if (LeftAttribute.Clone() is TableAttribute left)
-                if (RightAttribute.Clone() is TableAttribute right)
+            if (LeftAttribute.Clone() is PredicateNode left)
+                if (RightAttribute.Clone() is PredicateNode right)
                     return new JoinPredicate(left, right, ComType);
             throw new ArgumentNullException("Could not clone");
         }

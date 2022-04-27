@@ -74,15 +74,15 @@ namespace QueryOptimiser.Cost.EstimateCalculators
         {
             BucketMatches returnMatches = new BucketMatches();
             PairBucketList bucketPair = GetBucketPair(
-                predicate.LeftAttribute,
-                predicate.RightAttribute,
+                predicate.LeftAttribute.Attribute!,
+                predicate.RightAttribute.Attribute!,
                 table);
             PairBucketList bounds = BoundsFinder.GetBucketBounds(predicate.GetComType(), bucketPair.LeftBuckets, bucketPair.RightBuckets);
 
             if (bounds.LeftBuckets.Count > 0 && bounds.RightBuckets.Count > 0)
             {
-                returnMatches.References.Add(predicate.LeftAttribute);
-                returnMatches.References.Add(predicate.RightAttribute);
+                returnMatches.References.Add(predicate.LeftAttribute.Attribute!);
+                returnMatches.References.Add(predicate.RightAttribute.Attribute!);
             }
             else
                 return returnMatches;

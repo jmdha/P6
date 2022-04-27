@@ -8,20 +8,27 @@ namespace Tools.Models.JsonModels
 {
     public class JoinNode : INode
     {
-        public TableReferenceNode LeftTable { get; set; }
-        public TableReferenceNode RightTable { get; set; }
+        public List<TableReferenceNode> Tables { get {
+                var newList = new List<TableReferenceNode>();
+                foreach (var predicate in Predicates)
+                {
+                    if (predicate.LeftAttribute.Attribute != null)
+                        newList.Add(predicate.LeftAttribute.Attribute.Table);
+                    if (predicate.RightAttribute.Attribute != null)
+                        newList.Add(predicate.RightAttribute.Attribute.Table);
+                }
+                return newList;
+            } 
+        }
         public List<JoinPredicate> Predicates { get; set; }
 
-        public JoinNode(TableReferenceNode leftTable, TableReferenceNode rightTable, List<JoinPredicate> predicates)
+        public JoinNode(List<JoinPredicate> predicates)
         {
-            LeftTable = leftTable;
-            RightTable = rightTable;
             Predicates = predicates;
         }
+
         public JoinNode()
         {
-            LeftTable = new TableReferenceNode();
-            RightTable = new TableReferenceNode();
             Predicates = new List<JoinPredicate>();
         }
 
@@ -31,17 +38,13 @@ namespace Tools.Models.JsonModels
             foreach(var pred in Predicates)
                 if (pred.Clone() is JoinPredicate clone)
                     newList.Add(clone);
-            if (LeftTable.Clone() is TableReferenceNode left)
-                if (RightTable.Clone() is TableReferenceNode right)
-                    return new JoinNode(left, right, newList);
-            throw new ArgumentNullException("Could not clone");
+            return new JoinNode(newList);
         }
 
         public override bool Equals(object? obj)
         {
             return obj is JoinNode node &&
-                   EqualityComparer<TableReferenceNode>.Default.Equals(LeftTable, node.LeftTable) &&
-                   EqualityComparer<TableReferenceNode>.Default.Equals(RightTable, node.RightTable) &&
+                   EqualityComparer<List<TableReferenceNode>>.Default.Equals(Tables, node.Tables) &&
                    EqualityComparer<List<JoinPredicate>>.Default.Equals(Predicates, node.Predicates);
         }
 
@@ -50,7 +53,9 @@ namespace Tools.Models.JsonModels
             int hash = 0;
             foreach (var pred in Predicates)
                 hash += pred.GetHashCode();
-            return hash + LeftTable.GetHashCode() + RightTable.GetHashCode();
+            foreach (var table in Tables)
+                hash += table.GetHashCode();
+            return hash;
         }
     }
 }

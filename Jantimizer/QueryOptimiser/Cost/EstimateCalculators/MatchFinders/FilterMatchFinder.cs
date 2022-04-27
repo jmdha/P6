@@ -18,7 +18,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 
         internal List<IntermediateBucket> GetMatches(FilterNode node, List<IHistogramBucket> buckets)
         {
-            switch (node.ComType)
+            switch (node.GetComType())
             {
                 case ComparisonType.Type.Equal:
                     return GetEqualityMatches(node, buckets);
@@ -41,7 +41,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
                 if (DoesOverlap(node.Constant, buckets[i]))
                 {
                     matches = true;
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.FilterAttribute, MatchType.Overlap, node.ComType, node.Constant, buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.FilterAttribute, MatchType.Overlap, node.GetComType(), node.Constant, buckets[i]));
                 }
                 else if (matches)
                     break;
@@ -54,9 +54,9 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
             List<IntermediateBucket> intermediateBuckets = new List<IntermediateBucket>();
             for (int i = 0; i < buckets.Count; i++)
             {
-                MatchType type = DoesMatch(node.ComType, node.Constant, buckets[i]);
+                MatchType type = DoesMatch(node.GetComType(), node.Constant, buckets[i]);
                 if (type == MatchType.Match || type == MatchType.Overlap)
-                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.FilterAttribute, type, node.ComType, node.Constant, buckets[i]));
+                    intermediateBuckets.Add(MakeNewIntermediateBucket(node.FilterAttribute, type, node.GetComType(), node.Constant, buckets[i]));
             }
             return intermediateBuckets;
         }

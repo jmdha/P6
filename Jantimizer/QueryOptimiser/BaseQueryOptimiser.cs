@@ -26,8 +26,8 @@ namespace QueryOptimiser
             
             try
             {
-                for (int i = 0; i < jsonQuery.FilterNodes.Count; i++)
-                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(jsonQuery.FilterNodes[i], intermediateTable));
+                //for (int i = 0; i < jsonQuery.FilterNodes.Count; i++)
+                //    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(jsonQuery.FilterNodes[i], intermediateTable));
                 for (int i = 0; i < jsonQuery.JoinNodes.Count; i++)
                     intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(jsonQuery.JoinNodes[i], intermediateTable));
             }
