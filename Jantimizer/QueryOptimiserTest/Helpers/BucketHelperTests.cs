@@ -13,226 +13,226 @@ namespace QueryOptimiserTest.Helpers
     [TestClass]
     public class BucketHelperTests
     {
-        #region Merge
+        //#region Merge
 
-        [TestMethod]
-        public void Can_Merge()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_Merge()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
-            TableAttribute refe2 = new TableAttribute("c", "d");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
-            // ACT
-            var result = BucketHelper.Merge(ibucket1, ibucket2);
+        //    // ACT
+        //    var result = BucketHelper.Merge(ibucket1, ibucket2);
 
-            // ASSERT
-            Assert.AreEqual(2, result.Buckets.Keys.Count);
-            Assert.AreEqual(ibucket1.Buckets[refe1], result.Buckets[refe1]);
-            Assert.AreEqual(ibucket2.Buckets[refe2], result.Buckets[refe2]);
-        }
+        //    // ASSERT
+        //    Assert.AreEqual(2, result.Buckets.Keys.Count);
+        //    Assert.AreEqual(ibucket1.Buckets[refe1], result.Buckets[refe1]);
+        //    Assert.AreEqual(ibucket2.Buckets[refe2], result.Buckets[refe2]);
+        //}
 
-        [TestMethod]
-        public void Can_Merge_Duplicates()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_Merge_Duplicates()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
-            TableAttribute refe2 = new TableAttribute("a", "b");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
-            // ACT
-            var result = BucketHelper.Merge(ibucket1, ibucket2);
+        //    // ACT
+        //    var result = BucketHelper.Merge(ibucket1, ibucket2);
 
-            // ASSERT
-            Assert.AreEqual(1, result.Buckets.Keys.Count);
-            Assert.AreEqual(ibucket1.Buckets[refe1], result.Buckets[refe1]);
-        }
+        //    // ASSERT
+        //    Assert.AreEqual(1, result.Buckets.Keys.Count);
+        //    Assert.AreEqual(ibucket1.Buckets[refe1], result.Buckets[refe1]);
+        //}
 
-        #endregion
+        //#endregion
 
-        #region MergeOnOverlap
+        //#region MergeOnOverlap
 
-        [TestMethod]
-        public void Can_MergeOnOverlap_None()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_MergeOnOverlap_None()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
-            TableAttribute refe2 = new TableAttribute("c", "d");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
-            // ACT
-            var result = BucketHelper.MergeOnOverlap(
-                new List<IntermediateBucket>() { ibucket1 },
-                new List<IntermediateBucket>() { ibucket2 });
+        //    // ACT
+        //    var result = BucketHelper.MergeOnOverlap(
+        //        new List<IntermediateBucket>() { ibucket1 },
+        //        new List<IntermediateBucket>() { ibucket2 });
 
-            // ASSERT
-            Assert.AreEqual(0, result.Count);
-        }
+        //    // ASSERT
+        //    Assert.AreEqual(0, result.Count);
+        //}
 
-        [TestMethod]
-        public void Can_MergeOnOverlap_Single()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_MergeOnOverlap_Single()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            TableAttribute refe2 = new TableAttribute("a", "b");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
-            // ACT
-            var result = BucketHelper.MergeOnOverlap(
-                new List<IntermediateBucket>() { ibucket1 },
-                new List<IntermediateBucket>() { ibucket2 });
+        //    // ACT
+        //    var result = BucketHelper.MergeOnOverlap(
+        //        new List<IntermediateBucket>() { ibucket1 },
+        //        new List<IntermediateBucket>() { ibucket2 });
 
-            // ASSERT
-            Assert.AreEqual(1, result.Count);
-        }
+        //    // ASSERT
+        //    Assert.AreEqual(1, result.Count);
+        //}
 
-        [TestMethod]
-        public void Can_MergeOnOverlap_Multiple()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
-            TableAttribute refe2 = new TableAttribute("c", "d");
+        //[TestMethod]
+        //public void Can_MergeOnOverlap_Multiple()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 1);
+        //    TableAttribute refe2 = new TableAttribute("c", "d");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
-            ibucket1.AddBucketIfNotThere(refe2, ebucket2);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe2, ebucket2);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            TableAttribute refe3 = new TableAttribute("a", "b");
-            TableAttribute refe4 = new TableAttribute("c", "d");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    TableAttribute refe3 = new TableAttribute("a", "b");
+        //    TableAttribute refe4 = new TableAttribute("c", "d");
 
-            ibucket2.AddBucketIfNotThere(refe3, ebucket1);
-            ibucket2.AddBucketIfNotThere(refe4, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe3, ebucket1);
+        //    ibucket2.AddBucketIfNotThere(refe4, ebucket2);
 
-            // ACT
-            var result = BucketHelper.MergeOnOverlap(
-                new List<IntermediateBucket>() { ibucket1 },
-                new List<IntermediateBucket>() { ibucket2 });
+        //    // ACT
+        //    var result = BucketHelper.MergeOnOverlap(
+        //        new List<IntermediateBucket>() { ibucket1 },
+        //        new List<IntermediateBucket>() { ibucket2 });
 
-            // ASSERT
-            Assert.AreEqual(2, result.Count);
-        }
+        //    // ASSERT
+        //    Assert.AreEqual(2, result.Count);
+        //}
 
-        #endregion
+        //#endregion
 
-        #region DoesOverlap
+        //#region DoesOverlap
 
-        [TestMethod]
-        public void Can_DoesOverlap_None_1()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_DoesOverlap_None_1()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
 
-            ibucket2.AddBucketIfNotThere(refe1, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe1, ebucket2);
 
-            // ACT
-            var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
+        //    // ACT
+        //    var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
 
-            // ASSERT
-            Assert.IsFalse(result);
-        }
+        //    // ASSERT
+        //    Assert.IsFalse(result);
+        //}
 
-        [TestMethod]
-        public void Can_DoesOverlap_None_2()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_DoesOverlap_None_2()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
-            TableAttribute refe2 = new TableAttribute("b", "c");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    TableAttribute refe2 = new TableAttribute("b", "c");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket2);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket2);
 
-            // ACT
-            var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
+        //    // ACT
+        //    var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
 
-            // ASSERT
-            Assert.IsFalse(result);
-        }
+        //    // ASSERT
+        //    Assert.IsFalse(result);
+        //}
 
-        [TestMethod]
-        public void Can_DoesOverlap_Overlap()
-        {
-            // ARRANGE
-            IntermediateBucket ibucket1 = new IntermediateBucket();
-            IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
-            BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
-            TableAttribute refe1 = new TableAttribute("a", "b");
+        //[TestMethod]
+        //public void Can_DoesOverlap_Overlap()
+        //{
+        //    // ARRANGE
+        //    IntermediateBucket ibucket1 = new IntermediateBucket();
+        //    IHistogramBucket bucket1 = new HistogramBucket(0, 1, 2);
+        //    BucketEstimate ebucket1 = new BucketEstimate(bucket1, 1);
+        //    TableAttribute refe1 = new TableAttribute("a", "b");
 
-            ibucket1.AddBucketIfNotThere(refe1, ebucket1);
+        //    ibucket1.AddBucketIfNotThere(refe1, ebucket1);
 
-            IntermediateBucket ibucket2 = new IntermediateBucket();
-            IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
-            BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
-            TableAttribute refe2 = new TableAttribute("a", "b");
+        //    IntermediateBucket ibucket2 = new IntermediateBucket();
+        //    IHistogramBucket bucket2 = new HistogramBucket(1, 2, 3);
+        //    BucketEstimate ebucket2 = new BucketEstimate(bucket2, 2);
+        //    TableAttribute refe2 = new TableAttribute("a", "b");
 
-            ibucket2.AddBucketIfNotThere(refe2, ebucket1);
+        //    ibucket2.AddBucketIfNotThere(refe2, ebucket1);
 
-            // ACT
-            var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
+        //    // ACT
+        //    var result = BucketHelper.DoesOverlap(refe1, ibucket1, ibucket2);
 
-            // ASSERT
-            Assert.IsTrue(result);
-        }
+        //    // ASSERT
+        //    Assert.IsTrue(result);
+        //}
 
-        #endregion
+        //#endregion
     }
 }

@@ -2,10 +2,10 @@ using Histograms;
 using Histograms.Managers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryOptimiserTest;
-using QueryParser.Models;
 using System;
 using QueryOptimiser.Cost.Nodes;
 using Histograms.Models;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiserTest.Cost.Nodes
 {

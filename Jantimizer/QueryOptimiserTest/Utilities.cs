@@ -1,11 +1,10 @@
-﻿using QueryParser.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using QueryParser;
 using Histograms.Models;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiserTest
 {
@@ -51,31 +50,31 @@ namespace QueryOptimiserTest
             return "T" + index;
         }
 
-        static internal List<INode> GenerateNodes(int nestDepth, ComparisonType.Type type)
-        {
-            if (nestDepth < 0)
-                throw new ArgumentOutOfRangeException("NestDepth must be positive!");
+        //static internal List<INode> GenerateNodes(int nestDepth, ComparisonType.Type type)
+        //{
+        //    if (nestDepth < 0)
+        //        throw new ArgumentOutOfRangeException("NestDepth must be positive!");
 
-            var nodes = new List<INode>();
+        //    var nodes = new List<INode>();
 
-            for (int i = 1; i <= nestDepth; i ++)
-            {
-                string leftTableName = GetTableName(i - 1);
-                string rightTableName = GetTableName(i);
-                nodes.Add(
-                    new JoinNode(
-                        i - 1,
-                        $"{leftTableName} {QueryParser.Models.ComparisonType.GetOperatorString(type)} {rightTableName}",
-                        type,
-                        new TableReferenceNode(i - 1, leftTableName, leftTableName),
-                        "ID",
-                        new TableReferenceNode(i, rightTableName, rightTableName),
-                        "ID"
-                    ));
+        //    for (int i = 1; i <= nestDepth; i ++)
+        //    {
+        //        string leftTableName = GetTableName(i - 1);
+        //        string rightTableName = GetTableName(i);
+        //        nodes.Add(
+        //            new JoinNode(
+        //                i - 1,
+        //                $"{leftTableName} {QueryParser.Models.ComparisonType.GetOperatorString(type)} {rightTableName}",
+        //                type,
+        //                new TableReferenceNode(i - 1, leftTableName, leftTableName),
+        //                "ID",
+        //                new TableReferenceNode(i, rightTableName, rightTableName),
+        //                "ID"
+        //            ));
                     
-            }
+        //    }
 
-            return nodes;
-        }
+        //    return nodes;
+        //}
     }
 }

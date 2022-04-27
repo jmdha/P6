@@ -2,7 +2,6 @@
 using Histograms.Managers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryOptimiserTest;
-using QueryParser.Models;
 using System;
 using QueryOptimiser.Cost.Nodes;
 using Histograms.Models;
