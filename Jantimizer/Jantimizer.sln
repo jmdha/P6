@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParser", "QueryParser\QueryParser.csproj", "{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
@@ -24,13 +22,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "Histogra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "QueryParserTest\QueryParserTest.csproj", "{99113765-9490-4A5F-B7F8-96632015C7FE}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolsTests", "ToolsTests\ToolsTests.csproj", "{1D7B992B-10E6-4D59-88AC-776DE1F683C4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExperimentSuite", "ExperimentSuite\ExperimentSuite.csproj", "{E63110D1-2884-40AA-B48F-AF25D68A49B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResultsSentinel", "ResultsSentinel\ResultsSentinel.csproj", "{BADBF216-E3D3-4BA5-9E86-435FC0D75A94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResultsSentinel", "ResultsSentinel\ResultsSentinel.csproj", "{BADBF216-E3D3-4BA5-9E86-435FC0D75A94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +34,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,10 +74,6 @@ Global
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Release|Any CPU.ActiveCfg = Release|Any CPU

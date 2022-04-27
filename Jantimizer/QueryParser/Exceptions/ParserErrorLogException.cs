@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Exceptions;
+using Tools.Models.JsonModels;
 
 namespace QueryParser.Exceptions
 {
     public class ParserErrorLogException : BaseErrorLogException
     {
         public List<IQueryParser> Parsers { get; }
-        public string Query { get; }
+        public JsonQuery Query { get; }
 
-        public ParserErrorLogException(Exception actualException, List<IQueryParser> parsers, string query) : base(actualException)
+        public ParserErrorLogException(Exception actualException, List<IQueryParser> parsers, JsonQuery query) : base(actualException)
         {
             Parsers = parsers;
             Query = query;

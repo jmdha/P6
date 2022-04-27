@@ -1,12 +1,12 @@
 ﻿using Histograms.Models;
 using QueryOptimiser.Models;
-using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Helpers;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiser.Cost.EstimateCalculators
 {

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QueryParser.Models
+namespace Tools.Models.JsonModels
 {
     public interface INode : ICloneable
     {
-        public int Id { get; }
     }
 }

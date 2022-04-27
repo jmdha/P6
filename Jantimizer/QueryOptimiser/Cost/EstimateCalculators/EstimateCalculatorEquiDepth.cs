@@ -1,11 +1,9 @@
-﻿
-using DatabaseConnector;
+﻿using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
 using QueryOptimiser.Cost.EstimateCalculators.MatchFinders;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
-using QueryParser.Models;
 
 namespace QueryOptimiser.Cost.EstimateCalculators
 {

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace QueryParser.QueryParsers
 {
     public class ParserResult : ICloneable
     {
-        public Dictionary<string, TableReferenceNode> Tables { get; set; }
         public List<JoinNode> Joins { get; set; }
         public List<FilterNode> Filters { get; set; }
         public List<INode> Nodes { get {

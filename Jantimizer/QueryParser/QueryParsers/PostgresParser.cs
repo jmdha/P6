@@ -31,6 +31,8 @@ namespace QueryParser.QueryParsers
         {
             if (ConnectorProperties == null)
                 throw new ArgumentNullException("Connector was not set for the query parser!");
+            if (!query.ToUpper().StartsWith("SELECT "))
+                return false;
             try
             {
                 using (var connector = new PostgreSqlConnector(ConnectorProperties))
@@ -47,6 +49,8 @@ namespace QueryParser.QueryParsers
         {
             if (ConnectorProperties == null)
                 throw new ArgumentNullException("Connector was not set for the query parser!");
+            if (!query.ToUpper().StartsWith("SELECT "))
+                return false;
             try
             {
                 using (var connector = new PostgreSqlConnector(ConnectorProperties))
@@ -101,13 +105,11 @@ namespace QueryParser.QueryParsers
         {
             MatchCollection matches = TableFinder.Matches(queryExplanationTextBlock);
 
-            int id = 0;
             foreach (Match match in matches)
             {
                 string alias = GetAliasFromRegexMatch(match);
 
                 result.Tables[alias] = new TableReferenceNode(
-                    id: id++,
                     tableName: match.Groups["tableName"].Value,
                     alias: alias
                 );

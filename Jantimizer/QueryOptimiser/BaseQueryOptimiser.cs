@@ -6,8 +6,7 @@ using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Exceptions;
 using QueryOptimiser.Helpers;
 using QueryOptimiser.Models;
-using QueryParser.Models;
-using QueryParser.QueryParsers;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiser
 {
@@ -21,24 +20,24 @@ namespace QueryOptimiser
             HistogramManager = histogramManager;
         }
 
-        public OptimiserResult OptimiseQuery(ParserResult parserResult)
+        public OptimiserResult OptimiseQuery(JsonQuery jsonQuery)
         {
             IntermediateTable intermediateTable = new IntermediateTable();
             
             try
             {
-                for (int i = 0; i < parserResult.Filters.Count; i++)
-                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Filters[i], intermediateTable));
-                for (int i = 0; i < parserResult.Joins.Count; i++)
-                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(parserResult.Joins[i], intermediateTable));
+                for (int i = 0; i < jsonQuery.FilterNodes.Count; i++)
+                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(jsonQuery.FilterNodes[i], intermediateTable));
+                for (int i = 0; i < jsonQuery.JoinNodes.Count; i++)
+                    intermediateTable = UpdateTable(intermediateTable, EstimateCalculator.EstimateIntermediateTable(jsonQuery.JoinNodes[i], intermediateTable));
             }
             catch (Exception ex)
             {
-                throw new OptimiserErrorLogException(ex, this, parserResult.Nodes);
+                throw new OptimiserErrorLogException(ex, this, jsonQuery.Nodes);
             }
             
 
-            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), parserResult.Nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
+            return new OptimiserResult((ulong)intermediateTable.GetRowEstimate(), jsonQuery.Nodes, this.GetType().Name, nameof(HistogramManager), nameof(EstimateCalculator));
         }
 
         private IntermediateTable UpdateTable(IntermediateTable formerTable, IntermediateTable newTable)

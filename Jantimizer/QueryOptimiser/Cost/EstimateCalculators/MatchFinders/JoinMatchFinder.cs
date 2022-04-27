@@ -1,13 +1,13 @@
 ﻿using Histograms.Models;
 using QueryOptimiser.Cost.Nodes;
 using QueryOptimiser.Models;
-using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Helpers;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
 {
@@ -109,7 +109,7 @@ namespace QueryOptimiser.Cost.EstimateCalculators.MatchFinders
         internal IntermediateBucket MakeNewIntermediateBucket(MatchType matchType, JoinPredicate predicate, IHistogramBucket leftBucket, IHistogramBucket rightBucket)
         {
             return MakeNewIntermediateBucket(
-                new List<TableAttribute>() { new TableAttribute(predicate.LeftTable.Alias, predicate.LeftAttribute), new TableAttribute(predicate.RightTable.Alias, predicate.RightAttribute) },
+                new List<TableAttribute>() { predicate.LeftAttribute, predicate.RightAttribute },
                 new List<BucketEstimate>() { GetEstimate(matchType, predicate.ComType, leftBucket, rightBucket), GetEstimate(matchType, predicate.ComType, rightBucket, leftBucket) }
                 );
         }

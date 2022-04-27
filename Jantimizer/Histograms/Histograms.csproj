@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DatabaseConnector\DatabaseConnector.csproj" />
-    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
   </ItemGroup>
 
 </Project>

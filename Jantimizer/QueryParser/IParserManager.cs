@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace QueryParser
 {
@@ -20,8 +21,8 @@ namespace QueryParser
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public ParserResult ParseQuery(string query, bool throwIfNotFound = true);
-        public Task<ParserResult> ParseQueryAsync(string query, bool throwIfNotFound = true);
+        public ParserResult ParseQuery(JsonQuery query, bool throwIfNotFound = true);
+        public Task<ParserResult> ParseQueryAsync(JsonQuery query, bool throwIfNotFound = true);
 
         /// <summary>
         /// Forces a query to be parsed by a certain <see cref="IQueryParser"/>.
@@ -30,7 +31,7 @@ namespace QueryParser
         /// <param name="query"></param>
         /// <param name="parser"></param>
         /// <returns></returns>
-        public ParserResult ParseQuerySpecific<T>(string query, T parser) where T : IQueryParser;
-        public Task<ParserResult> ParseQuerySpecificAsync<T>(string query, T parser) where T : IQueryParser;
+        public ParserResult ParseQuerySpecific<T>(JsonQuery query, T parser) where T : IQueryParser;
+        public Task<ParserResult> ParseQuerySpecificAsync<T>(JsonQuery query, T parser) where T : IQueryParser;
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace QueryParser.QueryParsers
 {
@@ -14,15 +15,15 @@ namespace QueryParser.QueryParsers
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public bool DoesQueryMatch(string query);
-        public Task<bool> DoesQueryMatchAsync(string query);
+        public bool DoesQueryMatch(JsonQuery query);
+        public Task<bool> DoesQueryMatchAsync(JsonQuery query);
 
         /// <summary>
         /// Parse the query, and return a set of <see cref="INode"/> back.
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public ParserResult ParseQuery(string query);
-        public Task<ParserResult> ParseQueryAsync(string query);
+        public ParserResult ParseQuery(JsonQuery query);
+        public Task<ParserResult> ParseQueryAsync(JsonQuery query);
     }
 }
