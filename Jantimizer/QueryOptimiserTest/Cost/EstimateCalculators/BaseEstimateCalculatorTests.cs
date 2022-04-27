@@ -375,7 +375,7 @@ namespace QueryOptimiserTest.Cost.EstimateCalculators
 
             // ASSERT
             Assert.AreEqual(2, result.References.Count);
-            Assert.AreEqual(1, result.Buckets.Count);
+            Assert.AreEqual(2, result.Buckets.Count);
         }
 
         [TestMethod]
