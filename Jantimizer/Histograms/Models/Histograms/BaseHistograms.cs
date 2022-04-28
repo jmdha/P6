@@ -66,7 +66,7 @@ namespace Histograms.Models
 
             // Remove any segmentations for the last unique value, to prevent duplicates (And there might be multiple from equidepth)
             ValueCount lastUniqueValue = sortedGroups.Last();
-            foreach (var segmentation in Segmentations.Where(s => s.LowestValue == lastUniqueValue.Value))
+            foreach (var segmentation in Segmentations.Where(s => s.LowestValue == lastUniqueValue.Value).ToList())
                 Segmentations.Remove(segmentation);
 
             // Add final segmentation

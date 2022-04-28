@@ -23,8 +23,24 @@ namespace Histograms.Models
         {
             IEnumerable<TableAttribute> attributes = GetAllDistinctTableAttributes(histograms);
             TableAttributes = attributes.ToList();
-            foreach (TableAttribute attribute in attributes)
+
+            foreach (TableAttribute attribute in attributes) {
+                histograms.Any(h => h.Segmentations.Any(s => s.CountLargerThan.ContainsKey(attribute)));
+
+                foreach(var hist in histograms)
+                {
+                    foreach(var seg in hist.Segmentations)
+                    {
+
+                        if(seg.CountLargerThan.ContainsKey(attribute))
+                        {
+                            Console.WriteLine("Cheese");
+                        }
+                    }
+                }
+
                 DoAllComparisonsForAttribute(histograms, await DataGatherer.GetData(attribute));
+            }
         }
 
 
@@ -60,19 +76,22 @@ namespace Histograms.Models
                     larger += (ulong)valueCount.Count;
             }
 
-            int cheese;
-            try
+            
+            if(segmentation.CountSmallerThan.ContainsKey(data.Attribute))
             {
-                cheese = 1;
+                if (segmentation.CountSmallerThan[data.Attribute] != smaller)
+                    throw new Exception("Trying to set the same attribute again, to a new value");
+            }
+            else
                 segmentation.CountSmallerThan.Add(data.Attribute, smaller);
-                cheese = 2;
-                segmentation.CountLargerThan.Add(data.Attribute, larger);
-            }
-            catch (ArgumentException ex)
+
+            if (segmentation.CountLargerThan.ContainsKey(data.Attribute))
             {
-                Console.WriteLine("Cheese");
-                throw ex;
+                if (segmentation.CountLargerThan[data.Attribute] != larger)
+                    throw new Exception("Trying to set the same attribute again, to a new value");
             }
+            else
+                segmentation.CountLargerThan.Add(data.Attribute, larger);
 
         }
 

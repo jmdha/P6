@@ -9,10 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="experiments - Copy.json" />
+    <None Remove="experiments.json" />
     <None Remove="Tests\testorder.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="experiments - Copy.json" />
     <Content Include="experiments.json" />
   </ItemGroup>
 
