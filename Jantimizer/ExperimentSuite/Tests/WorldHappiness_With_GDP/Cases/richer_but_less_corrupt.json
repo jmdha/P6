@@ -1,0 +1,52 @@
+﻿{
+  "EquivalentSQLQuery": "select count(*) from world_happiness_2022 wh1, world_happiness_2022 wh2 where wh1.gdp_per_capita > wh2.gdp_per_capita and wh1.perception_of_corruption < wh2.perception_of_corruption",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "gdp_per_capita"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "gdp_per_capita"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}
