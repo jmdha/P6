@@ -7,9 +7,8 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models
 {
-    internal interface ISegmentResult
+    public interface ISegmentResult
     {
-
         public bool IsReferencingTableAttribute(TableAttribute attr);
         public long GetTotalEstimation();
     }
