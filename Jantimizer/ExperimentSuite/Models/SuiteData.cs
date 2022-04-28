@@ -2,8 +2,6 @@
 using Histograms;
 using Histograms.Models;
 using QueryOptimiser;
-using QueryParser;
-using QueryParser.QueryParsers;
 using QueryPlanParser;
 using System;
 using System.Collections.Generic;
@@ -25,7 +23,6 @@ namespace ExperimentSuite.Models
         public IHistogramManager HistoManager { get; set; }
 
         public IQueryOptimiser Optimiser { get; set; }
-        public IParserManager QueryParserManager { get; set; }
 
         public SuiteData(
             TestSettings settings,
@@ -34,8 +31,7 @@ namespace ExperimentSuite.Models
             IDbConnector connector, 
             IPlanParser parser, 
             IHistogramManager histoManager, 
-            IQueryOptimiser optimiser, 
-            IParserManager queryParserManager)
+            IQueryOptimiser optimiser)
         {
             Settings = settings;
             ID = id;
@@ -44,7 +40,6 @@ namespace ExperimentSuite.Models
             Parser = parser;
             HistoManager = histoManager;
             Optimiser = optimiser;
-            QueryParserManager = queryParserManager;
         }
     }
 }

@@ -3,8 +3,6 @@ using ExperimentSuite.Models;
 using ExperimentSuite.UserControls;
 using Histograms;
 using QueryOptimiser.Models;
-using QueryParser.Models;
-using QueryParser.QueryParsers;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using ResultsSentinel;
@@ -14,10 +12,12 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Tools.Helpers;
+using Tools.Models.JsonModels;
 using Tools.Services;
 
 namespace ExperimentSuite.Controllers
@@ -209,18 +209,19 @@ namespace ExperimentSuite.Controllers
                 UpdateRunnerProgressBar?.Invoke(value++);
                 using (var reader = new StreamReader(queryFile.FullName))
                 {
-                    string text = await reader.ReadToEndAsync();
-
+                    var jsonQuery = new JsonQuery(await reader.ReadToEndAsync());
+                    if (!jsonQuery.DoRun)
+                        continue;
                     RunData.HistoManager.UsedHistograms.Histograms.Clear();
 
                     // Get Cache
                     var timer = TimerHelper.GetWatchAndStart();
-                    ulong? accCardinality = GetCacheIfThere(text);
+                    ulong? accCardinality = GetCacheIfThere(jsonQuery.EquivalentSQLQuery);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
 
                     // Get DB result (with or without cache)
                     timer = TimerHelper.GetWatchAndStart();
-                    DataSet dbResult = await GetResultWithCache(text, accCardinality != null);
+                    DataSet dbResult = await GetResultWithCache(jsonQuery.EquivalentSQLQuery, accCardinality != null);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
 
                     // Parse query plan
@@ -234,22 +235,15 @@ namespace ExperimentSuite.Controllers
                     if (accCardinality == null)
                     {
                         timer = TimerHelper.GetWatchAndStart();
-                        CacheCardinalities(analysisResult, text);
+                        CacheCardinalities(analysisResult, jsonQuery.EquivalentSQLQuery);
                         CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Cache cardinality"));
                     }
                     else
                         analysisResult.ActualCardinality = (ulong)accCardinality;
 
-                    // Parse SQL file
-                    timer = TimerHelper.GetWatchAndStart();
-                    ParserResult resultNodes = await RunData.QueryParserManager.ParseQueryAsync(text, false);
-                    if (QueryParserResultSentinel.Instance != null)
-                        QueryParserResultSentinel.Instance.CheckResult(resultNodes, queryFile.Name, ExperimentName, RunnerName);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse SQL file"));
-
                     // Get Optimisers prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(resultNodes);
+                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
                     if (OptimiserResultSentinel.Instance != null)
                         OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));

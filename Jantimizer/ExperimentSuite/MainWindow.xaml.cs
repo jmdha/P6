@@ -29,7 +29,6 @@ namespace ExperimentSuite
             // Sentinels
             new OptimiserResultSentinel();
             new QueryPlanParserResultSentinel();
-            new QueryParserResultSentinel();
             new HistogramResultSentinel();
 
             // Cachers
@@ -108,14 +107,6 @@ namespace ExperimentSuite
                         QueryPlanParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
-        private void QuerySentinelCheckbox_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is CheckBox checkBox)
-                if (QueryParserResultSentinel.Instance != null)
-                    if (checkBox.IsChecked != null)
-                        QueryParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
-        }
-
         private void HistogramSentinelCheckbox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
@@ -129,8 +120,6 @@ namespace ExperimentSuite
             var newList = new List<IResultSentinel>();
             if (OptimiserResultSentinel.Instance != null)
                 newList.Add(OptimiserResultSentinel.Instance);
-            if (QueryParserResultSentinel.Instance != null)
-                newList.Add(QueryParserResultSentinel.Instance);
             if (QueryPlanParserResultSentinel.Instance != null)
                 newList.Add(QueryPlanParserResultSentinel.Instance);
             if (HistogramResultSentinel.Instance != null)
@@ -143,8 +132,6 @@ namespace ExperimentSuite
         {
             if (OptimiserResultSentinel.Instance != null)
                 OptimiserResultSentinel.Instance.ClearSentinel();
-            if (QueryParserResultSentinel.Instance != null)
-                QueryParserResultSentinel.Instance.ClearSentinel();
             if (QueryPlanParserResultSentinel.Instance != null)
                 QueryPlanParserResultSentinel.Instance.ClearSentinel();
             if (HistogramResultSentinel.Instance != null)
