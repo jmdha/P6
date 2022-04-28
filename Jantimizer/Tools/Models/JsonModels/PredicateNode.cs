@@ -8,6 +8,7 @@ namespace Tools.Models.JsonModels
 {
     public class PredicateNode : ICloneable
     {
+        public bool IsAttribute => Attribute != null;
         public TableAttribute? Attribute { get; set; }
         public string? ConstantValue { get; set; }
 

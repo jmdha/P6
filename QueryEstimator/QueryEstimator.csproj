@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jantimizer\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\Jantimizer\Tools\Tools.csproj" />
   </ItemGroup>
 
