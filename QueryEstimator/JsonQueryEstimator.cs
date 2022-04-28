@@ -10,6 +10,7 @@ using Tools.Models.JsonModels;
 using Tools.Helpers;
 using QueryEstimator.PredicateEstimators;
 using QueryEstimator.Mergers;
+using QueryEstimator.Exceptions;
 
 namespace QueryEstimator
 {
@@ -53,6 +54,32 @@ namespace QueryEstimator
         }
 
         public EstimatorResult GetQueryEstimation(JsonQuery query)
+        {
+            try
+            {
+                long returnValue = StitchResults(GetIntermediateResults(query));
+
+                return new EstimatorResult(query, (ulong)returnValue);
+            }
+            catch (Exception ex)
+            {
+                throw new EstimatorErrorLogException(ex, query);
+            }
+        }
+
+        private long StitchResults(Dictionary<TableAttribute, List<ISegmentResult>> dict)
+        {
+            long returnValue = 0;
+
+            foreach (var value in SegmentMerger.Stitch(dict))
+            {
+                returnValue += value.GetTotalEstimation();
+            }
+
+            return returnValue;
+        }
+
+        private Dictionary<TableAttribute, List<ISegmentResult>> GetIntermediateResults(JsonQuery query)
         {
             _upperBounds.Clear();
             _lowerBounds.Clear();
@@ -104,15 +131,7 @@ namespace QueryEstimator
                         throw new Exception("Impossible predicate detected.");
                 }
             }
-
-            long returnValue = 0;
-
-            foreach (var value in SegmentMerger.Stitch(intermediateResults))
-            {
-                returnValue += value.GetTotalEstimation();
-            }
-
-            return new EstimatorResult(query, (ulong)returnValue);
+            return intermediateResults;
         }
     }
 }
