@@ -1,4 +1,5 @@
-﻿using Histograms.Models;
+﻿using Histograms;
+using Histograms.Models;
 using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace QueryEstimator.PredicateEstimators
 {
     public class FilterEstimator : BasePredicateEstimator<Dictionary<TableAttribute, List<ISegmentResult>>, TableAttribute, IComparable>
     {
-        public FilterEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds) : base(upperBounds, lowerBounds)
+        public FilterEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 

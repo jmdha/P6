@@ -1,4 +1,5 @@
-﻿using QueryEstimator.Models;
+﻿using Histograms;
+using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace QueryEstimator.PredicateEstimators
 {
     public class TableAttributeEstimator : BasePredicateEstimator<Dictionary<TableAttribute, List<ISegmentResult>>, TableAttribute, TableAttribute>
     {
-        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds) : base(upperBounds, lowerBounds)
+        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 
@@ -32,7 +33,7 @@ namespace QueryEstimator.PredicateEstimators
 
                 if (dict.ContainsKey(source))
                 {
-                    if (dict[source][i] != null)
+                    if (dict[source].Count > i && dict[source][i] != null)
                         dict[source][i] = new SegmentResult(dict[source][i], new ValueResult(source, compare, newSegmentResult.LeftCount, 1));
                     else
                         dict[source].Insert(i, newSegmentResult);

@@ -22,8 +22,8 @@ namespace Tools.Models.JsonModels
         public override bool Equals(object? obj)
         {
             return obj is TableAttribute attribute &&
-                   EqualityComparer<TableReferenceNode>.Default.Equals(Table, attribute.Table) &&
-                   Attribute == attribute.Attribute;
+                   Attribute == attribute.Attribute &&
+                   Table.Equals(attribute.Table);
         }
 
         public override int GetHashCode()

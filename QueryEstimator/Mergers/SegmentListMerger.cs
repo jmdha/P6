@@ -36,6 +36,8 @@ namespace QueryEstimator.Mergers
                 {
                     if (i >= sourceLowerBound && i < sourceUpperBound)
                         newList.Insert(i, dict[firstKey][i]);
+                    else
+                        newList.Add(null);
                     if (i > sourceUpperBound)
                         break;
                 }
@@ -47,11 +49,13 @@ namespace QueryEstimator.Mergers
 
                     for (int i = sourceLowerBound; i < sourceUpperBound; i++)
                     {
-                        if (newList[i] is ISegmentResult segmentItem)
+                        if (newList.Count > i && newList[i] is ISegmentResult segmentItem)
                             newList[i] = new SegmentResult(segmentItem, RemoveReferencedTableCount(dict[key][i], key));
                     }
                 }
             }
+
+            newList.RemoveAll(x => x == null);
 
             return newList;
         }

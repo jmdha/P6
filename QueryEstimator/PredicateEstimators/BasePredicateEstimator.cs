@@ -1,4 +1,5 @@
-﻿using Histograms.Models;
+﻿using Histograms;
+using Histograms.Models;
 using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,13 @@ namespace QueryEstimator.PredicateEstimators
     {
         public Dictionary<TableAttribute, int> UpperBounds { get; }
         public Dictionary<TableAttribute, int> LowerBounds { get; }
+        public IHistogramManager HistogramManager { get; }
 
-        protected BasePredicateEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds)
+        protected BasePredicateEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager)
         {
             UpperBounds = upperBounds;
             LowerBounds = lowerBounds;
+            HistogramManager = histogramManager;
         }
 
         public abstract void GetEstimationResult(RefT dict, TLeft source, TRight compare, ComparisonType.Type type);
@@ -46,8 +49,7 @@ namespace QueryEstimator.PredicateEstimators
 
         internal List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr)
         {
-            var newList = new List<IHistogramSegmentationComparative>();
-            return newList;
+            return HistogramManager.GetHistogram(attr.Table.TableName, attr.Attribute).Segmentations;
         }
 
         internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Histograms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace QueryEstimator.PredicateEstimators
     {
         public TBounds UpperBounds { get; }
         public TBounds LowerBounds { get; }
+        public IHistogramManager HistogramManager { get; }
 
         public void GetEstimationResult(RefT dict, TLeft source, TRight compare, ComparisonType.Type type);
     }

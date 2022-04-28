@@ -48,8 +48,8 @@ namespace QueryEstimator
             HistogramManager = histogramManager;
             _upperBounds = new Dictionary<TableAttribute, int>();
             _lowerBounds = new Dictionary<TableAttribute, int>();
-            FilterEstimator = new FilterEstimator(_upperBounds, _lowerBounds);
-            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds);
+            FilterEstimator = new FilterEstimator(_upperBounds, _lowerBounds, histogramManager);
+            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, histogramManager);
             SegmentMerger = new SegmentListMerger(_upperBounds, _lowerBounds);
         }
 
