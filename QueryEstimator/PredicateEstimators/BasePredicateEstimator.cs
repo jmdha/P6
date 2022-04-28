@@ -34,7 +34,7 @@ namespace QueryEstimator.PredicateEstimators
             return new ValueResult(
                 fromAttr,
                 compareAttr,
-                (long)source.CountLargerThan[compareAttr],
+                GetAbstractCount(source.CountLargerThan, compareAttr),
                 source.ElementsBeforeNextSegmentation);
         }
 
@@ -43,8 +43,17 @@ namespace QueryEstimator.PredicateEstimators
             return new ValueResult(
                 fromAttr,
                 compareAttr,
-                (long)source.CountSmallerThan[compareAttr],
+                GetAbstractCount(source.CountSmallerThan, compareAttr),
                 source.ElementsBeforeNextSegmentation);
+        }
+
+
+        public long GetAbstractCount(Dictionary<TableAttribute, ulong> dict, TableAttribute attr)
+        {
+            foreach (var key in dict.Keys)
+                if (key.Table.TableName == attr.Table.TableName && key.Attribute == attr.Attribute)
+                    return (long)dict[key];
+            throw new KeyNotFoundException();
         }
 
         internal List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr)

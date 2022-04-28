@@ -10,6 +10,8 @@ namespace QueryEstimator.Models
     public interface ISegmentResult
     {
         public bool IsReferencingTableAttribute(TableAttribute attr);
+        public bool IsReferencingTableAttribute(List<TableAttribute> attr);
+        public List<TableAttribute> GetTabelAttributes();
         public long GetTotalEstimation();
     }
 }

@@ -37,20 +37,45 @@ namespace QueryEstimator.Mergers
                     if (i >= sourceLowerBound && i < sourceUpperBound)
                         newList.Insert(i, dict[firstKey][i]);
                     else
+                    {
+                        if (i >= sourceUpperBound)
+                            break;
                         newList.Add(null);
-                    if (i > sourceUpperBound)
-                        break;
+                    }
                 }
 
+                var keyList = new List<TableAttribute>(newList[sourceLowerBound].GetTabelAttributes());
                 foreach (var key in dict.Keys.Skip(1))
                 {
-                    sourceLowerBound = GetValueFromDictOrAlt(key, LowerBounds, 0);
-                    sourceUpperBound = GetValueFromDictOrAlt(key, UpperBounds, dict[key].Count);
-
-                    for (int i = sourceLowerBound; i < sourceUpperBound; i++)
+                    var newLowerBound = GetValueFromDictOrAlt(key, LowerBounds, 0);
+                    var newUpperBound = GetValueFromDictOrAlt(key, UpperBounds, dict[key].Count);
+                    if (newLowerBound > sourceLowerBound)
+                        sourceLowerBound = newLowerBound;
+                    if (newUpperBound < sourceUpperBound)
+                        sourceUpperBound = newUpperBound;
+                    if (dict[key][newLowerBound] != null && dict[key].Count > newLowerBound)
                     {
-                        if (newList.Count > i && newList[i] is ISegmentResult segmentItem)
-                            newList[i] = new SegmentResult(segmentItem, RemoveReferencedTableCount(dict[key][i], key));
+                        if (dict[key][newLowerBound].IsReferencingTableAttribute(keyList))
+                        {
+                            for (int i = sourceLowerBound; i < sourceUpperBound; i++)
+                            {
+                                if (newList.Count > i && newList[i] is ISegmentResult segmentItem)
+                                {
+                                    newList[i] = new SegmentResult(segmentItem, RemoveReferencedTableCount(dict[key][i], keyList[0]));
+                                    foreach (var usedKey in keyList)
+                                        newList[i] = new SegmentResult(segmentItem, RemoveReferencedTableCount(newList[i], usedKey));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int i = newLowerBound; i < newUpperBound; i++)
+                            {
+                                if (newList.Count > i && newList[i] is ISegmentResult segmentItem)
+                                    newList[i] = new SegmentResult(segmentItem, dict[key][i]);
+                            }
+                        }
+                        keyList.AddRange(dict[key][newLowerBound].GetTabelAttributes());
                     }
                 }
             }

@@ -31,6 +31,19 @@ namespace QueryEstimator.Models
             return false;
         }
 
+        public bool IsReferencingTableAttribute(List<TableAttribute> attr)
+        {
+            foreach (TableAttribute attr2 in attr)
+                if (IsReferencingTableAttribute(attr2))
+                    return true;
+            return false;
+        }
+
+        public List<TableAttribute> GetTabelAttributes()
+        {
+            return new List<TableAttribute>() { TableA, TableB };
+        }
+
         public long GetTotalEstimation()
         {
             return LeftCount * RightCount;

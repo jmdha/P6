@@ -11,13 +11,13 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public class FilterEstimator : BasePredicateEstimator<Dictionary<TableAttribute, List<ISegmentResult>>, TableAttribute, IComparable>
+    public class FilterEstimator : BasePredicateEstimator<Dictionary<TableAttribute, List<ISegmentResult?>>, TableAttribute, IComparable>
     {
         public FilterEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 
-        public override void GetEstimationResult(Dictionary<TableAttribute, List<ISegmentResult>> dict, TableAttribute source, IComparable compare, ComparisonType.Type type)
+        public override void GetEstimationResult(Dictionary<TableAttribute, List<ISegmentResult?>> dict, TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int newSourceLowerBound = GetValueFromDictOrAlt(source, LowerBounds, 0);
@@ -33,28 +33,23 @@ namespace QueryEstimator.PredicateEstimators
                 if (newSegmentResult == null)
                     throw new ArgumentNullException();
 
-                if (dict.ContainsKey(source))
-                {
-                    if (dict[source][i] != null)
-                        dict[source][i] = new SegmentResult(dict[source][i], new ValueResult(source, source, newSegmentResult.LeftCount, 1));
-                    else
-                        dict[source].Insert(i, newSegmentResult);
-                }
-                else
-                {
-                    dict.Add(source, new List<ISegmentResult>());
-                    dict[source].Insert(i, newSegmentResult);
-                }
-
                 if (newSegmentResult.GetTotalEstimation() == 0 && foundAny)
                 {
                     newSourceUpperBound = i;
+                    AddNullToDict(dict, source, i);
                     break;
                 }
                 else if (newSegmentResult.GetTotalEstimation() == 0)
+                {
                     newSourceLowerBound++;
+                    AddNullToDict(dict, source, i);
+                    continue;
+                }
                 else
+                {
                     foundAny = true;
+                    AddValueToDict(dict, source, newSegmentResult, i);
+                }
             }
 
             AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
@@ -63,38 +58,82 @@ namespace QueryEstimator.PredicateEstimators
 
         private ValueResult GetLargerCountFilters(IHistogramSegmentationComparative source, TableAttribute fromAttr, IComparable compareValue)
         {
+            var targetType = compareValue.GetType();
+            var valueType = source.LowestValue.GetType();
+            if (targetType != valueType)
+            {
+                compareValue = (IComparable)Convert.ChangeType(compareValue, valueType);
+            }
+
             if (compareValue.IsLessThanOrEqual(source.LowestValue))
             {
                 return new ValueResult(
                     fromAttr,
                     fromAttr,
-                    GetSmallerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    1,
                     source.ElementsBeforeNextSegmentation);
             }
             else
                 return new ValueResult(
                     fromAttr,
                     fromAttr,
-                    GetLargerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
-                    source.ElementsBeforeNextSegmentation);
+                    0,
+                    0);
         }
 
         private ValueResult GetSmallerCountFilters(IHistogramSegmentationComparative source, TableAttribute fromAttr, IComparable compareValue)
         {
+            var targetType = compareValue.GetType();
+            var valueType = source.LowestValue.GetType();
+            if (targetType != valueType)
+            {
+                compareValue = (IComparable)Convert.ChangeType(compareValue, valueType);
+            }
+
             if (compareValue.IsLargerThanOrEqual(source.LowestValue))
             {
                 return new ValueResult(
                     fromAttr,
                     fromAttr,
-                    GetLargerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    1,
                     source.ElementsBeforeNextSegmentation);
             }
             else
                 return new ValueResult(
                     fromAttr,
                     fromAttr,
-                    GetSmallerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
-                    source.ElementsBeforeNextSegmentation);
+                    0,
+                    0);
+        }
+
+        private void AddNullToDict(Dictionary<TableAttribute, List<ISegmentResult?>> dict, TableAttribute attr, int bound)
+        {
+            if (dict.ContainsKey(attr))
+            {
+                if (dict[attr].Count < bound)
+                    dict[attr].Add(null);
+            }
+            else
+            {
+                dict.Add(attr, new List<ISegmentResult?>());
+                dict[attr].Add(null);
+            }
+        }
+
+        private void AddValueToDict(Dictionary<TableAttribute, List<ISegmentResult?>> dict, TableAttribute attr, ValueResult newResult, int bound)
+        {
+            if (dict.ContainsKey(attr))
+            {
+                if (dict[attr].Count > bound && dict[attr][bound] is ISegmentResult seg)
+                    dict[attr][bound] = new SegmentResult(seg, new ValueResult(attr, attr, newResult.LeftCount, 1));
+                else
+                    dict[attr].Insert(bound, newResult);
+            }
+            else
+            {
+                dict.Add(attr, new List<ISegmentResult?>());
+                dict[attr].Insert(bound, newResult);
+            }
         }
     }
 }

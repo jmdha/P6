@@ -99,33 +99,45 @@ namespace QueryEstimator
                     }
                     else if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
                     {
-                        if (predicate.GetComType() == ComparisonType.Type.Less)
-                            FilterEstimator.GetEstimationResult(
-                                intermediateResults,
-                                predicate.RightAttribute.Attribute,
-                                predicate.LeftAttribute.ConstantValue,
-                                ComparisonType.Type.More);
-                        if (predicate.GetComType() == ComparisonType.Type.More)
-                            FilterEstimator.GetEstimationResult(
-                                intermediateResults,
-                                predicate.RightAttribute.Attribute,
-                                predicate.LeftAttribute.ConstantValue,
-                                ComparisonType.Type.Less);
+                        FilterEstimator.GetEstimationResult(
+                            intermediateResults,
+                            predicate.RightAttribute.Attribute,
+                            predicate.LeftAttribute.ConstantValue,
+                            predicate.GetComType());
+
+                        //if (predicate.GetComType() == ComparisonType.Type.Less)
+                        //    FilterEstimator.GetEstimationResult(
+                        //        intermediateResults,
+                        //        predicate.RightAttribute.Attribute,
+                        //        predicate.LeftAttribute.ConstantValue,
+                        //        ComparisonType.Type.More);
+                        //if (predicate.GetComType() == ComparisonType.Type.More)
+                        //    FilterEstimator.GetEstimationResult(
+                        //        intermediateResults,
+                        //        predicate.RightAttribute.Attribute,
+                        //        predicate.LeftAttribute.ConstantValue,
+                        //        ComparisonType.Type.Less);
                     }
                     else if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.ConstantValue != null)
                     {
-                        if (predicate.GetComType() == ComparisonType.Type.Less)
-                            FilterEstimator.GetEstimationResult(
+                        FilterEstimator.GetEstimationResult(
                                 intermediateResults,
                                 predicate.LeftAttribute.Attribute,
                                 predicate.RightAttribute.ConstantValue,
-                                ComparisonType.Type.More);
-                        if (predicate.GetComType() == ComparisonType.Type.More)
-                            FilterEstimator.GetEstimationResult(
-                                intermediateResults,
-                                predicate.LeftAttribute.Attribute,
-                                predicate.RightAttribute.ConstantValue,
-                                ComparisonType.Type.Less);
+                                predicate.GetComType());
+
+                        //if (predicate.GetComType() == ComparisonType.Type.Less)
+                        //    FilterEstimator.GetEstimationResult(
+                        //        intermediateResults,
+                        //        predicate.LeftAttribute.Attribute,
+                        //        predicate.RightAttribute.ConstantValue,
+                        //        ComparisonType.Type.More);
+                        //if (predicate.GetComType() == ComparisonType.Type.More)
+                        //    FilterEstimator.GetEstimationResult(
+                        //        intermediateResults,
+                        //        predicate.LeftAttribute.Attribute,
+                        //        predicate.RightAttribute.ConstantValue,
+                        //        ComparisonType.Type.Less);
                     }
                     else
                         throw new Exception("Impossible predicate detected.");
