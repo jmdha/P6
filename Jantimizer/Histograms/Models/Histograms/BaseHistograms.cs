@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text;
+using Tools.Models.JsonModels;
 
 namespace Histograms.Models
 {
@@ -8,21 +9,22 @@ namespace Histograms.Models
         public Guid HistogramId { get; internal set; }
         public abstract List<TypeCode> AcceptedTypes { get; }
         public List<IHistogramBucket> Buckets { get; }
-        public List<IHistogramSegmentation> Segmentations { get; }
-        public string TableName { get; }
-        public string AttributeName { get; }
+        public List<IHistogramSegmentationComparative> Segmentations { get; }
+        public TableAttribute TableAttribute { get; }
+        public string TableName => TableAttribute.Table.TableName;
+        public string AttributeName => TableAttribute.Attribute;
 
         public BaseHistogram(string tableName, string attributeName) : this(Guid.NewGuid(), tableName, attributeName)
-        {
-        }
+        { }
 
-        public BaseHistogram(Guid histogramId, string tableName, string attributeName)
+        public BaseHistogram(Guid histogramId, string tableName, string attributeName) : this(histogramId, new TableAttribute(tableName, attributeName))
+        { }
+        public BaseHistogram(Guid histogramId, TableAttribute tableAttribute)
         {
             HistogramId = histogramId;
-            TableName = tableName;
-            AttributeName = attributeName;
+            TableAttribute = tableAttribute;
             Buckets = new List<IHistogramBucket>();
-            Segmentations = new List<IHistogramSegmentation>();
+            Segmentations = new List<IHistogramSegmentationComparative>();
         }
 
         public void GenerateHistogram(DataTable table, string key)
@@ -56,12 +58,9 @@ namespace Histograms.Models
             GenerateHistogramFromSortedGroups(sortedGroups);
 
             // Turn all bucket-starts into segmentations
-            foreach (var bucket in Buckets) {
-                Segmentations.Add(new HistogramSegmentation()
-                {
-                    LowestValue = bucket.ValueStart,
-                    ElementsBeforeNextSegmentation = bucket.Count
-                });
+            foreach (var bucket in Buckets)
+            {
+                Segmentations.Add(new HistogramSegmentationComparative(bucket.ValueStart, bucket.Count));
             }
 
             // Remove any segmentations for the last unique value, to prevent duplicates (And there might be multiple from equidepth)
@@ -70,11 +69,7 @@ namespace Histograms.Models
                 Segmentations.Remove(segmentation);
 
             // Add final segmentation
-            Segmentations.Add(new HistogramSegmentation()
-            {
-                LowestValue = lastUniqueValue.Value,
-                ElementsBeforeNextSegmentation = lastUniqueValue.Count
-            });
+            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, lastUniqueValue.Count));
         }
 
         public override string? ToString()

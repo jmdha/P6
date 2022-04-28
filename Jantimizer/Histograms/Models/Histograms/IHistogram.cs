@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Tools.Models.JsonModels;
 
 namespace Histograms.Models
 {
@@ -6,10 +7,11 @@ namespace Histograms.Models
     {
         public Guid HistogramId { get; }
         public List<TypeCode> AcceptedTypes { get; }
+        public TableAttribute TableAttribute { get; }
         public string TableName { get; }
         public string AttributeName { get; }
         public List<IHistogramBucket> Buckets { get; }
-        public List<IHistogramSegmentation> Segmentations { get; }
+        public List<IHistogramSegmentationComparative> Segmentations { get; }
 
         public void GenerateHistogram(DataTable table, string key);
         public void GenerateHistogram(List<IComparable> column);
