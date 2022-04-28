@@ -8,15 +8,12 @@ namespace Histograms.Models
         public Guid HistogramId { get; internal set; }
         public abstract List<TypeCode> AcceptedTypes { get; }
         public List<IHistogramBucket> Buckets { get; }
+        public List<IHistogramSegmentation> Segmentations { get; }
         public string TableName { get; }
         public string AttributeName { get; }
 
-        public BaseHistogram(string tableName, string attributeName)
+        public BaseHistogram(string tableName, string attributeName) : this(Guid.NewGuid(), tableName, attributeName)
         {
-            HistogramId = Guid.NewGuid();
-            TableName = tableName;
-            AttributeName = attributeName;
-            Buckets = new List<IHistogramBucket>();
         }
 
         public BaseHistogram(Guid histogramId, string tableName, string attributeName)
@@ -25,6 +22,7 @@ namespace Histograms.Models
             TableName = tableName;
             AttributeName = attributeName;
             Buckets = new List<IHistogramBucket>();
+            Segmentations = new List<IHistogramSegmentation>();
         }
 
         public void GenerateHistogram(DataTable table, string key)
@@ -39,9 +37,45 @@ namespace Histograms.Models
             GenerateHistogramFromSorted(sorted);
         }
 
-        protected abstract void GenerateHistogramFromSorted(List<IComparable> sorted);
+        private void GenerateHistogramFromSorted(List<IComparable> sorted)
+        {
+            GenerateHistogramFromSortedGroups(sorted
+                .GroupBy(x => x)
+                .Select(group =>
+                    new ValueCount(
+                        group.First(),
+                        group.Count()
+                    )
+                )
+            );
+        }
 
         public abstract void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
+        public void GenerateSegmentationsFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
+        {
+            GenerateHistogramFromSortedGroups(sortedGroups);
+
+            // Turn all bucket-starts into segmentations
+            foreach (var bucket in Buckets) {
+                Segmentations.Add(new HistogramSegmentation()
+                {
+                    LowestValue = bucket.ValueStart,
+                    ElementsBeforeNextSegmentation = bucket.Count
+                });
+            }
+
+            // Remove any segmentations for the last unique value, to prevent duplicates (And there might be multiple from equidepth)
+            ValueCount lastUniqueValue = sortedGroups.Last();
+            foreach (var segmentation in Segmentations.Where(s => s.LowestValue == lastUniqueValue.Value))
+                Segmentations.Remove(segmentation);
+
+            // Add final segmentation
+            Segmentations.Add(new HistogramSegmentation()
+            {
+                LowestValue = lastUniqueValue.Value,
+                ElementsBeforeNextSegmentation = lastUniqueValue.Count
+            });
+        }
 
         public override string? ToString()
         {
