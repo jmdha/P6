@@ -34,7 +34,10 @@ namespace QueryEstimator.PredicateEstimators
 
                 if (dict.ContainsKey(source))
                 {
-                    dict[source].Insert(i, newSegmentResult);
+                    if (dict[source][i] != null)
+                        dict[source][i] = new SegmentResult(dict[source][i], new ValueResult(source, source, newSegmentResult.LeftCount, 1));
+                    else
+                        dict[source].Insert(i, newSegmentResult);
                 }
                 else
                 {

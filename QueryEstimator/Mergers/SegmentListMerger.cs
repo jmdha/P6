@@ -40,42 +40,15 @@ namespace QueryEstimator.Mergers
                         break;
                 }
 
-
                 foreach (var key in dict.Keys.Skip(1))
                 {
                     sourceLowerBound = GetValueFromDictOrAlt(key, LowerBounds, 0);
                     sourceUpperBound = GetValueFromDictOrAlt(key, UpperBounds, dict[key].Count);
 
-                    for (int i = 0; i < newList.Count; i++)
+                    for (int i = sourceLowerBound; i < sourceUpperBound; i++)
                     {
-                        if (i >= sourceLowerBound && i < sourceUpperBound)
-                        {
-                            if (newList[i] != null)
-                            {
-                                if (newList[i].IsReferencingTableAttribute(key))
-                                {
-                                    var thisValue = dict[key][i];
-                                    if (thisValue is ValueResult res)
-                                        newList[i] = new SegmentResult(newList[i], new ValueResult(
-                                            res.TableA,
-                                            res.TableB,
-                                            res.LeftCount,
-                                            1));
-                                }
-                                else
-                                {
-                                    var thisValue = dict[key][i];
-                                    if (thisValue is ValueResult res)
-                                        newList[i] = new SegmentResult(newList[i], new ValueResult(
-                                            res.TableA,
-                                            res.TableB,
-                                            res.LeftCount,
-                                            res.RightCount));
-                                }
-                            }
-                        }
-                        if (i > sourceUpperBound)
-                            break;
+                        if (newList[i] is ISegmentResult segmentItem)
+                            newList[i] = new SegmentResult(segmentItem, RemoveReferencedTableCount(dict[key][i], key));
                     }
                 }
             }
@@ -83,7 +56,29 @@ namespace QueryEstimator.Mergers
             return newList;
         }
 
-        private static int GetValueFromDictOrAlt(TableAttribute attr, Dictionary<TableAttribute, int> dict, int alt)
+        private ISegmentResult RemoveReferencedTableCount(ISegmentResult result, TableAttribute attr)
+        {
+            if (result is ValueResult res)
+            {
+                if (res.TableA != res.TableB)
+                {
+                    if (res.TableA == attr)
+                        res.LeftCount = 1;
+                    else if (res.TableB == attr)
+                        res.RightCount = 1;
+                }
+                return res;
+            }
+            else if (result is SegmentResult seg)
+            {
+                seg.Left = RemoveReferencedTableCount(seg.Left, attr);
+                seg.Right = RemoveReferencedTableCount(seg.Right, attr);
+                return seg;
+            }
+            throw new ArgumentNullException();
+        }
+
+        private int GetValueFromDictOrAlt(TableAttribute attr, Dictionary<TableAttribute, int> dict, int alt)
         {
             if (dict.ContainsKey(attr))
                 return dict[attr];
