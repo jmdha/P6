@@ -13,26 +13,17 @@ using QueryEstimator.Exceptions;
 
 namespace QueryEstimator
 {
-    public class JsonQueryEstimator : IJsonQueryEstimator<
-        JsonQuery,
-        Dictionary<TableAttribute, int>,
-        TableAttribute,
-        IComparable,
-        TableAttribute,
-        TableAttribute>
+    public class JsonQueryEstimator : IQueryEstimator<JsonQuery>
     {
-        public IPredicateEstimator<
-            Dictionary<TableAttribute, int>, 
-            TableAttribute, 
-            IComparable> FilterEstimator { get; }
-        public IPredicateEstimator<
-            Dictionary<TableAttribute, int>,
-            TableAttribute,
-            TableAttribute> TableAttributeEstimator { get; }
+        public CrossFilterEstimator FilterEstimator { get; }
+        public SimpleFilterEstimator SimpleFilterEstimator { get; }
+        public TableAttributeEstimator TableAttributeEstimator { get; }
         public IHistogramManager HistogramManager { get; }
 
         private Dictionary<TableAttribute, int> _upperBounds;
         private Dictionary<TableAttribute, int> _lowerBounds;
+        private Dictionary<string, int> _upperRowBounds;
+        private Dictionary<string, int> _lowerRowBounds;
         private TableAttribute _initAttribute = new TableAttribute();
 
         public JsonQueryEstimator(IHistogramManager histogramManager)
@@ -40,8 +31,11 @@ namespace QueryEstimator
             HistogramManager = histogramManager;
             _upperBounds = new Dictionary<TableAttribute, int>();
             _lowerBounds = new Dictionary<TableAttribute, int>();
-            FilterEstimator = new FilterEstimator(_upperBounds, _lowerBounds, histogramManager);
+            _upperRowBounds = new Dictionary<string, int>();
+            _lowerRowBounds = new Dictionary<string, int>();
+            FilterEstimator = new CrossFilterEstimator(_upperRowBounds, _lowerRowBounds, histogramManager);
             TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, histogramManager);
+            SimpleFilterEstimator = new SimpleFilterEstimator(_upperBounds, _lowerBounds, histogramManager);
         }
 
         public EstimatorResult GetQueryEstimation(JsonQuery query)
@@ -65,37 +59,81 @@ namespace QueryEstimator
 
             ISegmentResult result = new ValueTableAttributeResult(0,0, _initAttribute, _initAttribute, 1, ComparisonType.Type.None);
 
+            List<FilterPredicate> baseFilters = new List<FilterPredicate>();
+            List<FilterPredicate> crossFilters = new List<FilterPredicate>();
+            List<FilterPredicate> simpleFilters = new List<FilterPredicate>();
+            List<TableAttributePredicate> predicates = new List<TableAttributePredicate>();
+            List<TableAttribute> usedAttributes = new List<TableAttribute>();
+
+            // Scanning
             foreach (var node in query.JoinNodes)
             {
                 foreach (var predicate in node.Predicates)
                 {
                     if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
                     {
-                        result = TableAttributeEstimator.GetEstimationResult(
-                            result,
+                        predicates.Add(new TableAttributePredicate(
                             predicate.LeftAttribute.Attribute,
                             predicate.RightAttribute.Attribute,
-                            predicate.GetComType());
+                            predicate.GetComType()));
+                        usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                        usedAttributes.Add(predicate.RightAttribute.Attribute);
                     }
                     else if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
                     {
-                        result = FilterEstimator.GetEstimationResult(
-                            result,
+                        baseFilters.Add(new FilterPredicate(
                             predicate.RightAttribute.Attribute,
                             predicate.LeftAttribute.ConstantValue,
-                            predicate.GetComType());
+                            predicate.GetComType()));
                     }
                     else if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.ConstantValue != null)
                     {
-                        result = FilterEstimator.GetEstimationResult(
-                                result,
-                                predicate.LeftAttribute.Attribute,
-                                predicate.RightAttribute.ConstantValue,
-                                predicate.GetComType());
+                        baseFilters.Add(new FilterPredicate(
+                            predicate.LeftAttribute.Attribute,
+                            predicate.RightAttribute.ConstantValue,
+                            predicate.GetComType()));
                     }
                     else
                         throw new Exception("Impossible predicate detected.");
                 }
+            }
+
+            foreach(var filter in baseFilters)
+            {
+                if (usedAttributes.Contains(filter.LeftTable))
+                    simpleFilters.Add(filter);
+                else
+                    crossFilters.Add(filter);
+            }
+
+            // Simple filters
+            foreach (var filter in simpleFilters)
+            {
+                SimpleFilterEstimator.GetEstimationResult(
+                    result,
+                    filter.LeftTable,
+                    filter.ConstantValue,
+                    filter.ComType);
+            }
+
+            // Cross filters
+            foreach (var filter in crossFilters)
+            {
+                FilterEstimator.GetEstimationResult(
+                    result,
+                    filter.LeftTable,
+                    filter.ConstantValue,
+                    filter.ComType);
+            }
+
+            // Predicates
+            foreach (var predicate in predicates)
+            {
+                result = TableAttributeEstimator.GetEstimationResult(
+                    result,
+                    predicate.LeftTable,
+                    predicate.RightTable,
+                    predicate.ComType);
             }
 
             CalculateBounds(result);

@@ -18,6 +18,13 @@ namespace Tools.Models.JsonModels
                 return newList;
             } 
         }
+        public List<TableAttribute> TableAttributes { get {
+                var newList = new List<TableAttribute>();
+                foreach (var node in JoinNodes)
+                    newList.AddRange(node.TableAttributes);
+                return newList.Select(x => x).Distinct().ToList();
+            }
+        }
 
         public JsonQuery()
         {

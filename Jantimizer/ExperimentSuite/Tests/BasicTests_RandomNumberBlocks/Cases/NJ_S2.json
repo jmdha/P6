@@ -1,6 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON b.v < a.v",
-  "DoRun": false,
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON a.v < b.v",
+  "DoRun": true,
   "JoinNodes": [
     {
       "Predicates": [

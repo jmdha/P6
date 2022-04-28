@@ -20,6 +20,21 @@ namespace Tools.Models.JsonModels
                 return newList;
             } 
         }
+        public List<TableAttribute> TableAttributes
+        {
+            get
+            {
+                var newList = new List<TableAttribute>();
+                foreach (var predicate in Predicates)
+                {
+                    if (predicate.LeftAttribute.Attribute != null)
+                        newList.Add(predicate.LeftAttribute.Attribute);
+                    if (predicate.RightAttribute.Attribute != null)
+                        newList.Add(predicate.RightAttribute.Attribute);
+                }
+                return newList;
+            }
+        }
         public List<JoinPredicate> Predicates { get; set; }
 
         public JoinNode(List<JoinPredicate> predicates)

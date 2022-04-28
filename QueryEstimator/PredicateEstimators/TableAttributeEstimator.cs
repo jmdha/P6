@@ -9,10 +9,15 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public class TableAttributeEstimator : BasePredicateEstimator<TableAttribute, TableAttribute>
+    public class TableAttributeEstimator : BasePredicateEstimator<Dictionary<TableAttribute, int>, TableAttribute, TableAttribute>
     {
-        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
+        public override Dictionary<TableAttribute, int> UpperBounds { get; }
+        public override Dictionary<TableAttribute, int> LowerBounds { get; }
+
+        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(histogramManager)
         {
+            UpperBounds = upperBounds;
+            LowerBounds = lowerBounds;
         }
 
         public override ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type, bool isReverse = false)
@@ -80,6 +85,21 @@ namespace QueryEstimator.PredicateEstimators
             AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
 
             return new SegmentResult(current, new ValueTableAttributeResult(newSourceUpperBound, newSourceLowerBound, source, compare, newResult, type));
+        }
+
+        internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)
+        {
+            if (dict.ContainsKey(attr))
+                dict[attr] = bound;
+            else
+                dict.Add(attr, bound);
+        }
+
+        internal int GetValueFromDictOrAlt(TableAttribute attr, Dictionary<TableAttribute, int> dict, int alt)
+        {
+            if (dict.ContainsKey(attr))
+                return dict[attr];
+            return alt;
         }
     }
 }
