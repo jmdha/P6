@@ -1,5 +1,4 @@
-﻿using QueryOptimiser.Models;
-using QueryPlanParser.Models;
+﻿using QueryPlanParser.Models;
 using System.Text;
 using Tools.Models.Dictionaries;
 

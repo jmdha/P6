@@ -13,7 +13,7 @@ using QueryEstimator.Mergers;
 
 namespace QueryEstimator
 {
-    public class JsonQueryEstimator : IQueryEstimator<
+    public class JsonQueryEstimator : IJsonQueryEstimator<
         JsonQuery,
         Dictionary<TableAttribute, int>,
         Dictionary<TableAttribute, List<ISegmentResult>>,

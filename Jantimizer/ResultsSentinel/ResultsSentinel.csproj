@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\QueryEstimator\QueryEstimator.csproj" />
+    <ProjectReference Include="..\Histograms\Histograms.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>

@@ -2,7 +2,7 @@
 using ExperimentSuite.Models;
 using Histograms.DataGatherers;
 using Histograms.Managers;
-using QueryOptimiser;
+using QueryEstimator;
 using QueryPlanParser.Parsers;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties), 
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
+            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager);
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
                 "Default",
@@ -37,7 +37,7 @@ namespace ExperimentSuite.SuiteDatas
                 mySQLConnector,
                 mySQLPlanParser,
                 mySQLHistoManager,
-                mySQLOptimiser);
+                mySQLEstimator);
             return mySQLModel;
         }
 
@@ -49,7 +49,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
+            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager);
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
                 "EquiDepth",
@@ -57,7 +57,7 @@ namespace ExperimentSuite.SuiteDatas
                 mySQLConnector,
                 mySQLPlanParser,
                 mySQLHistoManager,
-                mySQLOptimiser);
+                mySQLEstimator);
             return mySQLModel;
         }
 
@@ -69,7 +69,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLHistoManager = new MinDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var mySQLOptimiser = new QueryOptimiserEquiDepth(mySQLHistoManager);
+            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager);
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
                 "MinDepth",
@@ -77,7 +77,7 @@ namespace ExperimentSuite.SuiteDatas
                 mySQLConnector,
                 mySQLPlanParser,
                 mySQLHistoManager,
-                mySQLOptimiser);
+                mySQLEstimator);
             return mySQLModel;
         }
 
@@ -93,7 +93,7 @@ namespace ExperimentSuite.SuiteDatas
             var postHistoManager = new EquiDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postEstimator = new JsonQueryEstimator(postHistoManager);
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
                 "Default",
@@ -101,7 +101,7 @@ namespace ExperimentSuite.SuiteDatas
                 postConnector,
                 postPlanParser,
                 postHistoManager,
-                postOptimiser);
+                postEstimator);
             return postgresModel;
         }
 
@@ -113,7 +113,7 @@ namespace ExperimentSuite.SuiteDatas
             var postHistoManager = new EquiDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postEstimator = new JsonQueryEstimator(postHistoManager);
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
                 "EquiDepth",
@@ -121,7 +121,7 @@ namespace ExperimentSuite.SuiteDatas
                 postConnector,
                 postPlanParser,
                 postHistoManager,
-                postOptimiser);
+                postEstimator);
             return postgresModel;
         }
 
@@ -133,7 +133,7 @@ namespace ExperimentSuite.SuiteDatas
             var postHistoManager = new MinDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var postOptimiser = new QueryOptimiserEquiDepth(postHistoManager);
+            var postEstimator = new JsonQueryEstimator(postHistoManager);
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
                 "MinDepth",
@@ -141,7 +141,7 @@ namespace ExperimentSuite.SuiteDatas
                 postConnector,
                 postPlanParser,
                 postHistoManager,
-                postOptimiser);
+                postEstimator);
             return postgresModel;
         }
 

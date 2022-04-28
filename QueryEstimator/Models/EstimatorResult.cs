@@ -7,7 +7,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models
 {
-    public class EstimatorResult
+    public class EstimatorResult : ICloneable
     {
         public JsonQuery FromQuery { get; set; }
         public ulong EstimatedCardinality { get; set; }
@@ -16,6 +16,13 @@ namespace QueryEstimator.Models
         {
             FromQuery = fromQuery;
             EstimatedCardinality = estimatedCardinality;
+        }
+
+        public object Clone()
+        {
+            if (FromQuery.Clone() is JsonQuery query)
+                return new EstimatorResult(query, EstimatedCardinality);
+            throw new ArgumentNullException("Could not clone!");
         }
     }
 }

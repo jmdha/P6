@@ -4,7 +4,6 @@ using ExperimentSuite.UserControls;
 using Histograms;
 using QueryEstimator;
 using QueryEstimator.Models;
-using QueryOptimiser.Models;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using ResultsSentinel;
@@ -245,9 +244,10 @@ namespace ExperimentSuite.Controllers
 
                     // Get Estimator prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    var estimator = new JsonQueryEstimator(RunData.HistoManager);
-                    EstimatorResult jantimatorResult = estimator.GetQueryEstimation(jsonQuery);
+                    EstimatorResult jantimatorResult = RunData.Estimator.GetQueryEstimation(jsonQuery);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Estimator"));
+                    if (EstimatorResultSentinel.Instance != null)
+                        EstimatorResultSentinel.Instance.CheckResult(jantimatorResult, queryFile.Name, ExperimentName, RunnerName);
 
                     // Get Optimisers prediction
                     //timer = TimerHelper.GetWatchAndStart();
