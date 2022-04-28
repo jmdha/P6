@@ -22,7 +22,7 @@ namespace Histograms.DataGatherers
         public Task<Type> GetAttributeType(TableAttribute attribute)
             => GetAttributeType(attribute.Table.TableName, attribute.Attribute);
 
-        internal virtual async Task<AttributeData> GetData(TableAttribute attribute)
+        public async Task<AttributeData> GetData(TableAttribute attribute)
         {
             return new AttributeData(
                 attribute,

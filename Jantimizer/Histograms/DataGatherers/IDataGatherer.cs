@@ -17,6 +17,6 @@ namespace Histograms.DataGatherers
         public Task<string> GetTableAttributeColumnHash(string tableName, string attributeName);
         public Task<Type> GetAttributeType(string tableName, string attributeName);
         public Task<Type> GetAttributeType(TableAttribute attribute);
-        internal Task<AttributeData> GetData(TableAttribute attribute);
+        public Task<AttributeData> GetData(TableAttribute attribute);
     }
 }

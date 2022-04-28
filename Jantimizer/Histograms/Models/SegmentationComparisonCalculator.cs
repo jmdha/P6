@@ -16,10 +16,13 @@ namespace Histograms.Models
             DataGatherer = dataGatherer;
         }
 
+        private List<TableAttribute> TableAttributes { get; set; }
+        private List<TableAttribute> UsedAttributes { get; } = new List<TableAttribute> { };
 
         public async Task DoHistogramComparisons(IEnumerable<IHistogram> histograms)
         {
             IEnumerable<TableAttribute> attributes = GetAllDistinctTableAttributes(histograms);
+            TableAttributes = attributes.ToList();
             foreach (TableAttribute attribute in attributes)
                 DoAllComparisonsForAttribute(histograms, await DataGatherer.GetData(attribute));
         }
@@ -28,9 +31,10 @@ namespace Histograms.Models
 
         private void DoAllComparisonsForAttribute(IEnumerable<IHistogram> histograms, AttributeData data)
         {
-            foreach(IHistogram histogram in histograms)
+            UsedAttributes.Add(data.Attribute);
+            foreach (IHistogram histogram in histograms)
             {
-                if (!histogram.AcceptedTypes.Contains(data.TypeCode))
+                if (histogram.DataTypeCode != data.TypeCode)
                     continue;
 
                 foreach(var segmentation in histogram.Segmentations)
@@ -45,6 +49,9 @@ namespace Histograms.Models
             ulong smaller = 0;
             ulong larger = 0;
             
+
+
+
             foreach(var valueCount in data.ValueCounts)
             {
                 if (valueCount.Value.CompareTo(segmentation.LowestValue) < 0)
@@ -53,8 +60,20 @@ namespace Histograms.Models
                     larger += (ulong)valueCount.Count;
             }
 
-            segmentation.CountSmallerThan.Add(data.Attribute, smaller);
-            segmentation.CountLargerThan.Add(data.Attribute, larger);
+            int cheese;
+            try
+            {
+                cheese = 1;
+                segmentation.CountSmallerThan.Add(data.Attribute, smaller);
+                cheese = 2;
+                segmentation.CountLargerThan.Add(data.Attribute, larger);
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine("Cheese");
+                throw ex;
+            }
+
         }
 
         private IEnumerable<TableAttribute> GetAllDistinctTableAttributes(IEnumerable<IHistogram> histograms)

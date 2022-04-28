@@ -8,6 +8,7 @@ namespace Histograms.Models
     {
         public Guid HistogramId { get; internal set; }
         public abstract List<TypeCode> AcceptedTypes { get; }
+        public TypeCode DataTypeCode { get; internal set; }
         public List<IHistogramBucket> Buckets { get; }
         public List<IHistogramSegmentationComparative> Segmentations { get; }
         public TableAttribute TableAttribute { get; }
@@ -70,6 +71,7 @@ namespace Histograms.Models
 
             // Add final segmentation
             Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, lastUniqueValue.Count));
+            DataTypeCode = Type.GetTypeCode(Segmentations.First().LowestValue.GetType());
         }
 
         public override string? ToString()

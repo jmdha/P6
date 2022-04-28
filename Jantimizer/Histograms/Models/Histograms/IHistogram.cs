@@ -7,6 +7,7 @@ namespace Histograms.Models
     {
         public Guid HistogramId { get; }
         public List<TypeCode> AcceptedTypes { get; }
+        public TypeCode DataTypeCode { get; }
         public TableAttribute TableAttribute { get; }
         public string TableName { get; }
         public string AttributeName { get; }

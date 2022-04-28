@@ -7,7 +7,7 @@ using Tools.Models.JsonModels;
 
 namespace Histograms.Models
 {
-    internal class AttributeData
+    public class AttributeData
     {
         public TableAttribute Attribute { get; }
         public List<ValueCount> ValueCounts { get; }

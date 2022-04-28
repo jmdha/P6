@@ -24,6 +24,8 @@ namespace HistogramsTests.Stubs
 
         public Guid HistogramId => throw new NotImplementedException();
 
+        public TypeCode DataTypeCode => throw new NotImplementedException();
+
         List<IHistogramSegmentationComparative> IHistogram.Segmentations => throw new NotImplementedException();
 
         public object Clone()
