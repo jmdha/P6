@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
+using Tools.Helpers;
 
 namespace QueryEstimator
 {
@@ -36,12 +37,44 @@ namespace QueryEstimator
                 {
                     if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
                     {
-                        GetEstimationResult(
+                        GetEstimationResultForPredicates(
                             intermediateResults,
                             predicate.LeftAttribute.Attribute,
                             predicate.RightAttribute.Attribute,
                             predicate.GetComType());
                     }
+                    else if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
+                    {
+                        if (predicate.GetComType() == ComparisonType.Type.Less)
+                            GetEstimationResultForFilters(
+                                intermediateResults,
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.ConstantValue,
+                                ComparisonType.Type.More);
+                        if (predicate.GetComType() == ComparisonType.Type.More)
+                            GetEstimationResultForFilters(
+                                intermediateResults,
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.ConstantValue,
+                                ComparisonType.Type.Less);
+                    }
+                    else if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.ConstantValue != null)
+                    {
+                        if (predicate.GetComType() == ComparisonType.Type.Less)
+                            GetEstimationResultForFilters(
+                                intermediateResults,
+                                predicate.LeftAttribute.Attribute,
+                                predicate.RightAttribute.ConstantValue,
+                                ComparisonType.Type.More);
+                        if (predicate.GetComType() == ComparisonType.Type.More)
+                            GetEstimationResultForFilters(
+                                intermediateResults,
+                                predicate.LeftAttribute.Attribute,
+                                predicate.RightAttribute.ConstantValue,
+                                ComparisonType.Type.Less);
+                    }
+                    else
+                        throw new Exception("Impossible predicate detected.");
                 }
             }
 
@@ -55,7 +88,7 @@ namespace QueryEstimator
             return new EstimatorResult(query, (ulong)returnValue);
         }
 
-        private void GetEstimationResult(Dictionary<TableAttribute, List<ISegmentResult>> current, TableAttribute from, TableAttribute compareAttr, ComparisonType.Type type)
+        private void GetEstimationResultForPredicates(Dictionary<TableAttribute, List<ISegmentResult>> current, TableAttribute from, TableAttribute compareAttr, ComparisonType.Type type)
         {
             var allSourceSegments = GetAllSegmentsForAttribute(from);
             if (allSourceSegments.Count > _milestoneCeil)
@@ -67,9 +100,52 @@ namespace QueryEstimator
             {
                 ValueResult? newSegmentResult = null;
                 if (type == ComparisonType.Type.More)
-                    newSegmentResult = GetLargerCount(allSourceSegments[i], from, compareAttr);
+                    newSegmentResult = GetLargerCountTableAttributes(allSourceSegments[i], from, compareAttr);
                 if (type == ComparisonType.Type.Less)
-                    newSegmentResult = GetSmallerCount(allSourceSegments[i], from, compareAttr);
+                    newSegmentResult = GetSmallerCountTableAttributes(allSourceSegments[i], from, compareAttr);
+                if (newSegmentResult == null)
+                    throw new ArgumentNullException();
+
+                if (current.ContainsKey(from))
+                {
+                    current[from].Add(newSegmentResult);
+                }
+                else
+                {
+                    current.Add(from, new List<ISegmentResult>());
+                    current[from].Add(newSegmentResult);
+                }
+
+                if (newSegmentResult.GetTotalEstimation() == 0 && foundAny)
+                {
+                    newSourceUpperBound = i;
+                    break;
+                }
+                else if (newSegmentResult.GetTotalEstimation() == 0)
+                    newSourceLowerBound++;
+                else
+                    foundAny = true;
+            }
+
+            AddToDictionaryIfNotThere(from, newSourceUpperBound, _upperBounds);
+            AddToDictionaryIfNotThere(from, newSourceLowerBound, _lowerBounds);
+        }
+
+        private void GetEstimationResultForFilters(Dictionary<TableAttribute, List<ISegmentResult>> current, TableAttribute from, IComparable constant, ComparisonType.Type type)
+        {
+            var allSourceSegments = GetAllSegmentsForAttribute(from);
+            if (allSourceSegments.Count > _milestoneCeil)
+                _milestoneCeil = allSourceSegments.Count;
+            int newSourceLowerBound = GetValueFromDictOrAlt(from, _lowerBounds, 0);
+            int newSourceUpperBound = GetValueFromDictOrAlt(from, _upperBounds, allSourceSegments.Count);
+            bool foundAny = false;
+            for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
+            {
+                ValueResult? newSegmentResult = null;
+                if (type == ComparisonType.Type.More)
+                    newSegmentResult = GetLargerCountFilters(allSourceSegments[i], from, constant);
+                if (type == ComparisonType.Type.Less)
+                    newSegmentResult = GetSmallerCountFilters(allSourceSegments[i], from, constant);
                 if (newSegmentResult == null)
                     throw new ArgumentNullException();
 
@@ -107,46 +183,51 @@ namespace QueryEstimator
                 var firstKey = dict.Keys.First();
                 int sourceLowerBound = GetValueFromDictOrAlt(firstKey, _lowerBounds, 0);
                 int sourceUpperBound = GetValueFromDictOrAlt(firstKey, _upperBounds, dict[firstKey].Count);
-                
+
                 for (int i = 0; i < _milestoneCeil; i++)
                 {
                     if (i >= sourceLowerBound && i < sourceUpperBound)
                         newList.Insert(i, dict[firstKey][i]);
+                    if (i > sourceUpperBound)
+                        break;
                 }
-            }
 
-            foreach(var key in dict.Keys.Skip(1))
-            {
-                int sourceLowerBound = GetValueFromDictOrAlt(key, _lowerBounds, 0);
-                int sourceUpperBound = GetValueFromDictOrAlt(key, _upperBounds, dict[key].Count);
 
-                for (int i = 0; i < newList.Count; i++)
+                foreach (var key in dict.Keys.Skip(1))
                 {
-                    if (i >= sourceLowerBound && i < sourceUpperBound)
+                    sourceLowerBound = GetValueFromDictOrAlt(key, _lowerBounds, 0);
+                    sourceUpperBound = GetValueFromDictOrAlt(key, _upperBounds, dict[key].Count);
+
+                    for (int i = 0; i < newList.Count; i++)
                     {
-                        if (newList[i] != null)
+                        if (i >= sourceLowerBound && i < sourceUpperBound)
                         {
-                            if (newList[i].IsReferencingTableAttribute(key))
+                            if (newList[i] != null)
                             {
-                                var thisValue = dict[key][i];
-                                if (thisValue is ValueResult res)
-                                    newList[i] = new SegmentResult(newList[i], new ValueResult(
-                                        res.TableA,
-                                        res.TableB,
-                                        res.LeftCount,
-                                        1));
-                            }
-                            else
-                            {
-                                var thisValue = dict[key][i];
-                                if (thisValue is ValueResult res)
-                                    newList[i] = new SegmentResult(newList[i], new ValueResult(
-                                        res.TableA,
-                                        res.TableB,
-                                        res.LeftCount,
-                                        res.RightCount));
+                                if (newList[i].IsReferencingTableAttribute(key))
+                                {
+                                    var thisValue = dict[key][i];
+                                    if (thisValue is ValueResult res)
+                                        newList[i] = new SegmentResult(newList[i], new ValueResult(
+                                            res.TableA,
+                                            res.TableB,
+                                            res.LeftCount,
+                                            1));
+                                }
+                                else
+                                {
+                                    var thisValue = dict[key][i];
+                                    if (thisValue is ValueResult res)
+                                        newList[i] = new SegmentResult(newList[i], new ValueResult(
+                                            res.TableA,
+                                            res.TableB,
+                                            res.LeftCount,
+                                            res.RightCount));
+                                }
                             }
                         }
+                        if (i > sourceUpperBound)
+                            break;
                     }
                 }
             }
@@ -154,7 +235,7 @@ namespace QueryEstimator
             return newList;
         }
 
-        private ValueResult GetLargerCount(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
+        private ValueResult GetLargerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
         {
             return new ValueResult(
                 fromAttr,
@@ -163,13 +244,48 @@ namespace QueryEstimator
                 source.ElementsBeforeNextSegmentation);
         }
 
-        private ValueResult GetSmallerCount(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
+        private ValueResult GetSmallerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
         {
             return new ValueResult(
                 fromAttr,
                 compareAttr,
                 (long)source.CountSmallerThan[compareAttr],
                 source.ElementsBeforeNextSegmentation);
+        }
+
+        private ValueResult GetLargerCountFilters(IHistogramSegmentationComparative source, TableAttribute fromAttr, IComparable compareValue)
+        {
+            if (compareValue.IsLessThanOrEqual(source.LowestValue)) {
+                return new ValueResult(
+                    fromAttr,
+                    fromAttr,
+                    GetSmallerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    source.ElementsBeforeNextSegmentation);
+            }
+            else
+                return new ValueResult(
+                    fromAttr,
+                    fromAttr,
+                    GetLargerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    source.ElementsBeforeNextSegmentation);
+        }
+
+        private ValueResult GetSmallerCountFilters(IHistogramSegmentationComparative source, TableAttribute fromAttr, IComparable compareValue)
+        {
+            if (compareValue.IsLargerThanOrEqual(source.LowestValue))
+            {
+                return new ValueResult(
+                    fromAttr,
+                    fromAttr,
+                    GetLargerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    source.ElementsBeforeNextSegmentation);
+            }
+            else
+                return new ValueResult(
+                    fromAttr,
+                    fromAttr,
+                    GetSmallerCountTableAttributes(source, fromAttr, fromAttr).GetTotalEstimation(),
+                    source.ElementsBeforeNextSegmentation);
         }
 
         private List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr)

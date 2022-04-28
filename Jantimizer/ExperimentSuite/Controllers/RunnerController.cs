@@ -2,6 +2,8 @@
 using ExperimentSuite.Models;
 using ExperimentSuite.UserControls;
 using Histograms;
+using QueryEstimator;
+using QueryEstimator.Models;
 using QueryOptimiser.Models;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
@@ -241,12 +243,18 @@ namespace ExperimentSuite.Controllers
                     else
                         analysisResult.ActualCardinality = (ulong)accCardinality;
 
-                    // Get Optimisers prediction
+                    // Get Estimator prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
-                    if (OptimiserResultSentinel.Instance != null)
-                        OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+                    var estimator = new JsonQueryEstimator(RunData.HistoManager);
+                    EstimatorResult jantimatorResult = estimator.GetQueryEstimation(jsonQuery);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Estimator"));
+
+                    // Get Optimisers prediction
+                    //timer = TimerHelper.GetWatchAndStart();
+                    //OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
+                    //if (OptimiserResultSentinel.Instance != null)
+                    //    OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
+                    //CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     if (HistogramResultSentinel.Instance != null)
                         HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
