@@ -1,0 +1,52 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 C1 JOIN world_happiness_2022 C2 ON (C1.happiness_score > C2.happiness_score AND C1.perception_of_corruption > C2.perception_of_corruption)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}

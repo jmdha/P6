@@ -29,7 +29,6 @@
             <StackPanel x:Name="SentinelsPanel" Grid.Column="2" Margin="2">
                 <CheckBox x:Name="OptimiserSentinelCheckbox" Content="Enable Optimiser Result Sentinel" Checked="OptimiserSentinelCheckbox_Click" Unchecked="OptimiserSentinelCheckbox_Click"/>
                 <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Checked="QueryPlanSentinelCheckbox_Click" Unchecked="QueryPlanSentinelCheckbox_Click"/>
-                <CheckBox x:Name="QuerySentinelCheckbox" Content="Enable Query Parser Sentinel" Checked="QuerySentinelCheckbox_Click" Unchecked="QuerySentinelCheckbox_Click"/>
                 <CheckBox x:Name="HistogramSentinelCheckbox" Content="Enable Histogram Sentinel" Checked="HistogramSentinelCheckbox_Click" Unchecked="HistogramSentinelCheckbox_Click"/>
             </StackPanel>
             <Button x:Name="SentinelViewerButton" Content="Sentinel Viewer" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>

@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParser", "Jantimizer\QueryParser\QueryParser.csproj", "{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Jantimizer\Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "Jantimizer\QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
@@ -14,15 +12,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnector", "Jantim
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiser", "Jantimizer\QueryOptimiser\QueryOptimiser.csproj", "{6BA92D63-FB2E-4283-94A9-898A816CC9E6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryOptimiserTest", "Jantimizer\QueryOptimiserTest\QueryOptimiserTest.csproj", "{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Jantimizer\Tools\Tools.csproj", "{5E98EE39-7976-40FF-A6E3-516F50A8271F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HistogramsTests", "Jantimizer\HistogramsTests\HistogramsTests.csproj", "{C95CEF7A-BF0F-42B3-8084-0658B5C58A02}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseConnectorTests", "Jantimizer\DatabaseConnectorTests\DatabaseConnectorTests.csproj", "{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryParserTest", "Jantimizer\QueryParserTest\QueryParserTest.csproj", "{99113765-9490-4A5F-B7F8-96632015C7FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToolsTests", "Jantimizer\ToolsTests\ToolsTests.csproj", "{1D7B992B-10E6-4D59-88AC-776DE1F683C4}"
 EndProject
@@ -42,10 +36,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C1EBF53-2E46-4666-8DFC-61988ABBE9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -66,10 +56,6 @@ Global
 		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BA92D63-FB2E-4283-94A9-898A816CC9E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2ACDFD4-4A59-4DC9-A596-4497B0574C9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E98EE39-7976-40FF-A6E3-516F50A8271F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,10 +68,6 @@ Global
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5888DEDD-1810-4217-A7FC-5D23D7B10AB5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99113765-9490-4A5F-B7F8-96632015C7FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D7B992B-10E6-4D59-88AC-776DE1F683C4}.Release|Any CPU.ActiveCfg = Release|Any CPU

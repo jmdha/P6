@@ -1,11 +1,11 @@
 ﻿using QueryOptimiser.Models;
-using QueryParser.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Exceptions;
+using Tools.Models.JsonModels;
 
 namespace QueryOptimiser.Exceptions
 {
@@ -25,18 +25,9 @@ namespace QueryOptimiser.Exceptions
             var sb = new StringBuilder();
             sb.AppendLine($"Optimiser Name: {Optimiser.GetType().Name}");
             sb.AppendLine($"Histogram Manager Name: {Optimiser.HistogramManager.GetType().Name}");
-            sb.AppendLine($"Cost Calculator Name: {Optimiser.EstimateCalculator.GetType().Name}");
             sb.AppendLine("Input Nodes:");
-            foreach(var node in InputNodes)
-            {
-                if (node is JoinNode joinNode)
-                {
-                    sb.AppendLine($"\tNode [{nameof(JoinNode)}]:");
-                    sb.AppendLine($"\t\t Predicate: {joinNode.Predicate}");
-                    foreach(var table in joinNode.Relation.GetJoinTables())
-                        sb.AppendLine($"\t\t Tables: {table.TableName}, alias: [{table.Alias}]");
-                }
-            }
+            foreach (var node in InputNodes)
+                sb.AppendLine(node.ToString());
             return sb.ToString();
         }
     }

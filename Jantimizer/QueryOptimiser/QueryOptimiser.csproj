@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\QueryParser\QueryParser.csproj" />
     <ProjectReference Include="..\Histograms\Histograms.csproj" />
   </ItemGroup>
 
