@@ -61,25 +61,6 @@ namespace ExperimentSuite.SuiteDatas
             return mySQLModel;
         }
 
-        public static SuiteData GetMySQLSD_EquiDepthVariance(JsonObject optionalTestSettings)
-        {
-            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new DatabaseConnector.Connectors.MyConnector(mySQLConnectionProperties);
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new EquiDepthVarianceHistogramManager(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var mySQLOptimiser = new QueryOptimiserEquiDepthVariance(mySQLHistoManager);
-            var mySQLModel = new SuiteData(
-                new TestSettings(mySQLConnectionProperties),
-                "EquiDepthVariance",
-                "MYSQL",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLOptimiser);
-            return mySQLModel;
-        }
         public static SuiteData GetMySQLSD_MinDepth(JsonObject optionalTestSettings)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
@@ -144,25 +125,6 @@ namespace ExperimentSuite.SuiteDatas
             return postgresModel;
         }
 
-        public static SuiteData GetPostgresSD_EquiDepthVariance(JsonObject optionalTestSettings)
-        {
-            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new EquiDepthVarianceHistogramManager(
-                new PostgresDataGatherer(postConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
-            var postOptimiser = new QueryOptimiserEquiDepthVariance(postHistoManager);
-            var postgresModel = new SuiteData(
-                new TestSettings(postConnectionProperties),
-                "EquiDepthVariance",
-                "POSGRESQL",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postOptimiser);
-            return postgresModel;
-        }
         public static SuiteData GetPostgresSD_MinDepth(JsonObject optionalTestSettings)
         {
             var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
@@ -193,9 +155,6 @@ namespace ExperimentSuite.SuiteDatas
             var pgDataEquiDepth = GetPostgresSD_EquiDepth(optionalSettings);
             var myDataEquiDepth = GetMySQLSD_EquiDepth(optionalSettings);
 
-            var pgDataEquiDepthVariance = GetPostgresSD_EquiDepthVariance(optionalSettings);
-            var myDataEquiDepthVariance = GetMySQLSD_EquiDepthVariance(optionalSettings);
-
             var pgDataMinDepth = GetPostgresSD_MinDepth(optionalSettings);
             var myDataMinDepth = GetMySQLSD_MinDepth(optionalSettings);
 
@@ -204,8 +163,6 @@ namespace ExperimentSuite.SuiteDatas
                 myDataDefault,
                 pgDataEquiDepth,
                 myDataEquiDepth,
-                pgDataEquiDepthVariance,
-                myDataEquiDepthVariance,
                 pgDataMinDepth,
                 myDataMinDepth
             };
