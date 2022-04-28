@@ -16,11 +16,8 @@ namespace Tools.Models.JsonModels
             Table = table;
             Attribute = attribute;
         }
-        public TableAttribute()
-        {
-            Table = new TableReferenceNode();
-            Attribute = "";
-        }
+        public TableAttribute(string table, string attribute) : this(new TableReferenceNode(table), attribute) { }
+        public TableAttribute() : this (new TableReferenceNode(), "") {}
 
         public override bool Equals(object? obj)
         {

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text;
+using Tools.Models.JsonModels;
 
 namespace Histograms.Models
 {
@@ -7,24 +8,24 @@ namespace Histograms.Models
     {
         public Guid HistogramId { get; internal set; }
         public abstract List<TypeCode> AcceptedTypes { get; }
+        public TypeCode DataTypeCode { get; internal set; }
         public List<IHistogramBucket> Buckets { get; }
-        public string TableName { get; }
-        public string AttributeName { get; }
+        public List<IHistogramSegmentationComparative> Segmentations { get; }
+        public TableAttribute TableAttribute { get; }
+        public string TableName => TableAttribute.Table.TableName;
+        public string AttributeName => TableAttribute.Attribute;
 
-        public BaseHistogram(string tableName, string attributeName)
-        {
-            HistogramId = Guid.NewGuid();
-            TableName = tableName;
-            AttributeName = attributeName;
-            Buckets = new List<IHistogramBucket>();
-        }
+        public BaseHistogram(string tableName, string attributeName) : this(Guid.NewGuid(), tableName, attributeName)
+        { }
 
-        public BaseHistogram(Guid histogramId, string tableName, string attributeName)
+        public BaseHistogram(Guid histogramId, string tableName, string attributeName) : this(histogramId, new TableAttribute(tableName, attributeName))
+        { }
+        public BaseHistogram(Guid histogramId, TableAttribute tableAttribute)
         {
             HistogramId = histogramId;
-            TableName = tableName;
-            AttributeName = attributeName;
+            TableAttribute = tableAttribute;
             Buckets = new List<IHistogramBucket>();
+            Segmentations = new List<IHistogramSegmentationComparative>();
         }
 
         public void GenerateHistogram(DataTable table, string key)
@@ -39,9 +40,39 @@ namespace Histograms.Models
             GenerateHistogramFromSorted(sorted);
         }
 
-        protected abstract void GenerateHistogramFromSorted(List<IComparable> sorted);
+        private void GenerateHistogramFromSorted(List<IComparable> sorted)
+        {
+            GenerateHistogramFromSortedGroups(sorted
+                .GroupBy(x => x)
+                .Select(group =>
+                    new ValueCount(
+                        group.First(),
+                        group.Count()
+                    )
+                )
+            );
+        }
 
         public abstract void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups);
+        public void GenerateSegmentationsFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
+        {
+            GenerateHistogramFromSortedGroups(sortedGroups);
+
+            // Turn all bucket-starts into segmentations
+            foreach (var bucket in Buckets)
+            {
+                Segmentations.Add(new HistogramSegmentationComparative(bucket.ValueStart, bucket.Count));
+            }
+
+            // Remove any segmentations for the last unique value, to prevent duplicates (And there might be multiple from equidepth)
+            ValueCount lastUniqueValue = sortedGroups.Last();
+            foreach (var segmentation in Segmentations.Where(s => s.LowestValue == lastUniqueValue.Value).ToList())
+                Segmentations.Remove(segmentation);
+
+            // Add final segmentation
+            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, lastUniqueValue.Count));
+            DataTypeCode = Type.GetTypeCode(Segmentations.First().LowestValue.GetType());
+        }
 
         public override string? ToString()
         {

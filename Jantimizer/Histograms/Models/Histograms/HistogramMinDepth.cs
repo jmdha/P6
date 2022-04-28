@@ -34,13 +34,6 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
-        {
-            GenerateHistogramFromSortedGroups(
-                sorted.GroupBy(x => x).Select(grp => new ValueCount(grp.Key, grp.Count())).ToList()
-            );
-        }
-
         public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
             IComparable? minValue = null;

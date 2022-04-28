@@ -34,7 +34,7 @@ namespace Histograms.Models
             Depth = depth;
         }
 
-        protected override void GenerateHistogramFromSorted(List<IComparable> sorted)
+        private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
             for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
             {
