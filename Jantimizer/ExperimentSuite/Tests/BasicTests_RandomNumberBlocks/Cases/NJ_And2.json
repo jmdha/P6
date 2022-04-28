@@ -1,6 +1,6 @@
 ﻿{
   "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON (a.v > b.v AND a.v < 50)",
-  "DoRun": true,
+  "DoRun": false,
   "JoinNodes": [
     {
       "Predicates": [

@@ -10,9 +10,8 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public abstract class BasePredicateEstimator<RefT, TLeft, TRight> : IPredicateEstimator<
+    public abstract class BasePredicateEstimator<TLeft, TRight> : IPredicateEstimator<
         Dictionary<TableAttribute, int>, 
-        RefT, 
         TLeft, 
         TRight>
     {
@@ -27,25 +26,25 @@ namespace QueryEstimator.PredicateEstimators
             HistogramManager = histogramManager;
         }
 
-        public abstract void GetEstimationResult(RefT dict, TLeft source, TRight compare, ComparisonType.Type type);
+        public abstract ISegmentResult GetEstimationResult(ISegmentResult current, TLeft source, TRight compare, ComparisonType.Type type, bool isReverse = false);
 
-        internal ValueResult GetLargerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
-        {
-            return new ValueResult(
-                fromAttr,
-                compareAttr,
-                GetAbstractCount(source.CountLargerThan, compareAttr),
-                source.ElementsBeforeNextSegmentation);
-        }
+        //internal ValueResult GetLargerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
+        //{
+        //    return new ValueResult(
+        //        fromAttr,
+        //        compareAttr,
+        //        GetAbstractCount(source.CountLargerThan, compareAttr),
+        //        source.ElementsBeforeNextSegmentation);
+        //}
 
-        internal ValueResult GetSmallerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
-        {
-            return new ValueResult(
-                fromAttr,
-                compareAttr,
-                GetAbstractCount(source.CountSmallerThan, compareAttr),
-                source.ElementsBeforeNextSegmentation);
-        }
+        //internal ValueResult GetSmallerCountTableAttributes(IHistogramSegmentationComparative source, TableAttribute fromAttr, TableAttribute compareAttr)
+        //{
+        //    return new ValueResult(
+        //        fromAttr,
+        //        compareAttr,
+        //        GetAbstractCount(source.CountSmallerThan, compareAttr),
+        //        source.ElementsBeforeNextSegmentation);
+        //}
 
 
         public long GetAbstractCount(Dictionary<TableAttribute, ulong> dict, TableAttribute attr)

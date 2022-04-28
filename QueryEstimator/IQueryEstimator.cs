@@ -1,5 +1,4 @@
 ﻿using Histograms;
-using QueryEstimator.Mergers;
 using QueryEstimator.Models;
 using QueryEstimator.PredicateEstimators;
 using Tools.Models.JsonModels;
