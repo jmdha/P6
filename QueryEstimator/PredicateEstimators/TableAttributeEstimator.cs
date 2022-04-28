@@ -33,7 +33,7 @@ namespace QueryEstimator.PredicateEstimators
                 bool foundAny = false;
                 for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
                 {
-                    var newInnerResult = (long)allSourceSegments[i].CountSmallerThan[compare] * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    var newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
 
                     if (newInnerResult == 0 && !foundAny)
                     {
@@ -59,7 +59,7 @@ namespace QueryEstimator.PredicateEstimators
                 bool foundAny = false;
                 for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
                 {
-                    var newInnerResult = (long)allSourceSegments[i].CountLargerThan[compare] * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    var newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
 
                     if (newInnerResult == 0 && foundAny)
                     {

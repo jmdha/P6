@@ -64,9 +64,6 @@ namespace Histograms.Models
         {
             ulong smaller = 0;
             ulong larger = 0;
-            
-
-
 
             foreach(var valueCount in data.ValueCounts)
             {
@@ -75,7 +72,6 @@ namespace Histograms.Models
                 else if (valueCount.Value.CompareTo(segmentation.LowestValue) > 0)
                     larger += (ulong)valueCount.Count;
             }
-
             
             if(segmentation.CountSmallerThan.ContainsKey(data.Attribute))
             {
@@ -103,8 +99,5 @@ namespace Histograms.Models
                 )
                 .Distinct();
         }
-
-
-
     }
 }
