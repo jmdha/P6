@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
-namespace QueryEstimator.Models
+namespace QueryEstimator.Models.PredicateScanners
 {
-    internal class FilterPredicate
+    internal class FilterPredicate : IPredicate
     {
         public TableAttribute LeftTable { get; set; }
         public IComparable ConstantValue { get; set; }

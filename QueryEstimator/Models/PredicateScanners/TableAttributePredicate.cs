@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
-namespace QueryEstimator.Models
+namespace QueryEstimator.Models.PredicateScanners
 {
-    internal class TableAttributePredicate
+    internal class TableAttributePredicate : IPredicate
     {
         public TableAttribute LeftTable { get; set; }
         public TableAttribute RightTable { get; set; }
