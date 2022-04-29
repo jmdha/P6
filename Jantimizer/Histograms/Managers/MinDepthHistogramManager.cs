@@ -30,7 +30,7 @@ namespace Histograms.Managers
                 tableName,
                 attributeName,
                 Depth);
-            histogram.GenerateHistogramFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
+            histogram.GenerateSegmentationsFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
         }
 

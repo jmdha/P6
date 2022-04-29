@@ -13,17 +13,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="experiments.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QueryOptimiser\QueryOptimiser.csproj" />
+    <ProjectReference Include="..\..\QueryEstimator\QueryEstimator.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\ResultsSentinel\ResultsSentinel.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />

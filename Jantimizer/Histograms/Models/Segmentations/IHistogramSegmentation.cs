@@ -16,9 +16,4 @@ namespace Histograms.Models
 
         public long ElementsBeforeNextSegmentation { get; set; }
     }
-    public interface IHistogramSegmentationComparative : IHistogramSegmentation
-    {
-        public Dictionary<TableAttribute, ulong> CountSmallerThan { get; }
-        public Dictionary<TableAttribute, ulong> CountLargerThan { get; }
-    }
 }

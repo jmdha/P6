@@ -39,7 +39,7 @@ namespace Tools.Models.JsonModels
                 case Type.More: return ">";
                 case Type.EqualOrLess: return "<=";
                 case Type.EqualOrMore: return ">=";
-                default: throw new ArgumentOutOfRangeException("Unhandled join string " + nameof(operatorType));
+                default: return "None";
             }
         }
     }

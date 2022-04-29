@@ -2,7 +2,8 @@
 using ExperimentSuite.Models;
 using ExperimentSuite.UserControls;
 using Histograms;
-using QueryOptimiser.Models;
+using QueryEstimator;
+using QueryEstimator.Models;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using ResultsSentinel;
@@ -241,12 +242,19 @@ namespace ExperimentSuite.Controllers
                     else
                         analysisResult.ActualCardinality = (ulong)accCardinality;
 
-                    // Get Optimisers prediction
+                    // Get Estimator prediction
                     timer = TimerHelper.GetWatchAndStart();
-                    OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
-                    if (OptimiserResultSentinel.Instance != null)
-                        OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
-                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
+                    EstimatorResult jantimatorResult = RunData.Estimator.GetQueryEstimation(jsonQuery);
+                    CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Estimator"));
+                    if (EstimatorResultSentinel.Instance != null)
+                        EstimatorResultSentinel.Instance.CheckResult(jantimatorResult, queryFile.Name, ExperimentName, RunnerName);
+
+                    // Get Optimisers prediction
+                    //timer = TimerHelper.GetWatchAndStart();
+                    //OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
+                    //if (OptimiserResultSentinel.Instance != null)
+                    //    OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
+                    //CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
 
                     if (HistogramResultSentinel.Instance != null)
                         HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
@@ -260,7 +268,7 @@ namespace ExperimentSuite.Controllers
                             RunData.Name,
                             analysisResult.EstimatedCardinality,
                             analysisResult.ActualCardinality,
-                            jantimiserResult.EstTotalCardinality)
+                            jantimatorResult.EstimatedCardinality)
                         );
                 }
             }

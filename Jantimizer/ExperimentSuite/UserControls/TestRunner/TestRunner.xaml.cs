@@ -1,6 +1,5 @@
 ﻿using ExperimentSuite.Controllers;
 using ExperimentSuite.Models;
-using QueryOptimiser.Models;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using System;

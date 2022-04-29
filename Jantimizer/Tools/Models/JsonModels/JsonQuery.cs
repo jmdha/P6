@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Tools.Models.JsonModels
 {
-    public class JsonQuery
+    public class JsonQuery : ICloneable
     {
         public List<JoinNode> JoinNodes { get; set; }
         public string EquivalentSQLQuery { get; set; }
@@ -17,6 +17,13 @@ namespace Tools.Models.JsonModels
                 newList.AddRange(JoinNodes);
                 return newList;
             } 
+        }
+        public List<TableAttribute> TableAttributes { get {
+                var newList = new List<TableAttribute>();
+                foreach (var node in JoinNodes)
+                    newList.AddRange(node.TableAttributes);
+                return newList.Select(x => x).Distinct().ToList();
+            }
         }
 
         public JsonQuery()
@@ -55,6 +62,15 @@ namespace Tools.Models.JsonModels
             foreach (var node in Nodes)
                 sb.AppendLine(node.ToString());
             return sb.ToString();
+        }
+
+        public object Clone()
+        {
+            var newList = new List<JoinNode>();
+            foreach(var node in JoinNodes)
+                if (node.Clone() is JoinNode join)
+                    newList.Add(join);
+            return new JsonQuery(newList, EquivalentSQLQuery, DoRun);
         }
     }
 }
