@@ -1,20 +1,20 @@
-﻿using QueryOptimiser.Models;
+﻿using QueryEstimator.Models;
 using System.Text;
 using Tools.Models.Dictionaries;
 
 namespace ResultsSentinel
 {
-    public class OptimiserResultSentinel : BaseResultSentinel<OptimiserResult>
+    public class EstimatorResultSentinel : BaseResultSentinel<EstimatorResult>
     {
-        public static OptimiserResultSentinel? Instance;
+        public static EstimatorResultSentinel? Instance;
 
-        public OptimiserResultSentinel() : base()
+        public EstimatorResultSentinel() : base()
         {
             Instance = this;
             Criticality = SentinelCriticality.High;
         }
 
-        public override string GetErrorDescription(OptimiserResult value1, OptimiserResult value2)
+        public override string GetErrorDescription(EstimatorResult value1, EstimatorResult value2)
         {
             var sb = new StringBuilder();
             sb.AppendLine("Missmatch in OptimiserResults!");

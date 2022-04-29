@@ -3,7 +3,14 @@
     public class TableReferenceNode : INode, ICloneable
     {
         public string TableName { get; set; }
-        public string Alias { get; set; }
+        private string _alias = "";
+        public string Alias { get {
+                if (_alias == "")
+                    return TableName;
+                return _alias;
+            } set {
+                _alias = value;
+            } }
 
         public TableReferenceNode(string tableName, string alias)
         {

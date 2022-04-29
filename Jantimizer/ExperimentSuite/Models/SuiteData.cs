@@ -1,13 +1,14 @@
 ﻿using DatabaseConnector;
 using Histograms;
 using Histograms.Models;
-using QueryOptimiser;
+using QueryEstimator;
 using QueryPlanParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace ExperimentSuite.Models
 {
@@ -22,7 +23,7 @@ namespace ExperimentSuite.Models
 
         public IHistogramManager HistoManager { get; set; }
 
-        public IQueryOptimiser Optimiser { get; set; }
+        public IQueryEstimator<JsonQuery> Estimator { get; set; }
 
         public SuiteData(
             TestSettings settings,
@@ -30,8 +31,8 @@ namespace ExperimentSuite.Models
             string name, 
             IDbConnector connector, 
             IPlanParser parser, 
-            IHistogramManager histoManager, 
-            IQueryOptimiser optimiser)
+            IHistogramManager histoManager,
+            IQueryEstimator<JsonQuery> estimator)
         {
             Settings = settings;
             ID = id;
@@ -39,7 +40,7 @@ namespace ExperimentSuite.Models
             Connector = connector;
             Parser = parser;
             HistoManager = histoManager;
-            Optimiser = optimiser;
+            Estimator = estimator;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace HistogramsTests.Stubs
 {
@@ -14,11 +15,18 @@ namespace HistogramsTests.Stubs
 
         public string AttributeName => throw new NotImplementedException();
 
+        public TableAttribute TableAttribute => throw new NotImplementedException();
+
         public List<IHistogramBucket> Buckets => throw new NotImplementedException();
+        public List<IHistogramSegmentation> Segmentations => throw new NotImplementedException();
 
         public List<TypeCode> AcceptedTypes => throw new NotImplementedException();
 
         public Guid HistogramId => throw new NotImplementedException();
+
+        public TypeCode DataTypeCode => throw new NotImplementedException();
+
+        List<IHistogramSegmentationComparative> IHistogram.Segmentations => throw new NotImplementedException();
 
         public object Clone()
         {
@@ -36,6 +44,11 @@ namespace HistogramsTests.Stubs
         }
 
         public void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GenerateSegmentationsFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
             throw new NotImplementedException();
         }

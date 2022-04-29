@@ -27,7 +27,7 @@ namespace ExperimentSuite
         public MainWindow()
         {
             // Sentinels
-            new OptimiserResultSentinel();
+            new EstimatorResultSentinel();
             new QueryPlanParserResultSentinel();
             new HistogramResultSentinel();
 
@@ -94,9 +94,9 @@ namespace ExperimentSuite
         private void OptimiserSentinelCheckbox_Click(object sender, RoutedEventArgs e)
         {
             if (sender is CheckBox checkBox)
-                if (OptimiserResultSentinel.Instance != null)
+                if (EstimatorResultSentinel.Instance != null)
                     if (checkBox.IsChecked != null)
-                        OptimiserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
+                        EstimatorResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
         private void QueryPlanSentinelCheckbox_Click(object sender, RoutedEventArgs e)
@@ -118,8 +118,8 @@ namespace ExperimentSuite
         private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var newList = new List<IResultSentinel>();
-            if (OptimiserResultSentinel.Instance != null)
-                newList.Add(OptimiserResultSentinel.Instance);
+            if (EstimatorResultSentinel.Instance != null)
+                newList.Add(EstimatorResultSentinel.Instance);
             if (QueryPlanParserResultSentinel.Instance != null)
                 newList.Add(QueryPlanParserResultSentinel.Instance);
             if (HistogramResultSentinel.Instance != null)
@@ -130,8 +130,8 @@ namespace ExperimentSuite
 
         private void ClearSentinelLogs()
         {
-            if (OptimiserResultSentinel.Instance != null)
-                OptimiserResultSentinel.Instance.ClearSentinel();
+            if (EstimatorResultSentinel.Instance != null)
+                EstimatorResultSentinel.Instance.ClearSentinel();
             if (QueryPlanParserResultSentinel.Instance != null)
                 QueryPlanParserResultSentinel.Instance.ClearSentinel();
             if (HistogramResultSentinel.Instance != null)
