@@ -11,18 +11,21 @@ namespace QueryEstimator.PredicateScanners
     internal class JoinPredicateScanner : IPredicateScanner<List<JoinNode>>
     {
         public Dictionary<Type, List<IPredicate>> Predicates { get; }
+        private List<TableAttribute> _usedAttributes;
 
         public JoinPredicateScanner()
         {
             Predicates = new Dictionary<Type, List<IPredicate>>();
+            _usedAttributes = new List<TableAttribute>();
         }
 
         public void Scan(List<JoinNode> nodes)
         {
             Predicates.Clear();
+            _usedAttributes.Clear();
 
             List<FilterPredicate> baseFilters = new List<FilterPredicate>();
-            List<TableAttribute> usedAttributes = new List<TableAttribute>();
+            List<TableAttribute> usedFilterAttributes = new List<TableAttribute>();
 
             // Scanning
             foreach (var node in nodes)
@@ -31,12 +34,9 @@ namespace QueryEstimator.PredicateScanners
                 {
                     if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
                     {
-                        AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                            predicate.LeftAttribute.Attribute,
-                            predicate.RightAttribute.Attribute,
-                            predicate.GetComType()));
-                        usedAttributes.Add(predicate.LeftAttribute.Attribute);
-                        usedAttributes.Add(predicate.RightAttribute.Attribute);
+                        AddPredicateIfValid(predicate);
+                        usedFilterAttributes.Add(predicate.LeftAttribute.Attribute);
+                        usedFilterAttributes.Add(predicate.RightAttribute.Attribute);
                     }
                     else if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
                     {
@@ -66,10 +66,63 @@ namespace QueryEstimator.PredicateScanners
             // Seperate filters
             foreach (var filter in baseFilters)
             {
-                if (usedAttributes.Contains(filter.LeftTable))
+                if (usedFilterAttributes.Contains(filter.LeftTable))
                     AddToDict<SimpleFilterPredicate>(new SimpleFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
                 else
                     AddToDict<CrossFilterPredicate>(new CrossFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
+            }
+        }
+
+        private void AddPredicateIfValid(JoinPredicate predicate)
+        {
+            if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
+            {
+                if (_usedAttributes.Count == 0)
+                {
+                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                        predicate.LeftAttribute.Attribute,
+                        predicate.RightAttribute.Attribute,
+                        predicate.GetComType()));
+                    _usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                }
+                else
+                {
+                    if (_usedAttributes.Contains(predicate.LeftAttribute.Attribute))
+                    {
+                        AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                            predicate.LeftAttribute.Attribute,
+                            predicate.RightAttribute.Attribute,
+                            predicate.GetComType()));
+                    }
+                    else if (_usedAttributes.Contains(predicate.RightAttribute.Attribute))
+                    {
+                        if (predicate.GetComType() == ComparisonType.Type.Less)
+                        {
+                            AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.Attribute,
+                                ComparisonType.Type.More));
+                        }
+                        else if (predicate.GetComType() == ComparisonType.Type.More)
+                        {
+                            AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.Attribute,
+                                ComparisonType.Type.Less));
+                        }
+                        else
+                            throw new Exception("Invalid Predicate!");
+                    }
+                    else
+                    {
+                        AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                            predicate.LeftAttribute.Attribute,
+                            predicate.RightAttribute.Attribute,
+                            predicate.GetComType()));
+                        _usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                    }
+                }
             }
         }
 
