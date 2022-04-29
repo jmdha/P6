@@ -1,0 +1,94 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 C1, world_happiness_2022 C2 WHERE C1.rank < C2.rank AND C1.happiness_score > C2.happiness_score AND C1.gdp_per_capita < C2.gdp_per_capita AND wh1.generocity > C2.generocity",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "rank"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "rank"
+            }
+          },
+          "ComType": "<"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "gdp_per_capita",
+                "Alias": "C1"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "gdp_per_capita",
+                "Alias": "C2"
+              },
+              "Attribute": "happiness_score"
+            }
+          },
+          "ComType": "<"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "gdp_per_capita",
+                "Alias": "C1"
+              },
+              "Attribute": "generocity"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "gdp_per_capita",
+                "Alias": "C2"
+              },
+              "Attribute": "generocity"
+            }
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}

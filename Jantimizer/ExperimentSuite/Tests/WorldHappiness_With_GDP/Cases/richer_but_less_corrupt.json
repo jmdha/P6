@@ -1,0 +1,52 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 C1, world_happiness_2022 C2 WHERE C1.gdp_per_capita > C2.gdp_per_capita AND C1.perception_of_corruption < C2.perception_of_corruption",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "gdp_per_capita"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "gdp_per_capita"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}
