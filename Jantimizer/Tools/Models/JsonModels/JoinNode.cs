@@ -68,8 +68,6 @@ namespace Tools.Models.JsonModels
             int hash = 0;
             foreach (var pred in Predicates)
                 hash += pred.GetHashCode();
-            foreach (var table in Tables)
-                hash += table.GetHashCode();
             return hash;
         }
 

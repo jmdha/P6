@@ -72,5 +72,13 @@ namespace Tools.Models.JsonModels
                     newList.Add(join);
             return new JsonQuery(newList, EquivalentSQLQuery, DoRun);
         }
+
+        public override int GetHashCode()
+        {
+            int hash = 0;
+            foreach (var node in Nodes)
+                hash += node.GetHashCode();
+            return hash + HashCode.Combine(EquivalentSQLQuery, DoRun);
+        }
     }
 }
