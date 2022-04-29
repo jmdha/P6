@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON a.v > b.v",
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON b.v > a.v",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -8,7 +8,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "a"
+                "TableName": "b"
               },
               "Attribute": "v"
             }
@@ -16,7 +16,7 @@
           "RightAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "b"
+                "TableName": "a"
               },
               "Attribute": "v"
             }
