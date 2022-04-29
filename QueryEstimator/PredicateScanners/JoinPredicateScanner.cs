@@ -40,10 +40,16 @@ namespace QueryEstimator.PredicateScanners
                     }
                     else if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
                     {
-                        baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            predicate.GetComType()));
+                        if (predicate.GetComType() == ComparisonType.Type.Less)
+                            baseFilters.Add(new FilterPredicate(
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.ConstantValue,
+                                ComparisonType.Type.More));
+                        if (predicate.GetComType() == ComparisonType.Type.More)
+                            baseFilters.Add(new FilterPredicate(
+                                predicate.RightAttribute.Attribute,
+                                predicate.LeftAttribute.ConstantValue,
+                                ComparisonType.Type.Less));
                     }
                     else if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.ConstantValue != null)
                     {
