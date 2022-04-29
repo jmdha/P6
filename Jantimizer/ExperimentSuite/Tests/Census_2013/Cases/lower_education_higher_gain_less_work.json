@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "select C1.id, C1.education, C1.capital_gain, C1.hours_per_week, C2.id, C2.education, C2.capital_gain, C2.hours_per_week from census c1 join census c2 on (c1.education_num < 9 and c2.education_num > 12 and c1.capital_gain > c2.capital_gain and c1.hours_per_week < c2.hours_per_week and c2.capital_gain > 2000)",
+  "EquivalentSQLQuery": "SELECT C1.id, C1.education, C1.capital_gain, C1.hours_per_week, C2.id, C2.education, C2.capital_gain, C2.hours_per_week FROM census c1 JOIN census c2 ON (c1.education_num < 9 AND c2.education_num > 12 AND c1.capital_gain > c2.capital_gain AND c1.hours_per_week < c2.hours_per_week AND c2.capital_gain > 2000)",
   "DoRun": false,
   "JoinNodes": [
     {

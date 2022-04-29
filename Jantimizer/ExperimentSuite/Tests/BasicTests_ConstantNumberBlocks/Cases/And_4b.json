@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "select count(*) from ((a join b on a.v < b.v) join c on a.v < c.v and b.v > c.v) join d on a.v < d.v and b.v > d.v and c.v > d.v",
+  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON a.v < b.v) JOIN c ON a.v < c.v AND b.v > c.v) JOIN d ON a.v < d.v AND b.v > d.v AND c.v > d.v",
   "DoRun": true,
   "JoinNodes": [
     {
