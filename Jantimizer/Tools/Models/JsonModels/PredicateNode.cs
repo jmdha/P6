@@ -8,7 +8,6 @@ namespace Tools.Models.JsonModels
 {
     public class PredicateNode : ICloneable
     {
-        public bool IsAttribute => Attribute != null;
         public TableAttribute? Attribute { get; set; }
         public string? ConstantValue { get; set; }
 
@@ -47,6 +46,14 @@ namespace Tools.Models.JsonModels
             if (ConstantValue != null)
                 return $"Constant: {ConstantValue}";
             return "";
+        }
+
+        public override int GetHashCode()
+        {
+            if (Attribute != null)
+                return Attribute.GetHashCode();
+
+            return HashCode.Combine(ConstantValue);
         }
     }
 }

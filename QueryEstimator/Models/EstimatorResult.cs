@@ -24,5 +24,21 @@ namespace QueryEstimator.Models
                 return new EstimatorResult(query, EstimatedCardinality);
             throw new ArgumentNullException("Could not clone!");
         }
+
+        public override int GetHashCode()
+        {
+            return FromQuery.GetHashCode() + HashCode.Combine(EstimatedCardinality);
+        }
+
+        public override string? ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Json Query was:");
+            sb.AppendLine(FromQuery.ToString());
+            sb.AppendLine("Estimated Cardinality was:");
+            sb.AppendLine($"{EstimatedCardinality}");
+
+            return sb.ToString();
+        }
     }
 }
