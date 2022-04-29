@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON a.v < b.v) JOIN c ON b.v < c.v) JOIN d ON c.v < d.v",
+  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON a.v > b.v) JOIN c ON a.v > c.v) JOIN d ON a.v > d.v",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -21,7 +21,7 @@
               "Attribute": "v"
             }
           },
-          "ComType": "<"
+          "ComType": ">"
         }
       ]
     },
@@ -31,7 +31,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "b"
+                "TableName": "a"
               },
               "Attribute": "v"
             }
@@ -44,7 +44,7 @@
               "Attribute": "v"
             }
           },
-          "ComType": "<"
+          "ComType": ">"
         }
       ]
     },
@@ -54,7 +54,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "c"
+                "TableName": "a"
               },
               "Attribute": "v"
             }
@@ -67,7 +67,7 @@
               "Attribute": "v"
             }
           },
-          "ComType": "<"
+          "ComType": ">"
         }
       ]
     }
