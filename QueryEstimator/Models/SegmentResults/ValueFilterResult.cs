@@ -7,28 +7,31 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models
 {
-    internal class ValueTableAttributeResult : ISegmentResult
+    internal class ValueFilterResult : ISegmentResult
     {
         public int TableAUpperBound { get; set; }
         public int TableALowerBound { get; set; }
         public TableAttribute TableA { get; set; }
-        public TableAttribute TableB { get; set; }
-        public long Count { get; set; }
+        public IComparable ConstantValue { get; set; }
         public ComparisonType.Type ComType { get; set; }
 
-        public ValueTableAttributeResult(int tableAUpperBound, int tableALowerBound, TableAttribute tableA, TableAttribute tableB, long count, ComparisonType.Type comType)
+        public ValueFilterResult(int tableAUpperBound, int tableALowerBound, TableAttribute tableA, IComparable constantValue, ComparisonType.Type comType)
         {
             TableAUpperBound = tableAUpperBound;
             TableALowerBound = tableALowerBound;
             TableA = tableA;
-            TableB = tableB;
-            Count = count;
+            ConstantValue = constantValue;
             ComType = comType;
         }
 
         public long GetTotalEstimation()
         {
-            return Count;
+            return 1;
+        }
+
+        public override int GetHashCode()
+        {
+            return TableA.GetHashCode() + HashCode.Combine(TableALowerBound, TableAUpperBound, ConstantValue, ComparisonType.GetOperatorString(ComType));
         }
     }
 }

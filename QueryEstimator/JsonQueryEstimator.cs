@@ -25,8 +25,10 @@ namespace QueryEstimator
         private Dictionary<string, int> _upperRowBounds;
         private Dictionary<string, int> _lowerRowBounds;
         private TableAttribute _initAttribute = new TableAttribute();
+        private int _maxSweeps = 0;
+        private JsonQuery _currentQuery;
 
-        public JsonQueryEstimator(IHistogramManager histogramManager)
+        public JsonQueryEstimator(IHistogramManager histogramManager, int maxSweeps)
         {
             HistogramManager = histogramManager;
             _upperBounds = new Dictionary<TableAttribute, int>();
@@ -36,12 +38,14 @@ namespace QueryEstimator
             FilterEstimator = new CrossFilterEstimator(_upperRowBounds, _lowerRowBounds, histogramManager);
             TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, histogramManager);
             SimpleFilterEstimator = new SimpleFilterEstimator(_upperBounds, _lowerBounds, histogramManager);
+            _maxSweeps = maxSweeps;
         }
 
         public EstimatorResult GetQueryEstimation(JsonQuery query)
         {
             try
             {
+                _currentQuery = query;
                 long returnValue = GetIntermediateResults(query).GetTotalEstimation();
 
                 return new EstimatorResult(query, (ulong)returnValue);
@@ -98,6 +102,7 @@ namespace QueryEstimator
                 }
             }
 
+            // Seperate filters
             foreach(var filter in baseFilters)
             {
                 if (usedAttributes.Contains(filter.LeftTable))
@@ -106,7 +111,7 @@ namespace QueryEstimator
                     crossFilters.Add(filter);
             }
 
-            // Simple filters
+            // Limit bounds for simple filters
             foreach (var filter in simpleFilters)
             {
                 SimpleFilterEstimator.GetEstimationResult(
@@ -116,7 +121,7 @@ namespace QueryEstimator
                     filter.ComType);
             }
 
-            // Cross filters
+            // Limit bounds for cross filters
             foreach (var filter in crossFilters)
             {
                 FilterEstimator.GetEstimationResult(
@@ -126,7 +131,7 @@ namespace QueryEstimator
                     filter.ComType);
             }
 
-            // Predicates
+            // Get estiamtes from predicates
             foreach (var predicate in predicates)
             {
                 result = TableAttributeEstimator.GetEstimationResult(
@@ -136,17 +141,32 @@ namespace QueryEstimator
                     predicate.ComType);
             }
 
-            CalculateBounds(result);
+            // Sweep all results for bounds changes
+            result = SweepAllSegments(result);
 
             return result;
         }
 
-        private ISegmentResult CalculateBounds(ISegmentResult current)
+        private ISegmentResult SweepAllSegments(ISegmentResult result)
+        {
+            int currentHash = result.GetHashCode();
+            for (int i = 0; i < _maxSweeps; i++)
+            {
+                result = SweepSegments(result);
+                var newHash = result.GetHashCode();
+                if (newHash == currentHash)
+                    break;
+                currentHash = newHash;
+            }
+            return result;
+        }
+
+        private ISegmentResult SweepSegments(ISegmentResult current)
         {
             if (current is SegmentResult seg)
             {
-                seg.Left = CalculateBounds(seg.Left);
-                seg.Right = CalculateBounds(seg.Right);
+                seg.Left = SweepSegments(seg.Left);
+                seg.Right = SweepSegments(seg.Right);
                 return seg;
             }
             if (current is ValueTableAttributeResult res)

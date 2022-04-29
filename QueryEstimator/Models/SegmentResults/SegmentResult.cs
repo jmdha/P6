@@ -22,5 +22,9 @@ namespace QueryEstimator.Models
         {
             return Left.GetTotalEstimation() * Right.GetTotalEstimation();
         }
+        public override int GetHashCode()
+        {
+            return Left.GetHashCode() + Right.GetHashCode();
+        }
     }
 }
