@@ -10,5 +10,6 @@ namespace QueryEstimator.Models
     public interface ISegmentResult
     {
         public long GetTotalEstimation();
+        public bool DoesContainTableAttribute(TableAttribute attr);
     }
 }

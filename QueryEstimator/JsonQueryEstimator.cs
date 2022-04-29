@@ -65,7 +65,7 @@ namespace QueryEstimator
             _upperBounds.Clear();
             _lowerBounds.Clear();
 
-            ISegmentResult result = new ValueTableAttributeResult(0,0, _initAttribute, _initAttribute, 1, ComparisonType.Type.None);
+            ISegmentResult result = new ValueTableAttributeResult(0,0, _initAttribute, 0,0, _initAttribute, 1, ComparisonType.Type.None);
 
             _scanner.Scan(query.JoinNodes);
 

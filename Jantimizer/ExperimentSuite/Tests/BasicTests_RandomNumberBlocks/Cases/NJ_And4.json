@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON (a.v > b.v AND a.v < 50)) JOIN c ON (a.v < c.v AND b.v < 100)) JOIN d ON (c.v < d.v AND d.v > 5000)",
+  "EquivalentSQLQuery": "SELECT * FROM ((a JOIN b ON (a.v > b.v AND a.v < 50)) JOIN c ON (a.v < c.v AND c.v < 100)) JOIN d ON (a.v < d.v AND d.v > 5000)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -64,7 +64,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "b"
+                "TableName": "c"
               },
               "Attribute": "v"
             }
@@ -82,7 +82,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "c"
+                "TableName": "a"
               },
               "Attribute": "v"
             }

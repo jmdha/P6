@@ -33,5 +33,12 @@ namespace QueryEstimator.Models
         {
             return TableA.GetHashCode() + HashCode.Combine(TableALowerBound, TableAUpperBound, ConstantValue, ComparisonType.GetOperatorString(ComType));
         }
+
+        public bool DoesContainTableAttribute(TableAttribute attr)
+        {
+            if (TableA.Equals(attr))
+                return true;
+            return false;
+        }
     }
 }

@@ -26,5 +26,14 @@ namespace QueryEstimator.Models
         {
             return Left.GetHashCode() + Right.GetHashCode();
         }
+
+        public bool DoesContainTableAttribute(TableAttribute attr)
+        {
+            if (Left.DoesContainTableAttribute(attr))
+                return true;
+            if (Right.DoesContainTableAttribute(attr))
+                return true;
+            return false;
+        }
     }
 }

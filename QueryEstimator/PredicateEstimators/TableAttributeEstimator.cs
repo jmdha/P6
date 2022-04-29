@@ -23,6 +23,9 @@ namespace QueryEstimator.PredicateEstimators
         public override ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type, bool isReverse = false)
         {
             long newResult = 0;
+            bool doesPreviousContain = false;
+            if (current.DoesContainTableAttribute(source) || current.DoesContainTableAttribute(compare))
+                doesPreviousContain = true;
 
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int newSourceLowerBound = GetValueFromDictOrAlt(source, LowerBounds, 0);
@@ -33,7 +36,11 @@ namespace QueryEstimator.PredicateEstimators
                 bool foundAny = false;
                 for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
                 {
-                    var newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    long newInnerResult = 0;
+                    if (doesPreviousContain)
+                        newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
+                    else
+                        newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
 
                     if (newInnerResult == 0 && !foundAny)
                     {
@@ -51,6 +58,10 @@ namespace QueryEstimator.PredicateEstimators
                         foundAny = true;
                     }
                 }
+
+                AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
+                AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
+
                 if (!isReverse)
                     GetEstimationResult(current, compare, source, ComparisonType.Type.Less, true);
             }
@@ -59,7 +70,11 @@ namespace QueryEstimator.PredicateEstimators
                 bool foundAny = false;
                 for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
                 {
-                    var newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    long newInnerResult = 0;
+                    if (doesPreviousContain)
+                        newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                    else
+                        newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
 
                     if (newInnerResult == 0 && foundAny)
                     {
@@ -77,14 +92,15 @@ namespace QueryEstimator.PredicateEstimators
                         foundAny = true;
                     }
                 }
+
+                AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
+                AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
+
                 if (!isReverse)
                     GetEstimationResult(current, compare, source, ComparisonType.Type.More, true);
             }
 
-            AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
-            AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
-
-            return new SegmentResult(current, new ValueTableAttributeResult(newSourceUpperBound, newSourceLowerBound, source, compare, newResult, type));
+            return new SegmentResult(current, new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type));
         }
 
         internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)
