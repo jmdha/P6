@@ -100,7 +100,7 @@ namespace QueryEstimator.PredicateEstimators
                     GetEstimationResult(current, compare, source, ComparisonType.Type.More, true);
             }
 
-            return new SegmentResult(current, new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type));
+            return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
         }
 
         internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)

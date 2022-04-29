@@ -40,7 +40,7 @@ namespace QueryEstimator.PredicateEstimators
             AddToDictionaryIfNotThere(source.Table.TableName, newSourceUpperBound, UpperBounds);
             AddToDictionaryIfNotThere(source.Table.TableName, newSourceLowerBound, LowerBounds);
 
-            return new SegmentResult(current, new ValueFilterResult(0, allSourceSegments.Count - 1, source, compare, type));
+            return current;
         }
 
         internal void AddToDictionaryIfNotThere(string tableName, int bound, Dictionary<string, int> dict)

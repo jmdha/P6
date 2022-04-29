@@ -95,11 +95,11 @@ namespace QueryEstimator
             foreach (var pred in _scanner.GetIfThere(typeof(TableAttributePredicate)))
             {
                 if (pred is TableAttributePredicate predicate)
-                    result = TableAttributeEstimator.GetEstimationResult(
+                    result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
                         result,
                         predicate.LeftTable,
                         predicate.RightTable,
-                        predicate.ComType);
+                        predicate.ComType));
             }
 
             // Sweep all results for bounds changes
@@ -134,28 +134,13 @@ namespace QueryEstimator
             {
                 if (res.TableA.Equals(_initAttribute))
                     return current;
-                if (res.TableALowerBound != _lowerBounds[res.TableA] || res.TableAUpperBound != _upperBounds[res.TableA])
+                if (res.TableALowerBound != _lowerBounds[res.TableA] || res.TableAUpperBound != _upperBounds[res.TableA] || res.TableBLowerBound != _lowerBounds[res.TableB] || res.TableBUpperBound != _upperBounds[res.TableB])
                 {
                     return TableAttributeEstimator.GetEstimationResult(
                         res,
                         res.TableA,
                         res.TableB,
                         res.ComType);
-                }
-                else
-                    return current;
-            }
-            if (current is ValueFilterResult fil)
-            {
-                if (fil.TableA.Equals(_initAttribute))
-                    return current;
-                if (fil.TableALowerBound != _lowerBounds[fil.TableA] || fil.TableAUpperBound != _upperBounds[fil.TableA])
-                {
-                    return CrossFilterEstimator.GetEstimationResult(
-                        fil,
-                        fil.TableA,
-                        fil.ConstantValue,
-                        fil.ComType);
                 }
                 else
                     return current;

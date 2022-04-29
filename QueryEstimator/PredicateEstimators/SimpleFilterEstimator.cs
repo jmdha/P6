@@ -28,20 +28,17 @@ namespace QueryEstimator.PredicateEstimators
             int newSourceLowerBound = GetValueFromDictOrAlt(source, LowerBounds, 0);
             int newSourceUpperBound = GetValueFromDictOrAlt(source, UpperBounds, allSourceSegments.Count);
 
+            var compType = compare.GetType();
+            var valueType = allSourceSegments[newSourceLowerBound].LowestValue.GetType();
+            if (compType != valueType)
+                compare = (IComparable)Convert.ChangeType(compare, valueType);
+
             if (type == ComparisonType.Type.More)
             {
-                for (int i = 0; i < newSourceUpperBound; i++)
+                for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
                 {
-                    var compType = compare.GetType();
-                    var valueType = allSourceSegments[i].LowestValue.GetType();
-                    if (compType != valueType)
-                    {
-                        compare = (IComparable)Convert.ChangeType(compare, valueType);
-                    }
                     if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
-                    {
                         break;
-                    }
                     newSourceLowerBound = i;
                 }
             }
@@ -49,16 +46,8 @@ namespace QueryEstimator.PredicateEstimators
             {
                 for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
                 {
-                    var compType = compare.GetType();
-                    var valueType = allSourceSegments[i].LowestValue.GetType();
-                    if (compType != valueType)
-                    {
-                        compare = (IComparable)Convert.ChangeType(compare, valueType);
-                    }
                     if (allSourceSegments[i].LowestValue.IsLessThanOrEqual(compare))
-                    {
                         break;
-                    }
                     newSourceUpperBound = i;
                 }
             }
