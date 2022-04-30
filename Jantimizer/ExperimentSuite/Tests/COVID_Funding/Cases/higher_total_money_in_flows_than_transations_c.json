@@ -1,0 +1,61 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM transactions AS T1 JOIN flows AS F2 ON (T1.total_money > F2.total_money AND T1.total_money > 100000 AND F2.total_money < 100000)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "transactions",
+                "Alias": "T1"
+              },
+              "Attribute": "total_money"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F2"
+              },
+              "Attribute": "total_money"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "transactions",
+                "Alias": "T1"
+              },
+              "Attribute": "total_money"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "100000"
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F2"
+              },
+              "Attribute": "total_money"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "100000"
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}

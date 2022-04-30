@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.gdp_per_capita > C2.gdp_per_capita AND C1.life_expectancy < C2.life_expectancy)",
+  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.happiness_score > C2.happiness_score AND C1.happiness_score > 5 AND C2.happiness_score < 4)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,7 +11,7 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "gdp_per_capita"
+              "Attribute": "happiness_score"
             }
           },
           "RightAttribute": {
@@ -20,7 +20,7 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
-              "Attribute": "gdp_per_capita"
+              "Attribute": "happiness_score"
             }
           },
           "ComType": ">"
@@ -32,17 +32,26 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "life_expectancy"
+              "Attribute": "happiness_score"
             }
           },
           "RightAttribute": {
+            "ConstantValue": "5"
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
-              "Attribute": "life_expectancy"
+              "Attribute": "happiness_score"
             }
+          },
+          "RightAttribute": {
+            "ConstantValue": "4"
           },
           "ComType": "<"
         }

@@ -17,29 +17,12 @@ namespace Histograms.Models
             DataGatherer = dataGatherer;
         }
 
-        private List<TableAttribute> TableAttributes { get; set; }
-        private List<TableAttribute> UsedAttributes { get; } = new List<TableAttribute> { };
-
         public async Task DoHistogramComparisons(IEnumerable<IHistogram> histograms)
         {
             IEnumerable<TableAttribute> attributes = GetAllDistinctTableAttributes(histograms);
-            TableAttributes = attributes.ToList();
 
-            foreach (TableAttribute attribute in attributes) {
-                histograms.Any(h => h.Segmentations.Any(s => s.CountLargerThan.ContainsKey(attribute)));
-
-                foreach(var hist in histograms)
-                {
-                    foreach(var seg in hist.Segmentations)
-                    {
-
-                        if(seg.CountLargerThan.ContainsKey(attribute))
-                        {
-                            Console.WriteLine("Cheese");
-                        }
-                    }
-                }
-
+            foreach (TableAttribute attribute in attributes)
+            {
                 DoAllComparisonsForAttribute(histograms, await DataGatherer.GetData(attribute));
             }
         }
@@ -48,7 +31,6 @@ namespace Histograms.Models
 
         private void DoAllComparisonsForAttribute(IEnumerable<IHistogram> histograms, AttributeData data)
         {
-            UsedAttributes.Add(data.Attribute);
             foreach (IHistogram histogram in histograms)
             {
                 if (histogram.DataTypeCode != data.TypeCode)
@@ -73,23 +55,9 @@ namespace Histograms.Models
                 else if (valueCount.Value.IsLargerThan(segmentation.LowestValue))
                     larger += (ulong)valueCount.Count;
             }
-            
-            if(segmentation.CountSmallerThan.ContainsKey(data.Attribute))
-            {
-                if (segmentation.CountSmallerThan[data.Attribute] != smaller)
-                    throw new Exception("Trying to set the same attribute again, to a new value");
-            }
-            else
-                segmentation.CountSmallerThan.Add(data.Attribute, smaller);
 
-            if (segmentation.CountLargerThan.ContainsKey(data.Attribute))
-            {
-                if (segmentation.CountLargerThan[data.Attribute] != larger)
-                    throw new Exception("Trying to set the same attribute again, to a new value");
-            }
-            else
-                segmentation.CountLargerThan.Add(data.Attribute, larger);
-
+            segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, smaller);
+            segmentation.CountLargerThan.AddOrUpdate(data.Attribute, larger);
         }
 
         private IEnumerable<TableAttribute> GetAllDistinctTableAttributes(IEnumerable<IHistogram> histograms)
