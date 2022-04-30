@@ -32,38 +32,41 @@ namespace QueryEstimator.PredicateEstimators
 
             long bottomBoundsOffset = GetBottomBoundsOffset(allcompareSegments, compareLowerBound, compare);
             long bottomBoundsCount = GetBottomBoundsCount(allcompareSegments, compareLowerBound, compare);
-            long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
             long topBoundsCount = GetTopBoundsCount(allcompareSegments, compareUpperBound, compare);
 
-            if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
+            switch (type)
             {
-                for (int i = sourceUpperBound; i >= sourceLowerBound; i--)
-                {
-                    long add = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
-                    newResult += AddSegmentResult(allSourceSegments[i], add, doesPreviousContain, bottomBoundsOffset, topBoundsCount);
-                }
-            } else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
-            {
-                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
-                {
-                    long add = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
-                    newResult += AddSegmentResult(allSourceSegments[i], add, doesPreviousContain, bottomBoundsOffset, bottomBoundsCount);
-                }
-            } else if (type == ComparisonType.Type.Equal)
-            {
-                IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
-                for (int i = sourceLowerBound + 1; i <= sourceUpperBound; i++)
-                {
-                    long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
-                    long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare);
-                    aboveThis = AddSegmentResult(allSourceSegments[i], aboveThis, true, bottomBoundsOffset, aboveThis);
-                    abovePreviousThis = AddSegmentResult(lastEqual, abovePreviousThis, true, bottomBoundsOffset, abovePreviousThis);
-                    if (doesPreviousContain)
-                        newResult += abovePreviousThis - aboveThis;
-                    else
-                        newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
-                    lastEqual = allSourceSegments[i];
-                }
+                case ComparisonType.Type.More:
+                case ComparisonType.Type.EqualOrMore:
+                    for (int i = sourceUpperBound; i >= sourceLowerBound; i--)
+                        newResult += AddSegmentResult(
+                            allSourceSegments[i], 
+                            (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare), 
+                            doesPreviousContain, bottomBoundsOffset, topBoundsCount);
+                    break;
+                case ComparisonType.Type.Less:
+                case ComparisonType.Type.EqualOrLess:
+                    for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                        newResult += AddSegmentResult(
+                            allSourceSegments[i],
+                            (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare),
+                            doesPreviousContain, bottomBoundsOffset, bottomBoundsCount);
+                    break;
+                case ComparisonType.Type.Equal:
+                    IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
+                    for (int i = sourceLowerBound + 1; i <= sourceUpperBound; i++)
+                    {
+                        long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                        long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare);
+                        aboveThis = AddSegmentResult(allSourceSegments[i], aboveThis, true, bottomBoundsOffset, aboveThis);
+                        abovePreviousThis = AddSegmentResult(lastEqual, abovePreviousThis, true, bottomBoundsOffset, abovePreviousThis);
+                        if (doesPreviousContain)
+                            newResult += abovePreviousThis - aboveThis;
+                        else
+                            newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        lastEqual = allSourceSegments[i];
+                    }
+                    break;
             }
 
             return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
