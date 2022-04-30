@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 C1, world_happiness_2022 C2 WHERE C1.rank < C2.rank AND C1.happiness_score > C2.happiness_score AND C1.gdp_per_capita < C2.gdp_per_capita AND wh1.generocity > C2.generocity",
+  "EquivalentSQLQuery": "SELECT * FROM (world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON C1.rank < C2.rank AND C1.happiness_score > C2.happiness_score AND C1.gdp_per_capita < C2.gdp_per_capita AND C1.generocity > C2.generocity)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -50,19 +50,19 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "gdp_per_capita",
+                "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "happiness_score"
+              "Attribute": "gdp_per_capita"
             }
           },
           "RightAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "gdp_per_capita",
+                "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
-              "Attribute": "happiness_score"
+              "Attribute": "gdp_per_capita"
             }
           },
           "ComType": "<"
@@ -71,7 +71,7 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "gdp_per_capita",
+                "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
               "Attribute": "generocity"
@@ -80,7 +80,7 @@
           "RightAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "gdp_per_capita",
+                "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
               "Attribute": "generocity"

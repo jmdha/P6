@@ -37,30 +37,34 @@ namespace QueryEstimator.PredicateBounders
         {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
-            IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
+            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
 
-            bool foundAny = false;
-            for (int i = newSourceLowerBound + 1; i < newSourceUpperBound; i++)
+            if (newSourceLowerBound != newSourceUpperBound)
             {
-                bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && lastEqual.IsAnyLargerThanNoAlias(compare);
-                lastEqual = allSourceSegments[i];
+                IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
 
-                if (!isAny && foundAny)
+                bool foundAny = false;
+                for (int i = newSourceLowerBound + 1; i <= newSourceUpperBound; i++)
                 {
-                    newSourceUpperBound = i;
-                    break;
+                    bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && lastEqual.IsAnyLargerThanNoAlias(compare);
+                    lastEqual = allSourceSegments[i];
+
+                    if (!isAny && foundAny)
+                    {
+                        newSourceUpperBound = i;
+                        break;
+                    }
+                    else
+                    {
+                        if (!foundAny)
+                            newSourceLowerBound = i - 1;
+                        foundAny = true;
+                    }
                 }
-                else
-                {
-                    if (!foundAny)
-                        newSourceLowerBound = i - 1;
-                    foundAny = true;
-                }
+
+                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
+                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
             }
-
-            AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-            AddToLowerBoundIfNotThere(source, newSourceLowerBound);
 
             return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
         }
@@ -69,31 +73,35 @@ namespace QueryEstimator.PredicateBounders
         {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
+            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
 
-            bool foundAny = false;
-            for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
+            if (newSourceLowerBound != newSourceUpperBound)
             {
-                bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
+                bool foundAny = false;
+                for (int i = newSourceUpperBound; i >= newSourceLowerBound; i--)
+                {
+                    bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
 
-                if (!isAny && foundAny)
-                {
-                    newSourceLowerBound = i;
-                    break;
+                    if (!isAny && foundAny)
+                    {
+                        newSourceLowerBound = i;
+                        break;
+                    }
+                    else if (!isAny)
+                    {
+                        if (!foundAny)
+                            newSourceUpperBound = i - 1;
+                        continue;
+                    }
+                    else
+                    {
+                        foundAny = true;
+                    }
                 }
-                else if (!isAny)
-                {
-                    newSourceUpperBound = i;
-                    continue;
-                }
-                else
-                {
-                    foundAny = true;
-                }
+
+                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
+                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
             }
-
-            AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-            AddToLowerBoundIfNotThere(source, newSourceLowerBound);
 
             return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
         }
@@ -102,31 +110,34 @@ namespace QueryEstimator.PredicateBounders
         {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
+            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
 
-            bool foundAny = false;
-            for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
+            if (newSourceLowerBound != newSourceUpperBound)
             {
-                bool isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
+                bool foundAny = false;
+                for (int i = newSourceLowerBound; i <= newSourceUpperBound; i++)
+                {
+                    bool isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
 
-                if (!isAny && foundAny)
-                {
-                    newSourceUpperBound = i;
-                    break;
+                    if (!isAny && foundAny)
+                    {
+                        newSourceUpperBound = i - 1;
+                        break;
+                    }
+                    else if (!isAny)
+                    {
+                        newSourceLowerBound = i;
+                        continue;
+                    }
+                    else
+                    {
+                        foundAny = true;
+                    }
                 }
-                else if (!isAny)
-                {
-                    newSourceLowerBound = i;
-                    continue;
-                }
-                else
-                {
-                    foundAny = true;
-                }
+
+                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
+                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
             }
-
-            AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-            AddToLowerBoundIfNotThere(source, newSourceLowerBound);
 
             return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
         }

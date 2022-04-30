@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 C1, world_happiness_2022 C2 WHERE C1.gdp_per_capita > C2.gdp_per_capita AND C1.perception_of_corruption < C2.perception_of_corruption",
+  "EquivalentSQLQuery": "SELECT * FROM (world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON C1.gdp_per_capita > C2.gdp_per_capita AND C1.perception_of_corruption < C2.perception_of_corruption)",
   "DoRun": true,
   "JoinNodes": [
     {

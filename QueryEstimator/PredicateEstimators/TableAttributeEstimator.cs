@@ -26,18 +26,14 @@ namespace QueryEstimator.PredicateEstimators
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
+            int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
-            int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count);
+            int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
 
             if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
             {
-                long bottomBoundsOffset = 0;
-                if (compareLowerBound == 0)
-                    bottomBoundsOffset = (long)allcompareSegments[compareLowerBound].GetCountSmallerThanNoAlias(compare);
-                else
-                    bottomBoundsOffset = (long)allcompareSegments[compareLowerBound - 1].GetCountSmallerThanNoAlias(compare);
-                for (int i = sourceUpperBound - 1; i >= sourceLowerBound; i--)
+                long bottomBoundsOffset = GetBottomBoundsOffset(allcompareSegments, compareLowerBound, compare);
+                for (int i = sourceUpperBound; i >= sourceLowerBound; i--)
                 {
                     if (doesPreviousContain)
                         newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - bottomBoundsOffset;
@@ -46,12 +42,8 @@ namespace QueryEstimator.PredicateEstimators
                 }
             } else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
             {
-                long topBoundsOffset = 0;
-                if (compareUpperBound == 0)
-                    topBoundsOffset = (long)allcompareSegments[compareUpperBound].GetCountLargerThanNoAlias(compare);
-                else
-                    topBoundsOffset = (long)allcompareSegments[compareUpperBound - 1].GetCountLargerThanNoAlias(compare);
-                for (int i = sourceLowerBound + 1; i < sourceUpperBound; i++)
+                long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
+                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
                 {
                     if (doesPreviousContain)
                         newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
@@ -60,29 +52,31 @@ namespace QueryEstimator.PredicateEstimators
                 }
             } else if (type == ComparisonType.Type.Equal)
             {
-                long topBoundsOffset = 0;
-                if (compareUpperBound == 0)
-                    topBoundsOffset = (long)allcompareSegments[compareUpperBound].GetCountLargerThanNoAlias(compare);
-                else
-                    topBoundsOffset = (long)allcompareSegments[compareUpperBound - 1].GetCountLargerThanNoAlias(compare);
+                long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
                 IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
-                for (int i = sourceLowerBound + 1; i < sourceUpperBound; i++)
+                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
                 {
                     long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
                     long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare) - topBoundsOffset;
                     if (doesPreviousContain)
-                    {
                         newResult += abovePreviousThis - aboveThis;
-                    }
                     else
-                    {
                         newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
-                    }
                     lastEqual = allSourceSegments[i];
                 }
             }
 
             return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
+        }
+
+        private long GetBottomBoundsOffset(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
+        }
+
+        private long GetTopBoundsOffset(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountLargerThanNoAlias(compare);
         }
     }
 }
