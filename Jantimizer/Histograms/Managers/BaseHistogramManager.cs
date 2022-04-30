@@ -20,6 +20,8 @@ namespace Histograms.Managers
         public HistogramSet UsedHistograms { get; }
         public List<string> Tables => Histograms.Keys.Select(a => a.Table.TableName).Distinct().ToList();
         public List<string> Attributes => Histograms.Keys.Select(a => $"{a.Table.TableName}.{a.Attribute}").ToList();
+        public string RunnerName { get; set; } = "";
+        public string ExperimentName { get; set; } = "";
 
         protected IDataGatherer DataGatherer { get; set; }
         public BaseHistogramManager(IDataGatherer dataGatherer)

@@ -14,7 +14,6 @@ namespace Histograms.Managers
 {
     public class EquiDepthHistogramManager : BaseHistogramManager, IDepthHistogramManager
     {
-
         public int Depth { get; }
 
         public EquiDepthHistogramManager(IDataGatherer dataGatherer, int depth) : base(dataGatherer)
@@ -36,6 +35,6 @@ namespace Histograms.Managers
         }
 
         protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash) =>
-            new string[] { tableName, attributeName, columnHash, Depth.ToString(), typeof(HistogramEquiDepth).Name };
+            new string[] { tableName, attributeName, columnHash, Depth.ToString(), RunnerName, ExperimentName, typeof(HistogramEquiDepth).Name };
     }
 }

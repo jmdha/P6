@@ -143,6 +143,8 @@ namespace ExperimentSuite.Controllers
             {
                 PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
+                RunData.HistoManager.ExperimentName = ExperimentName;
+                RunData.HistoManager.RunnerName = RunnerName;
                 await GenerateHistograms(RunData.HistoManager);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
@@ -326,6 +328,7 @@ namespace ExperimentSuite.Controllers
 
         private async Task GenerateHistograms(IHistogramManager manager)
         {
+            manager.ClearHistograms();
             List<Task> tasks = await manager.AddHistogramsFromDB();
             int value = 0;
             int max = tasks.Count;
