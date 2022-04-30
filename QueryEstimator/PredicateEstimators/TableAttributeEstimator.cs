@@ -1,4 +1,5 @@
 ﻿using Histograms;
+using Histograms.Models;
 using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,8 @@ namespace QueryEstimator.PredicateEstimators
                 doesPreviousContain = true;
 
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetValueFromDictOrAlt(source, LowerBounds, 0);
-            int newSourceUpperBound = GetValueFromDictOrAlt(source, UpperBounds, allSourceSegments.Count);
+            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
+            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
 
             if (type == ComparisonType.Type.More)
             {
@@ -46,23 +47,24 @@ namespace QueryEstimator.PredicateEstimators
                         newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
                 }
             }
+            if (type == ComparisonType.Type.Equal)
+            {
+                IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
+                for (int i = newSourceLowerBound + 1; i < newSourceUpperBound; i++)
+                {
+                    if (doesPreviousContain)
+                    {
+                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - (long)lastEqual.GetCountSmallerThanNoAlias(compare);
+                    }
+                    else
+                    {
+                        newResult += ((long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - (long)lastEqual.GetCountSmallerThanNoAlias(compare)) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    }
+                    lastEqual = allSourceSegments[i];
+                }
+            }
 
             return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
-        }
-
-        internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)
-        {
-            if (dict.ContainsKey(attr))
-                dict[attr] = bound;
-            else
-                dict.Add(attr, bound);
-        }
-
-        internal int GetValueFromDictOrAlt(TableAttribute attr, Dictionary<TableAttribute, int> dict, int alt)
-        {
-            if (dict.ContainsKey(attr))
-                return dict[attr];
-            return alt;
         }
     }
 }

@@ -31,6 +31,7 @@ namespace QueryEstimator.PredicateBounders
                 compare = (IComparable)Convert.ChangeType(compare, valueType);
 
             bool exitSentinel = false;
+            bool foundAny = false;
             for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
             {
                 switch (type)
@@ -68,14 +69,16 @@ namespace QueryEstimator.PredicateBounders
                         newSourceUpperBound = i;
                         break;
                     case ComparisonType.Type.Equal:
-                        if (allSourceSegments[i].LowestValue.IsLessThanOrEqual(compare) && lastEqual.LowestValue.IsLessThanOrEqual(compare))
+                        if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
                         {
                             exitSentinel = true;
                             break;
                         }
-                        lastEqual = allSourceSegments[i];
-                        newSourceLowerBound = i - 1;
-                        newSourceUpperBound = i;
+                        if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
+                        {
+                            newSourceUpperBound = i;
+                        }
+                        newSourceLowerBound = i + 1;
                         break;
                 }
                 if (exitSentinel)

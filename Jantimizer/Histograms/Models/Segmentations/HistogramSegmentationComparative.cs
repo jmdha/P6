@@ -29,7 +29,7 @@ namespace Histograms.Models
 
         public bool IsAnySmallerThanNoAlias(TableAttribute attr)
         {
-            return GetCountSmallerThanNoAlias(attr) == 0;
+            return GetCountSmallerThanNoAlias(attr) != 0;
         }
 
         public ulong GetCountLargerThanNoAlias(TableAttribute attr)
@@ -44,7 +44,7 @@ namespace Histograms.Models
 
         public bool IsAnyLargerThanNoAlias(TableAttribute attr)
         {
-            return GetCountLargerThanNoAlias(attr) == 0;
+            return GetCountLargerThanNoAlias(attr) != 0;
         }
     }
 }
