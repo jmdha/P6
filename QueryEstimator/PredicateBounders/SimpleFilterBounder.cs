@@ -21,17 +21,19 @@ namespace QueryEstimator.PredicateBounders
         public override IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+            int currentSourceLowerBound = GetLowerBoundOrAlt(source, 0);
+            int newSourceLowerBound = currentSourceLowerBound;
+            int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+            int newSourceUpperBound = currentSourceUpperBound;
 
             var compType = compare.GetType();
-            var valueType = allSourceSegments[newSourceLowerBound].LowestValue.GetType();
+            var valueType = allSourceSegments[currentSourceLowerBound].LowestValue.GetType();
             if (compType != valueType)
                 compare = (IComparable)Convert.ChangeType(compare, valueType);
 
             bool foundAny = false;
             bool exitSentinel = false;
-            for (int i = newSourceLowerBound; i <= newSourceUpperBound; i++)
+            for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
             {
                 switch (type)
                 {
@@ -52,7 +54,7 @@ namespace QueryEstimator.PredicateBounders
                         newSourceLowerBound = i;
                         break;
                     case ComparisonType.Type.Less:
-                        if (allSourceSegments[i].LowestValue.IsLessThan(compare))
+                        if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
                         {
                             exitSentinel = true;
                             break;

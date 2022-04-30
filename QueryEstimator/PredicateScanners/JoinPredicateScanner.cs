@@ -48,10 +48,7 @@ namespace QueryEstimator.PredicateScanners
             // Seperate filters
             foreach (var filter in _baseFilters)
             {
-                if (_usedFilterAttributes.Contains(filter.LeftTable))
-                    AddToDict<SimpleFilterPredicate>(new SimpleFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
-                else
-                    AddToDict<CrossFilterPredicate>(new CrossFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
+                AddToDict<SimpleFilterPredicate>(new SimpleFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
             }
         }
 
