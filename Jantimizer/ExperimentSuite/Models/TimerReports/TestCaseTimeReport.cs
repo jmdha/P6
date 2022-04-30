@@ -10,8 +10,7 @@ namespace ExperimentSuite.Models
     {
         public string CaseName { get; set; }
    
-        public TestCaseTimeReport(string databaseName, string testName, string experimentName, string caseName, string timerName, long time) : base(databaseName, testName, experimentName, timerName, time)
-        {
+        public TestCaseTimeReport(string databaseName, string testName, string experimentName, string caseName, string timerName, decimal ns, decimal ms) : base(databaseName, testName, experimentName, timerName, ns, ms)        {
             CaseName = caseName;
         }
 

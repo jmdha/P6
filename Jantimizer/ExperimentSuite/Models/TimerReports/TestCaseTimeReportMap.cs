@@ -11,6 +11,7 @@ namespace ExperimentSuite.Models {
             Map(m => m.CaseName).Name("Case Name");
             Map(m => m.TimerName).Name("Timer Name");
             Map(m => m.TimeMs).Name("Ms");
+            Map(m => m.TimeNs).Name("Ns");
         }
     }
 }
