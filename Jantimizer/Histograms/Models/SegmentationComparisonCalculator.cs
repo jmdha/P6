@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 using Tools.Models.JsonModels;
 
 namespace Histograms.Models
@@ -67,9 +68,9 @@ namespace Histograms.Models
 
             foreach(var valueCount in data.ValueCounts)
             {
-                if (valueCount.Value.CompareTo(segmentation.LowestValue) < 0)
+                if (valueCount.Value.IsLessThan(segmentation.LowestValue))
                     smaller += (ulong)valueCount.Count;
-                else if (valueCount.Value.CompareTo(segmentation.LowestValue) > 0)
+                else if (valueCount.Value.IsLargerThan(segmentation.LowestValue))
                     larger += (ulong)valueCount.Count;
             }
             

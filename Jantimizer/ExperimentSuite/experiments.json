@@ -9,20 +9,7 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_SetupTables",
-            "WorldHappiness_With_GDP_Setup",
-            "Census_2013_Setup",
-            "COVID_Funding_Setup"
-          ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_SetupTables",
-            "WorldHappiness_With_GDP_Setup",
-            "Census_2013_Setup",
-            "COVID_Funding_Setup"
+            "BasicTests_SetupTables"
           ]
         }
       ],
@@ -33,17 +20,10 @@
           "TestFiles": [
             "BasicTests_RandomNumberBlocks"
           ]
-        },
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            "BasicTests_RandomNumberBlocks"
-          ]
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 10,
+        "BucketSize": 256,
         "MaxEstimatorSweeps" : 10
       }
     },

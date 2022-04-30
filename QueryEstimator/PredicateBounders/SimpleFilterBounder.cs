@@ -24,14 +24,12 @@ namespace QueryEstimator.PredicateBounders
             int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
 
-            IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
             var compType = compare.GetType();
             var valueType = allSourceSegments[newSourceLowerBound].LowestValue.GetType();
             if (compType != valueType)
                 compare = (IComparable)Convert.ChangeType(compare, valueType);
 
             bool exitSentinel = false;
-            bool foundAny = false;
             for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
             {
                 switch (type)

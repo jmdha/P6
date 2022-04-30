@@ -24,41 +24,59 @@ namespace QueryEstimator.PredicateEstimators
                 doesPreviousContain = true;
 
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
+            var allcompareSegments = GetAllSegmentsForAttribute(compare);
+            int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
+            int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count);
+            int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
+            int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count);
 
-            if (type == ComparisonType.Type.More)
+            if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
             {
-                for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
+                long bottomBoundsOffset = 0;
+                if (compareLowerBound == 0)
+                    bottomBoundsOffset = (long)allcompareSegments[compareLowerBound].GetCountSmallerThanNoAlias(compare);
+                else
+                    bottomBoundsOffset = (long)allcompareSegments[compareLowerBound - 1].GetCountSmallerThanNoAlias(compare);
+                for (int i = sourceUpperBound - 1; i >= sourceLowerBound; i--)
                 {
                     if (doesPreviousContain)
-                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
+                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - bottomBoundsOffset;
                     else
-                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        newResult += ((long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - bottomBoundsOffset) * allSourceSegments[i].ElementsBeforeNextSegmentation;
                 }
-            }
-            if (type == ComparisonType.Type.Less)
+            } else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
             {
-                for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
+                long topBoundsOffset = 0;
+                if (compareUpperBound == 0)
+                    topBoundsOffset = (long)allcompareSegments[compareUpperBound].GetCountLargerThanNoAlias(compare);
+                else
+                    topBoundsOffset = (long)allcompareSegments[compareUpperBound - 1].GetCountLargerThanNoAlias(compare);
+                for (int i = sourceLowerBound + 1; i < sourceUpperBound; i++)
                 {
                     if (doesPreviousContain)
-                        newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                        newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
                     else
-                        newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        newResult += ((long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset) * allSourceSegments[i].ElementsBeforeNextSegmentation;
                 }
-            }
-            if (type == ComparisonType.Type.Equal)
+            } else if (type == ComparisonType.Type.Equal)
             {
-                IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
-                for (int i = newSourceLowerBound + 1; i < newSourceUpperBound; i++)
+                long topBoundsOffset = 0;
+                if (compareUpperBound == 0)
+                    topBoundsOffset = (long)allcompareSegments[compareUpperBound].GetCountLargerThanNoAlias(compare);
+                else
+                    topBoundsOffset = (long)allcompareSegments[compareUpperBound - 1].GetCountLargerThanNoAlias(compare);
+                IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
+                for (int i = sourceLowerBound + 1; i < sourceUpperBound; i++)
                 {
+                    long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
+                    long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare) - topBoundsOffset;
                     if (doesPreviousContain)
                     {
-                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - (long)lastEqual.GetCountSmallerThanNoAlias(compare);
+                        newResult += abovePreviousThis - aboveThis;
                     }
                     else
                     {
-                        newResult += ((long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - (long)lastEqual.GetCountSmallerThanNoAlias(compare)) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
                     }
                     lastEqual = allSourceSegments[i];
                 }

@@ -29,10 +29,14 @@ namespace QueryEstimator.SegmentHandler
 
         internal void AddToUpperBoundIfNotThere(TableAttribute key, int bound)
         {
+            if (GetValueFromDictOrAlt(key, UpperBounds, bound) < bound)
+                throw new Exception("Bound cannot get larger!");
             AddToDictionaryIfNotThere(key, bound, UpperBounds);
         }
         internal void AddToLowerBoundIfNotThere(TableAttribute key, int bound)
         {
+            if (GetValueFromDictOrAlt(key, LowerBounds, bound) > bound)
+                throw new Exception("Bound cannot get larger!");
             AddToDictionaryIfNotThere(key, bound, LowerBounds);
         }
 

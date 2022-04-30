@@ -76,15 +76,15 @@ namespace QueryEstimator.PredicateBounders
             {
                 bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
 
-                if (!isAny && !foundAny)
-                {
-                    newSourceUpperBound = i;
-                    continue;
-                }
-                else if (!isAny)
+                if (!isAny && foundAny)
                 {
                     newSourceLowerBound = i;
                     break;
+                }
+                else if (!isAny)
+                {
+                    newSourceUpperBound = i;
+                    continue;
                 }
                 else
                 {

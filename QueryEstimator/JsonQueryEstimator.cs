@@ -124,13 +124,26 @@ namespace QueryEstimator
         private bool CheckBounds<TRight>(List<IPredicateBoundResult<TRight>> bounds)
         {
             bool anyChanged = false;
-            var newBoundsList = new List<IPredicateBoundResult<TRight>>();
-            foreach (var bound in bounds)
+            for (int i = 0; i < bounds.Count; i++)
             {
-                if (bound.LowerBound != _lowerBounds[bound.Left] || bound.UpperBound != _upperBounds[bound.Left])
+                if (typeof(TRight) == typeof(TableAttribute))
                 {
-                    anyChanged = true;
-                    bound.RecalculateBounds();
+                    if (bounds[i].LowerBound > _lowerBounds[bounds[i].Left] || bounds[i].UpperBound > _upperBounds[bounds[i].Left] ||
+                        bounds[i + 1].LowerBound > _lowerBounds[bounds[i + 1].Left] || bounds[i + 1].UpperBound > _upperBounds[bounds[i + 1].Left])
+                    {
+                        anyChanged = true;
+                        bounds[i].RecalculateBounds();
+                        bounds[i + 1].RecalculateBounds();
+                    }
+                    i++;
+                }
+                else if (typeof(TRight) == typeof(IComparable))
+                {
+                    if (bounds[i].LowerBound != _lowerBounds[bounds[i].Left] || bounds[i].UpperBound != _upperBounds[bounds[i].Left])
+                    {
+                        anyChanged = true;
+                        bounds[i].RecalculateBounds();
+                    }
                 }
             }
             return anyChanged;
