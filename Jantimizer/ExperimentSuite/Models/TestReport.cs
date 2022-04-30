@@ -14,9 +14,10 @@ namespace ExperimentSuite.Models
         public string DatabaseName { get; set; }
         public ulong DatabasePredicted { get; set; }
         public ulong DatabaseActual { get; set; }
-        public ulong OptimiserPredicted { get; set; }
+        public ulong EstimatorPredicted { get; set; }
         public decimal DatabaseAcc { get; }
-        public decimal OptimiserAcc { get; }
+        public decimal EstimatorAcc { get; }
+        public bool IsBetter { get; }
 
         public TestReport()
         {
@@ -26,12 +27,12 @@ namespace ExperimentSuite.Models
             DatabaseName = "";
             DatabasePredicted = 0;
             DatabaseActual = 0;
-            OptimiserPredicted = 0;
+            EstimatorPredicted = 0;
             DatabaseAcc = 0;
-            OptimiserAcc = 0;
+            EstimatorAcc = 0;
         }
 
-        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted)
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted)
         {
             ExperimentName = experimentName;
             Category = category;
@@ -39,9 +40,13 @@ namespace ExperimentSuite.Models
             DatabaseName = databaseName;
             DatabasePredicted = databasePredicted;
             DatabaseActual = databaseActual;
-            OptimiserPredicted = optimiserPredicted;
+            EstimatorPredicted = estimatorPredicted;
             DatabaseAcc = GetAccuracy(databaseActual, databasePredicted);
-            OptimiserAcc = GetAccuracy(databaseActual, optimiserPredicted);
+            EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
+            if (EstimatorAcc > DatabaseAcc)
+                IsBetter = true;
+            else
+                IsBetter = false;
         }
 
         private decimal GetAccuracy(ulong actualValue, ulong predictedValue)

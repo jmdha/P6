@@ -10,7 +10,7 @@ namespace ExperimentSuite.Models {
             Map(m => m.DatabaseName).Name("Database");
             Map(m => m.CaseName).Name("Case");
             Map(m => m.DatabasePredicted).Name("Database Est. Rows");
-            Map(m => m.OptimiserPredicted).Name("Optimiser Est. Rows");
+            Map(m => m.EstimatorPredicted).Name("Estimator Rows");
             Map(m => m.DatabaseActual).Name("Actual Rows");
         }
     }
