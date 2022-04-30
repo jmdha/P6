@@ -30,29 +30,27 @@ namespace QueryEstimator.PredicateEstimators
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
             int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
 
+            long bottomBoundsOffset = GetBottomBoundsOffset(allcompareSegments, compareLowerBound, compare);
+            long bottomBoundsCount = GetBottomBoundsCount(allcompareSegments, compareLowerBound, compare);
+            long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
+            long topBoundsCount = GetTopBoundsCount(allcompareSegments, compareUpperBound, compare);
+
             if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
             {
-                long bottomBoundsOffset = GetBottomBoundsOffset(allcompareSegments, compareLowerBound, compare);
                 for (int i = sourceUpperBound; i >= sourceLowerBound; i--)
                 {
-                    if (doesPreviousContain)
-                        newResult += (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - bottomBoundsOffset;
-                    else
-                        newResult += ((long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) - bottomBoundsOffset) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    long add = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
+                    newResult += AddSegmentResult(allSourceSegments[i], add, doesPreviousContain, bottomBoundsOffset, topBoundsCount);
                 }
             } else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
             {
-                long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
                 for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
                 {
-                    if (doesPreviousContain)
-                        newResult += (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
-                    else
-                        newResult += ((long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                    long add = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                    newResult += AddSegmentResult(allSourceSegments[i], add, doesPreviousContain, bottomBoundsOffset, bottomBoundsCount);
                 }
             } else if (type == ComparisonType.Type.Equal)
             {
-                long topBoundsOffset = GetTopBoundsOffset(allcompareSegments, compareUpperBound, compare);
                 IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
                 for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
                 {
@@ -74,9 +72,33 @@ namespace QueryEstimator.PredicateEstimators
             return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
         }
 
+        private long GetBottomBoundsCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountLargerThanNoAlias(compare);
+        }
+
+        private long GetTopBoundsCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
+        }
+
         private long GetTopBoundsOffset(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
         {
             return (long)segments[compareIndex].GetCountLargerThanNoAlias(compare);
+        }
+
+        private long AddSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffset, long checkCountOffset)
+        {
+            if (add > checkCountOffset)
+                add -= (add - checkCountOffset);
+            if (bottomOffset > 0)
+                add -= bottomOffset;
+            if (add < 0)
+                return 0;
+            if (doesPreviousContain)
+                return add;
+            else
+                return add * segment.ElementsBeforeNextSegmentation;
         }
     }
 }
