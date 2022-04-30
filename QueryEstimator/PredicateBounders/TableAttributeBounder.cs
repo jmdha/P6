@@ -27,14 +27,14 @@ namespace QueryEstimator.PredicateBounders
                 bool foundAny = false;
                 for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
                 {
-                    long newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
+                    bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
 
-                    if (newInnerResult == 0 && !foundAny)
+                    if (!isAny && !foundAny)
                     {
                         newSourceUpperBound = i;
                         continue;
                     }
-                    else if (newInnerResult == 0)
+                    else if (!isAny)
                     {
                         newSourceLowerBound = i;
                         break;
@@ -50,14 +50,14 @@ namespace QueryEstimator.PredicateBounders
                 bool foundAny = false;
                 for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
                 {
-                    long newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                    bool isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
 
-                    if (newInnerResult == 0 && foundAny)
+                    if (!isAny && foundAny)
                     {
                         newSourceUpperBound = i;
                         break;
                     }
-                    else if (newInnerResult == 0)
+                    else if (!isAny)
                     {
                         newSourceLowerBound = i;
                         continue;
