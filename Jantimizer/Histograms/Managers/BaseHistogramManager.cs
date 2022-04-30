@@ -128,5 +128,14 @@ namespace Histograms.Managers
                     sb.AppendLine(histogram.ToString());
             return sb.ToString();
         }
+
+        public decimal GetAbstractStorage()
+        {
+            decimal result = 0;
+            foreach (var histogram in Histograms.Values)
+                foreach (var segments in histogram.Segmentations)
+                    result += segments.CountLargerThan.Count + segments.CountSmallerThan.Count;
+            return result;
+        }
     }
 }
