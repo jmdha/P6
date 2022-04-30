@@ -23,7 +23,7 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 256,
+        "BucketSize": 25,
         "MaxEstimatorSweeps" : 10
       }
     },

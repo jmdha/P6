@@ -52,10 +52,12 @@ namespace QueryEstimator.PredicateEstimators
             } else if (type == ComparisonType.Type.Equal)
             {
                 IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
-                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                for (int i = sourceLowerBound + 1; i <= sourceUpperBound; i++)
                 {
-                    long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) - topBoundsOffset;
-                    long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare) - topBoundsOffset;
+                    long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                    long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare);
+                    aboveThis = AddSegmentResult(allSourceSegments[i], aboveThis, true, bottomBoundsOffset, aboveThis);
+                    abovePreviousThis = AddSegmentResult(lastEqual, abovePreviousThis, true, bottomBoundsOffset, abovePreviousThis);
                     if (doesPreviousContain)
                         newResult += abovePreviousThis - aboveThis;
                     else
