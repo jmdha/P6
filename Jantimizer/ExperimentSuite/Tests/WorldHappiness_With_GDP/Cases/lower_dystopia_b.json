@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.country, C2.country FROM world_happiness_2022 C1 JOIN world_happiness_2022 C2 ON (C1.happiness_score > C2.happiness_score AND C1.perception_of_corruption > C2.perception_of_corruption)",
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.dystopia < C2.dystopia AND C2.dystopia > 0.5)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,7 +11,7 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "happiness_score"
+              "Attribute": "dystopia"
             }
           },
           "RightAttribute": {
@@ -20,29 +20,23 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
-              "Attribute": "happiness_score"
+              "Attribute": "dystopia"
             }
           },
-          "ComType": ">"
+          "ComType": "<"
         },
         {
           "LeftAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "world_happiness_2022",
-                "Alias": "C1"
+                "Alias": "C2"
               },
-              "Attribute": "perception_of_corruption"
+              "Attribute": "dystopia"
             }
           },
           "RightAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "world_happiness_2022",
-                "Alias": "C2"
-              },
-              "Attribute": "perception_of_corruption"
-            }
+            "ConstantValue": "0.5"
           },
           "ComType": ">"
         }

@@ -1,0 +1,31 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.dystopia < C2.dystopia)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "dystopia"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "dystopia"
+            }
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}

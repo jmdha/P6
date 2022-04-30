@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 C1, world_happiness_2022 C2 WHERE C1.gdp_per_capita > C2.gdp_per_capita AND C1.perception_of_corruption < C2.perception_of_corruption",
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.life_expectancy > C2.life_expectancy AND C2.life_expectancy > 0.5 AND C1.life_expectancy > 0.7)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,7 +11,7 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "gdp_per_capita"
+              "Attribute": "life_expectancy"
             }
           },
           "RightAttribute": {
@@ -20,8 +20,23 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C2"
               },
-              "Attribute": "gdp_per_capita"
+              "Attribute": "life_expectancy"
             }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "life_expectancy"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0.5"
           },
           "ComType": ">"
         },
@@ -32,19 +47,13 @@
                 "TableName": "world_happiness_2022",
                 "Alias": "C1"
               },
-              "Attribute": "perception_of_corruption"
+              "Attribute": "life_expectancy"
             }
           },
           "RightAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "world_happiness_2022",
-                "Alias": "C2"
-              },
-              "Attribute": "perception_of_corruption"
-            }
+            "ConstantValue": "0.7"
           },
-          "ComType": "<"
+          "ComType": ">"
         }
       ]
     }

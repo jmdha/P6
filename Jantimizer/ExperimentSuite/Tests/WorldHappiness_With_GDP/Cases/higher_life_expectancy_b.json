@@ -1,0 +1,46 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON (C1.life_expectancy > C2.life_expectancy AND C2.life_expectancy > 0.5)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "life_expectancy"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "life_expectancy"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "life_expectancy"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0.5"
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}
