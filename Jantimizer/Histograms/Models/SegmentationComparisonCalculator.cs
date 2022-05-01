@@ -70,9 +70,9 @@ namespace Histograms.Models
             if (larger > 0)
             {
                 if (larger < byte.MaxValue)
-                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (byte)smaller);
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (byte)larger);
                 if (larger < ushort.MaxValue)
-                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (ushort)smaller);
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (ushort)larger);
                 else if (larger < uint.MaxValue)
                     segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (uint)larger);
                 else
