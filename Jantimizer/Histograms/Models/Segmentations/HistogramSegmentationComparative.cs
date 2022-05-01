@@ -19,21 +19,17 @@ namespace Histograms.Models
 
         public ulong GetCountSmallerThanNoAlias(TableAttribute attr)
         {
-            foreach(var key in CountSmallerThan.Keys)
-            {
-                if (key.Attribute == attr.Attribute && key.Table.TableName == attr.Table.TableName)
-                    return CountSmallerThan[key];
-            }
+            var partialKey = new TableAttribute(attr.Table.TableName, attr.Attribute);
+            if (CountSmallerThan.ContainsKey(partialKey))
+                return CountSmallerThan[partialKey];
             return 0;
         }
 
         public ulong GetCountLargerThanNoAlias(TableAttribute attr)
         {
-            foreach (var key in CountLargerThan.Keys)
-            {
-                if (key.Attribute == attr.Attribute && key.Table.TableName == attr.Table.TableName)
-                    return CountLargerThan[key];
-            }
+            var partialKey = new TableAttribute(attr.Table.TableName, attr.Attribute);
+            if (CountLargerThan.ContainsKey(partialKey))
+                return CountLargerThan[partialKey];
             return 0;
         }
     }
