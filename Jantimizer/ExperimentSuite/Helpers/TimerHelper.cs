@@ -30,11 +30,11 @@ namespace ExperimentSuite.Helpers
         }
 
         // https://stackoverflow.com/questions/2329079/how-do-you-convert-stopwatch-ticks-to-nanoseconds-milliseconds-and-seconds
-        private static decimal GetNs(Stopwatch watch)
+        private static long GetNs(Stopwatch watch)
         {
             decimal ticks = (decimal)watch.ElapsedTicks;
             decimal nanoseconds = (ticks / Stopwatch.Frequency) * 1000000000;
-            return nanoseconds;
+            return (long)nanoseconds;
         }
     }
 }

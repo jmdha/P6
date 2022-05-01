@@ -12,8 +12,8 @@ namespace ExperimentSuite.Models
         public string TestName { get; set; }
         public string ExperimentName { get; set; }
         public string TimerName { get; set; }
-        public decimal TimeNs { get; set; }
-        public decimal TimeMs { get; set; }
+        public long TimeNs { get; set; }
+        public long TimeMs { get; set; }
 
         public TestTimeReport()
         {
@@ -25,7 +25,7 @@ namespace ExperimentSuite.Models
             TimeMs = 0;
         }
 
-        public TestTimeReport(string databaseName, string testName, string experimentName, string timerName, decimal timeNs, decimal timeMs)
+        public TestTimeReport(string databaseName, string testName, string experimentName, string timerName, long timeNs, long timeMs)
         {
             DatabaseName = databaseName;
             TestName = testName;
