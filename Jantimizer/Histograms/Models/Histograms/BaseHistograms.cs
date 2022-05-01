@@ -70,7 +70,7 @@ namespace Histograms.Models
                 Segmentations.Remove(segmentation);
 
             // Add final segmentation
-            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, 1));
+            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, lastUniqueValue.Count));
             DataTypeCode = Type.GetTypeCode(Segmentations.First().LowestValue.GetType());
         }
 

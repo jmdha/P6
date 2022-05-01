@@ -9,10 +9,12 @@ namespace Histograms.Models
 {
     public interface IHistogramSegmentationComparative : IHistogramSegmentation
     {
-        public Dictionary<TableAttribute, IConvertible> CountSmallerThan { get; }
+        public Dictionary<TableAttribute, ulong> CountSmallerThan { get; }
         public ulong GetCountSmallerThanNoAlias(TableAttribute attr);
-        public Dictionary<TableAttribute, IConvertible> CountLargerThan { get; }
+        public bool IsAnySmallerThanNoAlias(TableAttribute attr);
+        public Dictionary<TableAttribute, ulong> CountLargerThan { get; }
         public ulong GetCountLargerThanNoAlias(TableAttribute attr);
-        public ulong GetTotalAbstractStorageUse();
+        public bool IsAnyLargerThanNoAlias(TableAttribute attr);
+
     }
 }
