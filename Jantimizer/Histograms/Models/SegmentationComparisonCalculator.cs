@@ -56,8 +56,10 @@ namespace Histograms.Models
                     larger += (ulong)valueCount.Count;
             }
 
-            segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, smaller);
-            segmentation.CountLargerThan.AddOrUpdate(data.Attribute, larger);
+            if (smaller > 0)
+                segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, smaller);
+            if (larger > 0)
+                segmentation.CountLargerThan.AddOrUpdate(data.Attribute, larger);
         }
 
         private IEnumerable<TableAttribute> GetAllDistinctTableAttributes(IEnumerable<IHistogram> histograms)
