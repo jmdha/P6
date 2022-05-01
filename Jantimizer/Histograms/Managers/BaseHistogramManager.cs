@@ -129,12 +129,15 @@ namespace Histograms.Managers
             return sb.ToString();
         }
 
-        public decimal GetAbstractStorage()
+        public decimal GetAbstractStorageBytes()
         {
             decimal result = 0;
+            // Get all bytes from all segments.
             foreach (var histogram in Histograms.Values)
                 foreach (var segments in histogram.Segmentations)
-                    result += segments.CountLargerThan.Count + segments.CountSmallerThan.Count;
+                    result += segments.GetTotalAbstractStorageUse();
+            // Converting from bit to bytes
+            result = result / 8;
             return result;
         }
     }

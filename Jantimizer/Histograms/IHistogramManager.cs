@@ -21,6 +21,6 @@ namespace Histograms
 
         public IHistogram GetHistogram(string table, string attribute);
 
-        public decimal GetAbstractStorage();
+        public decimal GetAbstractStorageBytes();
     }
 }

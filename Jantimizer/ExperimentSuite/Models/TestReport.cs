@@ -17,7 +17,7 @@ namespace ExperimentSuite.Models
         public ulong OptimiserPredicted { get; set; }
         public decimal DatabaseAcc { get; }
         public decimal OptimiserAcc { get; }
-        public decimal AbstractStorageUsage { get; }
+        public decimal AbstractStorageUsageBytes { get; }
 
         public TestReport()
         {
@@ -30,10 +30,10 @@ namespace ExperimentSuite.Models
             OptimiserPredicted = 0;
             DatabaseAcc = 0;
             OptimiserAcc = 0;
-            AbstractStorageUsage = 0;
+            AbstractStorageUsageBytes = 0;
         }
 
-        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted, decimal abstractStorageUsage)
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong optimiserPredicted, decimal abstractStorageUsageBytes)
         {
             ExperimentName = experimentName;
             Category = category;
@@ -42,7 +42,7 @@ namespace ExperimentSuite.Models
             DatabasePredicted = databasePredicted;
             DatabaseActual = databaseActual;
             OptimiserPredicted = optimiserPredicted;
-            AbstractStorageUsage = abstractStorageUsage;
+            AbstractStorageUsageBytes = abstractStorageUsageBytes;
             DatabaseAcc = GetAccuracy(databaseActual, databasePredicted);
             OptimiserAcc = GetAccuracy(databaseActual, optimiserPredicted);
         }

@@ -12,7 +12,7 @@ namespace ExperimentSuite.Models {
             Map(m => m.DatabasePredicted).Name("Database Est. Rows");
             Map(m => m.OptimiserPredicted).Name("Optimiser Est. Rows");
             Map(m => m.DatabaseActual).Name("Actual Rows");
-            Map(m => m.AbstractStorageUsage).Name("Abstract storage use");
+            Map(m => m.AbstractStorageUsageBytes).Name("Abstract storage use (Bytes)");
         }
     }
 }
