@@ -27,6 +27,11 @@ namespace Histograms.Models
             return 0;
         }
 
+        public bool IsAnySmallerThanNoAlias(TableAttribute attr)
+        {
+            return GetCountSmallerThanNoAlias(attr) != 0;
+        }
+
         public ulong GetCountLargerThanNoAlias(TableAttribute attr)
         {
             foreach (var key in CountLargerThan.Keys)
@@ -35,6 +40,11 @@ namespace Histograms.Models
                     return CountLargerThan[key];
             }
             return 0;
+        }
+
+        public bool IsAnyLargerThanNoAlias(TableAttribute attr)
+        {
+            return GetCountLargerThanNoAlias(attr) != 0;
         }
     }
 }

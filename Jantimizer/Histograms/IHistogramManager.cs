@@ -14,6 +14,8 @@ namespace Histograms
         public List<string> Tables { get; }
         public List<string> Attributes { get; }
         public HistogramSet UsedHistograms { get; }
+        public string RunnerName { get; set; }
+        public string ExperimentName { get; set; }
 
         public Task<List<Task>> AddHistogramsFromDB();
         public void AddHistogram(IHistogram histogram);

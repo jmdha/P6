@@ -1,4 +1,5 @@
 ﻿using Histograms;
+using Histograms.Models;
 using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
@@ -9,18 +10,13 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public class TableAttributeEstimator : BasePredicateEstimator<Dictionary<TableAttribute, int>, TableAttribute, TableAttribute>
+    public class TableAttributeEstimator : BasePredicateEstimator<TableAttribute>
     {
-        public override Dictionary<TableAttribute, int> UpperBounds { get; }
-        public override Dictionary<TableAttribute, int> LowerBounds { get; }
-
-        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(histogramManager)
+        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
-            UpperBounds = upperBounds;
-            LowerBounds = lowerBounds;
         }
 
-        public override ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type, bool isReverse = false)
+        public override ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
             long newResult = 0;
             bool doesPreviousContain = false;
@@ -28,94 +24,86 @@ namespace QueryEstimator.PredicateEstimators
                 doesPreviousContain = true;
 
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetValueFromDictOrAlt(source, LowerBounds, 0);
-            int newSourceUpperBound = GetValueFromDictOrAlt(source, UpperBounds, allSourceSegments.Count);
+            var allcompareSegments = GetAllSegmentsForAttribute(compare);
+            int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
+            int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+            int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
+            int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
 
-            if (type == ComparisonType.Type.More)
+            long bottomBoundsOffset = GetBottomBoundsOffset(allcompareSegments, compareLowerBound, compare);
+            long bottomBoundsCount = GetBottomBoundsCount(allcompareSegments, compareLowerBound, compare);
+            long topBoundsCount = GetTopBoundsCount(allcompareSegments, compareUpperBound, compare);
+
+            switch (type)
             {
-                bool foundAny = false;
-                for (int i = newSourceUpperBound - 1; i >= newSourceLowerBound; i--)
-                {
-                    long newInnerResult = 0;
-                    if (doesPreviousContain)
-                        newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare);
-                    else
-                        newInnerResult = (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
-
-                    if (newInnerResult == 0 && !foundAny)
+                case ComparisonType.Type.More:
+                case ComparisonType.Type.EqualOrMore:
+                    for (int i = sourceUpperBound; i >= sourceLowerBound; i--)
+                        newResult += AddSegmentResult(
+                            allSourceSegments[i], 
+                            (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare), 
+                            doesPreviousContain, bottomBoundsOffset, topBoundsCount);
+                    break;
+                case ComparisonType.Type.Less:
+                case ComparisonType.Type.EqualOrLess:
+                    for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                        newResult += AddSegmentResult(
+                            allSourceSegments[i],
+                            (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare),
+                            doesPreviousContain, bottomBoundsOffset, bottomBoundsCount);
+                    break;
+                case ComparisonType.Type.Equal:
+                    IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
+                    for (int i = sourceLowerBound + 1; i <= sourceUpperBound; i++)
                     {
-                        newSourceUpperBound = i;
-                        continue;
+                        long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
+                        long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare);
+                        aboveThis = AddSegmentResult(allSourceSegments[i], aboveThis, true, bottomBoundsOffset, aboveThis);
+                        abovePreviousThis = AddSegmentResult(lastEqual, abovePreviousThis, true, bottomBoundsOffset, abovePreviousThis);
+                        if (doesPreviousContain)
+                            newResult += abovePreviousThis - aboveThis;
+                        else
+                            newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        lastEqual = allSourceSegments[i];
                     }
-                    else if (newInnerResult == 0)
-                    {
-                        newSourceLowerBound = i;
-                        break;
-                    }
-                    else
-                    {
-                        newResult += newInnerResult;
-                        foundAny = true;
-                    }
-                }
-
-                AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
-                AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
-
-                if (!isReverse)
-                    GetEstimationResult(current, compare, source, ComparisonType.Type.Less, true);
-            }
-            if (type == ComparisonType.Type.Less)
-            {
-                bool foundAny = false;
-                for (int i = newSourceLowerBound; i < newSourceUpperBound; i++)
-                {
-                    long newInnerResult = 0;
-                    if (doesPreviousContain)
-                        newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
-                    else
-                        newInnerResult = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare) * allSourceSegments[i].ElementsBeforeNextSegmentation;
-
-                    if (newInnerResult == 0 && foundAny)
-                    {
-                        newSourceUpperBound = i;
-                        break;
-                    }
-                    else if (newInnerResult == 0)
-                    {
-                        newSourceLowerBound = i;
-                        continue;
-                    }
-                    else
-                    {
-                        newResult += newInnerResult;
-                        foundAny = true;
-                    }
-                }
-
-                AddToDictionaryIfNotThere(source, newSourceUpperBound, UpperBounds);
-                AddToDictionaryIfNotThere(source, newSourceLowerBound, LowerBounds);
-
-                if (!isReverse)
-                    GetEstimationResult(current, compare, source, ComparisonType.Type.More, true);
+                    break;
             }
 
             return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
         }
 
-        internal void AddToDictionaryIfNotThere(TableAttribute attr, int bound, Dictionary<TableAttribute, int> dict)
+        private long GetBottomBoundsOffset(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
         {
-            if (dict.ContainsKey(attr))
-                dict[attr] = bound;
-            else
-                dict.Add(attr, bound);
+            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
         }
 
-        internal int GetValueFromDictOrAlt(TableAttribute attr, Dictionary<TableAttribute, int> dict, int alt)
+        private long GetBottomBoundsCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
         {
-            if (dict.ContainsKey(attr))
-                return dict[attr];
-            return alt;
+            return (long)segments[compareIndex].GetCountLargerThanNoAlias(compare);
+        }
+
+        private long GetTopBoundsCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
+        }
+
+        private long GetTopBoundsOffset(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
+        {
+            return (long)segments[compareIndex].GetCountLargerThanNoAlias(compare);
+        }
+
+        private long AddSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffset, long checkCountOffset)
+        {
+            if (add > checkCountOffset)
+                add -= (add - checkCountOffset);
+            if (bottomOffset > 0)
+                add -= bottomOffset;
+            if (add < 0)
+                return 0;
+            if (doesPreviousContain)
+                return add;
+            else
+                return add * segment.ElementsBeforeNextSegmentation;
         }
     }
 }

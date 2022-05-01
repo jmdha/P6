@@ -1,5 +1,6 @@
 ﻿using Histograms;
 using QueryEstimator.Models;
+using QueryEstimator.SegmentHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,8 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public interface IPredicateEstimator<TBounds, TLeft, TRight>
+    public interface IPredicateEstimator<TRight> : ISegmentHandler
     {
-        public TBounds UpperBounds { get; }
-        public TBounds LowerBounds { get; }
-        public IHistogramManager HistogramManager { get; }
-
-        public ISegmentResult GetEstimationResult(ISegmentResult current, TLeft source, TRight compare, ComparisonType.Type type, bool isReverse = false);
+        public ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TRight compare, ComparisonType.Type type);
     }
 }
