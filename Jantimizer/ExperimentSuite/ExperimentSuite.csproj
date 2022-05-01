@@ -46,4 +46,11 @@
     <Folder Include="UserControls\TestRunner\Controls\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Themes\DarkTheme.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

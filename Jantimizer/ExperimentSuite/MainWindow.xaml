@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:ExperimentSuite"
         xmlns:uc="clr-namespace:ExperimentSuite.UserControls"
         mc:Ignorable="d"
-        Title="Jantimiser" Height="750" Width="1600">
-    <Grid x:Name="MainGrid">
+        Title="Jantimiser" Height="750" Width="1600" Loaded="Window_Loaded">
+    <Grid x:Name="MainGrid" Style="{DynamicResource StandartGridStyle}">
         <Grid.RowDefinitions>
             <RowDefinition Height="70"/>
             <RowDefinition/>
@@ -16,6 +16,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="100"/>
@@ -25,16 +26,20 @@
             </Grid.ColumnDefinitions>
 
             <Image x:Name="LoadingImage"/>
-            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="1" Margin="5"/>
-            <StackPanel x:Name="SentinelsPanel" Grid.Column="2" Margin="2">
-                <CheckBox x:Name="OptimiserSentinelCheckbox" Content="Enable Estimator Result Sentinel" Checked="OptimiserSentinelCheckbox_Click" Unchecked="OptimiserSentinelCheckbox_Click"/>
-                <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Checked="QueryPlanSentinelCheckbox_Click" Unchecked="QueryPlanSentinelCheckbox_Click"/>
-                <CheckBox x:Name="HistogramSentinelCheckbox" Content="Enable Histogram Sentinel" Checked="HistogramSentinelCheckbox_Click" Unchecked="HistogramSentinelCheckbox_Click"/>
+            <ComboBox x:Name="ThemesComboBox" Grid.Column="1" SelectionChanged="ThemesComboBox_SelectionChanged" Margin="10" Style="{DynamicResource StandartComboboxStyle}">
+                <ComboBoxItem>White Theme</ComboBoxItem>
+                <ComboBoxItem>Dark Theme</ComboBoxItem>
+            </ComboBox>
+            <ProgressBar x:Name="ExperimentProgressBar" Grid.Column="2" Style="{DynamicResource StandartProgressbarStyle}"/>
+            <StackPanel x:Name="SentinelsPanel" Grid.Column="3" Margin="2">
+                <CheckBox x:Name="OptimiserSentinelCheckbox" Content="Enable Estimator Result Sentinel" Checked="OptimiserSentinelCheckbox_Click" Unchecked="OptimiserSentinelCheckbox_Click" Style="{DynamicResource StandartCheckboxStyle}"/>
+                <CheckBox x:Name="QueryPlanSentinelCheckbox" Content="Enable Query Plan Parser Sentinel" Checked="QueryPlanSentinelCheckbox_Click" Unchecked="QueryPlanSentinelCheckbox_Click" Style="{DynamicResource StandartCheckboxStyle}"/>
+                <CheckBox x:Name="HistogramSentinelCheckbox" Content="Enable Histogram Sentinel" Checked="HistogramSentinelCheckbox_Click" Unchecked="HistogramSentinelCheckbox_Click" Style="{DynamicResource StandartCheckboxStyle}"/>
             </StackPanel>
-            <Button x:Name="SentinelViewerButton" Content="Sentinel Viewer" Grid.Column="3" Margin="5" Click="SentinelViewerButton_Click"/>
-            <Button x:Name="RunButton" Content="Run!" Grid.Column="4" Margin="5" Click="RunButton_Click"/>
-            <Button x:Name="PauseButton" Grid.Column="5" Content="Pause" Margin="5" IsEnabled="False" Click="PauseButton_Click"/>
-            <Button x:Name="CacheViewerButton" Grid.Column="6" Content="Cache Viewer" Margin="5" Click="CacheViewerButton_Click"/>
+            <Button x:Name="SentinelViewerButton" Content="Sentinel Viewer" Grid.Column="4" Click="SentinelViewerButton_Click" Style="{DynamicResource StandartButtonStyle}"/>
+            <Button x:Name="RunButton" Content="Run!" Grid.Column="5" Click="RunButton_Click" Style="{DynamicResource StandartButtonStyle}"/>
+            <Button x:Name="PauseButton" Grid.Column="6" Content="Pause" IsEnabled="False" Click="PauseButton_Click" Style="{DynamicResource StandartButtonStyle}"/>
+            <Button x:Name="CacheViewerButton" Grid.Column="7" Content="Cache Viewer" Click="CacheViewerButton_Click" Style="{DynamicResource StandartButtonStyle}"/>
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">

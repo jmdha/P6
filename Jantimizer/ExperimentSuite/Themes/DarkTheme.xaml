@@ -1,0 +1,39 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!--Text-->
+    <FontFamily x:Key="StandartFont">Lucida Console</FontFamily>
+    
+    <!--Labels-->
+    <SolidColorBrush x:Key="StandartLabelBackColor" Color="Black" />
+    <SolidColorBrush x:Key="StandartLabelFrontColor" Color="White" />
+
+    <!--TextBoxes-->
+    <SolidColorBrush x:Key="StandartTextboxBackColor" Color="Black" />
+    <SolidColorBrush x:Key="StandartTextboxFrontColor" Color="White" />
+
+    <!--Grids-->
+    <SolidColorBrush x:Key="StandartGridBackColor" Color="#1e2736" />
+
+    <!--Buttons-->
+    <SolidColorBrush x:Key="StandartButtonFrontColor" Color="White" />
+    <SolidColorBrush x:Key="StandartDisabledButtonColor" Color="#8b96a6" />
+    <SolidColorBrush x:Key="StandartButtonColor" Color="#545f70" />
+    <SolidColorBrush x:Key="StandartButtonColorHover" Color="#FF8D8D8D" />
+    
+    <!--Comboboxes-->
+    <SolidColorBrush x:Key="StandartComboboxButtonBackColor" Color="#545f70" />
+    <SolidColorBrush x:Key="StandartComboboxButtonForeColor" Color="White" />
+    <SolidColorBrush x:Key="StandartComboboxBorderBackgroundColor" Color="#6b7380" />
+    <SolidColorBrush x:Key="StandartComboboxBackgroundColor" Color="#FF1B212E" />
+    <SolidColorBrush x:Key="StandartComboboxFrontColor" Color="White" />
+
+    <!--Checkboxes-->
+    <SolidColorBrush x:Key="StandartCheckboxBackColor" Color="#545f70" />
+    <SolidColorBrush x:Key="StandartCheckboxFrontColor" Color="White" />
+
+    <!--Progressbars-->
+    <SolidColorBrush x:Key="StandartProgressbarBackColor" Color="#545f70" />
+    <SolidColorBrush x:Key="StandartProgressbarFrontColor" Color="Black" />
+    
+</ResourceDictionary>

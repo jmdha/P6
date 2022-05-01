@@ -23,6 +23,7 @@ namespace ExperimentSuite
         private readonly string QueryPlanCacheFile = "query-plan-cache.json";
 
         private ExperimentController controller;
+        private bool _isLoaded = false;
 
         public MainWindow()
         {
@@ -43,6 +44,8 @@ namespace ExperimentSuite
             InitializeComponent();
             var iconHandle = Properties.Resources.icon;
             this.Icon = ImageHelper.ByteToImage(iconHandle);
+
+            ThemesComboBox.SelectedIndex = 0;
         }
 
         private void UpdateExperimentProgressBar(double value, double max = 0)
@@ -169,6 +172,22 @@ namespace ExperimentSuite
                 var gifController = ImageBehavior.GetAnimationController(LoadingImage);
                 gifController.Dispose();
             }
+        }
+
+        private void ThemesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isLoaded)
+            {
+                if (sender is ComboBox box && e.AddedItems.Count > 0 && e.AddedItems[0] is ComboBoxItem boxItem && boxItem.Content is string cont) {
+                    Application.Current.Resources.MergedDictionaries.Clear();
+                    Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri($"/Themes/{cont.Replace(" ","")}.xaml", UriKind.Relative) });
+                }
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            _isLoaded = true;
         }
     }
 }
