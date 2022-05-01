@@ -1,4 +1,6 @@
-﻿using Histograms.Caches;
+﻿using Histograms;
+using Histograms.Caches;
+using Histograms.DepthCalculators;
 using Histograms.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -37,7 +39,8 @@ namespace HistogramsTests.Unit_Tests.Caches
         {
             // ARRANGE
             new HistogramCacher();
-            HistogramEquiDepth histogram = new HistogramEquiDepth(tableName, attributeName, depth);
+            DepthCalculator getDepth = new ConstantDepth(depth).GetDepth;
+            HistogramEquiDepth histogram = new HistogramEquiDepth(tableName, attributeName, getDepth);
             Assert.IsNotNull(HistogramCacher.Instance);
 
             // ACT
@@ -48,7 +51,7 @@ namespace HistogramsTests.Unit_Tests.Caches
             Assert.IsNotNull(returnHistogram);
             Assert.AreEqual(tableName, returnHistogram.TableName);
             Assert.AreEqual(attributeName, returnHistogram.AttributeName);
-            Assert.AreEqual(depth, returnHistogram.Depth);
+            Assert.AreEqual(getDepth, returnHistogram.GetDepth);
         }
 
         [TestMethod]
@@ -58,7 +61,8 @@ namespace HistogramsTests.Unit_Tests.Caches
         {
             // ARRANGE
             new HistogramCacher();
-            HistogramEquiDepthVariance histogram = new HistogramEquiDepthVariance(tableName, attributeName, depth);
+            DepthCalculator getDepth = new ConstantDepth(depth).GetDepth;
+            HistogramEquiDepthVariance histogram = new HistogramEquiDepthVariance(tableName, attributeName, getDepth);
             Assert.IsNotNull(HistogramCacher.Instance);
 
             // ACT
@@ -69,7 +73,7 @@ namespace HistogramsTests.Unit_Tests.Caches
             Assert.IsNotNull(returnHistogram);
             Assert.AreEqual(tableName, returnHistogram.TableName);
             Assert.AreEqual(attributeName, returnHistogram.AttributeName);
-            Assert.AreEqual(depth, returnHistogram.Depth);
+            Assert.AreEqual(getDepth, returnHistogram.GetDepth);
         }
 
         [TestMethod]
@@ -77,7 +81,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         {
             // ARRANGE
             new HistogramCacher();
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", 10);
+            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", new ConstantDepth(10).GetDepth);
             Assert.IsNotNull(HistogramCacher.Instance);
 
             // ACT
@@ -101,11 +105,12 @@ namespace HistogramsTests.Unit_Tests.Caches
             new HistogramCacher();
             Assert.IsNotNull(HistogramCacher.Instance);
             HistogramEquiDepth[] histograms = new HistogramEquiDepth[tableName.Length];
+            DepthCalculator[] depthCalculators = depth.Select(x => (DepthCalculator)new ConstantDepth(x).GetDepth).ToArray();
             string[] hash = new string[tableName.Length];
             for (int i = 0; i < tableName.Length; i++)
             {
-                histograms[i] = new HistogramEquiDepth(tableName[i], attributeName[i], depth[i]);
-                hash[i] = HistogramCacher.Instance.GetCacheKey(new string[] { tableName[i], attributeName[i], columnHashes[i], depth[i].ToString() });
+                histograms[i] = new HistogramEquiDepth(tableName[i], attributeName[i], depthCalculators[i]);
+                hash[i] = HistogramCacher.Instance.GetCacheKey(new string[] { tableName[i], attributeName[i], columnHashes[i], depthCalculators[i].GetHashCode().ToString() });
             }
 
             // ACT
@@ -119,7 +124,7 @@ namespace HistogramsTests.Unit_Tests.Caches
                 Assert.IsNotNull(returnHistogram);
                 Assert.AreEqual(tableName[i], returnHistogram.TableName);
                 Assert.AreEqual(attributeName[i], returnHistogram.AttributeName);
-                Assert.AreEqual(depth[i], returnHistogram.Depth);
+                Assert.AreEqual(depthCalculators[i], returnHistogram.GetDepth);
             }
         }
 
@@ -132,7 +137,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         {
             // ARRANGE
             new HistogramCacher();
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", 10);
+            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", new ConstantDepth(10).GetDepth);
             Assert.IsNotNull(HistogramCacher.Instance);
             HistogramCacher.Instance.AddToCacheIfNotThere("abc1", histogram);
             HistogramCacher.Instance.AddToCacheIfNotThere("abc2", histogram);
@@ -154,7 +159,7 @@ namespace HistogramsTests.Unit_Tests.Caches
         {
             // ARRANGE
             new HistogramCacher();
-            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", 10);
+            HistogramEquiDepth histogram = new HistogramEquiDepth("A", "b", new ConstantDepth(10).GetDepth);
             Assert.IsNotNull(HistogramCacher.Instance);
             HistogramCacher.Instance.AddToCacheIfNotThere("abc1", histogram);
             HistogramCacher.Instance.AddToCacheIfNotThere("abc2", histogram);

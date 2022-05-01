@@ -17,17 +17,18 @@ namespace Histograms.Models
             TypeCode.Double
         };
 
-        public HistogramEquiDepthVariance(string tableName, string attributeName, int depth) : base(tableName, attributeName, depth)
+        public HistogramEquiDepthVariance(string tableName, string attributeName, DepthCalculator getDepth) : base(tableName, attributeName, getDepth)
         {
         }
 
-        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName, depth)
+        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, DepthCalculator getDepth) : base(histogramId, tableName, attributeName, getDepth)
         {
         }
 
         private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
-            for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
+            var depth = GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
+            for (int bStart = 0; bStart < sorted.Count; bStart += depth)
             {
                 IComparable startValue = sorted[bStart];
                 IComparable endValue = sorted[bStart];
@@ -36,14 +37,14 @@ namespace Histograms.Models
                 double variance = 0;
                 double standardDeviation = 0;
 
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                for (int bIter = bStart + 1; bIter < bStart + depth && bIter < sorted.Count; bIter++)
                 {
                     countValue++;
                     endValue = sorted[bIter];
                     mean += Convert.ToDouble(endValue);
                 }
                 mean = mean / countValue;
-                for (int bIter = bStart; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                for (int bIter = bStart; bIter < bStart + depth && bIter < sorted.Count; bIter++)
                 {
                     variance += Math.Pow(Convert.ToDouble(sorted[bIter]) - mean, 2);
                 }
@@ -60,7 +61,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, Depth);
+            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, GetDepth);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);

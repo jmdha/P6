@@ -8,8 +8,9 @@ using Histograms.Models;
 
 namespace Histograms
 {
+    public delegate int DepthCalculator(long uniqueValueCount, long totalValueCount);
     public interface IDepthHistogramManager : IHistogramManager
     {
-        public int Depth { get; }
+        public DepthCalculator GetDepth { get; }
     }
 }

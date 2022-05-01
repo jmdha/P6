@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Tools.Models;
 using Histograms.DataGatherers;
 using HistogramsTests.Stubs;
+using Histograms.DepthCalculators;
 
 namespace HistogramsTests.Unit_Tests.Managers
 {
@@ -29,7 +30,7 @@ namespace HistogramsTests.Unit_Tests.Managers
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
             foreach (string tableName in tableNames)
-                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
+                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, new ConstantDepth(10).GetDepth));
 
             // ACT
             var result = manager.Tables;
@@ -49,7 +50,7 @@ namespace HistogramsTests.Unit_Tests.Managers
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
             foreach (string attribute in attributeName)
-                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, 10));
+                manager.AddHistogram(new HistogramEquiDepth(tableName, attribute, new ConstantDepth(10).GetDepth));
 
             // ACT
             var result = manager.Attributes;
@@ -72,7 +73,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, 10);
+            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, new ConstantDepth(10).GetDepth);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -90,7 +91,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, 10);
+            IHistogram histogram = new HistogramEquiDepthVariance(tableName, attributeName, new ConstantDepth(10).GetDepth);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -106,7 +107,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            IHistogram histogram = new HistogramEquiDepthVariance(tableName, "a", 10);
+            IHistogram histogram = new HistogramEquiDepthVariance(tableName, "a", new ConstantDepth(10).GetDepth);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -121,7 +122,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            IHistogram histogram = new HistogramEquiDepth("A", attributeName, 10);
+            IHistogram histogram = new HistogramEquiDepth("A", attributeName, new ConstantDepth(10).GetDepth);
 
             // ACT
             manager.AddHistogram(histogram);
@@ -135,7 +136,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            var expectedHistogram = new HistogramEquiDepth("t", "a", 10);
+            var expectedHistogram = new HistogramEquiDepth("t", "a", new ConstantDepth(10).GetDepth);
             manager.AddHistogram(expectedHistogram);
 
             Assert.IsNotNull(manager.GetHistogram("t", "a"));
@@ -156,7 +157,7 @@ namespace HistogramsTests.Unit_Tests.Managers
         {
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
-            var expectedHistogram = new HistogramEquiDepthVariance(table, attribute, 10);
+            var expectedHistogram = new HistogramEquiDepthVariance(table, attribute, new ConstantDepth(10).GetDepth);
             manager.AddHistogram(expectedHistogram);
 
             // ACT
@@ -176,7 +177,7 @@ namespace HistogramsTests.Unit_Tests.Managers
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
             manager.AddHistogram(
-                new HistogramEquiDepthVariance("A", "a", 10)
+                new HistogramEquiDepthVariance("A", "a", new ConstantDepth(10).GetDepth)
             );
 
             // ACT
@@ -192,7 +193,7 @@ namespace HistogramsTests.Unit_Tests.Managers
             // ARRANGE
             IHistogramManager manager = new BaseHistogramManagerStub();
             for (int i = 0; i < tables.Length; i++)
-                manager.AddHistogram(new HistogramEquiDepth(tables[i], attributes[i], 1));
+                manager.AddHistogram(new HistogramEquiDepth(tables[i], attributes[i], new ConstantDepth(1).GetDepth));
 
             // ACT
             IHistogram actualHistogram = manager.GetHistogram(table, attribute);

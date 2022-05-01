@@ -21,21 +21,23 @@ namespace Histograms.Models
             TypeCode.UInt32,
             TypeCode.UInt64,
         };
-        public int Depth { get; }
+        public DepthCalculator GetDepth { get; }
 
-        public HistogramMinDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
+        public HistogramMinDepth(string tableName, string attributeName, DepthCalculator getDepth) : base(tableName, attributeName)
         {
             HistogramId = Guid.NewGuid();
-            Depth = depth;
+            GetDepth = getDepth;
         }
 
-        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName)
+        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, DepthCalculator getDepth) : base(histogramId, tableName, attributeName)
         {
-            Depth = depth;
+            GetDepth = getDepth;
         }
 
         public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
+            var depth = GetDepth(sortedGroups.Count(), sortedGroups.Sum(x => x.Count));
+
             IComparable? minValue = null;
             IComparable? maxValue = null;
             long count = 0;
@@ -48,7 +50,7 @@ namespace Histograms.Models
                 count += grp.Count;
                 maxValue = grp.Value;
 
-                if (count >= Depth)
+                if (count >= depth)
                 {
                     Buckets.Add(new HistogramBucket(minValue, grp.Value, count));
                     minValue = null;
@@ -69,7 +71,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, Depth);
+            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, GetDepth);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);
@@ -78,7 +80,7 @@ namespace Histograms.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() + HashCode.Combine(Depth);
+            return base.GetHashCode() + HashCode.Combine(GetDepth);
         }
     }
 }
