@@ -35,7 +35,7 @@ namespace ExperimentSuite.Models
             EstimatorAcc = 0;
         }
 
-        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted)
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, decimal abstractStorageUsage)
         {
             ExperimentName = experimentName;
             Category = category;
@@ -44,6 +44,7 @@ namespace ExperimentSuite.Models
             DatabasePredicted = databasePredicted;
             DatabaseActual = databaseActual;
             EstimatorPredicted = estimatorPredicted;
+            AbstractStorageUsage = abstractStorageUsage;
             DatabaseAcc = GetAccuracy(databaseActual, databasePredicted);
             EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
             DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - databasePredicted);
