@@ -268,7 +268,8 @@ namespace ExperimentSuite.Controllers
                             RunData.Name,
                             analysisResult.EstimatedCardinality,
                             analysisResult.ActualCardinality,
-                            jantimatorResult.EstimatedCardinality)
+                            jantimatorResult.EstimatedCardinality,
+                            RunData.HistoManager.GetAbstractStorage())
                         );
                 }
             }
