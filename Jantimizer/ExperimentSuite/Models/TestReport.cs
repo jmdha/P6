@@ -20,7 +20,8 @@ namespace ExperimentSuite.Models
         public ulong DatabaseOffBy { get; set; }
         public ulong EstimatorOffBy { get; set; }
         public bool IsBetter { get; }
-        public decimal AbstractStorageUsage { get; }
+        public ulong AbstractStorageUsageBytes { get; }
+        public ulong AbstractDatabaseSizeBytes { get; }
 
         public TestReport()
         {
@@ -35,7 +36,7 @@ namespace ExperimentSuite.Models
             EstimatorAcc = 0;
         }
 
-        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, decimal abstractStorageUsage)
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes)
         {
             ExperimentName = experimentName;
             Category = category;
@@ -44,11 +45,12 @@ namespace ExperimentSuite.Models
             DatabasePredicted = databasePredicted;
             DatabaseActual = databaseActual;
             EstimatorPredicted = estimatorPredicted;
-            AbstractStorageUsage = abstractStorageUsage;
+            AbstractStorageUsageBytes = abstractStorageUsageBytes;
+            AbstractDatabaseSizeBytes = abstractDatabaseSizeBytes;
             DatabaseAcc = GetAccuracy(databaseActual, databasePredicted);
             EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
-            DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - databasePredicted);
-            EstimatorOffBy = (ulong)Math.Abs((decimal)databaseActual - estimatorPredicted);
+            DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)databasePredicted);
+            EstimatorOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)estimatorPredicted);
             if (EstimatorOffBy < DatabaseOffBy)
                 IsBetter = true;
             else

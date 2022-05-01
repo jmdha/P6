@@ -56,8 +56,28 @@ namespace Histograms.Models
                     larger += (ulong)valueCount.Count;
             }
 
-            segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, smaller);
-            segmentation.CountLargerThan.AddOrUpdate(data.Attribute, larger);
+            if (smaller > 0)
+            {
+                if (smaller < byte.MaxValue)
+                    segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, (byte)smaller);
+                if (smaller < ushort.MaxValue)
+                    segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, (ushort)smaller);
+                else if (smaller < uint.MaxValue)
+                    segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, (uint)smaller);
+                else
+                    segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, smaller);
+            }
+            if (larger > 0)
+            {
+                if (larger < byte.MaxValue)
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (byte)larger);
+                if (larger < ushort.MaxValue)
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (ushort)larger);
+                else if (larger < uint.MaxValue)
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (uint)larger);
+                else
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, larger);
+            }
         }
 
         private IEnumerable<TableAttribute> GetAllDistinctTableAttributes(IEnumerable<IHistogram> histograms)

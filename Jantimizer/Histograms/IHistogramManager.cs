@@ -23,6 +23,7 @@ namespace Histograms
 
         public IHistogram GetHistogram(string table, string attribute);
 
-        public decimal GetAbstractStorage();
+        public ulong GetAbstractStorageBytes();
+        public ulong GetAbstractDatabaseSizeBytes();
     }
 }

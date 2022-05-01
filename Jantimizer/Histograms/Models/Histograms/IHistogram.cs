@@ -13,6 +13,7 @@ namespace Histograms.Models
         public string AttributeName { get; }
         public List<IHistogramBucket> Buckets { get; }
         public List<IHistogramSegmentationComparative> Segmentations { get; }
+        public ulong RawDataSizeBytes { get; }
 
         public void GenerateHistogram(DataTable table, string key);
         public void GenerateHistogram(List<IComparable> column);

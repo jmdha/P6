@@ -131,12 +131,26 @@ namespace Histograms.Managers
             return sb.ToString();
         }
 
-        public decimal GetAbstractStorage()
+        public ulong GetAbstractStorageBytes()
         {
-            decimal result = 0;
+            ulong result = 0;
+            // Get all bytes from all segments.
             foreach (var histogram in Histograms.Values)
                 foreach (var segments in histogram.Segmentations)
-                    result += segments.CountLargerThan.Count + segments.CountSmallerThan.Count;
+                    result += segments.GetTotalAbstractStorageUse();
+            // Converting from bit to bytes
+            result = result / 8;
+            return result;
+        }
+
+        public ulong GetAbstractDatabaseSizeBytes()
+        {
+            ulong result = 0;
+            // Get all bytes from all histograms.
+            foreach (var histogram in Histograms.Values)
+                result += histogram.RawDataSizeBytes;
+            // Converting from bit to bytes
+            result = result / 8;
             return result;
         }
     }
