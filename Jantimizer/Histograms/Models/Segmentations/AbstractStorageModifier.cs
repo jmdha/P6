@@ -9,6 +9,8 @@ namespace Histograms.Models.Segmentations
     internal static class AbstractStorageModifier
     {
         private static Dictionary<TypeCode, int> _modifiers { get; } = new Dictionary<TypeCode, int>() {
+            { TypeCode.SByte, 8 },
+            { TypeCode.Byte, 8 },
             { TypeCode.Int16, 16 },
             { TypeCode.UInt16, 16 },
             { TypeCode.Int32, 32 },

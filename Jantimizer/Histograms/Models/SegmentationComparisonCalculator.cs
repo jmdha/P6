@@ -58,6 +58,8 @@ namespace Histograms.Models
 
             if (smaller > 0)
             {
+                if (smaller < byte.MaxValue)
+                    segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, (byte)smaller);
                 if (smaller < ushort.MaxValue)
                     segmentation.CountSmallerThan.AddOrUpdate(data.Attribute, (ushort)smaller);
                 else if (smaller < uint.MaxValue)
@@ -67,6 +69,8 @@ namespace Histograms.Models
             }
             if (larger > 0)
             {
+                if (larger < byte.MaxValue)
+                    segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (byte)smaller);
                 if (larger < ushort.MaxValue)
                     segmentation.CountLargerThan.AddOrUpdate(data.Attribute, (ushort)smaller);
                 else if (larger < uint.MaxValue)
