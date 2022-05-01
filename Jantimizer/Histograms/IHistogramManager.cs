@@ -22,5 +22,7 @@ namespace Histograms
         public void ClearHistograms();
 
         public IHistogram GetHistogram(string table, string attribute);
+
+        public decimal GetAbstractStorage();
     }
 }

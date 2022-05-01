@@ -14,6 +14,7 @@ namespace ExperimentSuite.Models {
             Map(m => m.DatabaseActual).Name("Actual Rows");
             Map(m => m.DatabaseOffBy).Name("Database off by");
             Map(m => m.EstimatorOffBy).Name("Estimator off by");
+            Map(m => m.AbstractStorageUsage).Name("Abstract storage use");
         }
     }
 }

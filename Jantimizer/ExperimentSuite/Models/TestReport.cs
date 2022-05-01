@@ -20,6 +20,7 @@ namespace ExperimentSuite.Models
         public ulong DatabaseOffBy { get; set; }
         public ulong EstimatorOffBy { get; set; }
         public bool IsBetter { get; }
+        public decimal AbstractStorageUsage { get; }
 
         public TestReport()
         {
