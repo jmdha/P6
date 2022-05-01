@@ -9,6 +9,7 @@ namespace ExperimentSuite.Models {
             Map(m => m.DatabaseName).Name("Database Name");
             Map(m => m.TestName).Name("Test Name");
             Map(m => m.TimerName).Name("Timer Name");
+            Map(m => m.TimeNs).Name("Ns");
             Map(m => m.TimeMs).Name("Ms");
         }
     }
