@@ -17,6 +17,8 @@ namespace ExperimentSuite.Models
         public ulong EstimatorPredicted { get; set; }
         public decimal DatabaseAcc { get; }
         public decimal EstimatorAcc { get; }
+        public ulong DatabaseOffBy { get; set; }
+        public ulong EstimatorOffBy { get; set; }
         public bool IsBetter { get; }
 
         public TestReport()
@@ -43,7 +45,9 @@ namespace ExperimentSuite.Models
             EstimatorPredicted = estimatorPredicted;
             DatabaseAcc = GetAccuracy(databaseActual, databasePredicted);
             EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
-            if (EstimatorAcc > DatabaseAcc)
+            DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - databasePredicted);
+            EstimatorOffBy = (ulong)Math.Abs((decimal)databaseActual - estimatorPredicted);
+            if (EstimatorOffBy < DatabaseOffBy)
                 IsBetter = true;
             else
                 IsBetter = false;
