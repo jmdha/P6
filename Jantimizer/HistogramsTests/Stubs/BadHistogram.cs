@@ -26,6 +26,8 @@ namespace HistogramsTests.Stubs
 
         public TypeCode DataTypeCode => throw new NotImplementedException();
 
+        public ulong RawDataSizeBytes => throw new NotImplementedException();
+
         List<IHistogramSegmentationComparative> IHistogram.Segmentations => throw new NotImplementedException();
 
         public object Clone()
