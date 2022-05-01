@@ -143,6 +143,8 @@ namespace ExperimentSuite.Controllers
             {
                 PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
+                RunData.HistoManager.ExperimentName = ExperimentName;
+                RunData.HistoManager.RunnerName = RunnerName;
                 await GenerateHistograms(RunData.HistoManager);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
@@ -249,13 +251,6 @@ namespace ExperimentSuite.Controllers
                     if (EstimatorResultSentinel.Instance != null)
                         EstimatorResultSentinel.Instance.CheckResult(jantimatorResult, queryFile.Name, ExperimentName, RunnerName);
 
-                    // Get Optimisers prediction
-                    //timer = TimerHelper.GetWatchAndStart();
-                    //OptimiserResult jantimiserResult = RunData.Optimiser.OptimiseQuery(jsonQuery);
-                    //if (OptimiserResultSentinel.Instance != null)
-                    //    OptimiserResultSentinel.Instance.CheckResult(jantimiserResult, queryFile.Name, ExperimentName, RunnerName);
-                    //CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Optimiser"));
-
                     if (HistogramResultSentinel.Instance != null)
                         HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
 
@@ -268,7 +263,9 @@ namespace ExperimentSuite.Controllers
                             RunData.Name,
                             analysisResult.EstimatedCardinality,
                             analysisResult.ActualCardinality,
-                            jantimatorResult.EstimatedCardinality)
+                            jantimatorResult.EstimatedCardinality,
+                            RunData.HistoManager.GetAbstractStorageBytes(),
+                            RunData.HistoManager.GetAbstractDatabaseSizeBytes())
                         );
                 }
             }
@@ -326,6 +323,7 @@ namespace ExperimentSuite.Controllers
 
         private async Task GenerateHistograms(IHistogramManager manager)
         {
+            manager.ClearHistograms();
             List<Task> tasks = await manager.AddHistogramsFromDB();
             int value = 0;
             int max = tasks.Count;

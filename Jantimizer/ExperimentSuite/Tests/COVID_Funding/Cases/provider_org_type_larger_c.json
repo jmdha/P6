@@ -1,0 +1,61 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM flows AS F1 JOIN flows AS F2 ON (F1.provider_org_type > F2.provider_org_type AND F1.provider_org_type > 15 AND F2.provider_org_type < 40)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F1"
+              },
+              "Attribute": "provider_org_type"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F2"
+              },
+              "Attribute": "provider_org_type"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F1"
+              },
+              "Attribute": "provider_org_type"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "15"
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "flows",
+                "Alias": "F2"
+              },
+              "Attribute": "provider_org_type"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "40"
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}

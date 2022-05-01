@@ -1,0 +1,29 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM c JOIN d ON c.v = d.v",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "c"
+              },
+              "Attribute": "v"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "d"
+              },
+              "Attribute": "v"
+            }
+          },
+          "ComType": "="
+        }
+      ]
+    }
+  ]
+}

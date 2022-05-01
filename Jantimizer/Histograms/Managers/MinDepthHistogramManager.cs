@@ -35,6 +35,6 @@ namespace Histograms.Managers
         }
 
         protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash) =>
-            new string[] { tableName, attributeName, columnHash, GetDepth.GetHashCode().ToString(), typeof(HistogramMinDepth).Name };
+            new string[] { tableName, attributeName, columnHash, GetDepth.GetHashCode().ToString(), RunnerName, ExperimentName, typeof(HistogramMinDepth).Name };
     }
 }

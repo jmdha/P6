@@ -20,6 +20,8 @@ namespace Histograms.Managers
         public HistogramSet UsedHistograms { get; }
         public List<string> Tables => Histograms.Keys.Select(a => a.Table.TableName).Distinct().ToList();
         public List<string> Attributes => Histograms.Keys.Select(a => $"{a.Table.TableName}.{a.Attribute}").ToList();
+        public string RunnerName { get; set; } = "";
+        public string ExperimentName { get; set; } = "";
 
         protected IDataGatherer DataGatherer { get; set; }
         public BaseHistogramManager(IDataGatherer dataGatherer)
@@ -127,6 +129,29 @@ namespace Histograms.Managers
             foreach (var histogram in Histograms.Values)
                     sb.AppendLine(histogram.ToString());
             return sb.ToString();
+        }
+
+        public ulong GetAbstractStorageBytes()
+        {
+            ulong result = 0;
+            // Get all bytes from all segments.
+            foreach (var histogram in Histograms.Values)
+                foreach (var segments in histogram.Segmentations)
+                    result += segments.GetTotalAbstractStorageUse();
+            // Converting from bit to bytes
+            result = result / 8;
+            return result;
+        }
+
+        public ulong GetAbstractDatabaseSizeBytes()
+        {
+            ulong result = 0;
+            // Get all bytes from all histograms.
+            foreach (var histogram in Histograms.Values)
+                result += histogram.RawDataSizeBytes;
+            // Converting from bit to bytes
+            result = result / 8;
+            return result;
         }
     }
 }

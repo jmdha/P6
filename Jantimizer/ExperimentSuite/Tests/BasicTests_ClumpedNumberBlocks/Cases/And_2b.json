@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM flows AS F1 JOIN flows AS F2 ON (F1.provider_org_type > 20 AND F2.provider_org_type < 20)",
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON (a.v > b.v AND a.v = 50)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -8,14 +8,18 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "flows",
-                "Alias": "F1"
+                "TableName": "a"
               },
-              "Attribute": "provider_org_type"
+              "Attribute": "v"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "20"
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
           },
           "ComType": ">"
         },
@@ -23,16 +27,15 @@
           "LeftAttribute": {
             "Attribute": {
               "Table": {
-                "TableName": "flows",
-                "Alias": "F2"
+                "TableName": "a"
               },
-              "Attribute": "provider_org_type"
+              "Attribute": "v"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "20"
+            "ConstantValue": "50"
           },
-          "ComType": "<"
+          "ComType": "="
         }
       ]
     }

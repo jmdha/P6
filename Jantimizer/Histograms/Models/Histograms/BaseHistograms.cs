@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Histograms.Models.Segmentations;
+using System.Data;
 using System.Text;
 using Tools.Models.JsonModels;
 
@@ -14,6 +15,7 @@ namespace Histograms.Models
         public TableAttribute TableAttribute { get; }
         public string TableName => TableAttribute.Table.TableName;
         public string AttributeName => TableAttribute.Attribute;
+        public ulong RawDataSizeBytes { get; internal set; } = 0;
 
         public BaseHistogram(string tableName, string attributeName) : this(Guid.NewGuid(), tableName, attributeName)
         { }
@@ -57,10 +59,12 @@ namespace Histograms.Models
         public void GenerateSegmentationsFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
             GenerateHistogramFromSortedGroups(sortedGroups);
+            RawDataSizeBytes = 0;
 
             // Turn all bucket-starts into segmentations
             foreach (var bucket in Buckets)
             {
+                RawDataSizeBytes += Convert.ToUInt64(bucket.Count) * Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(bucket.ValueStart.GetType())));
                 Segmentations.Add(new HistogramSegmentationComparative(bucket.ValueStart, bucket.Count));
             }
 
@@ -70,7 +74,7 @@ namespace Histograms.Models
                 Segmentations.Remove(segmentation);
 
             // Add final segmentation
-            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, 1));
+            Segmentations.Add(new HistogramSegmentationComparative(lastUniqueValue.Value, lastUniqueValue.Count));
             DataTypeCode = Type.GetTypeCode(Segmentations.First().LowestValue.GetType());
         }
 

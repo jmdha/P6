@@ -1,8 +1,8 @@
 ﻿{
   "Experiments": [
     {
-      "ExperimentName": "Experiment One - Base EquiDepth",
-      "RunParallel": false,
+      "ExperimentName": "Experiment One - EquiDepth",
+      "RunParallel": true,
       "RunExperiment": true,
       "PreRunData": [
         {
@@ -31,26 +31,34 @@
           "ConnectorName": "POSGRESQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks"
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
           ]
         },
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "EquiDepth",
           "TestFiles": [
-            "BasicTests_RandomNumberBlocks"
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
           ]
         }
       ],
       "OptionalTestSettings": {
         "BucketSize": 256,
-        "MaxEstimatorSweeps" : 10
+        "MaxEstimatorSweeps": 10
       }
     },
     {
-      "ExperimentName": "Experiment Three - MinDepth",
+      "ExperimentName": "Experiment Two - MinDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -79,7 +87,6 @@
           "ConnectorID": "MinDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
             "BasicTests_ClumpedNumberBlocks",
             "WorldHappiness_With_GDP",
             "Census_2013",
@@ -91,7 +98,6 @@
           "ConnectorID": "MinDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
-            "BasicTests_ConstantNumberBlocks",
             "BasicTests_ClumpedNumberBlocks",
             "WorldHappiness_With_GDP",
             "Census_2013",
