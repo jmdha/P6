@@ -13,25 +13,31 @@ namespace QueryEstimator.PredicateBounders
 {
     public class TableAttributeBounder : BasePredicateBounder<TableAttribute>
     {
+        private IHistogramSegmentationComparative? _lastEqual = null;
         public TableAttributeBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 
         public override IPredicateBoundResult<TableAttribute> Bound(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
+            // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int currentSourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int newSourceLowerBound = currentSourceLowerBound;
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             int newSourceUpperBound = currentSourceUpperBound;
 
-            IHistogramSegmentationComparative lastEqual = allSourceSegments[currentSourceLowerBound];
-
-            if (currentSourceLowerBound != currentSourceUpperBound)
+            // Only check for new bounds if the bound have not already been reduced to the max
+            if (currentSourceLowerBound < currentSourceUpperBound)
             {
+                // Skip the first lower bound if the predicate is equal
                 if (type == ComparisonType.Type.Equal)
+                {
+                    _lastEqual = allSourceSegments[currentSourceLowerBound];
                     currentSourceLowerBound++;
+                }
 
+                // Check within the bounds until a given predicate is no longer correct
                 bool foundAny = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
@@ -39,8 +45,10 @@ namespace QueryEstimator.PredicateBounders
                     switch (type)
                     {
                         case ComparisonType.Type.Equal:
-                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && lastEqual.IsAnyLargerThanNoAlias(compare);
-                            lastEqual = allSourceSegments[i];
+                            if (_lastEqual == null)
+                                throw new ArgumentNullException("_lastEqual cannot be null");
+                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && _lastEqual.IsAnyLargerThanNoAlias(compare);
+                            _lastEqual = allSourceSegments[i];
                             break;
                         case ComparisonType.Type.More:
                         case ComparisonType.Type.EqualOrMore:
@@ -58,18 +66,17 @@ namespace QueryEstimator.PredicateBounders
                         break;
                     }
                     else if (!isAny)
-                    {
                         newSourceLowerBound = i;
-                        continue;
-                    }
                     else
                         foundAny = true;
                 }
 
-                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
+                // Add to dictionary if not there
+                AddOrReduceUpperBound(source, newSourceUpperBound);
+                AddOrReduceLowerBound(source, newSourceLowerBound);
             }
 
+            // Return a new bound result with the new upper and lower bounds
             return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
         }
     }

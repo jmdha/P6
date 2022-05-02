@@ -12,6 +12,6 @@ namespace QueryEstimator.PredicateScanners
     {
         public Dictionary<Type, List<IPredicate>> Predicates { get; }
         public void Scan(T input);
-        public List<IPredicate> GetIfThere(Type t);
+        public List<Pred> GetIfThere<Pred>() where Pred : IPredicate;
     }
 }
