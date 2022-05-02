@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\QueryEstimator\QueryEstimator.csproj" />
+    <ProjectReference Include="..\QueryEstimator\QueryEstimator.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\ResultsSentinel\ResultsSentinel.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
