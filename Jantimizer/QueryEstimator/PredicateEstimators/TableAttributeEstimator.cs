@@ -72,18 +72,6 @@ namespace QueryEstimator.PredicateEstimators
             return new ValueTableAttributeResult(UpperBounds[source], LowerBounds[source], source, UpperBounds[compare], LowerBounds[compare], compare, newResult, type);
         }
 
-        private long GetBottomBoundsOffsetCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
-        {
-            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
-        }
-
-        private long GetTopBoundsOffsetCount(List<IHistogramSegmentationComparative> segments, int compareIndex, TableAttribute compare)
-        {
-            return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
-        }
-
-
-
         private long GetBoundedSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
         {
             if (add > checkOffsetCount)
