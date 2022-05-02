@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.id, C1.age, C2.id, C2.age FROM (census as C1 JOIN census as C2 ON C1.age > 20 AND C1.age < 30 AND C2.age > 30 AND C2.age < 40 AND C1.capital_loss > C2.capital_loss)",
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 0 AND C2.capital_loss > 0) JOIN census as C3 ON C1.capital_loss < C3.capital_gain AND C3.capital_gain > 0",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,11 +11,17 @@
                 "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "age"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "20"
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "capital_loss"
+            }
           },
           "ComType": ">"
         },
@@ -26,26 +32,11 @@
                 "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "age"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "30"
-          },
-          "ComType": "<"
-        },
-        {
-          "LeftAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "census",
-                "Alias": "C2"
-              },
-              "Attribute": "age"
-            }
-          },
-          "RightAttribute": {
-            "ConstantValue": "30"
+            "ConstantValue": "0"
           },
           "ComType": ">"
         },
@@ -56,14 +47,18 @@
                 "TableName": "census",
                 "Alias": "C2"
               },
-              "Attribute": "age"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "40"
+            "ConstantValue": "0"
           },
-          "ComType": "<"
-        },
+          "ComType": ">"
+        }
+      ]
+    },
+    {
+      "Predicates": [
         {
           "LeftAttribute": {
             "Attribute": {
@@ -78,10 +73,25 @@
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C2"
+                "Alias": "C3"
               },
-              "Attribute": "capital_loss"
+              "Attribute": "capital_gain"
             }
+          },
+          "ComType": "<"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C3"
+              },
+              "Attribute": "capital_gain"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0"
           },
           "ComType": ">"
         }
