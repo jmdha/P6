@@ -19,105 +19,39 @@ namespace QueryEstimator.PredicateBounders
 
         public override IPredicateBoundResult<TableAttribute> Bound(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
-            switch (type)
-            {
-                case ComparisonType.Type.Equal:
-                    return TraverseFromBottomEqual(source, compare, type);
-                case ComparisonType.Type.More:
-                case ComparisonType.Type.EqualOrMore:
-                    return TraverseFromTop(source, compare, type);
-                case ComparisonType.Type.Less:
-                case ComparisonType.Type.EqualOrLess:
-                    return TraverseFromBottom(source, compare, type);
-            }
-            throw new Exception("Impossible predicate type!");
-        }
-
-        private IPredicateBoundResult<TableAttribute> TraverseFromBottomEqual(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
-        {
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+            int currentSourceLowerBound = GetLowerBoundOrAlt(source, 0);
+            int newSourceLowerBound = currentSourceLowerBound;
+            int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+            int newSourceUpperBound = currentSourceUpperBound;
 
-            if (newSourceLowerBound != newSourceUpperBound)
+            IHistogramSegmentationComparative lastEqual = allSourceSegments[currentSourceLowerBound];
+
+            if (currentSourceLowerBound != currentSourceUpperBound)
             {
-                IHistogramSegmentationComparative lastEqual = allSourceSegments[newSourceLowerBound];
+                if (type == ComparisonType.Type.Equal)
+                    currentSourceLowerBound++;
 
                 bool foundAny = false;
-                for (int i = newSourceLowerBound + 1; i <= newSourceUpperBound; i++)
+                for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
-                    bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && lastEqual.IsAnyLargerThanNoAlias(compare);
-                    lastEqual = allSourceSegments[i];
-
-                    if (!isAny && foundAny)
+                    bool isAny = false;
+                    switch (type)
                     {
-                        newSourceUpperBound = i;
-                        break;
+                        case ComparisonType.Type.Equal:
+                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && lastEqual.IsAnyLargerThanNoAlias(compare);
+                            lastEqual = allSourceSegments[i];
+                            break;
+                        case ComparisonType.Type.More:
+                        case ComparisonType.Type.EqualOrMore:
+                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
+                            break;
+                        case ComparisonType.Type.Less:
+                        case ComparisonType.Type.EqualOrLess:
+                            isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
+                            break;
                     }
-                    else
-                    {
-                        if (!foundAny)
-                            newSourceLowerBound = i - 1;
-                        foundAny = true;
-                    }
-                }
-
-                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
-            }
-
-            return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
-        }
-
-        private IPredicateBoundResult<TableAttribute> TraverseFromTop(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
-        {
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
-
-            if (newSourceLowerBound != newSourceUpperBound)
-            {
-                bool foundAny = false;
-                for (int i = newSourceUpperBound; i >= newSourceLowerBound; i--)
-                {
-                    bool isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
-
-                    if (!isAny && foundAny)
-                    {
-                        newSourceLowerBound = i;
-                        break;
-                    }
-                    else if (!isAny)
-                    {
-                        if (!foundAny)
-                            newSourceUpperBound = i - 1;
-                        continue;
-                    }
-                    else
-                    {
-                        foundAny = true;
-                    }
-                }
-
-                AddToUpperBoundIfNotThere(source, newSourceUpperBound);
-                AddToLowerBoundIfNotThere(source, newSourceLowerBound);
-            }
-
-            return new PredicateBoundResult<TableAttribute>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
-        }
-
-        private IPredicateBoundResult<TableAttribute> TraverseFromBottom(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
-        {
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
-            int newSourceLowerBound = GetLowerBoundOrAlt(source, 0);
-            int newSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
-
-            if (newSourceLowerBound != newSourceUpperBound)
-            {
-                bool foundAny = false;
-                for (int i = newSourceLowerBound; i <= newSourceUpperBound; i++)
-                {
-                    bool isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
+                    isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
 
                     if (!isAny && foundAny)
                     {
@@ -130,9 +64,7 @@ namespace QueryEstimator.PredicateBounders
                         continue;
                     }
                     else
-                    {
                         foundAny = true;
-                    }
                 }
 
                 AddToUpperBoundIfNotThere(source, newSourceUpperBound);
