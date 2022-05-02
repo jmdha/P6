@@ -51,7 +51,6 @@ namespace QueryEstimator.PredicateBounders
                             isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
                             break;
                     }
-                    isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
 
                     if (!isAny && foundAny)
                     {
