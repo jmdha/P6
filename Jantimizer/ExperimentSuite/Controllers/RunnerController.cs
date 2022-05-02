@@ -203,7 +203,7 @@ namespace ExperimentSuite.Controllers
             var testCases = new List<TestReport>();
             int max = CaseFiles.Count();
             int value = 0;
-            UpdateRunnerProgressBar?.Invoke(value, "", "", "", max);
+            UpdateRunnerProgressBar?.Invoke(value, "", "", "Starting...", max);
             foreach (var queryFile in CaseFiles)
             {
                 while (SyncHelper.IsPaused)
@@ -218,19 +218,19 @@ namespace ExperimentSuite.Controllers
                     RunData.HistoManager.UsedHistograms.Histograms.Clear();
 
                     // Get Cache
-                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, "Fetching cache...", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment, "Fetching cache...");
                     var timer = TimerHelper.GetWatchAndStart();
                     ulong? accCardinality = GetCacheIfThere(jsonQuery.EquivalentSQLQuery);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Fetch cardinality cache"));
 
                     // Get DB result (with or without cache)
-                    UpdateRunnerProgressBar?.Invoke(value, queryFile.Name, "Executing query...", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value, queryFile.Name, jsonQuery.Comment, "Executing query...");
                     timer = TimerHelper.GetWatchAndStart();
                     DataSet dbResult = await GetResultWithCache(jsonQuery.EquivalentSQLQuery, accCardinality != null);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Get DB estimation"));
 
                     // Parse query plan
-                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, "Parsing query plan...", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment, "Parsing query plan...");
                     timer = TimerHelper.GetWatchAndStart();
                     AnalysisResult analysisResult = RunData.Parser.ParsePlan(dbResult);
                     if (QueryPlanParserResultSentinel.Instance != null)
@@ -238,7 +238,7 @@ namespace ExperimentSuite.Controllers
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Parse DB estimation"));
 
                     // Cache actual cardinalities (if not set)
-                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, "Cache Result", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment, "Cache Result");
                     if (accCardinality == null)
                     {
                         timer = TimerHelper.GetWatchAndStart();
@@ -249,7 +249,7 @@ namespace ExperimentSuite.Controllers
                         analysisResult.ActualCardinality = (ulong)accCardinality;
 
                     // Get Estimator prediction
-                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, "Getting Estimator prediction...", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment, "Getting Estimator prediction...");
                     timer = TimerHelper.GetWatchAndStart();
                     EstimatorResult jantimatorResult = RunData.Estimator.GetQueryEstimation(jsonQuery);
                     CaseTimeResults.Add(timer.StopAndGetCaseReportFromWatch(ExperimentName, RunData.Name, RunnerName, queryFile.Name, "Estimator"));
@@ -260,7 +260,7 @@ namespace ExperimentSuite.Controllers
                         HistogramResultSentinel.Instance.CheckResult(RunData.HistoManager.UsedHistograms, queryFile.Name, ExperimentName, RunnerName);
 
                     // Make test report
-                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, "Generating Report...", jsonQuery.Comment);
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment, "Generating Report...");
                     testCases.Add(
                         new TestReport(
                             ExperimentName,
@@ -275,7 +275,7 @@ namespace ExperimentSuite.Controllers
                         );
                 }
             }
-            UpdateRunnerProgressBar?.Invoke(max, "Finished!", "", "");
+            UpdateRunnerProgressBar?.Invoke(max, "", "", "Finished!");
             return testCases;
         }
 
