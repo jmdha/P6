@@ -22,15 +22,16 @@ namespace ExperimentSuite.UserControls
     {
         public string CurrentFileName { get; set; } = "";
         public string CurrentComment { get; set; } = "";
+        public string CurrentAction { get; set; } = "";
 
         public SQLFileProgressControl()
         {
             InitializeComponent();
         }
 
-        private void SQLProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        public void UpdateLabel()
         {
-            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum}) [{CurrentFileName}], [{CurrentComment}]";
+            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum}) [File: {CurrentFileName}], [Comment: {CurrentComment}] [Action: {CurrentAction}]";
         }
     }
 }
