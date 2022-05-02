@@ -1,5 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 0 AND C2.capital_loss > 0) JOIN census as C3 ON C1.capital_loss < C3.capital_gain AND C3.capital_gain > 0",
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 100000 AND C2.capital_loss > 2000) JOIN census as C3 ON C1.capital_loss > C3.capital_gain AND C3.capital_gain > 4000",
+  "Comment": "Expecting zero result",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -36,7 +37,7 @@
             }
           },
           "RightAttribute": {
-            "ConstantValue": "0"
+            "ConstantValue": "2000"
           },
           "ComType": ">"
         },
@@ -51,7 +52,7 @@
             }
           },
           "RightAttribute": {
-            "ConstantValue": "0"
+            "ConstantValue": "2000"
           },
           "ComType": ">"
         }
@@ -78,7 +79,7 @@
               "Attribute": "capital_gain"
             }
           },
-          "ComType": "<"
+          "ComType": ">"
         },
         {
           "LeftAttribute": {
@@ -91,7 +92,7 @@
             }
           },
           "RightAttribute": {
-            "ConstantValue": "0"
+            "ConstantValue": "4000"
           },
           "ComType": ">"
         }
