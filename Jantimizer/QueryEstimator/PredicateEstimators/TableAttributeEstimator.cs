@@ -23,13 +23,16 @@ namespace QueryEstimator.PredicateEstimators
             if (current.DoesContainTableAttribute(source) || current.DoesContainTableAttribute(compare))
                 doesPreviousContain = true;
 
+            // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllSegmentsForAttribute(source);
-            var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
+
+            // Get segments and lower/upper bounds for the compare attribute
+            // Also get how many items that should be bounded in the compare segments.
+            var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
             int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
-
             long bottomBoundsCount = GetBottomBoundsOffsetCount(allcompareSegments, compareLowerBound, compare);
             long topBoundsCount = GetTopBoundsOffsetCount(allcompareSegments, compareUpperBound, compare);
 
@@ -43,27 +46,22 @@ namespace QueryEstimator.PredicateEstimators
                 {
                     case ComparisonType.Type.More:
                     case ComparisonType.Type.EqualOrMore:
-                        newResult += AddSegmentResult(
+                        newResult += GetBoundedSegmentResult(
                             allSourceSegments[i],
                             (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare),
                             doesPreviousContain, bottomBoundsCount, topBoundsCount);
                         break;
                     case ComparisonType.Type.Less:
                     case ComparisonType.Type.EqualOrLess:
-                        newResult += AddSegmentResult(
+                        newResult += GetBoundedSegmentResult(
                             allSourceSegments[i],
                             (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare),
                             doesPreviousContain, bottomBoundsCount, topBoundsCount);
                         break;
                     case ComparisonType.Type.Equal:
-                        long aboveThis = (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare);
-                        long abovePreviousThis = (long)lastEqual.GetCountLargerThanNoAlias(compare);
-                        aboveThis = AddSegmentResult(allSourceSegments[i], aboveThis, true, bottomBoundsCount, aboveThis);
-                        abovePreviousThis = AddSegmentResult(lastEqual, abovePreviousThis, true, bottomBoundsCount, abovePreviousThis);
-                        if (doesPreviousContain)
-                            newResult += abovePreviousThis - aboveThis;
-                        else
-                            newResult += (abovePreviousThis - aboveThis) * allSourceSegments[i].ElementsBeforeNextSegmentation;
+                        long belowThis = GetBoundedSegmentResult(allSourceSegments[i], (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare), true, bottomBoundsCount, topBoundsCount);
+                        long belowPreviousThis = GetBoundedSegmentResult(lastEqual, (long)lastEqual.GetCountSmallerThanNoAlias(compare), true, bottomBoundsCount, topBoundsCount); ;
+                        newResult += (belowThis - belowPreviousThis);
                         lastEqual = allSourceSegments[i];
                         break;
                 }
@@ -82,7 +80,7 @@ namespace QueryEstimator.PredicateEstimators
             return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
         }
 
-        private long AddSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
+        private long GetBoundedSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
         {
             if (add > checkOffsetCount)
                 add -= (add - checkOffsetCount);

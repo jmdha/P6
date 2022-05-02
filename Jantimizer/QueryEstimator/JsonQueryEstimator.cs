@@ -153,10 +153,10 @@ namespace QueryEstimator
         {
             switch (fromType)
             {
-                case ComparisonType.Type.Less: return ComparisonType.Type.More;
-                case ComparisonType.Type.More: return ComparisonType.Type.Less;
-                case ComparisonType.Type.EqualOrLess: return ComparisonType.Type.EqualOrMore;
-                case ComparisonType.Type.EqualOrMore: return ComparisonType.Type.EqualOrLess;
+                case ComparisonType.Type.Less: return ComparisonType.Type.EqualOrMore;
+                case ComparisonType.Type.More: return ComparisonType.Type.EqualOrLess;
+                case ComparisonType.Type.EqualOrLess: return ComparisonType.Type.More;
+                case ComparisonType.Type.EqualOrMore: return ComparisonType.Type.Less;
                 case ComparisonType.Type.Equal: return ComparisonType.Type.Equal;
                 default:
                     throw new Exception("Impossible comparison type");
