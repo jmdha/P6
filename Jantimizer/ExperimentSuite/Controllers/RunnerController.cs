@@ -28,7 +28,7 @@ namespace ExperimentSuite.Controllers
         public delegate void UpdateHistogramProgressBarHandler(double value, double max = 0);
         public event UpdateHistogramProgressBarHandler? UpdateHistogramProgressBar;
 
-        public delegate void UpdateRunnerProgressBarHandler(double value, double max = 0);
+        public delegate void UpdateRunnerProgressBarHandler(double value, string fileName, string comment, double max = 0);
         public event UpdateRunnerProgressBarHandler? UpdateRunnerProgressBar;
 
         public delegate void SetTestNameColorHandler(Brush brush);
@@ -203,18 +203,20 @@ namespace ExperimentSuite.Controllers
             var testCases = new List<TestReport>();
             int max = CaseFiles.Count();
             int value = 0;
-            UpdateRunnerProgressBar?.Invoke(value, max);
+            UpdateRunnerProgressBar?.Invoke(value, "", "", max);
             foreach (var queryFile in CaseFiles)
             {
                 while (SyncHelper.IsPaused)
                     await Task.Delay(100);
 
-                UpdateRunnerProgressBar?.Invoke(value++);
                 using (var reader = new StreamReader(queryFile.FullName))
                 {
                     var jsonQuery = new JsonQuery(await reader.ReadToEndAsync());
                     if (!jsonQuery.DoRun)
                         continue;
+
+                    UpdateRunnerProgressBar?.Invoke(value++, queryFile.Name, jsonQuery.Comment);
+
                     RunData.HistoManager.UsedHistograms.Histograms.Clear();
 
                     // Get Cache
@@ -269,7 +271,7 @@ namespace ExperimentSuite.Controllers
                         );
                 }
             }
-            UpdateRunnerProgressBar?.Invoke(max);
+            UpdateRunnerProgressBar?.Invoke(max, "Finished!", "");
             return testCases;
         }
 

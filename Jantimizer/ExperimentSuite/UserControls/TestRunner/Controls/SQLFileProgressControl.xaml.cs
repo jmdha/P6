@@ -20,6 +20,9 @@ namespace ExperimentSuite.UserControls
     /// </summary>
     public partial class SQLFileProgressControl : UserControl
     {
+        public string CurrentFileName { get; set; } = "";
+        public string CurrentComment { get; set; } = "";
+
         public SQLFileProgressControl()
         {
             InitializeComponent();
@@ -27,7 +30,7 @@ namespace ExperimentSuite.UserControls
 
         private void SQLProgressBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum})";
+            SQLProgressLabel.Content = $"SQL Progress ({SQLProgressBar.Value}/{SQLProgressBar.Maximum}) [{CurrentFileName}], [{CurrentComment}]";
         }
     }
 }
