@@ -33,8 +33,10 @@ namespace QueryEstimator.PredicateEstimators
             var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
             int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
-            long bottomBoundsCount = GetBottomBoundsOffsetCount(allcompareSegments, compareLowerBound, compare);
-            long topBoundsCount = GetTopBoundsOffsetCount(allcompareSegments, compareUpperBound, compare);
+            long bottomBoundsSmallerCount = (long)allcompareSegments[compareLowerBound].GetCountSmallerThanNoAlias(compare);
+            long bottomBoundsLargerCount = (long)allcompareSegments[compareLowerBound].GetCountLargerThanNoAlias(compare);
+            long topBoundsSmallCount = (long)allcompareSegments[compareUpperBound].GetCountSmallerThanNoAlias(compare);
+            long topBoundsLargerCount = (long)allcompareSegments[compareUpperBound].GetCountLargerThanNoAlias(compare);
 
             IHistogramSegmentationComparative lastEqual = allSourceSegments[sourceLowerBound];
             if (type == ComparisonType.Type.Equal)
@@ -49,18 +51,18 @@ namespace QueryEstimator.PredicateEstimators
                         newResult += GetBoundedSegmentResult(
                             allSourceSegments[i],
                             (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare),
-                            doesPreviousContain, bottomBoundsCount, topBoundsCount);
+                            doesPreviousContain, bottomBoundsSmallerCount, topBoundsSmallCount);
                         break;
                     case ComparisonType.Type.Less:
                     case ComparisonType.Type.EqualOrLess:
                         newResult += GetBoundedSegmentResult(
                             allSourceSegments[i],
                             (long)allSourceSegments[i].GetCountLargerThanNoAlias(compare),
-                            doesPreviousContain, bottomBoundsCount, topBoundsCount);
+                            doesPreviousContain, topBoundsLargerCount, bottomBoundsLargerCount);
                         break;
                     case ComparisonType.Type.Equal:
-                        long belowThis = GetBoundedSegmentResult(allSourceSegments[i], (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare), true, bottomBoundsCount, topBoundsCount);
-                        long belowPreviousThis = GetBoundedSegmentResult(lastEqual, (long)lastEqual.GetCountSmallerThanNoAlias(compare), true, bottomBoundsCount, topBoundsCount); ;
+                        long belowThis = GetBoundedSegmentResult(allSourceSegments[i], (long)allSourceSegments[i].GetCountSmallerThanNoAlias(compare), true, bottomBoundsSmallerCount, topBoundsSmallCount);
+                        long belowPreviousThis = GetBoundedSegmentResult(lastEqual, (long)lastEqual.GetCountSmallerThanNoAlias(compare), true, bottomBoundsSmallerCount, topBoundsSmallCount); ;
                         newResult += (belowThis - belowPreviousThis);
                         lastEqual = allSourceSegments[i];
                         break;
@@ -79,6 +81,8 @@ namespace QueryEstimator.PredicateEstimators
         {
             return (long)segments[compareIndex].GetCountSmallerThanNoAlias(compare);
         }
+
+
 
         private long GetBoundedSegmentResult(IHistogramSegmentationComparative segment, long add, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
         {
