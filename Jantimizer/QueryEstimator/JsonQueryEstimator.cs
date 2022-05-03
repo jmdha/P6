@@ -20,39 +20,41 @@ namespace QueryEstimator
 {
     public class JsonQueryEstimator : IQueryEstimator<JsonQuery>
     {
-        public SimpleFilterBounder SimpleFilterBounder { get; }
-        public TableAttributeBounder TableAttributeBounder { get; }
-        public TableAttributeEstimator TableAttributeEstimator { get; }
         public IHistogramManager HistogramManager { get; }
+
+        // Scanners
+        public IPredicateScanner<List<JoinNode>> PredicateScanner { get; }
+        // Bounders
+        public IPredicateBounder<IComparable> SimpleFilterBounder { get; }
+        public IPredicateBounder<TableAttribute> TableAttributeBounder { get; }
+        // Estimators
+        public IPredicateEstimator<TableAttribute> TableAttributeEstimator { get; }
 
         private Dictionary<TableAttribute, int> _upperBounds;
         private Dictionary<TableAttribute, int> _lowerBounds;
-        private TableAttribute _initAttribute = new TableAttribute();
         private int _maxSweeps;
-        private JsonQuery _currentQuery = new JsonQuery();
-        private IPredicateScanner<List<JoinNode>> _scanner;
+        private int _didSweeps = 0;
 
         public JsonQueryEstimator(IHistogramManager histogramManager, int maxSweeps)
         {
             HistogramManager = histogramManager;
             _upperBounds = new Dictionary<TableAttribute, int>();
             _lowerBounds = new Dictionary<TableAttribute, int>();
-            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, histogramManager);
-            SimpleFilterBounder = new SimpleFilterBounder(_upperBounds, _lowerBounds, histogramManager);
-            TableAttributeBounder = new TableAttributeBounder(_upperBounds, _lowerBounds, histogramManager);
+            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, HistogramManager);
+            SimpleFilterBounder = new SimpleFilterBounder(_upperBounds, _lowerBounds, HistogramManager);
+            TableAttributeBounder = new TableAttributeBounder(_upperBounds, _lowerBounds, HistogramManager);
             _maxSweeps = maxSweeps;
-            _scanner = new JoinPredicateScanner();
+            PredicateScanner = new JoinPredicateScanner();
         }
 
         public EstimatorResult GetQueryEstimation(JsonQuery query)
         {
             try
             {
-                _currentQuery = query;
-                var segmentResultChain = GetIntermediateResults(query);
-                var totalEstimation = segmentResultChain.GetTotalEstimation();
+                _didSweeps = 0;
+                var totalEstimation = GetTotalEstimationForQuery(query);
 
-                return new EstimatorResult(query, (ulong)totalEstimation);
+                return new EstimatorResult(query, (ulong)totalEstimation, _didSweeps);
             }
             catch (Exception ex)
             {
@@ -60,38 +62,46 @@ namespace QueryEstimator
             }
         }
 
-        private ISegmentResult GetIntermediateResults(JsonQuery query)
+        private long GetTotalEstimationForQuery(JsonQuery query)
         {
             // Clear previous bounds
             _upperBounds.Clear();
             _lowerBounds.Clear();
 
+            // Phase One
             // Scan the query for predicates
-            _scanner.Scan(query.JoinNodes);
+            PredicateScanner.Scan(query.JoinNodes);
 
+            // Phase Two
             // Set bounds
-            BoundAttributes();
+            BoundTableAttributes();
 
-            // Get estiamtes from predicates
-            var result = GetEstimationForSegments();
+            // Phase Three
+            // Get estiamte chain
+            var segmentChain = GetEstimationForSegments();
+
+            // Phase Four
+            // Get total estimate for all predicates
+            var result = segmentChain.GetTotalEstimation();
 
             return result;
         }
 
-        private void BoundAttributes()
+        private void BoundTableAttributes()
         {
-            var filterBounds = new List<IPredicateBoundResult<IComparable>>();
+            // Get bounds for filters
+            var filterBounds = GetBoundsForFilters();
+            // Get bounds for table attribute predicates
+            var tableAttributeBounds = GetBoundsForTableAttributePredicates();
+
+            // Sweep all bounds to see of some need to be changed
+            SweepBounds(filterBounds, tableAttributeBounds);
+        }
+
+        private List<IPredicateBoundResult<TableAttribute>> GetBoundsForTableAttributePredicates()
+        {
             var tableAttributeBounds = new List<IPredicateBoundResult<TableAttribute>>();
-
-            // Limit bounds for simple filters
-            foreach (var filter in _scanner.GetIfThere<FilterPredicate>())
-                filterBounds.Add(SimpleFilterBounder.Bound(
-                    filter.LeftTable,
-                    filter.ConstantValue,
-                    filter.ComType));
-
-            // Get estiamtes from predicates
-            foreach (var predicate in _scanner.GetIfThere<TableAttributePredicate>())
+            foreach (var predicate in PredicateScanner.GetIfThere<TableAttributePredicate>())
             {
                 // Get bounds for left and right tables, both ways
                 tableAttributeBounds.Add(TableAttributeBounder.Bound(
@@ -103,8 +113,22 @@ namespace QueryEstimator
                     predicate.LeftTable,
                     ComparisonTypeHelper.InvertType(predicate.ComType)));
             }
+            return tableAttributeBounds;
+        }
 
-            // Sweep all bounds to see of some need to be changed
+        private List<IPredicateBoundResult<IComparable>> GetBoundsForFilters()
+        {
+            var filterBounds = new List<IPredicateBoundResult<IComparable>>();
+            foreach (var filter in PredicateScanner.GetIfThere<FilterPredicate>())
+                filterBounds.Add(SimpleFilterBounder.Bound(
+                    filter.LeftTable,
+                    filter.ConstantValue,
+                    filter.ComType));
+            return filterBounds;
+        }
+
+        private void SweepBounds(List<IPredicateBoundResult<IComparable>> filterBounds, List<IPredicateBoundResult<TableAttribute>> tableAttributeBounds)
+        {
             bool anyChanged = false;
             for (int i = 0; i < _maxSweeps; i++)
             {
@@ -122,7 +146,7 @@ namespace QueryEstimator
             bool anyChanged = false;
             for (int i = 0; i < bounds.Count; i++)
             {
-                if (bounds[i].LowerBound != _lowerBounds[bounds[i].Left] || bounds[i].UpperBound != _upperBounds[bounds[i].Left])
+                if (bounds[i].HaveChanged(_lowerBounds, _upperBounds))
                 {
                     anyChanged = true;
                     bounds[i].RecalculateBounds();
@@ -136,8 +160,7 @@ namespace QueryEstimator
             bool anyChanged = false;
             for (int i = 0; i < bounds.Count; i += 2)
             {
-                if (bounds[i].LowerBound > _lowerBounds[bounds[i].Left] || bounds[i].UpperBound > _upperBounds[bounds[i].Left] ||
-                        bounds[i + 1].LowerBound > _lowerBounds[bounds[i + 1].Left] || bounds[i + 1].UpperBound > _upperBounds[bounds[i + 1].Left])
+                if (bounds[i].HaveChanged(_lowerBounds, _upperBounds) || bounds[i + 1].HaveChanged(_lowerBounds, _upperBounds))
                 {
                     anyChanged = true;
                     bounds[i].RecalculateBounds();
@@ -147,14 +170,12 @@ namespace QueryEstimator
             return anyChanged;
         }
 
-
-
         private ISegmentResult GetEstimationForSegments()
         {
-            ISegmentResult result = new ValueTableAttributeResult(_initAttribute, _initAttribute, 1, ComparisonType.Type.None);
+            ISegmentResult result = new ValueTableAttributeResult(new TableAttribute(), new TableAttribute(), 1, ComparisonType.Type.None);
 
             // Foreach TableAttribute predicate in the join query, get an estimation based on new bounds.
-            foreach (var pred in _scanner.GetIfThere<TableAttributePredicate>())
+            foreach (var pred in PredicateScanner.GetIfThere<TableAttributePredicate>())
             {
                 result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
                     result,
