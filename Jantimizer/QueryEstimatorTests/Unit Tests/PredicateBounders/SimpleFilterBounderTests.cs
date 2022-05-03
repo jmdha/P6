@@ -14,6 +14,8 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
     [TestClass]
     public class SimpleFilterBounderTests
     {
+        #region Bound
+
         [TestMethod]
         [DataRow(19, 2, 5)]
         [DataRow(20, 3, 5)]
@@ -185,5 +187,37 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             Assert.AreEqual(expLowerBound, result.LowerBound);
             Assert.AreEqual(expUpperBound, result.UpperBound);
         }
+
+        #endregion
+
+        #region ConvertCompareTypes
+
+        [TestMethod]
+        [DataRow(5, "5")]
+        [DataRow(5.51, "5.51")]
+        [DataRow("abc", "abc")]
+        public void Can_ConvertCompareTypes(IComparable expItem, IComparable item)
+        {
+            // ARRANGE
+            var tableAttr = new TableAttribute("A", "v");
+
+            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
+            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
+            TestHistogramManager testManager = new TestHistogramManager();
+            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
+            var histoValues = new List<ValueCount>();
+            histoValues.Add(new ValueCount(expItem, 10));
+            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
+            testManager.AddHistogram(histogram);
+            SimpleFilterBounder bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+
+            // ACT
+            var result = bounder.ConvertCompareTypes(bounder.GetAllSegmentsForAttribute(tableAttr)[0], item);
+
+            // ASSERT
+            Assert.AreEqual(expItem, result);
+        }
+
+        #endregion
     }
 }
