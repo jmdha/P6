@@ -58,7 +58,7 @@
     {
       "ExperimentName": "Experiment Two - MinDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
@@ -96,6 +96,116 @@
         {
           "ConnectorName": "MYSQL",
           "ConnectorID": "MinDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 256,
+        "MaxEstimatorSweeps": 10
+      }
+    },
+    {
+      "ExperimentName": "Experiment Three - EquiDepth_DynDepth",
+      "RunParallel": true,
+      "RunExperiment": false,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "EquiDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "EquiDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        }
+      ],
+      "OptionalTestSettings": {
+        "BucketSize": 256,
+        "MaxEstimatorSweeps": 10
+      }
+    },
+    {
+      "ExperimentName": "Experiment Four - MinDepth_DynDepth",
+      "RunParallel": true,
+      "RunExperiment": true,
+      "PreRunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_SetupTables",
+            "WorldHappiness_With_GDP_Setup",
+            "Census_2013_Setup",
+            "COVID_Funding_Setup"
+          ]
+        }
+      ],
+      "RunData": [
+        {
+          "ConnectorName": "POSGRESQL",
+          "ConnectorID": "MinDepth_DynamicDepth",
+          "TestFiles": [
+            "BasicTests_RandomNumberBlocks",
+            "BasicTests_ClumpedNumberBlocks",
+            "WorldHappiness_With_GDP",
+            "Census_2013",
+            "COVID_Funding"
+          ]
+        },
+        {
+          "ConnectorName": "MYSQL",
+          "ConnectorID": "MinDepth_DynamicDepth",
           "TestFiles": [
             "BasicTests_RandomNumberBlocks",
             "BasicTests_ClumpedNumberBlocks",
