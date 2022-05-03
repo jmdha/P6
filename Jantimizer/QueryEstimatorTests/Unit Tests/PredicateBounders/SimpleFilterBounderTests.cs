@@ -235,6 +235,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
                 histoValues.Add(new ValueCount(0, 10));
                 histoValues.Add(new ValueCount(10, 10));
                 histoValues.Add(new ValueCount(20, 10));
+                histoValues.Add(new ValueCount(30, 10));
                 histoValues.Add(new ValueCount(40, 10));
                 histoValues.Add(new ValueCount(50, 10));
                 histogram.GenerateSegmentationsFromSortedGroups(histoValues);

@@ -33,19 +33,19 @@ namespace QueryEstimator.PredicateBounders
             int newSourceUpperBound = currentSourceUpperBound;
 
             // Initialise the new source bounds for edge cases
-            if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
-            {
-                newSourceLowerBound = currentSourceUpperBound;
-                newSourceUpperBound = currentSourceUpperBound;
-            }
-            else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
-            {
-                newSourceLowerBound = 0;
-                newSourceUpperBound = -1;
-            }
+            //if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
+            //{
+            //    newSourceLowerBound = currentSourceUpperBound;
+            //    newSourceUpperBound = currentSourceUpperBound;
+            //}
+            //else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
+            //{
+            //    newSourceLowerBound = 0;
+            //    newSourceUpperBound = -1;
+            //}
 
             // Only check for new bounds if the bound have not already been reduced to the max
-            if (currentSourceLowerBound < currentSourceUpperBound)
+            if (currentSourceLowerBound <= currentSourceUpperBound)
             {
                 // Convert the type to compare against to be the same as the one in the segments (assuming its correct)
                 compare = ConvertCompareTypes(allSourceSegments[currentSourceLowerBound], compare);
@@ -70,6 +70,8 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.Less:
                             if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
                             {
+                                if (newSourceUpperBound == currentSourceUpperBound)
+                                    newSourceUpperBound = -1;
                                 exitSentinel = true;
                                 break;
                             }
@@ -78,6 +80,8 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.EqualOrLess:
                             if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
                             {
+                                if (newSourceUpperBound == currentSourceUpperBound)
+                                    newSourceUpperBound = -1;
                                 exitSentinel = true;
                                 break;
                             }

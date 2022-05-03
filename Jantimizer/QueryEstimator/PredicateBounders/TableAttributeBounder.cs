@@ -31,7 +31,7 @@ namespace QueryEstimator.PredicateBounders
 
 
             // Only check for new bounds if the bound have not already been reduced to the max
-            if (currentSourceLowerBound < currentSourceUpperBound)
+            if (currentSourceLowerBound <= currentSourceUpperBound)
             {
                 // Check within the bounds until a given predicate is no longer correct
                 bool foundAny = false;
@@ -73,7 +73,7 @@ namespace QueryEstimator.PredicateBounders
 
                 if (!foundAny)
                 {
-                    newSourceLowerBound = 0;
+                    newSourceLowerBound = currentSourceLowerBound;
                     newSourceUpperBound = -1;
                 }
 

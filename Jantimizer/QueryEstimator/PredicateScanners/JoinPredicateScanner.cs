@@ -78,12 +78,26 @@ namespace QueryEstimator.PredicateScanners
         {
             if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
             {
-                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                    predicate.LeftAttribute.Attribute,
-                    predicate.RightAttribute.Attribute,
-                    predicate.GetComType()));
-                _usedAttributes.Add(predicate.LeftAttribute.Attribute);
-                _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                if (_usedAttributes.Count > 0 && !_usedAttributes.Contains(predicate.LeftAttribute.Attribute) && !_usedAttributes.Contains(predicate.RightAttribute.Attribute))
+                    return false;
+
+                if (_usedAttributes.Contains(predicate.LeftAttribute.Attribute) && !_usedAttributes.Contains(predicate.RightAttribute.Attribute))
+                {
+                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                        predicate.RightAttribute.Attribute,
+                        predicate.LeftAttribute.Attribute,
+                        ComparisonTypeHelper.InvertType(predicate.GetComType())));
+                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                } 
+                else
+                {
+                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                        predicate.LeftAttribute.Attribute,
+                        predicate.RightAttribute.Attribute,
+                        predicate.GetComType()));
+                    _usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                }
                 return true;
             }
             return false;

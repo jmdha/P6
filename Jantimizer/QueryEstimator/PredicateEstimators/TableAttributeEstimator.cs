@@ -38,19 +38,12 @@ namespace QueryEstimator.PredicateEstimators
             var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
             int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
-            if (compareLowerBound < compareUpperBound)
+            if (sourceLowerBound <= sourceUpperBound && compareLowerBound <= compareUpperBound)
             {
                 long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
                 long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
                 long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
                 long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
-
-                // Skip the first lower bound if the predicate is equal
-                if (type == ComparisonType.Type.Equal)
-                {
-                    _lastEqual = allSourceSegments[sourceLowerBound];
-                    sourceLowerBound++;
-                }
 
                 for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
                 {
@@ -75,11 +68,7 @@ namespace QueryEstimator.PredicateEstimators
                                 bottomBoundsLargerCount);
                             break;
                         case ComparisonType.Type.Equal:
-                            newResult += GetEstimatedValues_Equal(
-                                allSourceSegments[i],
-                                compare,
-                                bottomBoundsSmallerCount,
-                                topBoundsSmallCount);
+                            newResult += GetEstimatedValues_Equal(allSourceSegments[i]);
                             break;
                     }
                 }
@@ -104,16 +93,9 @@ namespace QueryEstimator.PredicateEstimators
                             doesPreviousContain, topBoundsLargerCount, bottomBoundsLargerCount);
         }
 
-        private long GetEstimatedValues_Equal(IHistogramSegmentationComparative segment, TableAttribute compare, long bottomBoundsSmallerCount, long topBoundsSmallCount)
+        private long GetEstimatedValues_Equal(IHistogramSegmentationComparative segment)
         {
-            if (_lastEqual != null)
-            {
-                long belowThis = GetBoundedSegmentResult(segment, GetCountSmallerThan(segment, compare), true, bottomBoundsSmallerCount, topBoundsSmallCount);
-                long belowPreviousThis = GetBoundedSegmentResult(_lastEqual, GetCountSmallerThan(_lastEqual, compare), true, bottomBoundsSmallerCount, topBoundsSmallCount);
-                _lastEqual = segment;
-                return (belowThis - belowPreviousThis);
-            }
-            throw new ArgumentNullException("Error! '_lastEqual' was null!");
+            return segment.ElementsBeforeNextSegmentation;
         }
 
         private long GetBoundedSegmentResult(IHistogramSegmentationComparative segment, long addValue, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
@@ -122,10 +104,10 @@ namespace QueryEstimator.PredicateEstimators
                 addValue -= (addValue - checkOffsetCount);
             if (bottomOffsetCount > 0)
                 addValue -= bottomOffsetCount;
-            if (addValue < 0)
+            if (addValue <= 0)
                 return 0;
             if (doesPreviousContain)
-                return addValue;
+                return segment.ElementsBeforeNextSegmentation;
             else
                 return addValue * segment.ElementsBeforeNextSegmentation;
         }
