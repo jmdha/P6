@@ -8,16 +8,26 @@ namespace Histograms.DepthCalculators
 {
     public class DynamicDepth : IDepthCalculator
     {
-        public DynamicDepth() { }
+        private bool UseUniqueValueCount { get; }
+        public DynamicDepth(bool useUniqueValueCount = true) {
+            UseUniqueValueCount = useUniqueValueCount;
+        }
 
-        public int GetDepth(long uniqueValueCount, long totalValueCount)
+        private int SquareRootBuckets(long x)
         {
-            long x = uniqueValueCount;
-            double bucketCount = Math.Sqrt(x+25) * 10 - 50;
+            double bucketCount = Math.Sqrt(x + 25) * 10 - 50;
 
             double depth = x / bucketCount;
 
             return (int)Math.Floor(depth);
+        }
+
+        public int GetDepth(long uniqueValueCount, long totalValueCount)
+        {
+            if(UseUniqueValueCount)
+                return SquareRootBuckets(uniqueValueCount);
+            else
+                return SquareRootBuckets(totalValueCount);
         }
     }
 }

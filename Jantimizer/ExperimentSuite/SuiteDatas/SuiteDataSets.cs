@@ -68,7 +68,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                new DynamicDepth());
+                new DynamicDepth(useUniqueValueCount: false));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
@@ -169,7 +169,7 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new EquiDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new DynamicDepth());
+                new DynamicDepth(useUniqueValueCount: false));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
