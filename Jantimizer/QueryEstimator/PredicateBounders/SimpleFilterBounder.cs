@@ -14,6 +14,7 @@ namespace QueryEstimator.PredicateBounders
 {
     public class SimpleFilterBounder : BasePredicateBounder<IComparable>
     {
+        private IHistogramSegmentationComparative? _lastEqual = null;
         public SimpleFilterBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
@@ -36,8 +37,13 @@ namespace QueryEstimator.PredicateBounders
                 if (compType != valueType)
                     compare = (IComparable)Convert.ChangeType(compare, valueType);
 
+                if (type == ComparisonType.Type.Equal)
+                {
+                    _lastEqual = allSourceSegments[currentSourceLowerBound];
+                    currentSourceLowerBound++;
+                }
+
                 // Check within the bounds until a given predicate is no longer correct
-                bool foundAny = false;
                 bool exitSentinel = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
@@ -73,12 +79,13 @@ namespace QueryEstimator.PredicateBounders
                             if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
                             {
                                 newSourceUpperBound = i;
-                                foundAny = true;
                                 exitSentinel = true;
                                 break;
                             }
-                            if (!foundAny)
+                            if (_lastEqual != null && _lastEqual.LowestValue != allSourceSegments[i].LowestValue)
                                 newSourceLowerBound = i;
+
+                            _lastEqual = allSourceSegments[i];
                             break;
                     }
                     if (exitSentinel)

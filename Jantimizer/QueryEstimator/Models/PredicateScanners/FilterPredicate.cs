@@ -7,7 +7,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models.PredicateScanners
 {
-    internal class FilterPredicate : IPredicate
+    public class FilterPredicate : IPredicate
     {
         public TableAttribute LeftTable { get; set; }
         public IComparable ConstantValue { get; set; }
