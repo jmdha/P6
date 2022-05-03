@@ -1,6 +1,7 @@
 ﻿using Histograms;
 using Histograms.Models;
 using QueryEstimator.Models;
+using QueryEstimator.SegmentHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateEstimators
 {
-    public class TableAttributeEstimator : BasePredicateEstimator<TableAttribute>
+    public class TableAttributeEstimator : BaseSegmentBoundsHandler, IPredicateEstimator<TableAttribute>
     {
         private IHistogramSegmentationComparative? _lastEqual = null;
 
@@ -18,7 +19,7 @@ namespace QueryEstimator.PredicateEstimators
         {
         }
 
-        public override ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type)
+        public ISegmentResult GetEstimationResult(ISegmentResult current, TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
             long newResult = 0;
 

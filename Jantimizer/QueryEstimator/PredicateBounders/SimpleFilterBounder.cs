@@ -2,6 +2,7 @@
 using Histograms.Models;
 using QueryEstimator.Models;
 using QueryEstimator.Models.BoundResults;
+using QueryEstimator.SegmentHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,14 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateBounders
 {
-    public class SimpleFilterBounder : BasePredicateBounder<IComparable>
+    public class SimpleFilterBounder : BaseSegmentBoundsHandler, IPredicateBounder<IComparable>
     {
         private IHistogramSegmentationComparative? _lastEqual = null;
         public SimpleFilterBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 
-        public override IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
+        public IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllSegmentsForAttribute(source);
