@@ -38,47 +38,50 @@ namespace QueryEstimator.PredicateEstimators
             var allcompareSegments = GetAllSegmentsForAttribute(compare);
             int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
             int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
-            long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
-            long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
-            long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
-            long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
-
-            // Skip the first lower bound if the predicate is equal
-            if (type == ComparisonType.Type.Equal)
+            if (compareLowerBound < compareUpperBound)
             {
-                _lastEqual = allSourceSegments[sourceLowerBound];
-                sourceLowerBound++;
-            }
+                long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
+                long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
+                long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
+                long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
 
-            for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
-            {
-                switch (type)
+                // Skip the first lower bound if the predicate is equal
+                if (type == ComparisonType.Type.Equal)
                 {
-                    case ComparisonType.Type.More:
-                    case ComparisonType.Type.EqualOrMore:
-                        newResult += GetEstimatedValues_More(
-                            allSourceSegments[i], 
-                            compare, 
-                            doesPreviousContain, 
-                            bottomBoundsSmallerCount, 
-                            topBoundsSmallCount);
-                        break;
-                    case ComparisonType.Type.Less:
-                    case ComparisonType.Type.EqualOrLess:
-                        newResult += GetEstimatedValues_Less(
-                            allSourceSegments[i],
-                            compare,
-                            doesPreviousContain, 
-                            topBoundsLargerCount, 
-                            bottomBoundsLargerCount);
-                        break;
-                    case ComparisonType.Type.Equal:
-                        newResult += GetEstimatedValues_Equal(
-                            allSourceSegments[i],
-                            compare,
-                            bottomBoundsSmallerCount,
-                            topBoundsSmallCount);
-                        break;
+                    _lastEqual = allSourceSegments[sourceLowerBound];
+                    sourceLowerBound++;
+                }
+
+                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                {
+                    switch (type)
+                    {
+                        case ComparisonType.Type.More:
+                        case ComparisonType.Type.EqualOrMore:
+                            newResult += GetEstimatedValues_More(
+                                allSourceSegments[i],
+                                compare,
+                                doesPreviousContain,
+                                bottomBoundsSmallerCount,
+                                topBoundsSmallCount);
+                            break;
+                        case ComparisonType.Type.Less:
+                        case ComparisonType.Type.EqualOrLess:
+                            newResult += GetEstimatedValues_Less(
+                                allSourceSegments[i],
+                                compare,
+                                doesPreviousContain,
+                                topBoundsLargerCount,
+                                bottomBoundsLargerCount);
+                            break;
+                        case ComparisonType.Type.Equal:
+                            newResult += GetEstimatedValues_Equal(
+                                allSourceSegments[i],
+                                compare,
+                                bottomBoundsSmallerCount,
+                                topBoundsSmallCount);
+                            break;
+                    }
                 }
             }
 

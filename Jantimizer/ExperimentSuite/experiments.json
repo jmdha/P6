@@ -2,7 +2,7 @@
   "Experiments": [
     {
       "ExperimentName": "Experiment One - EquiDepth",
-      "RunParallel": true,
+      "RunParallel": false,
       "RunExperiment": true,
       "PreRunData": [
         {
