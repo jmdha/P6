@@ -13,8 +13,6 @@ namespace QueryEstimator.PredicateEstimators
 {
     public class TableAttributeEstimator : BaseSegmentBoundsHandler, IPredicateEstimator<TableAttribute>
     {
-        private IHistogramSegmentationComparative? _lastEqual = null;
-
         public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
@@ -23,53 +21,61 @@ namespace QueryEstimator.PredicateEstimators
         {
             long newResult = 0;
 
-            // Check if the current segment results have already joined on either the source or compare table attribute
-            bool doesPreviousContain = false;
-            if (current.DoesContainTableAttribute(source) || current.DoesContainTableAttribute(compare))
-                doesPreviousContain = true;
-
             // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllSegmentsForAttribute(source);
             int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
 
-            // Get segments and lower/upper bounds for the compare attribute
-            // Also get how many items that should be bounded in the compare segments.
-            var allcompareSegments = GetAllSegmentsForAttribute(compare);
-            int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
-            int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
-            if (sourceLowerBound <= sourceUpperBound && compareLowerBound <= compareUpperBound)
+            if (sourceLowerBound <= sourceUpperBound)
             {
-                long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
-                long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
-                long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
-                long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
-
-                for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                // Check if the current segment results have already joined on either the source or compare table attribute
+                bool doesPreviousContain = false;
+                if (current.DoesContainTableAttribute(source) || current.DoesContainTableAttribute(compare))
                 {
-                    switch (type)
+                    for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                        newResult += allSourceSegments[i].ElementsBeforeNextSegmentation;
+                }
+                else
+                {
+                    // Get segments and lower/upper bounds for the compare attribute
+                    // Also get how many items that should be bounded in the compare segments.
+                    var allcompareSegments = GetAllSegmentsForAttribute(compare);
+                    int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
+                    int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
+                    if (compareLowerBound <= compareUpperBound)
                     {
-                        case ComparisonType.Type.More:
-                        case ComparisonType.Type.EqualOrMore:
-                            newResult += GetEstimatedValues_More(
-                                allSourceSegments[i],
-                                compare,
-                                doesPreviousContain,
-                                bottomBoundsSmallerCount,
-                                topBoundsSmallCount);
-                            break;
-                        case ComparisonType.Type.Less:
-                        case ComparisonType.Type.EqualOrLess:
-                            newResult += GetEstimatedValues_Less(
-                                allSourceSegments[i],
-                                compare,
-                                doesPreviousContain,
-                                topBoundsLargerCount,
-                                bottomBoundsLargerCount);
-                            break;
-                        case ComparisonType.Type.Equal:
-                            newResult += GetEstimatedValues_Equal(allSourceSegments[i]);
-                            break;
+                        long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
+                        long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
+                        long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
+                        long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
+
+                        for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
+                        {
+                            switch (type)
+                            {
+                                case ComparisonType.Type.More:
+                                case ComparisonType.Type.EqualOrMore:
+                                    newResult += GetEstimatedValues_More(
+                                        allSourceSegments[i],
+                                        compare,
+                                        doesPreviousContain,
+                                        bottomBoundsSmallerCount,
+                                        topBoundsSmallCount);
+                                    break;
+                                case ComparisonType.Type.Less:
+                                case ComparisonType.Type.EqualOrLess:
+                                    newResult += GetEstimatedValues_Less(
+                                        allSourceSegments[i],
+                                        compare,
+                                        doesPreviousContain,
+                                        topBoundsLargerCount,
+                                        bottomBoundsLargerCount);
+                                    break;
+                                case ComparisonType.Type.Equal:
+                                    newResult += GetEstimatedValues_Equal(allSourceSegments[i]);
+                                    break;
+                            }
+                        }
                     }
                 }
             }
