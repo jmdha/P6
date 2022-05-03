@@ -33,10 +33,7 @@ namespace QueryEstimator.PredicateBounders
             if (currentSourceLowerBound < currentSourceUpperBound)
             {
                 // Convert the type to compare against to be the same as the one in the segments (assuming its correct)
-                var compType = compare.GetType();
-                var valueType = allSourceSegments[currentSourceLowerBound].LowestValue.GetType();
-                if (compType != valueType)
-                    compare = (IComparable)Convert.ChangeType(compare, valueType);
+                compare = ConvertCompareTypes(allSourceSegments[currentSourceLowerBound], compare);
 
                 if (type == ComparisonType.Type.Equal)
                 {
@@ -100,6 +97,15 @@ namespace QueryEstimator.PredicateBounders
 
             // Return a new bound result with the new upper and lower bounds
             return new PredicateBoundResult<IComparable>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
+        }
+
+        internal IComparable ConvertCompareTypes(IHistogramSegmentationComparative segment, IComparable compare)
+        {
+            var compType = compare.GetType();
+            var valueType = segment.LowestValue.GetType();
+            if (compType != valueType)
+                return (IComparable)Convert.ChangeType(compare, valueType);
+            return compare;
         }
     }
 }
