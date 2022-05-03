@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\QueryEstimator\QueryEstimator.csproj" />
     <ProjectReference Include="..\QueryEstimator\QueryEstimator.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\ResultsSentinel\ResultsSentinel.csproj" />
@@ -43,6 +42,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Tests\Census_2013\Cases\" />
     <Folder Include="UserControls\CacheViewer\Controls\" />
     <Folder Include="UserControls\TestRunner\Controls\" />
   </ItemGroup>

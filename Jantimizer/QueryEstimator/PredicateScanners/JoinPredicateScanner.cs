@@ -1,4 +1,5 @@
-﻿using QueryEstimator.Models.PredicateScanners;
+﻿using QueryEstimator.Helpers;
+using QueryEstimator.Models.PredicateScanners;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,13 @@ namespace QueryEstimator.PredicateScanners
     {
         public Dictionary<Type, List<IPredicate>> Predicates { get; }
         private List<TableAttribute> _usedAttributes;
-
         private List<FilterPredicate> _baseFilters;
-        private List<TableAttribute> _usedFilterAttributes;
 
         public JoinPredicateScanner()
         {
             Predicates = new Dictionary<Type, List<IPredicate>>();
             _usedAttributes = new List<TableAttribute>();
             _baseFilters = new List<FilterPredicate>();
-            _usedFilterAttributes = new List<TableAttribute>();
         }
 
         public void Scan(List<JoinNode> nodes)
@@ -29,9 +27,8 @@ namespace QueryEstimator.PredicateScanners
             Predicates.Clear();
             _usedAttributes.Clear();
             _baseFilters.Clear();
-            _usedFilterAttributes.Clear();
 
-            // Scanning
+            // Scan for both predicates and filters
             foreach (var node in nodes)
             {
                 foreach (var predicate in node.Predicates)
@@ -45,52 +42,25 @@ namespace QueryEstimator.PredicateScanners
                 }
             }
 
-            // Seperate filters
+            // Make sure filter attributes are used in the predicates
             foreach (var filter in _baseFilters)
             {
-                AddToDict<SimpleFilterPredicate>(new SimpleFilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
+                if (!_usedAttributes.Contains(filter.LeftTable))
+                    throw new Exception("Invalid filter! Cannot have a filter that is not included in any of the JOIN predicates!");
+                AddToDict<FilterPredicate>(new FilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
             }
         }
 
         private bool AddFilterIfValid(JoinPredicate predicate)
         {
+            // Check if the filter is inverted, e.g. "50 < a.v"
+            // If it is, add it but turn the order back to normal
             if (predicate.LeftAttribute.ConstantValue != null && predicate.RightAttribute.Attribute != null)
             {
-                switch (predicate.GetComType())
-                {
-                    case ComparisonType.Type.Equal:
-                        _baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            ComparisonType.Type.Equal));
-                        break;
-                    case ComparisonType.Type.Less:
-                        _baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            ComparisonType.Type.More));
-                        break;
-                    case ComparisonType.Type.More:
-                        _baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            ComparisonType.Type.Less));
-                        break;
-                    case ComparisonType.Type.EqualOrLess:
-                        _baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            ComparisonType.Type.EqualOrMore));
-                        break;
-                    case ComparisonType.Type.EqualOrMore:
-                        _baseFilters.Add(new FilterPredicate(
-                            predicate.RightAttribute.Attribute,
-                            predicate.LeftAttribute.ConstantValue,
-                            ComparisonType.Type.EqualOrLess));
-                        break;
-                    default:
-                        throw new Exception("Invalid Predicate!");
-                }
+                _baseFilters.Add(new FilterPredicate(
+                    predicate.RightAttribute.Attribute,
+                    predicate.LeftAttribute.ConstantValue,
+                    ComparisonTypeHelper.InvertType(predicate.GetComType())));
                 return true;
             }
             else if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.ConstantValue != null)
@@ -108,83 +78,28 @@ namespace QueryEstimator.PredicateScanners
         {
             if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
             {
-                if (_usedAttributes.Count == 0)
-                {
-                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                        predicate.LeftAttribute.Attribute,
-                        predicate.RightAttribute.Attribute,
-                        predicate.GetComType()));
-                    _usedAttributes.Add(predicate.LeftAttribute.Attribute);
-                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
-                }
-                else
-                {
-                    if (_usedAttributes.Contains(predicate.LeftAttribute.Attribute))
-                    {
-                        AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                            predicate.LeftAttribute.Attribute,
-                            predicate.RightAttribute.Attribute,
-                            predicate.GetComType()));
-                    }
-                    else if (_usedAttributes.Contains(predicate.RightAttribute.Attribute))
-                    {
-                        switch (predicate.GetComType())
-                        {
-                            case ComparisonType.Type.Equal:
-                                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                                    predicate.RightAttribute.Attribute,
-                                    predicate.LeftAttribute.Attribute,
-                                    ComparisonType.Type.Equal));
-                                break;
-                            case ComparisonType.Type.Less:
-                                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                                    predicate.RightAttribute.Attribute,
-                                    predicate.LeftAttribute.Attribute,
-                                    ComparisonType.Type.More));
-                                break;
-                            case ComparisonType.Type.More:
-                                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                                    predicate.RightAttribute.Attribute,
-                                    predicate.LeftAttribute.Attribute,
-                                    ComparisonType.Type.Less));
-                                break;
-                            case ComparisonType.Type.EqualOrLess:
-                                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                                    predicate.RightAttribute.Attribute,
-                                    predicate.LeftAttribute.Attribute,
-                                    ComparisonType.Type.EqualOrMore));
-                                break;
-                            case ComparisonType.Type.EqualOrMore:
-                                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                                    predicate.RightAttribute.Attribute,
-                                    predicate.LeftAttribute.Attribute,
-                                    ComparisonType.Type.EqualOrLess));
-                                break;
-                            default:
-                                throw new Exception("Invalid Predicate!");
-                        }
-                    }
-                    else
-                    {
-                        AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                            predicate.LeftAttribute.Attribute,
-                            predicate.RightAttribute.Attribute,
-                            predicate.GetComType()));
-                        _usedAttributes.Add(predicate.LeftAttribute.Attribute);
-                    }
-                }
-                _usedFilterAttributes.Add(predicate.LeftAttribute.Attribute);
-                _usedFilterAttributes.Add(predicate.RightAttribute.Attribute);
+                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                    predicate.LeftAttribute.Attribute,
+                    predicate.RightAttribute.Attribute,
+                    predicate.GetComType()));
+                _usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                _usedAttributes.Add(predicate.RightAttribute.Attribute);
                 return true;
             }
             return false;
         }
 
-        public List<IPredicate> GetIfThere(Type t)
+        public List<Pred> GetIfThere<Pred>() where Pred : IPredicate
         {
-            if (Predicates.ContainsKey(t))
-                return Predicates[t];
-            return new List<IPredicate>();
+            var retList = new List<Pred>();
+            if (Predicates.ContainsKey(typeof(Pred)))
+            {
+                var predList = Predicates[typeof(Pred)];
+                foreach (var item in predList)
+                    if (item is Pred accItem)
+                        retList.Add(accItem);
+            }
+            return retList;
         }
 
         private void AddToDict<T>(IPredicate pred) where T : IPredicate

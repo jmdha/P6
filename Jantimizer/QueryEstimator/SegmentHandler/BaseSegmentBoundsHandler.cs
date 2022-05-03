@@ -27,24 +27,26 @@ namespace QueryEstimator.SegmentHandler
             return HistogramManager.GetHistogram(attr.Table.TableName, attr.Attribute).Segmentations;
         }
 
-        internal void AddToUpperBoundIfNotThere(TableAttribute key, int bound)
+        public void AddOrReduceUpperBound(TableAttribute key, int bound)
         {
             if (GetValueFromDictOrAlt(key, UpperBounds, bound) < bound)
                 throw new Exception("Bound cannot get larger!");
             AddToDictionaryIfNotThere(key, bound, UpperBounds);
         }
-        internal void AddToLowerBoundIfNotThere(TableAttribute key, int bound)
+
+        public void AddOrReduceLowerBound(TableAttribute key, int bound)
         {
             if (GetValueFromDictOrAlt(key, LowerBounds, bound) > bound)
                 throw new Exception("Bound cannot get larger!");
             AddToDictionaryIfNotThere(key, bound, LowerBounds);
         }
 
-        internal int GetUpperBoundOrAlt(TableAttribute key, int alt)
+        public int GetUpperBoundOrAlt(TableAttribute key, int alt)
         {
             return GetValueFromDictOrAlt(key, UpperBounds, alt);
         }
-        internal int GetLowerBoundOrAlt(TableAttribute key, int alt)
+
+        public int GetLowerBoundOrAlt(TableAttribute key, int alt)
         {
             return GetValueFromDictOrAlt(key, LowerBounds, alt);
         }
