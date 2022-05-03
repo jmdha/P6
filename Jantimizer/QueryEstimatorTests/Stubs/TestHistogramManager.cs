@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Models.JsonModels;
 
 namespace QueryEstimatorTests.Stubs
 {
     internal class TestHistogramManager : IHistogramManager
     {
+        private Dictionary<TableAttribute, IHistogram> Histograms { get; set; } = new Dictionary<TableAttribute, IHistogram>();
         public List<string> Tables => throw new NotImplementedException();
 
         public List<string> Attributes => throw new NotImplementedException();
@@ -22,7 +24,7 @@ namespace QueryEstimatorTests.Stubs
 
         public void AddHistogram(IHistogram histogram)
         {
-            throw new NotImplementedException();
+            Histograms.Add(histogram.TableAttribute, histogram);
         }
 
         public Task<List<Task>> AddHistogramsFromDB()
@@ -47,7 +49,7 @@ namespace QueryEstimatorTests.Stubs
 
         public IHistogram GetHistogram(string table, string attribute)
         {
-            throw new NotImplementedException();
+            return Histograms[new TableAttribute(table, attribute)];
         }
     }
 }
