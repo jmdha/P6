@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="System Tests\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\QueryEstimator\QueryEstimator.csproj" />
   </ItemGroup>
 

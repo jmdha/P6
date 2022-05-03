@@ -138,6 +138,7 @@ namespace QueryEstimator
                     anyChanged = true;
                 if (!anyChanged)
                     break;
+                _didSweeps++;
             }
         }
 
