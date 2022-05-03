@@ -1,4 +1,5 @@
 ﻿using Histograms.Caches;
+using Histograms.DepthCalculators;
 using System.Data;
 using System.Text;
 
@@ -21,22 +22,22 @@ namespace Histograms.Models
             TypeCode.UInt32,
             TypeCode.UInt64,
         };
-        public DepthCalculator GetDepth { get; }
+        public IDepthCalculator DepthCalculator { get; }
 
-        public HistogramMinDepth(string tableName, string attributeName, DepthCalculator getDepth) : base(tableName, attributeName)
+        public HistogramMinDepth(string tableName, string attributeName, IDepthCalculator depthCalculator) : base(tableName, attributeName)
         {
             HistogramId = Guid.NewGuid();
-            GetDepth = getDepth;
+            DepthCalculator = depthCalculator;
         }
 
-        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, DepthCalculator getDepth) : base(histogramId, tableName, attributeName)
+        public HistogramMinDepth(Guid histogramId, string tableName, string attributeName, IDepthCalculator getDepth) : base(histogramId, tableName, attributeName)
         {
-            GetDepth = getDepth;
+            DepthCalculator = getDepth;
         }
 
         public override void GenerateHistogramFromSortedGroups(IEnumerable<ValueCount> sortedGroups)
         {
-            var depth = GetDepth(sortedGroups.Count(), sortedGroups.Sum(x => x.Count));
+            var depth = DepthCalculator.GetDepth(sortedGroups.Count(), sortedGroups.Sum(x => x.Count));
 
             IComparable? minValue = null;
             IComparable? maxValue = null;
@@ -71,7 +72,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, GetDepth);
+            var retObj = new HistogramMinDepth(HistogramId, TableName, AttributeName, DepthCalculator);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);
@@ -80,7 +81,7 @@ namespace Histograms.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() + HashCode.Combine(GetDepth);
+            return base.GetHashCode() + HashCode.Combine(DepthCalculator);
         }
     }
 }

@@ -25,13 +25,13 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Constructor_SetsProperties(int depth)
         {
             // ARRANGE
-            DepthCalculator constDepthDelegate = new ConstantDepth(depth).GetDepth;
+            IDepthCalculator depthCalc = new ConstantDepth(depth);
             // ACT
-            EquiDepthHistogramManager manager = new EquiDepthHistogramManager(new DataGathererStub(), constDepthDelegate);
+            EquiDepthHistogramManager manager = new EquiDepthHistogramManager(new DataGathererStub(), depthCalc);
 
             // ASSERT
-            Assert.AreEqual(depth, manager.GetDepth(5, 123));
-            Assert.AreEqual(depth, manager.GetDepth(643, 133));
+            Assert.AreEqual(depth, manager.DepthCalculator.GetDepth(5, 123));
+            Assert.AreEqual(depth, manager.DepthCalculator.GetDepth(643, 133));
         }
 
         #endregion

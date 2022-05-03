@@ -21,10 +21,10 @@ namespace HistogramsTests.Unit_Tests.DepthCalculators
         public void ConstantDepth_Base_Tests(int depth, long uniqueCount, long totalCount)
         {
             // ARRANGE
-            DepthCalculator getDepth = new ConstantDepth(depth).GetDepth;
+            IDepthCalculator depthCalculator = new ConstantDepth(depth);
 
             // ACT
-            var calcedDepth = getDepth(uniqueCount, totalCount);
+            var calcedDepth = depthCalculator.GetDepth(uniqueCount, totalCount);
 
             // ASSERT
             Assert.AreEqual(depth, calcedDepth);

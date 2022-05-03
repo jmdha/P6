@@ -1,4 +1,5 @@
 ﻿using Histograms.Caches;
+using Histograms.DepthCalculators;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -17,17 +18,17 @@ namespace Histograms.Models
             TypeCode.Double
         };
 
-        public HistogramEquiDepthVariance(string tableName, string attributeName, DepthCalculator getDepth) : base(tableName, attributeName, getDepth)
+        public HistogramEquiDepthVariance(string tableName, string attributeName, IDepthCalculator depthCalculator) : base(tableName, attributeName, depthCalculator)
         {
         }
 
-        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, DepthCalculator getDepth) : base(histogramId, tableName, attributeName, getDepth)
+        public HistogramEquiDepthVariance(Guid histogramId, string tableName, string attributeName, IDepthCalculator depthCalculator) : base(histogramId, tableName, attributeName, depthCalculator)
         {
         }
 
         private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
-            var depth = GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
+            var depth = DepthCalculator.GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
             for (int bStart = 0; bStart < sorted.Count; bStart += depth)
             {
                 IComparable startValue = sorted[bStart];
@@ -61,7 +62,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, GetDepth);
+            var retObj = new HistogramEquiDepthVariance(HistogramId, TableName, AttributeName, DepthCalculator);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);

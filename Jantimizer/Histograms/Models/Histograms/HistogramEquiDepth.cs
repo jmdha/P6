@@ -1,4 +1,5 @@
 ﻿using Histograms.Caches;
+using Histograms.DepthCalculators;
 using System.Data;
 using System.Text;
 
@@ -21,20 +22,20 @@ namespace Histograms.Models
             TypeCode.UInt32,
             TypeCode.UInt64,
         };
-        public DepthCalculator GetDepth { get; }
+        public IDepthCalculator DepthCalculator { get; }
 
-        public HistogramEquiDepth(string tableName, string attributeName, DepthCalculator getDepth) : this(Guid.NewGuid(), tableName, attributeName, getDepth)
+        public HistogramEquiDepth(string tableName, string attributeName, IDepthCalculator depthCalculator) : this(Guid.NewGuid(), tableName, attributeName, depthCalculator)
         {
         }
 
-        public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, DepthCalculator getDepth) : base(histogramId, tableName, attributeName)
+        public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, IDepthCalculator depthCalculator) : base(histogramId, tableName, attributeName)
         {
-            GetDepth = getDepth;
+            DepthCalculator = depthCalculator;
         }
 
         private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
-            var depth = GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
+            var depth = DepthCalculator.GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
             for (int bStart = 0; bStart < sorted.Count; bStart += depth)
             {
                 IComparable startValue = sorted[bStart];
@@ -64,7 +65,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, GetDepth);
+            var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, DepthCalculator);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);
@@ -73,7 +74,7 @@ namespace Histograms.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() + HashCode.Combine(GetDepth);
+            return base.GetHashCode() + HashCode.Combine(DepthCalculator);
         }
     }
 }

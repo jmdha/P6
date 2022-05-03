@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 
 namespace Histograms.DepthCalculators
 {
-    public class DynamicDepth
+    public class DynamicDepth : IDepthCalculator
     {
         public DynamicDepth() { }
 
         public int GetDepth(long uniqueValueCount, long totalValueCount)
         {
-            var bucketsCount = uniqueValueCount / Math.Log10((uniqueValueCount + 11) / 11);
-            return (int)Math.Ceiling(uniqueValueCount / bucketsCount);
+            long x = uniqueValueCount;
+            double bucketCount = Math.Sqrt(x+25) * 10 - 50;
+
+            double depth = x / bucketCount;
+
+            return (int)Math.Floor(depth);
         }
     }
 }

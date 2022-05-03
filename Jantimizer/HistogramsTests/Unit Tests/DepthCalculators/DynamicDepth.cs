@@ -22,10 +22,10 @@ namespace HistogramsTests.Unit_Tests.DepthCalculators
         public void DynamicDepth_Base_Tests(long uniqueCount, long totalCount)
         {
             // ARRANGE
-            DepthCalculator getDepth = new DynamicDepth().GetDepth;
+            IDepthCalculator depthCalculator = new DynamicDepth();
 
             // ACT
-            var calcedDepth = getDepth(uniqueCount, totalCount);
+            var calcedDepth = depthCalculator.GetDepth(uniqueCount, totalCount);
 
             // ASSERT
             Assert.IsTrue(0 < calcedDepth);

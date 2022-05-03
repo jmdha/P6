@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Histograms.DepthCalculators
 {
-    public class ConstantDepth
+    public class ConstantDepth : IDepthCalculator
     {
         int Depth { get; }
         public ConstantDepth(int depth)

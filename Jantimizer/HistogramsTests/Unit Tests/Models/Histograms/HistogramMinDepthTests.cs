@@ -22,7 +22,7 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         {
             // ARRANGE
             // ACT
-            IDepthHistogram histogram = new HistogramMinDepth("A", "b", new ConstantDepth(1).GetDepth);
+            IDepthHistogram histogram = new HistogramMinDepth("A", "b", new ConstantDepth(1));
 
             // ASSERT
             Assert.IsNotNull(histogram.Buckets);
@@ -36,14 +36,14 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         public void Constructor_SetsProperties(string tableName, string attributeName, int depth)
         {
             // ARRANGE
-            DepthCalculator getDepth = new ConstantDepth(depth).GetDepth;
+            IDepthCalculator getDepth = new ConstantDepth(depth);
             // ACT
             IDepthHistogram histogram = new HistogramMinDepth(tableName, attributeName, getDepth);
 
             // ASSERT
             Assert.AreEqual(tableName, histogram.TableName);
             Assert.AreEqual(attributeName, histogram.AttributeName);
-            Assert.AreEqual(getDepth, histogram.GetDepth);
+            Assert.AreEqual(getDepth, histogram.DepthCalculator);
         }
 
         #endregion
@@ -60,7 +60,7 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         public void Can_GenerateHistogram_Table(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            IDepthHistogram histogram = new HistogramMinDepth("A", columnName, new ConstantDepth(depth).GetDepth);
+            IDepthHistogram histogram = new HistogramMinDepth("A", columnName, new ConstantDepth(depth));
             DataTable table = DataTableHelper.GetDatatable(columnName, typeof(int));
             foreach (int row in rows)
                 DataTableHelper.AddRow(table, new int[] { row });
@@ -86,7 +86,7 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         public void Can_GenerateHistogram_List(string columnName, int[] rows, int depth, int expBucketCount)
         {
             // ARRANGE
-            IDepthHistogram histogram = new HistogramMinDepth("A", columnName, new ConstantDepth(depth).GetDepth);
+            IDepthHistogram histogram = new HistogramMinDepth("A", columnName, new ConstantDepth(depth));
 
             // ACT
             histogram.GenerateHistogram(rows.Cast<IComparable>().ToList());
@@ -111,7 +111,7 @@ namespace HistogramsTests.Unit_Tests.Models.Histograms
         public void Can_GenerateHistogramFromSorted_BucketCount(int[] value, long[] count, int bucketSize, int expBucketCount)
         {
             // ARRANGE
-            IDepthHistogram histogram = new HistogramMinDepth("A", "b", new ConstantDepth(bucketSize).GetDepth);
+            IDepthHistogram histogram = new HistogramMinDepth("A", "b", new ConstantDepth(bucketSize));
             List<ValueCount> values = new List<ValueCount>();
             for (int i = 0; i < value.Length; i++)
                 values.Add(new ValueCount(value[i], count[i]));
