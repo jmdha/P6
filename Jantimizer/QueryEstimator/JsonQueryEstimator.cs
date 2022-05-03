@@ -14,6 +14,7 @@ using QueryEstimator.Models.PredicateScanners;
 using QueryEstimator.PredicateScanners;
 using QueryEstimator.PredicateBounders;
 using QueryEstimator.Models.BoundResults;
+using QueryEstimator.Helpers;
 
 namespace QueryEstimator
 {
@@ -48,9 +49,10 @@ namespace QueryEstimator
             try
             {
                 _currentQuery = query;
-                long returnValue = GetIntermediateResults(query).GetTotalEstimation();
+                var segmentResultChain = GetIntermediateResults(query);
+                var totalEstimation = segmentResultChain.GetTotalEstimation();
 
-                return new EstimatorResult(query, (ulong)returnValue);
+                return new EstimatorResult(query, (ulong)totalEstimation);
             }
             catch (Exception ex)
             {
@@ -82,98 +84,83 @@ namespace QueryEstimator
             var tableAttributeBounds = new List<IPredicateBoundResult<TableAttribute>>();
 
             // Limit bounds for simple filters
-            foreach (var pred in _scanner.GetIfThere(typeof(SimpleFilterPredicate)))
-            {
-                if (pred is SimpleFilterPredicate filter)
-                    filterBounds.Add(SimpleFilterBounder.Bound(
-                        filter.LeftTable,
-                        filter.ConstantValue,
-                        filter.ComType));
-            }
+            foreach (var filter in _scanner.GetIfThere<FilterPredicate>())
+                filterBounds.Add(SimpleFilterBounder.Bound(
+                    filter.LeftTable,
+                    filter.ConstantValue,
+                    filter.ComType));
 
             // Get estiamtes from predicates
-            foreach (var pred in _scanner.GetIfThere(typeof(TableAttributePredicate)))
+            foreach (var predicate in _scanner.GetIfThere<TableAttributePredicate>())
             {
-                if (pred is TableAttributePredicate predicate)
-                {
-                    // Get bounds for left and right tables, both ways
-                    tableAttributeBounds.Add(TableAttributeBounder.Bound(
-                        predicate.LeftTable,
-                        predicate.RightTable,
-                        predicate.ComType));
-                    tableAttributeBounds.Add(TableAttributeBounder.Bound(
-                        predicate.RightTable,
-                        predicate.LeftTable,
-                        InvertType(predicate.ComType)));
-                }
+                // Get bounds for left and right tables, both ways
+                tableAttributeBounds.Add(TableAttributeBounder.Bound(
+                    predicate.LeftTable,
+                    predicate.RightTable,
+                    predicate.ComType));
+                tableAttributeBounds.Add(TableAttributeBounder.Bound(
+                    predicate.RightTable,
+                    predicate.LeftTable,
+                    ComparisonTypeHelper.InvertType(predicate.ComType)));
             }
 
             // Sweep all bounds to see of some need to be changed
             bool anyChanged = false;
             for (int i = 0; i < _maxSweeps; i++)
             {
-                if (CheckBounds(filterBounds))
+                if (CheckAndRecalculateFilterBounds(filterBounds))
                     anyChanged = true;
-                if (CheckBounds(tableAttributeBounds))
+                if (CheckAndRecalculateTableAttributeBounds(tableAttributeBounds))
                     anyChanged = true;
                 if (!anyChanged)
                     break;
             }
         }
 
-        private bool CheckBounds<TRight>(List<IPredicateBoundResult<TRight>> bounds)
+        private bool CheckAndRecalculateFilterBounds(List<IPredicateBoundResult<IComparable>> bounds)
         {
             bool anyChanged = false;
             for (int i = 0; i < bounds.Count; i++)
             {
-                if (typeof(TRight) == typeof(TableAttribute))
+                if (bounds[i].LowerBound != _lowerBounds[bounds[i].Left] || bounds[i].UpperBound != _upperBounds[bounds[i].Left])
                 {
-                    if (bounds[i].LowerBound > _lowerBounds[bounds[i].Left] || bounds[i].UpperBound > _upperBounds[bounds[i].Left] ||
-                        bounds[i + 1].LowerBound > _lowerBounds[bounds[i + 1].Left] || bounds[i + 1].UpperBound > _upperBounds[bounds[i + 1].Left])
-                    {
-                        anyChanged = true;
-                        bounds[i].RecalculateBounds();
-                        bounds[i + 1].RecalculateBounds();
-                    }
-                    i++;
-                }
-                else if (typeof(TRight) == typeof(IComparable))
-                {
-                    if (bounds[i].LowerBound != _lowerBounds[bounds[i].Left] || bounds[i].UpperBound != _upperBounds[bounds[i].Left])
-                    {
-                        anyChanged = true;
-                        bounds[i].RecalculateBounds();
-                    }
+                    anyChanged = true;
+                    bounds[i].RecalculateBounds();
                 }
             }
             return anyChanged;
         }
 
-        private ComparisonType.Type InvertType(ComparisonType.Type fromType)
+        private bool CheckAndRecalculateTableAttributeBounds(List<IPredicateBoundResult<TableAttribute>> bounds)
         {
-            switch (fromType)
+            bool anyChanged = false;
+            for (int i = 0; i < bounds.Count; i += 2)
             {
-                case ComparisonType.Type.Less: return ComparisonType.Type.More;
-                case ComparisonType.Type.More: return ComparisonType.Type.Less;
-                case ComparisonType.Type.EqualOrLess: return ComparisonType.Type.EqualOrMore;
-                case ComparisonType.Type.EqualOrMore: return ComparisonType.Type.EqualOrLess;
-                case ComparisonType.Type.Equal: return ComparisonType.Type.Equal;
-                default:
-                    throw new Exception("Impossible comparison type");
+                if (bounds[i].LowerBound > _lowerBounds[bounds[i].Left] || bounds[i].UpperBound > _upperBounds[bounds[i].Left] ||
+                        bounds[i + 1].LowerBound > _lowerBounds[bounds[i + 1].Left] || bounds[i + 1].UpperBound > _upperBounds[bounds[i + 1].Left])
+                {
+                    anyChanged = true;
+                    bounds[i].RecalculateBounds();
+                    bounds[i + 1].RecalculateBounds();
+                }
             }
+            return anyChanged;
         }
+
+
 
         private ISegmentResult GetEstimationForSegments()
         {
-            ISegmentResult result = new ValueTableAttributeResult(0, 0, _initAttribute, 0, 0, _initAttribute, 1, ComparisonType.Type.None);
-            foreach (var pred in _scanner.GetIfThere(typeof(TableAttributePredicate)))
+            ISegmentResult result = new ValueTableAttributeResult(_initAttribute, _initAttribute, 1, ComparisonType.Type.None);
+
+            // Foreach TableAttribute predicate in the join query, get an estimation based on new bounds.
+            foreach (var pred in _scanner.GetIfThere<TableAttributePredicate>())
             {
-                if (pred is TableAttributePredicate predicate)
-                    result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
-                        result,
-                        predicate.LeftTable,
-                        predicate.RightTable,
-                        predicate.ComType));
+                result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
+                    result,
+                    pred.LeftTable,
+                    pred.RightTable,
+                    pred.ComType));
             }
             return result;
         }

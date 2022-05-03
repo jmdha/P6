@@ -16,5 +16,11 @@ namespace QueryEstimator.SegmentHandler
         public IHistogramManager HistogramManager { get; }
 
         public List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr);
+
+        public void AddOrReduceUpperBound(TableAttribute key, int bound);
+        public void AddOrReduceLowerBound(TableAttribute key, int bound);
+
+        public int GetUpperBoundOrAlt(TableAttribute key, int alt);
+        public int GetLowerBoundOrAlt(TableAttribute key, int alt);
     }
 }

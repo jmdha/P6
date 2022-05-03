@@ -1,5 +1,5 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.id, C1.education, C1.capital_gain, C1.hours_per_week, C2.id, C2.education, C2.capital_gain, C2.hours_per_week FROM (census as C1 JOIN census as C2 ON C1.education < '9th' AND C1.capital_gain > C2.capital_gain AND C1.hours_per_week < C2.hours_per_week)",
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 0 AND C2.capital_loss > 0)",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,22 +11,7 @@
                 "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "education"
-            }
-          },
-          "RightAttribute": {
-            "ConstantValue": "9th"
-          },
-          "ComType": "<"
-        },
-        {
-          "LeftAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "census",
-                "Alias": "C1"
-              },
-              "Attribute": "capital_gain"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
@@ -35,7 +20,7 @@
                 "TableName": "census",
                 "Alias": "C2"
               },
-              "Attribute": "capital_gain"
+              "Attribute": "capital_loss"
             }
           },
           "ComType": ">"
@@ -47,19 +32,28 @@
                 "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "hours_per_week"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
+            "ConstantValue": "0"
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "census",
                 "Alias": "C2"
               },
-              "Attribute": "hours_per_week"
+              "Attribute": "capital_loss"
             }
           },
-          "ComType": "<"
+          "RightAttribute": {
+            "ConstantValue": "0"
+          },
+          "ComType": ">"
         }
       ]
     }

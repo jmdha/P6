@@ -1,5 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.id, C1.age, C2.id, C2.age FROM (census as C1 JOIN census as C2 ON C1.age > 20 AND C1.age < 30 AND C2.age > 30 AND C2.age < 40 AND C1.capital_loss > C2.capital_loss)",
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.age < C2.age AND C2.age > 50 AND C1.age > 50)",
+  "Comment": "Might take a while to compute",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -15,22 +16,13 @@
             }
           },
           "RightAttribute": {
-            "ConstantValue": "20"
-          },
-          "ComType": ">"
-        },
-        {
-          "LeftAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C1"
+                "Alias": "C2"
               },
               "Attribute": "age"
             }
-          },
-          "RightAttribute": {
-            "ConstantValue": "30"
           },
           "ComType": "<"
         },
@@ -45,7 +37,7 @@
             }
           },
           "RightAttribute": {
-            "ConstantValue": "30"
+            "ConstantValue": "50"
           },
           "ComType": ">"
         },
@@ -54,34 +46,13 @@
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C2"
+                "Alias": "C1"
               },
               "Attribute": "age"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "40"
-          },
-          "ComType": "<"
-        },
-        {
-          "LeftAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "census",
-                "Alias": "C1"
-              },
-              "Attribute": "capital_loss"
-            }
-          },
-          "RightAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "census",
-                "Alias": "C2"
-              },
-              "Attribute": "capital_loss"
-            }
+            "ConstantValue": "50"
           },
           "ComType": ">"
         }

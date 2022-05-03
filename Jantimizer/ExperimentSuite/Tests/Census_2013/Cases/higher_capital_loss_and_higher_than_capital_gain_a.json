@@ -1,5 +1,6 @@
 ﻿{
-  "EquivalentSQLQuery": "SELECT C1.id, C1.education, C1.capital_gain, C1.hours_per_week, C2.id, C2.education, C2.capital_gain, C2.hours_per_week FROM census c1 JOIN census c2 ON (c1.education_num < 9 AND c2.education_num > 12 AND c1.capital_gain > c2.capital_gain AND c1.hours_per_week < c2.hours_per_week AND c2.capital_gain > 2000)",
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 2000 AND C2.capital_loss > 2000) JOIN census as C3 ON C1.capital_loss > C3.capital_gain AND C3.capital_gain > 4000",
+  "Comment": "Can take quite a while to process",
   "DoRun": true,
   "JoinNodes": [
     {
@@ -11,26 +12,17 @@
                 "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "education_num"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
-            "ConstantValue": "9"
-          },
-          "ComType": "<"
-        },
-        {
-          "LeftAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "census",
                 "Alias": "C2"
               },
-              "Attribute": "education_num"
+              "Attribute": "capital_loss"
             }
-          },
-          "RightAttribute": {
-            "ConstantValue": "12"
           },
           "ComType": ">"
         },
@@ -39,9 +31,9 @@
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C2"
+                "Alias": "C1"
               },
-              "Attribute": "capital_gain"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
@@ -54,16 +46,35 @@
             "Attribute": {
               "Table": {
                 "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "capital_loss"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "2000"
+          },
+          "ComType": ">"
+        }
+      ]
+    },
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
                 "Alias": "C1"
               },
-              "Attribute": "capital_gain"
+              "Attribute": "capital_loss"
             }
           },
           "RightAttribute": {
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C2"
+                "Alias": "C3"
               },
               "Attribute": "capital_gain"
             }
@@ -75,21 +86,15 @@
             "Attribute": {
               "Table": {
                 "TableName": "census",
-                "Alias": "C1"
+                "Alias": "C3"
               },
-              "Attribute": "hours_per_week"
+              "Attribute": "capital_gain"
             }
           },
           "RightAttribute": {
-            "Attribute": {
-              "Table": {
-                "TableName": "census",
-                "Alias": "C2"
-              },
-              "Attribute": "hours_per_week"
-            }
+            "ConstantValue": "4000"
           },
-          "ComType": "<"
+          "ComType": ">"
         }
       ]
     }

@@ -8,6 +8,6 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
         <Label x:Name="SQLProgressLabel" Content="SQL Progress (0/0)"/>
-        <ProgressBar x:Name="SQLProgressBar" Height="20" ValueChanged="SQLProgressBar_ValueChanged"/>
+        <ProgressBar x:Name="SQLProgressBar" Height="20"/>
     </StackPanel>
 </UserControl>

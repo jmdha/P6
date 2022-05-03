@@ -8,10 +8,10 @@ namespace ExperimentSuite.Models
 {
     public class TestReport
     {
-        public string ExperimentName { get; set; }
-        public string Category { get; set; }
+        internal string ExperimentName { get; set; }
+        internal string Category { get; set; }
         public string CaseName { get; set; }
-        public string DatabaseName { get; set; }
+        internal string DatabaseName { get; set; }
         public ulong DatabasePredicted { get; set; }
         public ulong DatabaseActual { get; set; }
         public ulong EstimatorPredicted { get; set; }
@@ -20,6 +20,8 @@ namespace ExperimentSuite.Models
         public ulong DatabaseOffBy { get; set; }
         public ulong EstimatorOffBy { get; set; }
         public bool IsBetter { get; }
+        public bool OverEstimated { get; }
+        public bool UnderEstimated { get; }
         public ulong AbstractStorageUsageBytes { get; }
         public ulong AbstractDatabaseSizeBytes { get; }
 
@@ -51,10 +53,10 @@ namespace ExperimentSuite.Models
             EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
             DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)databasePredicted);
             EstimatorOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)estimatorPredicted);
-            if (EstimatorOffBy < DatabaseOffBy)
-                IsBetter = true;
-            else
-                IsBetter = false;
+
+            IsBetter = EstimatorOffBy < DatabaseOffBy;
+            OverEstimated = estimatorPredicted > databaseActual;
+            UnderEstimated = estimatorPredicted < databaseActual;
         }
 
         private decimal GetAccuracy(ulong actualValue, ulong predictedValue)
