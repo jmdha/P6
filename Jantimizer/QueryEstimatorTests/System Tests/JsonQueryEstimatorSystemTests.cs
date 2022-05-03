@@ -90,10 +90,10 @@ namespace QueryEstimatorTests.System_Tests
 
         [TestMethod]
         // SELECT * FROM (A JOIN B ON A.v = B.v) JOIN C ON B.v > C.v
-        // "(A JOIN B ON A.v = B.v)" : 10 + 10 + 10 = 30
+        // "(A JOIN B ON A.v = B.v)" : Count(A.v) * Count(B.v) = 20 * 30 = 600
         // Followed by "... JOIN C ON B.v > C.v",
         //      flipped to most significant table: "...  JOIN C ON C.v < B.v"
-        //      Then gives: 30 (from above) * 20 (total rows within bounds of C.v) = 600 total rows estimation
+        //      Then gives: 600 (from above) * 20 (total rows within bounds of C.v) = 12000 total rows estimation
         public void Can_GetQueryEstimation_3()
         {
             // ARRANGE
@@ -122,7 +122,7 @@ namespace QueryEstimatorTests.System_Tests
             var result = estimator.GetQueryEstimation(query);
 
             // ASSERT
-            Assert.AreEqual(600UL, result.EstimatedCardinality);
+            Assert.AreEqual(12000UL, result.EstimatedCardinality);
         }
 
         [TestMethod]

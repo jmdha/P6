@@ -157,7 +157,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
             new int[] { 10, 10, 10, 10, 10 },   // Count(A.v)
             new int[] { 20, 30, 40, 50, 60 },   // B.v
             new int[] { 10, 10, 10, 10, 10 },   // Count(B.v)
-            50)]                                // 10 + 10 + 10 + 10 + 10 = 50
+            2500)]                              // Count(A.v) * Count(B.v) = 50 * 50 = 2500
         // Note, unbounded "=" always gives the full A.v count.
         public void Can_GetEstimationResult_Single_Unbounded_Equal(int[] sourceValues, int[] sourceCounts, int[] compareValues, int[] compareCounts, int expectedCount)
         {
@@ -264,7 +264,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
             new int[] { 10, 10, 10, 10, 10 },   // Count(B.v)
             new int[] { 30, 40, 50, 60, 70 },   // C.v
             new int[] { 10, 10, 10, 10, 10 },   // Count(C.v)
-            2500)]                              // 50           *  (10 + 10 + 10 + 10 + 10)
+            125000)]                            // 2500        *  (10 + 10 + 10 + 10 + 10)
                                                 // A.v = B.v              Count(C.v)
         // Note, unbounded "=" always gives the full A.v count.
         public void Can_GetEstimationResult_Double_Unbounded_Equal(int[] sourceValues, int[] sourceCounts, int[] compareValuesA, int[] compareCountsA, int[] compareValuesB, int[] compareCountsB, int expectedCount)
