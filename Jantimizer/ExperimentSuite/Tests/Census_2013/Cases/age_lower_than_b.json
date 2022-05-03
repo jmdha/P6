@@ -1,0 +1,47 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.age < C2.age AND C1.age = 0)",
+  "Comment": "Expecting zero results from this.",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C1"
+              },
+              "Attribute": "age"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "age"
+            }
+          },
+          "ComType": "<"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C1"
+              },
+              "Attribute": "age"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0"
+          },
+          "ComType": "="
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.capital_loss > C2.capital_loss AND C1.capital_loss > 0 AND C2.capital_loss > 0)",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C1"
+              },
+              "Attribute": "capital_loss"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "capital_loss"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C1"
+              },
+              "Attribute": "capital_loss"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0"
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "capital_loss"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "0"
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}

@@ -82,11 +82,15 @@ namespace ExperimentSuite.UserControls
             HistogramControl.HistogramProgressBar.Value = value;
         }
 
-        private void UpdateSQLFileProgressBar(double value, double max = 0)
+        private void UpdateSQLFileProgressBar(double value, string fileName, string comment, string action, double max = 0)
         {
             if (max != 0)
                 SQLFileControl.SQLProgressBar.Maximum = max;
             SQLFileControl.SQLProgressBar.Value = value;
+            SQLFileControl.CurrentFileName = fileName;
+            SQLFileControl.CurrentComment = comment;
+            SQLFileControl.CurrentAction = action;
+            SQLFileControl.UpdateLabel();
         }
 
         private void PrintTestUpdate(string left, string right)
