@@ -8,8 +8,8 @@ namespace ExperimentSuite.Models
 {
     public class TestReport
     {
-        internal string ExperimentName { get; set; }
-        internal string Category { get; set; }
+        public string ExperimentName { get; set; }
+        public string Category { get; set; }
         public string CaseName { get; set; }
         internal string DatabaseName { get; set; }
         public ulong DatabasePredicted { get; set; }
