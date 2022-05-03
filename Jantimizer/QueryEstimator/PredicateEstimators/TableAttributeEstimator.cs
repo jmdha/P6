@@ -5,9 +5,12 @@ using QueryEstimator.SegmentHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
+
+[assembly: InternalsVisibleTo("QueryEstimatorTests")]
 
 namespace QueryEstimator.PredicateEstimators
 {
@@ -45,8 +48,8 @@ namespace QueryEstimator.PredicateEstimators
                     if (compareLowerBound <= compareUpperBound)
                     {
                         long bottomBoundsSmallerCount = GetCountSmallerThan(allcompareSegments[compareLowerBound], compare);
-                        long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare);
-                        long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare);
+                        long bottomBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareLowerBound], compare) + allcompareSegments[compareLowerBound].ElementsBeforeNextSegmentation;
+                        long topBoundsSmallCount = GetCountSmallerThan(allcompareSegments[compareUpperBound], compare) + allcompareSegments[compareUpperBound].ElementsBeforeNextSegmentation;
                         long topBoundsLargerCount = GetCountLargerThan(allcompareSegments[compareUpperBound], compare);
 
                         for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
@@ -86,7 +89,7 @@ namespace QueryEstimator.PredicateEstimators
         private long GetEstimatedValues_More(IHistogramSegmentationComparative segment, TableAttribute compare, bool doesPreviousContain, long bottomBoundsSmallerCount, long topBoundsSmallCount)
         {
             return GetBoundedSegmentResult(
-                            segment,
+                            segment.ElementsBeforeNextSegmentation,
                             (long)segment.GetCountSmallerThanNoAlias(compare),
                             doesPreviousContain, bottomBoundsSmallerCount, topBoundsSmallCount);
         }
@@ -94,7 +97,7 @@ namespace QueryEstimator.PredicateEstimators
         private long GetEstimatedValues_Less(IHistogramSegmentationComparative segment, TableAttribute compare, bool doesPreviousContain, long topBoundsLargerCount, long bottomBoundsLargerCount)
         {
             return GetBoundedSegmentResult(
-                            segment,
+                            segment.ElementsBeforeNextSegmentation,
                             (long)segment.GetCountLargerThanNoAlias(compare),
                             doesPreviousContain, topBoundsLargerCount, bottomBoundsLargerCount);
         }
@@ -104,18 +107,18 @@ namespace QueryEstimator.PredicateEstimators
             return segment.ElementsBeforeNextSegmentation;
         }
 
-        private long GetBoundedSegmentResult(IHistogramSegmentationComparative segment, long addValue, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
+        internal long GetBoundedSegmentResult(long segmentCount, long addValue, bool doesPreviousContain, long bottomOffsetCount, long checkOffsetCount)
         {
-            if (addValue > checkOffsetCount)
+            if (addValue >= checkOffsetCount)
                 addValue -= (addValue - checkOffsetCount);
             if (bottomOffsetCount > 0)
                 addValue -= bottomOffsetCount;
             if (addValue <= 0)
                 return 0;
             if (doesPreviousContain)
-                return segment.ElementsBeforeNextSegmentation;
+                return segmentCount;
             else
-                return addValue * segment.ElementsBeforeNextSegmentation;
+                return addValue * segmentCount;
         }
 
         private long GetCountSmallerThan(IHistogramSegmentationComparative segment, TableAttribute compare)
