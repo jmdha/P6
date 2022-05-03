@@ -28,6 +28,18 @@ namespace QueryEstimator.PredicateBounders
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             int newSourceUpperBound = currentSourceUpperBound;
 
+            // Initialise the new source bounds for edge cases
+            if (type == ComparisonType.Type.More || type == ComparisonType.Type.EqualOrMore)
+            {
+                newSourceLowerBound = currentSourceUpperBound;
+                newSourceUpperBound = currentSourceUpperBound;
+            }
+            else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
+            {
+                newSourceLowerBound = 0;
+                newSourceUpperBound = -1;
+            }
+
             // Only check for new bounds if the bound have not already been reduced to the max
             if (currentSourceLowerBound < currentSourceUpperBound)
             {

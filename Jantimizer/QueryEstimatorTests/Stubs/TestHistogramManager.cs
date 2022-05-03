@@ -12,7 +12,7 @@ namespace QueryEstimatorTests.Stubs
 {
     internal class TestHistogramManager : IHistogramManager
     {
-        private Dictionary<TableAttribute, IHistogram> Histograms { get; set; } = new Dictionary<TableAttribute, IHistogram>();
+        public Dictionary<TableAttribute, IHistogram> Histograms { get; set; } = new Dictionary<TableAttribute, IHistogram>();
         public List<string> Tables => throw new NotImplementedException();
 
         public List<string> Attributes => throw new NotImplementedException();

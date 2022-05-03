@@ -37,11 +37,12 @@ namespace QueryEstimator.PredicateBounders
             {
                 newSourceLowerBound = currentSourceUpperBound;
                 newSourceUpperBound = currentSourceUpperBound;
-            } else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
+            }
+            else if (type == ComparisonType.Type.Less || type == ComparisonType.Type.EqualOrLess)
             {
                 newSourceLowerBound = 0;
                 newSourceUpperBound = -1;
-            }   
+            }
 
             // Only check for new bounds if the bound have not already been reduced to the max
             if (currentSourceLowerBound < currentSourceUpperBound)
@@ -49,13 +50,8 @@ namespace QueryEstimator.PredicateBounders
                 // Convert the type to compare against to be the same as the one in the segments (assuming its correct)
                 compare = ConvertCompareTypes(allSourceSegments[currentSourceLowerBound], compare);
 
-                if (type == ComparisonType.Type.Equal)
-                {
-                    _lastEqual = allSourceSegments[currentSourceLowerBound];
-                    currentSourceLowerBound++;
-                }
-
                 // Check within the bounds until a given predicate is no longer correct
+                bool foundLower = false;
                 bool exitSentinel = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
@@ -88,16 +84,25 @@ namespace QueryEstimator.PredicateBounders
                             newSourceUpperBound = i;
                             break;
                         case ComparisonType.Type.Equal:
-                            if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
+                            if (!foundLower)
                             {
-                                newSourceUpperBound = i;
-                                exitSentinel = true;
-                                break;
-                            }
-                            if (_lastEqual != null && _lastEqual.LowestValue != allSourceSegments[i].LowestValue)
+                                if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
+                                {
+                                    foundLower = true;
+                                }
+                                if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                                    break;
                                 newSourceLowerBound = i;
+                                newSourceUpperBound = i;
+                            }
+                            else
+                            {
+                                if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                                    exitSentinel = true;
+                                else 
+                                    newSourceUpperBound = i;
 
-                            _lastEqual = allSourceSegments[i];
+                            }
                             break;
                     }
                     if (exitSentinel)
