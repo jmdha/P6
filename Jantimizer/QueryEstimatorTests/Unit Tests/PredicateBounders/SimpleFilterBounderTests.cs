@@ -35,21 +35,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.More);
@@ -78,21 +64,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.EqualOrMore);
@@ -121,21 +93,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Less);
@@ -164,21 +122,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.EqualOrLess);
@@ -207,21 +151,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Equal);
@@ -240,22 +170,16 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
 
-            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
-            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
-            var histoValues = new List<ValueCount>();
-            histoValues.Add(new ValueCount(0, 10));
-            histoValues.Add(new ValueCount(10, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(20, 10));
-            histoValues.Add(new ValueCount(30, 10));
-            histoValues.Add(new ValueCount(40, 10));
-            histoValues.Add(new ValueCount(50, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
-            IPredicateBounder<IComparable> bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+            var overrideValues = new List<ValueCount>();
+            overrideValues.Add(new ValueCount(0, 10));
+            overrideValues.Add(new ValueCount(10, 10));
+            overrideValues.Add(new ValueCount(20, 10));
+            overrideValues.Add(new ValueCount(20, 10));
+            overrideValues.Add(new ValueCount(20, 10));
+            overrideValues.Add(new ValueCount(30, 10));
+            overrideValues.Add(new ValueCount(40, 10));
+            overrideValues.Add(new ValueCount(50, 10));
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, overrideValues);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Equal);
@@ -298,6 +222,29 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         #endregion
 
         #region Private Test Methods
+
+        private IPredicateBounder<IComparable> GetBaseBounder(TableAttribute tableAttr, List<ValueCount>? overrideList = null)
+        {
+            Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
+            Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
+            TestHistogramManager testManager = new TestHistogramManager();
+            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
+            if (overrideList == null)
+            {
+                var histoValues = new List<ValueCount>();
+                histoValues.Add(new ValueCount(0, 10));
+                histoValues.Add(new ValueCount(10, 10));
+                histoValues.Add(new ValueCount(20, 10));
+                histoValues.Add(new ValueCount(40, 10));
+                histoValues.Add(new ValueCount(50, 10));
+                histogram.GenerateSegmentationsFromSortedGroups(histoValues);
+            }
+            else
+                histogram.GenerateSegmentationsFromSortedGroups(overrideList);
+
+            testManager.AddHistogram(histogram);
+            return new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
+        }
 
         #endregion
     }
