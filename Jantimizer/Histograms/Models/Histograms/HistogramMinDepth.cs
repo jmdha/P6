@@ -39,34 +39,21 @@ namespace Histograms.Models
         {
             var depth = DepthCalculator.GetDepth(sortedGroups.Count(), sortedGroups.Sum(x => x.Count));
 
-            IComparable? minValue = null;
-            IComparable? maxValue = null;
-            long count = 0;
+            Queue<ValueCount> groupQueue = new Queue<ValueCount>(sortedGroups);
 
-            foreach (var grp in sortedGroups)
+            while (groupQueue.Count > 0)
             {
-                if (minValue == null) // Begin new bucket
-                    minValue = grp.Value;
+                ValueCount currentGrp = groupQueue.Dequeue();
 
-                count += grp.Count;
-                maxValue = grp.Value;
+                IComparable minValue = currentGrp.Value;
+                long count = currentGrp.Count;
 
-                if (count >= depth)
+                while (count < depth && groupQueue.Count() > 0)
                 {
-                    Buckets.Add(new HistogramBucket(minValue, grp.Value, count));
-                    minValue = null;
-                    maxValue = null;
-                    count = 0;
+                    count += groupQueue.Dequeue().Count;
                 }
-            }
 
-            // Catch final value, if it wasn't enough to trigger a new bucket
-            if (minValue != null || maxValue != null)
-            {
-                if (minValue == null || maxValue == null)
-                    throw new NullReferenceException($"Unexpected null, should be impossible for minValue or maxValue to be null here");
-
-                Buckets.Add(new HistogramBucket(minValue, maxValue, count));
+                Buckets.Add(new HistogramBucket(minValue, currentGrp.Value, count));
             }
         }
 
