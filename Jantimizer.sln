@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Histograms", "Jantimizer\Histograms\Histograms.csproj", "{9092D43B-36ED-4127-9C05-E263412D11DB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParser", "Jantimizer\QueryPlanParser\QueryPlanParser.csproj", "{3B5B3F2D-B086-4473-8A43-85ED29CE6376}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryPlanParserTests", "Jantimizer\QueryPlanParserTests\QueryPlanParserTests.csproj", "{96FB8101-5B1B-4B0F-93CC-634E7961F782}"
@@ -38,10 +36,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9092D43B-36ED-4127-9C05-E263412D11DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9092D43B-36ED-4127-9C05-E263412D11DB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3B5B3F2D-B086-4473-8A43-85ED29CE6376}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3B5B3F2D-B086-4473-8A43-85ED29CE6376}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B5B3F2D-B086-4473-8A43-85ED29CE6376}.Release|Any CPU.ActiveCfg = Release|Any CPU
