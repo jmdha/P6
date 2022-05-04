@@ -1,5 +1,4 @@
-﻿using Histograms.Caches;
-using QueryPlanParser.Caches;
+﻿using QueryPlanParser.Caches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +21,6 @@ namespace ExperimentSuite.Controllers
         {
             if (QueryPlanCacher.Instance != null)
                 QueryPlanCacher.Instance.ClearCache();
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.ClearCache();
 
             ClearViewPanel?.Invoke();
         }
@@ -32,8 +29,6 @@ namespace ExperimentSuite.Controllers
         {
             if (QueryPlanCacher.Instance != null)
                 QueryPlanCacher.Instance.ClearCache(true);
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.ClearCache(true);
 
             ClearViewPanel?.Invoke();
         }
@@ -41,8 +36,6 @@ namespace ExperimentSuite.Controllers
         public List<CacheItem> GetAllCacheItems()
         {
             var cacheItems = new List<CacheItem>();
-            if (HistogramCacher.Instance != null)
-                cacheItems.AddRange(HistogramCacher.Instance.GetAllCacheItems());
             if (QueryPlanCacher.Instance != null)
                 cacheItems.AddRange(QueryPlanCacher.Instance.GetAllCacheItems());
             return cacheItems;
@@ -52,8 +45,6 @@ namespace ExperimentSuite.Controllers
         {
             if (QueryPlanCacher.Instance != null)
                 QueryPlanCacher.Instance.LoadCacheFromFile();
-            if (HistogramCacher.Instance != null)
-                HistogramCacher.Instance.LoadCacheFromFile();
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using Histograms.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryEstimator;
 using QueryEstimatorTests.Stubs;
+using Milestoner.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -166,36 +166,21 @@ namespace QueryEstimatorTests.System_Tests
 
         private IQueryEstimator<JsonQuery> GetBaseEstimator(TableAttribute tableAttr1, TableAttribute tableAttr2, TableAttribute tableAttr3)
         {
-            TestHistogramManager testManager = new TestHistogramManager();
-            TestDataGathereStub testGatherer = new TestDataGathereStub();
+            TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var tabelAttr1Histogram = new HistogramEquiDepth(tableAttr1.Table.TableName, tableAttr1.Attribute, 10);
             var tabelAttr1HistoValues = GetTableAttr1Values();
-            var tabelAttr1AttributeData = new AttributeData(tableAttr1, tabelAttr1HistoValues, TypeCode.Int32);
-            tabelAttr1Histogram.GenerateSegmentationsFromSortedGroups(tabelAttr1HistoValues);
-            testManager.AddHistogram(tabelAttr1Histogram);
+            testManager.AddMilestonesFromValueCount(tableAttr1, tabelAttr1HistoValues);
 
             // Add B table
-            var tabelAttr2Histogram = new HistogramEquiDepth(tableAttr2.Table.TableName, tableAttr2.Attribute, 10);
             var tabelAttr2HistoValues = GetTableAttr2Values();
-            var tabelAttr2AttributeData = new AttributeData(tableAttr2, tabelAttr2HistoValues, TypeCode.Int32);
-            tabelAttr2Histogram.GenerateSegmentationsFromSortedGroups(tabelAttr2HistoValues);
-            testManager.AddHistogram(tabelAttr2Histogram);
+            testManager.AddMilestonesFromValueCount(tableAttr2, tabelAttr2HistoValues);
 
             // Add C table
-            var tabelAttr3Histogram = new HistogramEquiDepth(tableAttr3.Table.TableName, tableAttr3.Attribute, 10);
             var tabelAttr3HistoValues = GetTableAttr3Values();
-            var tabelAttr3AttributeData = new AttributeData(tableAttr3, tabelAttr3HistoValues, TypeCode.Int32);
-            tabelAttr3Histogram.GenerateSegmentationsFromSortedGroups(tabelAttr3HistoValues);
-            testManager.AddHistogram(tabelAttr3Histogram);
+            testManager.AddMilestonesFromValueCount(tableAttr3, tabelAttr3HistoValues);
 
-            testGatherer.Data.Add(tableAttr1, tabelAttr1AttributeData);
-            testGatherer.Data.Add(tableAttr2, tabelAttr2AttributeData);
-            testGatherer.Data.Add(tableAttr3, tabelAttr3AttributeData);
-
-            var segmentComparer = new SegmentationComparisonCalculator(testGatherer);
-            segmentComparer.DoHistogramComparisons(testManager.Histograms.Values.ToList()).Wait();
+            testManager.Comparer.DoMilestoneComparisons();
 
             return new JsonQueryEstimator(testManager, 10);
         }

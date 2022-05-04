@@ -1,6 +1,4 @@
-﻿using Histograms;
-using Histograms.Models;
-using QueryEstimator.Models;
+﻿using QueryEstimator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +13,13 @@ using QueryEstimator.PredicateScanners;
 using QueryEstimator.PredicateBounders;
 using QueryEstimator.Models.BoundResults;
 using QueryEstimator.Helpers;
+using Milestoner;
 
 namespace QueryEstimator
 {
     public class JsonQueryEstimator : IQueryEstimator<JsonQuery>
     {
-        public IHistogramManager HistogramManager { get; }
+        public IMilestoner Milestoner { get; }
 
         // Scanners
         public IPredicateScanner<List<JoinNode>> PredicateScanner { get; }
@@ -35,14 +34,14 @@ namespace QueryEstimator
         private int _maxSweeps;
         private int _didSweeps = 0;
 
-        public JsonQueryEstimator(IHistogramManager histogramManager, int maxSweeps)
+        public JsonQueryEstimator(IMilestoner milestoner, int maxSweeps)
         {
-            HistogramManager = histogramManager;
+            Milestoner = milestoner;
             _upperBounds = new Dictionary<TableAttribute, int>();
             _lowerBounds = new Dictionary<TableAttribute, int>();
-            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, HistogramManager);
-            SimpleFilterBounder = new SimpleFilterBounder(_upperBounds, _lowerBounds, HistogramManager);
-            TableAttributeBounder = new TableAttributeBounder(_upperBounds, _lowerBounds, HistogramManager);
+            TableAttributeEstimator = new TableAttributeEstimator(_upperBounds, _lowerBounds, Milestoner);
+            SimpleFilterBounder = new SimpleFilterBounder(_upperBounds, _lowerBounds, Milestoner);
+            TableAttributeBounder = new TableAttributeBounder(_upperBounds, _lowerBounds, Milestoner);
             _maxSweeps = maxSweeps;
             PredicateScanner = new JoinPredicateScanner();
         }

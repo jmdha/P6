@@ -1,5 +1,4 @@
-﻿using Histograms;
-using QueryEstimator.Models;
+﻿using QueryEstimator.Models;
 using QueryEstimator.Models.BoundResults;
 using QueryEstimator.SegmentHandler;
 using System;

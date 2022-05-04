@@ -2,7 +2,6 @@
 using ExperimentSuite.Helpers;
 using ExperimentSuite.UserControls;
 using ExperimentSuite.UserControls.SentinelReportViewer;
-using Histograms.Caches;
 using QueryPlanParser.Caches;
 using ResultsSentinel;
 using ResultsSentinel.SentinelLog;
@@ -29,11 +28,9 @@ namespace ExperimentSuite
             // Sentinels
             new EstimatorResultSentinel();
             new QueryPlanParserResultSentinel();
-            new HistogramResultSentinel();
 
             // Cachers
             new QueryPlanCacher(QueryPlanCacheFile);
-            new HistogramCacher();
 
             controller = new ExperimentController();
             controller.UpdateExperimentProgressBar += UpdateExperimentProgressBar;
@@ -107,14 +104,6 @@ namespace ExperimentSuite
                         QueryPlanParserResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
         }
 
-        private void HistogramSentinelCheckbox_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is CheckBox checkBox)
-                if (HistogramResultSentinel.Instance != null)
-                    if (checkBox.IsChecked != null)
-                        HistogramResultSentinel.Instance.IsEnabled = (bool)checkBox.IsChecked;
-        }
-
         private void SentinelViewerButton_Click(object sender, RoutedEventArgs e)
         {
             var newList = new List<IResultSentinel>();
@@ -122,8 +111,6 @@ namespace ExperimentSuite
                 newList.Add(EstimatorResultSentinel.Instance);
             if (QueryPlanParserResultSentinel.Instance != null)
                 newList.Add(QueryPlanParserResultSentinel.Instance);
-            if (HistogramResultSentinel.Instance != null)
-                newList.Add(HistogramResultSentinel.Instance);
             var sentinelWindow = new SentinelReportViewer(newList);
             sentinelWindow.Show();
         }
@@ -134,8 +121,6 @@ namespace ExperimentSuite
                 EstimatorResultSentinel.Instance.ClearSentinel();
             if (QueryPlanParserResultSentinel.Instance != null)
                 QueryPlanParserResultSentinel.Instance.ClearSentinel();
-            if (HistogramResultSentinel.Instance != null)
-                HistogramResultSentinel.Instance.ClearSentinel();
         }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)

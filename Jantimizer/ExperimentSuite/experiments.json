@@ -58,7 +58,7 @@
     {
       "ExperimentName": "Experiment Two - MinDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",

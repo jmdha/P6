@@ -1,5 +1,5 @@
-﻿using Histograms;
-using Histograms.Models;
+﻿using Milestoner;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +13,18 @@ namespace QueryEstimator.SegmentHandler
     {
         public Dictionary<TableAttribute, int> UpperBounds { get; }
         public Dictionary<TableAttribute, int> LowerBounds { get; }
-        public IHistogramManager HistogramManager { get; }
+        public IMilestoner Milestoner { get; }
 
-        protected BaseSegmentBoundsHandler(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager)
+        protected BaseSegmentBoundsHandler(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IMilestoner milestoner)
         {
             UpperBounds = upperBounds;
             LowerBounds = lowerBounds;
-            HistogramManager = histogramManager;
+            Milestoner = milestoner;
         }
 
-        public List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr)
+        public List<IMilestone> GetAllMilestonesForAttribute(TableAttribute attr)
         {
-            return HistogramManager.GetHistogram(attr.Table.TableName, attr.Attribute).Segmentations;
+            return Milestoner.GetSegmentsNoAlias(attr);
         }
 
         public void AddOrReduceUpperBound(TableAttribute key, int bound)

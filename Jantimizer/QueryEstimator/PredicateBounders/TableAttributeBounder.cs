@@ -1,8 +1,7 @@
-﻿using Histograms;
-using Histograms.Models;
-using QueryEstimator.Models;
+﻿using QueryEstimator.Models;
 using QueryEstimator.Models.BoundResults;
 using QueryEstimator.SegmentHandler;
+using Milestoner;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +13,14 @@ namespace QueryEstimator.PredicateBounders
 {
     public class TableAttributeBounder : BaseSegmentBoundsHandler, IPredicateBounder<TableAttribute>
     {
-        public TableAttributeBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
+        public TableAttributeBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IMilestoner milestoner) : base(upperBounds, lowerBounds, milestoner)
         {
         }
 
         public IPredicateBoundResult<TableAttribute> Bound(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
+            var allSourceSegments = GetAllMilestonesForAttribute(source);
             int currentSourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int newSourceLowerBound = currentSourceLowerBound;
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
