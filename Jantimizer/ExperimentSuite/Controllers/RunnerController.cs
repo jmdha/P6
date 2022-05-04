@@ -1,7 +1,6 @@
 ﻿using ExperimentSuite.Helpers;
 using ExperimentSuite.Models;
 using ExperimentSuite.UserControls;
-using Histograms;
 using QueryEstimator;
 using QueryEstimator.Models;
 using QueryPlanParser.Caches;
@@ -143,9 +142,8 @@ namespace ExperimentSuite.Controllers
             {
                 PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                //RunData.Milestoner.ExperimentName = ExperimentName;
-                //RunData.Milestoner.RunnerName = RunnerName;
                 await RunData.Milestoner.AddMilestonesFromDB();
+                UpdateHistogramProgressBar?.Invoke(1,1);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
 
@@ -326,24 +324,6 @@ namespace ExperimentSuite.Controllers
                 return (bool)value;
             return false;
         }
-
-        //private async Task GenerateHistograms(IHistogramManager manager)
-        //{
-        //    manager.ClearHistograms();
-        //    List<Task> tasks = await manager.AddHistogramsFromDB();
-        //    int value = 0;
-        //    int max = tasks.Count;
-        //    UpdateHistogramProgressBar?.Invoke(value, max);
-        //    // https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/start-multiple-async-tasks-and-process-them-as-they-complete?pivots=dotnet-6-0#create-the-asynchronous-sum-page-sizes-method
-        //    while (tasks.Any())
-        //    {
-        //        var finishedTask = await Task.WhenAny(tasks);
-        //        tasks.Remove(finishedTask);
-        //        await finishedTask;
-        //        UpdateHistogramProgressBar?.Invoke(value++);
-        //    }
-        //    UpdateHistogramProgressBar?.Invoke(max);
-        //}
 
         public void Dispose()
         {

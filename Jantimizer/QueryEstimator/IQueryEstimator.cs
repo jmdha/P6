@@ -1,5 +1,4 @@
-﻿using Histograms;
-using QueryEstimator.Models;
+﻿using QueryEstimator.Models;
 using QueryEstimator.PredicateEstimators;
 using Segmentator;
 using Tools.Models.JsonModels;

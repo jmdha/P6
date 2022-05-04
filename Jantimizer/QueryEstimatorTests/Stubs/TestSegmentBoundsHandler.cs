@@ -1,5 +1,4 @@
-﻿using Histograms;
-using QueryEstimator.SegmentHandler;
+﻿using QueryEstimator.SegmentHandler;
 using Segmentator;
 using System;
 using System.Collections.Generic;

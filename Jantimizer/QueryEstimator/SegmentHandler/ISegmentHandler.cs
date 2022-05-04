@@ -1,6 +1,4 @@
-﻿using Histograms;
-using Histograms.Models;
-using Segmentator;
+﻿using Segmentator;
 using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;

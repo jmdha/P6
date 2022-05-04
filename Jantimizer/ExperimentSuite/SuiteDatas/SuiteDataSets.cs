@@ -1,6 +1,5 @@
 ﻿using DatabaseConnector.Connectors;
 using ExperimentSuite.Models;
-using Histograms.Managers;
 using QueryEstimator;
 using QueryPlanParser.Parsers;
 using Segmentator.DataGatherers;

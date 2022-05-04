@@ -1,5 +1,4 @@
 ﻿using ExperimentSuite.Helpers;
-using Histograms.Caches;
 using Microsoft.Win32;
 using QueryPlanParser.Caches;
 using System;
@@ -45,8 +44,6 @@ namespace ExperimentSuite.UserControls
         {
             CachePanel.Children.Clear();
             var cacheItems = new List<CacheItem>();
-            if (HistogramCacher.Instance != null)
-                cacheItems.AddRange(HistogramCacher.Instance.GetAllCacheItems());
             if (QueryPlanCacher.Instance != null)
                 cacheItems.AddRange(QueryPlanCacher.Instance.GetAllCacheItems());
 

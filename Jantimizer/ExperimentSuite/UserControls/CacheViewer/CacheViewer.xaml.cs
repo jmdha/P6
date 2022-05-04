@@ -1,5 +1,4 @@
 ﻿using ExperimentSuite.Controllers;
-using Histograms.Caches;
 using QueryPlanParser.Caches;
 using System;
 using System.Collections.Generic;

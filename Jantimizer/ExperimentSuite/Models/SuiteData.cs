@@ -1,6 +1,4 @@
 ﻿using DatabaseConnector;
-using Histograms;
-using Histograms.Models;
 using QueryEstimator;
 using QueryPlanParser;
 using Segmentator;
