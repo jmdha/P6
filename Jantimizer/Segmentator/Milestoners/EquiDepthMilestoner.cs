@@ -12,46 +12,13 @@ using Tools.Models.JsonModels;
 
 namespace Segmentator.Milestoners
 {
-    public class EquiDepthMilestoner : IMilestoner
+    public class EquiDepthMilestoner : BaseMilestoner
     {
-        public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
-        public IMilestoneComparers Comparer { get; }
-        public IDepthCalculator DepthCalculator { get; }
-        public IDataGatherer DataGatherer { get; }
-
-        public EquiDepthMilestoner(IDataGatherer dataGatherer, IDepthCalculator depthCalculator)
+        public EquiDepthMilestoner(IDataGatherer dataGatherer, IDepthCalculator depthCalculator) : base(dataGatherer, depthCalculator)
         {
-            Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
-            Comparer = new MilestoneComparer(Milestones);
-            DepthCalculator = depthCalculator;
-            DataGatherer = dataGatherer;
         }
 
-        public async Task AddMilestonesFromDB()
-        {
-            ClearMilestones();
-            foreach (string tableName in await DataGatherer.GetTableNamesInSchema())
-            {
-                foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
-                {
-                    var newAttr = new TableAttribute(tableName, attributeName);
-                    var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
-                    AddMilestonesFromValueCount(newAttr, data);
-                }
-            }
-
-            Comparer.DoMilestoneComparisons();
-        }
-
-        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
-        {
-            var tempAttr = new TableAttribute(attr.Table.TableName, attr.Attribute);
-            if (Milestones.ContainsKey(tempAttr))
-                return Milestones[tempAttr];
-            return new List<IMilestone>();
-        }
-
-        public void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
+        public override void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
         {
             long totalValues = 0;
             foreach (var value in sorted)
@@ -100,43 +67,6 @@ namespace Segmentator.Milestoners
                 var addFinal = sorted[sorted.Count - 1];
                 AddOrUpdate(attr, new Milestone(addFinal.Value, 1));
             }
-        }
-
-        public void ClearMilestones()
-        {
-            Milestones.Clear();
-        }
-
-        private void AddOrUpdate(TableAttribute attr, IMilestone milestone)
-        {
-            if (Milestones.ContainsKey(attr))
-                Milestones[attr].Add(milestone);
-            else
-                Milestones.Add(attr, new List<IMilestone>() { milestone });
-        }
-
-        public ulong GetAbstractMilestoneStorageBytes()
-        {
-            ulong result = 0;
-            // Get all bytes from all segments.
-            foreach (var segments in Milestones.Values)
-                foreach (var segment in segments)
-                    result += segment.GetTotalAbstractStorageUse();
-            // Converting from bit to bytes
-            result = result / 8;
-            return result;
-        }
-
-        public ulong GetAbstractDatabaseStorageBytes()
-        {
-            ulong result = 0;
-            // Get all bytes from all segments.
-            foreach (var segments in Milestones.Values)
-                foreach (var segment in segments)
-                    result += segment.GetTotalAbstractStorageUse() * (ulong)segment.ElementsBeforeNextSegmentation;
-            // Converting from bit to bytes
-            result = result / 8;
-            return result;
         }
     }
 }

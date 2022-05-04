@@ -20,10 +20,12 @@ namespace Segmentator.MilestoneComparers
 
         public void DoMilestoneComparisons()
         {
-            foreach(var milestoneList in Milestones)
+            foreach (var milestoneList in Milestones)
             {
                 foreach (var milestone in milestoneList.Value)
                 {
+                    if (!IsNumericType(milestone.LowestValue.GetType()))
+                        break;
                     DoMilestoneComparison(milestone);
                 }
             }
@@ -35,10 +37,16 @@ namespace Segmentator.MilestoneComparers
             {
                 ulong smaller = 0;
                 ulong larger = 0;
+                if (!IsNumericType(milestones.Value[0].LowestValue.GetType()))
+                    continue;
+
+                // We really need to find a better solution for this!
+                if (Type.GetTypeCode(milestones.Value[0].LowestValue.GetType()) != Type.GetTypeCode(sourceMilestone.LowestValue.GetType()))
+                    continue;
 
                 foreach (var milestone in milestones.Value)
                 {
-                    var checkValue = ConvertCompareTypes(sourceMilestone, milestone.LowestValue);
+                    var checkValue = ConvertCompareTypes(sourceMilestone.LowestValue, milestone.LowestValue);
                     if (checkValue.IsLessThan(sourceMilestone.LowestValue))
                         smaller += (ulong)milestone.ElementsBeforeNextSegmentation;
                     else if (checkValue.IsLargerThan(sourceMilestone.LowestValue))
@@ -70,13 +78,35 @@ namespace Segmentator.MilestoneComparers
             }
         }
 
-        internal IComparable ConvertCompareTypes(IMilestone segment, IComparable compare)
+        internal IComparable ConvertCompareTypes(IComparable segment, IComparable compare)
         {
             var compType = compare.GetType();
-            var valueType = segment.LowestValue.GetType();
+            var valueType = segment.GetType();
             if (compType != valueType)
                 return (IComparable)Convert.ChangeType(compare, valueType);
+
             return compare;
+        }
+
+        private bool IsNumericType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

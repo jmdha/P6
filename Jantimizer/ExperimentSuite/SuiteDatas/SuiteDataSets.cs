@@ -67,7 +67,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
             var mySQLConnector = new MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new EquiDepthMilestoner(
+            var mySQLHistoManager = new MinDepthMilestoner(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
                 new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
@@ -86,7 +86,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
             var mySQLConnector = new MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new EquiDepthMilestoner(
+            var mySQLHistoManager = new MinDepthMilestoner(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
                 new DynamicDepth());
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
@@ -149,7 +149,7 @@ namespace ExperimentSuite.SuiteDatas
             var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new EquiDepthMilestoner(
+            var postHistoManager = new MinDepthMilestoner(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
@@ -168,7 +168,7 @@ namespace ExperimentSuite.SuiteDatas
             var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
             var postConnector = new PostgreSqlConnector(postConnectionProperties);
             var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new EquiDepthMilestoner(
+            var postHistoManager = new MinDepthMilestoner(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
                 new DynamicDepth());
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));

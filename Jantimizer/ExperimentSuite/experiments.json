@@ -51,14 +51,14 @@
         }
       ],
       "OptionalTestSettings": {
-        "BucketSize": 1,
+        "BucketSize": 256,
         "MaxEstimatorSweeps": 10
       }
     },
     {
       "ExperimentName": "Experiment Two - MinDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "PreRunData": [
         {
           "ConnectorName": "POSGRESQL",
