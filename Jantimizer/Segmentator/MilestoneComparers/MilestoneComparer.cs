@@ -31,42 +31,52 @@ namespace Segmentator.MilestoneComparers
 
         private void DoMilestoneComparison(IMilestone sourceMilestone)
         {
-            foreach (var milestone in Milestones)
+            foreach (var milestones in Milestones)
             {
                 ulong smaller = 0;
                 ulong larger = 0;
 
-                foreach (var milestones in milestone.Value)
+                foreach (var milestone in milestones.Value)
                 {
-                    if (milestones.LowestValue.IsLessThan(sourceMilestone.LowestValue))
-                        smaller += (ulong)milestones.ElementsBeforeNextSegmentation;
-                    else if (milestones.LowestValue.IsLargerThan(sourceMilestone.LowestValue))
-                        larger += (ulong)milestones.ElementsBeforeNextSegmentation;
+                    var checkValue = ConvertCompareTypes(sourceMilestone, milestone.LowestValue);
+                    if (checkValue.IsLessThan(sourceMilestone.LowestValue))
+                        smaller += (ulong)milestone.ElementsBeforeNextSegmentation;
+                    else if (checkValue.IsLargerThan(sourceMilestone.LowestValue))
+                        larger += (ulong)milestone.ElementsBeforeNextSegmentation;
                 }
 
                 if (smaller > 0)
                 {
                     if (smaller < byte.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestone.Key, (byte)smaller);
+                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (byte)smaller);
                     if (smaller < ushort.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestone.Key, (ushort)smaller);
+                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (ushort)smaller);
                     else if (smaller < uint.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestone.Key, (uint)smaller);
+                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (uint)smaller);
                     else
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestone.Key, smaller);
+                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, smaller);
                 }
                 if (larger > 0)
                 {
                     if (larger < byte.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestone.Key, (byte)larger);
+                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (byte)larger);
                     if (larger < ushort.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestone.Key, (ushort)larger);
+                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (ushort)larger);
                     else if (larger < uint.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestone.Key, (uint)larger);
+                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (uint)larger);
                     else
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestone.Key, larger);
+                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, larger);
                 }
             }
+        }
+
+        internal IComparable ConvertCompareTypes(IMilestone segment, IComparable compare)
+        {
+            var compType = compare.GetType();
+            var valueType = segment.LowestValue.GetType();
+            if (compType != valueType)
+                return (IComparable)Convert.ChangeType(compare, valueType);
+            return compare;
         }
     }
 }

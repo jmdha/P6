@@ -213,7 +213,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             SimpleFilterBounder bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
 
             // ACT
-            var result = bounder.ConvertCompareTypes(bounder.GetAllSegmentsForAttribute(tableAttr)[0], item);
+            var result = bounder.ConvertCompareTypes(bounder.GetAllMilestonesForAttribute(tableAttr)[0], item);
 
             // ASSERT
             Assert.AreEqual(expItem, result);

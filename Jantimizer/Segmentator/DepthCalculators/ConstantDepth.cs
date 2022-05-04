@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Histograms.DepthCalculators
+namespace Segmentator.DepthCalculators
 {
     public class ConstantDepth : IDepthCalculator
     {

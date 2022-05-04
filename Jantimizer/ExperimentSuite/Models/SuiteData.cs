@@ -3,6 +3,7 @@ using Histograms;
 using Histograms.Models;
 using QueryEstimator;
 using QueryPlanParser;
+using Segmentator;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ExperimentSuite.Models
         public IDbConnector Connector { get; set; }
         public IPlanParser Parser { get; set; }
 
-        public IHistogramManager HistoManager { get; set; }
+        public IMilestoner Milestoner { get; set; }
 
         public IQueryEstimator<JsonQuery> Estimator { get; set; }
 
@@ -30,8 +31,8 @@ namespace ExperimentSuite.Models
             string id,
             string name, 
             IDbConnector connector, 
-            IPlanParser parser, 
-            IHistogramManager histoManager,
+            IPlanParser parser,
+            IMilestoner milestoner,
             IQueryEstimator<JsonQuery> estimator)
         {
             Settings = settings;
@@ -39,7 +40,7 @@ namespace ExperimentSuite.Models
             Name = name;
             Connector = connector;
             Parser = parser;
-            HistoManager = histoManager;
+            Milestoner = milestoner;
             Estimator = estimator;
         }
     }

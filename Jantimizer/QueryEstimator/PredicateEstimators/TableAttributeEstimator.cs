@@ -2,6 +2,8 @@
 using Histograms.Models;
 using QueryEstimator.Models;
 using QueryEstimator.SegmentHandler;
+using Segmentator;
+using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ namespace QueryEstimator.PredicateEstimators
 {
     public class TableAttributeEstimator : BaseSegmentBoundsHandler, IPredicateEstimator<TableAttribute>
     {
-        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
+        public TableAttributeEstimator(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IMilestoner milestoner) : base(upperBounds, lowerBounds, milestoner)
         {
         }
 
@@ -25,7 +27,7 @@ namespace QueryEstimator.PredicateEstimators
             long newResult = 0;
 
             // Get segments and lower/upper bounds for the source attribute
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
+            var allSourceSegments = GetAllMilestonesForAttribute(source);
             int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
 
@@ -50,7 +52,7 @@ namespace QueryEstimator.PredicateEstimators
 
                         // Get segments and lower/upper bounds for the compare attribute
                         // Also get how many items that should be bounded in the compare segments.
-                        var allcompareSegments = GetAllSegmentsForAttribute(compare);
+                        var allcompareSegments = GetAllMilestonesForAttribute(compare);
                         int compareLowerBound = GetLowerBoundOrAlt(compare, 0);
                         int compareUpperBound = GetUpperBoundOrAlt(compare, allcompareSegments.Count - 1);
                         if (compareLowerBound <= compareUpperBound)
@@ -95,7 +97,7 @@ namespace QueryEstimator.PredicateEstimators
         private long GetEstimateSourceBoundedCount(TableAttribute source)
         {
             long newResult = 0;
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
+            var allSourceSegments = GetAllMilestonesForAttribute(source);
             int sourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int sourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             for (int i = sourceLowerBound; i <= sourceUpperBound; i++)
@@ -103,7 +105,7 @@ namespace QueryEstimator.PredicateEstimators
             return newResult;
         }
 
-        private long GetEstimatedValues_More(IHistogramSegmentationComparative segment, TableAttribute compare, bool doesPreviousContain, long bottomBoundsSmallerCount, long topBoundsSmallCount)
+        private long GetEstimatedValues_More(IMilestone segment, TableAttribute compare, bool doesPreviousContain, long bottomBoundsSmallerCount, long topBoundsSmallCount)
         {
             return GetBoundedSegmentResult(
                             segment.ElementsBeforeNextSegmentation,
@@ -111,7 +113,7 @@ namespace QueryEstimator.PredicateEstimators
                             doesPreviousContain, bottomBoundsSmallerCount, topBoundsSmallCount);
         }
 
-        private long GetEstimatedValues_Less(IHistogramSegmentationComparative segment, TableAttribute compare, bool doesPreviousContain, long topBoundsLargerCount, long bottomBoundsLargerCount)
+        private long GetEstimatedValues_Less(IMilestone segment, TableAttribute compare, bool doesPreviousContain, long topBoundsLargerCount, long bottomBoundsLargerCount)
         {
             return GetBoundedSegmentResult(
                             segment.ElementsBeforeNextSegmentation,
@@ -133,12 +135,12 @@ namespace QueryEstimator.PredicateEstimators
                 return addValue * segmentCount;
         }
 
-        private long GetCountSmallerThan(IHistogramSegmentationComparative segment, TableAttribute compare)
+        private long GetCountSmallerThan(IMilestone segment, TableAttribute compare)
         {
             return (long)segment.GetCountSmallerThanNoAlias(compare);
         }
 
-        private long GetCountLargerThan(IHistogramSegmentationComparative segment, TableAttribute compare)
+        private long GetCountLargerThan(IMilestone segment, TableAttribute compare)
         {
             return (long)segment.GetCountLargerThanNoAlias(compare);
         }

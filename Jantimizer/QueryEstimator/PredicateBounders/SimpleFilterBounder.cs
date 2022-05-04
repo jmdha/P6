@@ -3,6 +3,8 @@ using Histograms.Models;
 using QueryEstimator.Models;
 using QueryEstimator.Models.BoundResults;
 using QueryEstimator.SegmentHandler;
+using Segmentator;
+using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +20,14 @@ namespace QueryEstimator.PredicateBounders
 {
     public class SimpleFilterBounder : BaseSegmentBoundsHandler, IPredicateBounder<IComparable>
     {
-        public SimpleFilterBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
+        public SimpleFilterBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IMilestoner milestoner) : base(upperBounds, lowerBounds, milestoner)
         {
         }
 
         public IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
-            var allSourceSegments = GetAllSegmentsForAttribute(source);
+            var allSourceSegments = GetAllMilestonesForAttribute(source);
             int currentSourceLowerBound = GetLowerBoundOrAlt(source, 0);
             int newSourceLowerBound = currentSourceLowerBound;
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
@@ -109,7 +111,7 @@ namespace QueryEstimator.PredicateBounders
             return new PredicateBoundResult<IComparable>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
         }
 
-        internal IComparable ConvertCompareTypes(IHistogramSegmentationComparative segment, IComparable compare)
+        internal IComparable ConvertCompareTypes(IMilestone segment, IComparable compare)
         {
             var compType = compare.GetType();
             var valueType = segment.LowestValue.GetType();

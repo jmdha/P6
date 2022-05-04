@@ -1,4 +1,7 @@
-﻿using Segmentator.MilestoneComparers;
+﻿using Segmentator.DataGatherers;
+using Segmentator.DepthCalculators;
+using Segmentator.MilestoneComparers;
+using Segmentator.Models;
 using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;
@@ -13,39 +16,121 @@ namespace Segmentator.Milestoners
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         public IMilestoneComparers Comparer { get; }
+        public IDepthCalculator DepthCalculator { get; }
+        public IDataGatherer DataGatherer { get; }
 
-        public EquiDepthMilestoner()
+        public EquiDepthMilestoner(IDataGatherer dataGatherer, IDepthCalculator depthCalculator)
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
             Comparer = new MilestoneComparer(Milestones);
+            DepthCalculator = depthCalculator;
+            DataGatherer = dataGatherer;
         }
 
-        public Task<List<Task>> AddMilestonesFromDB()
+        public async Task AddMilestonesFromDB()
         {
-            
-        }
-
-        private void GenerateHistogramFromSorted(List<IComparable> sorted)
-        {
-            var depth = DepthCalculator.GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
-            for (int bStart = 0; bStart < sorted.Count; bStart += depth)
+            ClearMilestones();
+            foreach (string tableName in await DataGatherer.GetTableNamesInSchema())
             {
-                IComparable startValue = sorted[bStart];
-                IComparable endValue = sorted[bStart];
-                int countValue = 1;
-
-                for (int bIter = bStart + 1; bIter < bStart + depth && bIter < sorted.Count; bIter++)
+                foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
                 {
-                    countValue++;
-                    endValue = sorted[bIter];
+                    var newAttr = new TableAttribute(tableName, attributeName);
+                    var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
+                    GenerateHistogramFromSorted(newAttr, data);
                 }
-                Buckets.Add(new HistogramBucket(startValue, endValue, countValue));
             }
+
+            Comparer.DoMilestoneComparisons();
+        }
+
+        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
+        {
+            var tempAttr = new TableAttribute(attr.Table.TableName, attr.Attribute);
+            if (Milestones.ContainsKey(tempAttr))
+                return Milestones[tempAttr];
+            return new List<IMilestone>();
+        }
+
+        private void GenerateHistogramFromSorted(TableAttribute attr, List<ValueCount> sorted)
+        {
+            long totalValues = 0;
+            foreach (var value in sorted)
+                totalValues += value.Count;
+            var depth = DepthCalculator.GetDepth(sorted.Count, totalValues);
+
+            IComparable? currentStart = null;
+            long currentCount = 0;
+            foreach (var value in sorted)
+            {
+                long currentValueCount = value.Count;
+
+                while (currentValueCount > 0)
+                {
+                    if (currentStart == null)
+                        currentStart = value.Value;
+                    if (currentCount + currentValueCount < depth)
+                    {
+                        currentCount += currentValueCount;
+                        break;
+                    }
+                    else
+                    {
+                        if (currentCount + currentValueCount > depth)
+                        {
+                            currentValueCount -= depth - currentCount;
+                            currentCount += currentValueCount;
+                        }
+                        else
+                        {
+                            currentCount += currentValueCount;
+                            currentValueCount = 0;
+                        }
+                        if (currentStart != null)
+                            AddOrUpdate(attr, new Milestone(currentStart, currentCount));
+                        currentStart = null;
+                        currentCount = 0;
+                    }
+                }
+            }
+            if (currentCount > 0 && currentStart != null)
+                AddOrUpdate(attr, new Milestone(currentStart, currentCount));
         }
 
         public void ClearMilestones()
         {
-            
+            Milestones.Clear();
+        }
+
+        private void AddOrUpdate(TableAttribute attr, IMilestone milestone)
+        {
+            if (Milestones.ContainsKey(attr))
+                Milestones[attr].Add(milestone);
+            else
+                Milestones.Add(attr, new List<IMilestone>() { milestone });
+        }
+
+        public ulong GetAbstractMilestoneStorageBytes()
+        {
+            ulong result = 0;
+            // Get all bytes from all segments.
+            foreach (var segments in Milestones.Values)
+                foreach (var segment in segments)
+                    result += segment.GetTotalAbstractStorageUse();
+            // Converting from bit to bytes
+            result = result / 8;
+            return result;
+        }
+
+        public ulong GetAbstractDatabaseStorageBytes()
+        {
+            ulong result = 0;
+            // Get all bytes from all segments.
+            foreach (var segments in Milestones.Values)
+                foreach (var segment in segments)
+                    result += segment.GetTotalAbstractStorageUse() * (ulong)segment.ElementsBeforeNextSegmentation;
+            // Converting from bit to bytes
+            result = result / 8;
+            return result;
         }
     }
 }

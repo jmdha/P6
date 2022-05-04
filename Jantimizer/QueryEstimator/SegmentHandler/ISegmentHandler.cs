@@ -1,5 +1,7 @@
 ﻿using Histograms;
 using Histograms.Models;
+using Segmentator;
+using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +15,9 @@ namespace QueryEstimator.SegmentHandler
     {
         public Dictionary<TableAttribute, int> UpperBounds { get; }
         public Dictionary<TableAttribute, int> LowerBounds { get; }
-        public IHistogramManager HistogramManager { get; }
+        public IMilestoner Milestoner { get; }
 
-        public List<IHistogramSegmentationComparative> GetAllSegmentsForAttribute(TableAttribute attr);
+        public List<IMilestone> GetAllMilestonesForAttribute(TableAttribute attr);
 
         public void AddOrReduceUpperBound(TableAttribute key, int bound);
         public void AddOrReduceLowerBound(TableAttribute key, int bound);
