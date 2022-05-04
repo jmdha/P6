@@ -1,6 +1,7 @@
 ﻿using Segmentator.DataGatherers;
 using Segmentator.DepthCalculators;
 using Segmentator.MilestoneComparers;
+using Segmentator.Models;
 using Segmentator.Models.Milestones;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace Segmentator
         public ulong GetAbstractDatabaseStorageBytes();
         public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr);
         public Task AddMilestonesFromDB();
+        public void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted);
         public void ClearMilestones();
     }
 }

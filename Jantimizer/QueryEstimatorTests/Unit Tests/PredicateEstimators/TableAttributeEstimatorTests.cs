@@ -1,8 +1,8 @@
-﻿using Histograms.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryEstimator.Models;
 using QueryEstimator.PredicateEstimators;
 using QueryEstimatorTests.Stubs;
+using Segmentator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -293,39 +293,28 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
         {
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            return new TableAttributeEstimator(upperBounds, lowerBounds, new TestHistogramManager());
+            return new TableAttributeEstimator(upperBounds, lowerBounds, new TestMilestonerManager());
         }
 
         private TableAttributeEstimator GetSingleBounder(TableAttribute sourceAttr, int[] sourceValues, int[] sourceCounts, TableAttribute compareAttr, int[] compareValues, int[] compareCounts)
         {
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            TestDataGathereStub testGatherer = new TestDataGathereStub();
+            TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var sourceHistogram = new HistogramEquiDepth(sourceAttr.Table.TableName, sourceAttr.Attribute, 10);
             var sourceHistoValues = new List<ValueCount>();
             for(int i = 0; i < sourceValues.Length; i++)
                 sourceHistoValues.Add(new ValueCount(sourceValues[i], sourceCounts[i]));
-            var sourceAttributeData = new AttributeData(sourceAttr, sourceHistoValues, TypeCode.Int32);
-            sourceHistogram.GenerateSegmentationsFromSortedGroups(sourceHistoValues);
-            testManager.AddHistogram(sourceHistogram);
+            testManager.AddMilestonesFromValueCount(sourceAttr, sourceHistoValues);
 
             // Add B table
-            var compareHistogram = new HistogramEquiDepth(compareAttr.Table.TableName, compareAttr.Attribute, 10);
             var compareHistoValues = new List<ValueCount>();
             for (int i = 0; i < compareValues.Length; i++)
                 compareHistoValues.Add(new ValueCount(compareValues[i], compareCounts[i]));
-            var compareAttributeData = new AttributeData(compareAttr, compareHistoValues, TypeCode.Int32);
-            compareHistogram.GenerateSegmentationsFromSortedGroups(compareHistoValues);
-            testManager.AddHistogram(compareHistogram);
+            testManager.AddMilestonesFromValueCount(compareAttr, compareHistoValues);
 
-            testGatherer.Data.Add(sourceAttr, sourceAttributeData);
-            testGatherer.Data.Add(compareAttr, compareAttributeData);
-
-            var segmentComparer = new SegmentationComparisonCalculator(testGatherer);
-            segmentComparer.DoHistogramComparisons(testManager.Histograms.Values.ToList()).Wait();
+            testManager.Comparer.DoMilestoneComparisons();
 
             return new TableAttributeEstimator(upperBounds, lowerBounds, testManager);
         }
@@ -334,42 +323,27 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
         {
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            TestDataGathereStub testGatherer = new TestDataGathereStub();
+            TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var sourceHistogram = new HistogramEquiDepth(sourceAttr.Table.TableName, sourceAttr.Attribute, 10);
             var sourceHistoValues = new List<ValueCount>();
             for (int i = 0; i < sourceValues.Length; i++)
                 sourceHistoValues.Add(new ValueCount(sourceValues[i], sourceCounts[i]));
-            var sourceAttributeData = new AttributeData(sourceAttr, sourceHistoValues, TypeCode.Int32);
-            sourceHistogram.GenerateSegmentationsFromSortedGroups(sourceHistoValues);
-            testManager.AddHistogram(sourceHistogram);
+            testManager.AddMilestonesFromValueCount(sourceAttr, sourceHistoValues);
 
             // Add Compare A table
-            var compareAHistogram = new HistogramEquiDepth(compareAttrA.Table.TableName, compareAttrA.Attribute, 10);
             var compareAHistoValues = new List<ValueCount>();
             for (int i = 0; i < compareValuesA.Length; i++)
                 compareAHistoValues.Add(new ValueCount(compareValuesA[i], compareCountsA[i]));
-            var compareAAttributeData = new AttributeData(compareAttrA, compareAHistoValues, TypeCode.Int32);
-            compareAHistogram.GenerateSegmentationsFromSortedGroups(compareAHistoValues);
-            testManager.AddHistogram(compareAHistogram);
+            testManager.AddMilestonesFromValueCount(compareAttrA, compareAHistoValues);
 
             // Add Compare B table
-            var compareBHistogram = new HistogramEquiDepth(compareAttrB.Table.TableName, compareAttrB.Attribute, 10);
             var compareBHistoValues = new List<ValueCount>();
             for (int i = 0; i < compareValuesB.Length; i++)
                 compareBHistoValues.Add(new ValueCount(compareValuesB[i], compareCountsB[i]));
-            var compareBAttributeData = new AttributeData(compareAttrB, compareBHistoValues, TypeCode.Int32);
-            compareBHistogram.GenerateSegmentationsFromSortedGroups(compareBHistoValues);
-            testManager.AddHistogram(compareBHistogram);
+            testManager.AddMilestonesFromValueCount(compareAttrB, compareBHistoValues);
 
-            testGatherer.Data.Add(sourceAttr, sourceAttributeData);
-            testGatherer.Data.Add(compareAttrA, compareAAttributeData);
-            testGatherer.Data.Add(compareAttrB, compareBAttributeData);
-
-            var segmentComparer = new SegmentationComparisonCalculator(testGatherer);
-            segmentComparer.DoHistogramComparisons(testManager.Histograms.Values.ToList()).Wait();
+            testManager.Comparer.DoMilestoneComparisons();
 
             return new TableAttributeEstimator(upperBounds, lowerBounds, testManager);
         }

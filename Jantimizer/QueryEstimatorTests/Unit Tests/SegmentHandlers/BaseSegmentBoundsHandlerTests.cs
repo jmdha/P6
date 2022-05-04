@@ -26,7 +26,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
 
             // ACT
             boundsHandler.AddOrReduceUpperBound(key, value);
@@ -46,7 +46,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceUpperBound(key, initialValue);
 
             // ACT
@@ -68,7 +68,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceUpperBound(key, initialValue);
 
             // ACT
@@ -90,7 +90,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
 
             // ACT
             boundsHandler.AddOrReduceLowerBound(key, value);
@@ -110,7 +110,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceLowerBound(key, initialValue);
 
             // ACT
@@ -132,7 +132,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceLowerBound(key, initialValue);
 
             // ACT
@@ -155,7 +155,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceUpperBound(addKey, value);
 
             // ACT
@@ -177,7 +177,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceUpperBound(addKey, value);
 
             // ACT
@@ -203,7 +203,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceUpperBound(addKey, value);
 
             // ACT
@@ -225,7 +225,7 @@ namespace QueryEstimatorTests.Unit_Tests.SegmentHandlers
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestHistogramManager());
+            ISegmentHandler boundsHandler = new TestSegmentBoundsHandler(upperBounds, lowerBounds, new TestMilestonerManager());
             boundsHandler.AddOrReduceLowerBound(addKey, value);
 
             // ACT

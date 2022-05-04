@@ -1,7 +1,7 @@
-﻿using Histograms.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryEstimator.PredicateBounders;
 using QueryEstimatorTests.Stubs;
+using Segmentator.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -204,12 +204,10 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
+            TestMilestonerManager testManager = new TestMilestonerManager();
             var histoValues = new List<ValueCount>();
             histoValues.Add(new ValueCount(expItem, 10));
-            histogram.GenerateSegmentationsFromSortedGroups(histoValues);
-            testManager.AddHistogram(histogram);
+            testManager.AddMilestonesFromValueCount(tableAttr, histoValues);
             SimpleFilterBounder bounder = new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
 
             // ACT
@@ -227,8 +225,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         {
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
-            TestHistogramManager testManager = new TestHistogramManager();
-            var histogram = new HistogramEquiDepth(tableAttr.Table.TableName, tableAttr.Attribute, 10);
+            TestMilestonerManager testManager = new TestMilestonerManager();
             if (overrideList == null)
             {
                 var histoValues = new List<ValueCount>();
@@ -238,12 +235,11 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
                 histoValues.Add(new ValueCount(30, 10));
                 histoValues.Add(new ValueCount(40, 10));
                 histoValues.Add(new ValueCount(50, 10));
-                histogram.GenerateSegmentationsFromSortedGroups(histoValues);
+                testManager.AddMilestonesFromValueCount(tableAttr, histoValues);
             }
             else
-                histogram.GenerateSegmentationsFromSortedGroups(overrideList);
+                testManager.AddMilestonesFromValueCount(tableAttr, overrideList);
 
-            testManager.AddHistogram(histogram);
             return new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
         }
 

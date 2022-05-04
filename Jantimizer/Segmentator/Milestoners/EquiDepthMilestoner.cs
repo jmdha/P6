@@ -36,7 +36,7 @@ namespace Segmentator.Milestoners
                 {
                     var newAttr = new TableAttribute(tableName, attributeName);
                     var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
-                    GenerateHistogramFromSorted(newAttr, data);
+                    AddMilestonesFromValueCount(newAttr, data);
                 }
             }
 
@@ -51,7 +51,7 @@ namespace Segmentator.Milestoners
             return new List<IMilestone>();
         }
 
-        private void GenerateHistogramFromSorted(TableAttribute attr, List<ValueCount> sorted)
+        public void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
         {
             long totalValues = 0;
             foreach (var value in sorted)
@@ -92,8 +92,14 @@ namespace Segmentator.Milestoners
                     }
                 }
             }
-            if (currentCount > 0 && currentStart != null)
+            if (currentCount == 0 && currentStart != null)
                 AddOrUpdate(attr, new Milestone(currentStart, currentCount));
+            if (currentCount > 0 && currentStart != null)
+            {
+                AddOrUpdate(attr, new Milestone(currentStart, currentCount - 1));
+                var addFinal = sorted[sorted.Count - 1];
+                AddOrUpdate(attr, new Milestone(addFinal.Value, 1));
+            }
         }
 
         public void ClearMilestones()
