@@ -1,4 +1,5 @@
-﻿using Histograms.Exceptions;
+﻿using Histograms.DepthCalculators;
+using Histograms.Exceptions;
 using Histograms.Models;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Histograms.HistogramSelectors
             throw new NotImplementedException("It makes no sense to call this method here! Use the one with depth");
         }
 
-        public IDepthHistogram GetHistogramDepthOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName, int depth)
+        public IDepthHistogram GetHistogramDepthOfTypeOrAlt(IDepthHistogram targetType, Type type, string tableName, string attributeName, IDepthCalculator depthCalculator)
         {
             if (targetType.AcceptedTypes.Contains(Type.GetTypeCode(type)))
                 return targetType;
@@ -34,13 +35,13 @@ namespace Histograms.HistogramSelectors
                 case TypeCode.UInt32:
                 case TypeCode.UInt64:
                 case TypeCode.Double:
-                    histogram = new HistogramEquiDepthVariance(tableName, attributeName, depth);
+                    histogram = new HistogramEquiDepthVariance(tableName, attributeName, depthCalculator);
                     break;
                 case TypeCode.String:
                 case TypeCode.Decimal:
                 case TypeCode.Boolean:
                 case TypeCode.DateTime:
-                    histogram = new HistogramEquiDepth(tableName, attributeName, depth);
+                    histogram = new HistogramEquiDepth(tableName, attributeName, depthCalculator);
                     break;
                 default:
                     throw new HistogramManagerErrorLogException(new ArgumentException($"Could not find a fitting histogram for TypeCode {Type.GetTypeCode(type)}!"));

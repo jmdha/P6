@@ -1,4 +1,5 @@
 ﻿using Histograms.Caches;
+using Histograms.DepthCalculators;
 using System.Data;
 using System.Text;
 
@@ -21,28 +22,30 @@ namespace Histograms.Models
             TypeCode.UInt32,
             TypeCode.UInt64,
         };
-        public int Depth { get; }
+        public IDepthCalculator DepthCalculator { get; }
 
-        public HistogramEquiDepth(string tableName, string attributeName, int depth) : base(tableName, attributeName)
+        public HistogramEquiDepth(string tableName, string attributeName, IDepthCalculator depthCalculator) : this(Guid.NewGuid(), tableName, attributeName, depthCalculator)
         {
-            HistogramId = Guid.NewGuid();
-            Depth = depth;
+        }
+        public HistogramEquiDepth(string tableName, string attributeName, int constDepth) : this(Guid.NewGuid(), tableName, attributeName, new ConstantDepth(constDepth))
+        {
         }
 
-        public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, int depth) : base(histogramId, tableName, attributeName)
+        public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, IDepthCalculator depthCalculator) : base(histogramId, tableName, attributeName)
         {
-            Depth = depth;
+            DepthCalculator = depthCalculator;
         }
 
         private void GenerateHistogramFromSorted(List<IComparable> sorted)
         {
-            for (int bStart = 0; bStart < sorted.Count; bStart += Depth)
+            var depth = DepthCalculator.GetDepth(sorted.GroupBy(x => x).Count(), sorted.Count);
+            for (int bStart = 0; bStart < sorted.Count; bStart += depth)
             {
                 IComparable startValue = sorted[bStart];
                 IComparable endValue = sorted[bStart];
                 int countValue = 1;
 
-                for (int bIter = bStart + 1; bIter < bStart + Depth && bIter < sorted.Count; bIter++)
+                for (int bIter = bStart + 1; bIter < bStart + depth && bIter < sorted.Count; bIter++)
                 {
                     countValue++;
                     endValue = sorted[bIter];
@@ -65,7 +68,7 @@ namespace Histograms.Models
 
         public override object Clone()
         {
-            var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, Depth);
+            var retObj = new HistogramEquiDepth(HistogramId, TableName, AttributeName, DepthCalculator);
             foreach (var bucket in Buckets)
                 if (bucket.Clone() is IHistogramBucket acc)
                     retObj.Buckets.Add(acc);
@@ -74,7 +77,7 @@ namespace Histograms.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() + HashCode.Combine(Depth);
+            return base.GetHashCode() + HashCode.Combine(DepthCalculator);
         }
     }
 }

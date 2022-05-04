@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Histograms.Models;
+using Histograms.DepthCalculators;
 
 namespace Histograms
 {
     public interface IDepthHistogramManager : IHistogramManager
     {
-        public int Depth { get; }
+        public IDepthCalculator DepthCalculator { get; }
     }
 }

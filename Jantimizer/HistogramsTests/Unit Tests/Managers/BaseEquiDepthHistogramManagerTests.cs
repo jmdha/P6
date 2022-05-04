@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models;
 using HistogramsTests.Stubs;
+using Histograms.DepthCalculators;
 
 namespace HistogramsTests.Unit_Tests.Managers
 {
@@ -24,11 +25,13 @@ namespace HistogramsTests.Unit_Tests.Managers
         public void Constructor_SetsProperties(int depth)
         {
             // ARRANGE
+            IDepthCalculator depthCalc = new ConstantDepth(depth);
             // ACT
-            EquiDepthHistogramManager manager = new EquiDepthHistogramManager(new DataGathererStub(), depth);
+            EquiDepthHistogramManager manager = new EquiDepthHistogramManager(new DataGathererStub(), depthCalc);
 
             // ASSERT
-            Assert.AreEqual(depth, manager.Depth);
+            Assert.AreEqual(depth, manager.DepthCalculator.GetDepth(5, 123));
+            Assert.AreEqual(depth, manager.DepthCalculator.GetDepth(643, 133));
         }
 
         #endregion

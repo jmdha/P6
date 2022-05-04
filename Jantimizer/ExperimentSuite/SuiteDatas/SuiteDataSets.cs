@@ -1,6 +1,7 @@
 ﻿using DatabaseConnector.Connectors;
 using ExperimentSuite.Models;
 using Histograms.DataGatherers;
+using Histograms.DepthCalculators;
 using Histograms.Managers;
 using QueryEstimator;
 using QueryPlanParser.Parsers;
@@ -27,8 +28,8 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLConnector = new MyConnector(mySQLConnectionProperties);
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthHistogramManager(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties), 
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
@@ -48,7 +49,7 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
@@ -60,7 +61,25 @@ namespace ExperimentSuite.SuiteDatas
                 mySQLEstimator);
             return mySQLModel;
         }
-
+        public static SuiteData GetMySQLSD_EquiDepth_DynamicDepth(JsonObject optionalTestSettings)
+        {
+            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
+            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
+            var mySQLPlanParser = new MySQLParser();
+            var mySQLHistoManager = new EquiDepthHistogramManager(
+                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
+                new DynamicDepth(useUniqueValueCount: false));
+            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
+            var mySQLModel = new SuiteData(
+                new TestSettings(mySQLConnectionProperties),
+                "EquiDepth_DynamicDepth",
+                "MYSQL",
+                mySQLConnector,
+                mySQLPlanParser,
+                mySQLHistoManager,
+                mySQLEstimator);
+            return mySQLModel;
+        }
         public static SuiteData GetMySQLSD_MinDepth(JsonObject optionalTestSettings)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
@@ -68,11 +87,30 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MinDepthHistogramManager(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
                 "MinDepth",
+                "MYSQL",
+                mySQLConnector,
+                mySQLPlanParser,
+                mySQLHistoManager,
+                mySQLEstimator);
+            return mySQLModel;
+        }
+        public static SuiteData GetMySQLSD_MinDepth_DynamicDepth(JsonObject optionalTestSettings)
+        {
+            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
+            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
+            var mySQLPlanParser = new MySQLParser();
+            var mySQLHistoManager = new MinDepthHistogramManager(
+                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
+                new DynamicDepth());
+            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
+            var mySQLModel = new SuiteData(
+                new TestSettings(mySQLConnectionProperties),
+                "MinDepth_DynamicDepth",
                 "MYSQL",
                 mySQLConnector,
                 mySQLPlanParser,
@@ -92,7 +130,7 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new EquiDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
@@ -112,11 +150,30 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new EquiDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
                 "EquiDepth",
+                "POSGRESQL",
+                postConnector,
+                postPlanParser,
+                postHistoManager,
+                postEstimator);
+            return postgresModel;
+        }
+        public static SuiteData GetPostgresSD_EquiDepth_DynamicDepth(JsonObject optionalTestSettings)
+        {
+            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
+            var postConnector = new PostgreSqlConnector(postConnectionProperties);
+            var postPlanParser = new PostgreSqlParser();
+            var postHistoManager = new EquiDepthHistogramManager(
+                new PostgresDataGatherer(postConnector.ConnectionProperties),
+                new DynamicDepth(useUniqueValueCount: false));
+            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
+            var postgresModel = new SuiteData(
+                new TestSettings(postConnectionProperties),
+                "EquiDepth_DynamicDepth",
                 "POSGRESQL",
                 postConnector,
                 postPlanParser,
@@ -132,11 +189,30 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new MinDepthHistogramManager(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
                 "MinDepth",
+                "POSGRESQL",
+                postConnector,
+                postPlanParser,
+                postHistoManager,
+                postEstimator);
+            return postgresModel;
+        }
+        public static SuiteData GetPostgresSD_MinDepth_DynamicDepth(JsonObject optionalTestSettings)
+        {
+            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
+            var postConnector = new PostgreSqlConnector(postConnectionProperties);
+            var postPlanParser = new PostgreSqlParser();
+            var postHistoManager = new MinDepthHistogramManager(
+                new PostgresDataGatherer(postConnector.ConnectionProperties),
+                new DynamicDepth());
+            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
+            var postgresModel = new SuiteData(
+                new TestSettings(postConnectionProperties),
+                "MinDepth_DynamicDepth",
                 "POSGRESQL",
                 postConnector,
                 postPlanParser,
@@ -149,23 +225,26 @@ namespace ExperimentSuite.SuiteDatas
 
         public static List<SuiteData> GetSuiteDatas(JsonObject optionalSettings)
         {
-            var pgDataDefault = GetPostgresSD_Default(optionalSettings);
-            var myDataDefault = GetMySQLSD_Default(optionalSettings);
-
-            var pgDataEquiDepth = GetPostgresSD_EquiDepth(optionalSettings);
-            var myDataEquiDepth = GetMySQLSD_EquiDepth(optionalSettings);
-
-            var pgDataMinDepth = GetPostgresSD_MinDepth(optionalSettings);
-            var myDataMinDepth = GetMySQLSD_MinDepth(optionalSettings);
-
             var connectorSet = new List<SuiteData>() {
-                pgDataDefault,
-                myDataDefault,
-                pgDataEquiDepth,
-                myDataEquiDepth,
-                pgDataMinDepth,
-                myDataMinDepth
+                // Default
+                GetPostgresSD_Default(optionalSettings),
+                GetMySQLSD_Default(optionalSettings),
+
+                // EquiDepth
+                GetPostgresSD_EquiDepth(optionalSettings),
+                GetPostgresSD_EquiDepth_DynamicDepth(optionalSettings),
+
+                GetMySQLSD_EquiDepth(optionalSettings),
+                GetMySQLSD_EquiDepth_DynamicDepth(optionalSettings),
+
+                // MinDepth
+                GetPostgresSD_MinDepth(optionalSettings),
+                GetPostgresSD_MinDepth_DynamicDepth(optionalSettings),
+
+                GetMySQLSD_MinDepth(optionalSettings),
+                GetMySQLSD_MinDepth_DynamicDepth(optionalSettings)
             };
+
             return connectorSet;
         }
 

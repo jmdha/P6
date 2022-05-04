@@ -1,5 +1,6 @@
 ﻿using Histograms.Caches;
 using Histograms.DataGatherers;
+using Histograms.DepthCalculators;
 using Histograms.HistogramSelectors;
 using Histograms.Models;
 using System;
@@ -14,27 +15,27 @@ namespace Histograms.Managers
 {
     public class MinDepthHistogramManager : BaseHistogramManager, IDepthHistogramManager
     {
-        public int Depth { get; }
+        public IDepthCalculator DepthCalculator { get; }
 
-        public MinDepthHistogramManager(IDataGatherer dataGatherer, int depth) : base(dataGatherer)
+        public MinDepthHistogramManager(IDataGatherer dataGatherer, IDepthCalculator depthCalculator) : base(dataGatherer)
         {
-            Depth = depth;
+            DepthCalculator = depthCalculator;
         }
 
         protected override async Task<IHistogram> CreateHistogramForAttribute(string tableName, string attributeName)
         {
             IDepthHistogramSelector<IDepthHistogram> selector = new DepthHistogramSelector();
             IDepthHistogram histogram = selector.GetHistogramDepthOfTypeOrAlt(
-                new HistogramMinDepth(tableName, attributeName, Depth),
+                new HistogramMinDepth(tableName, attributeName, DepthCalculator),
                 await DataGatherer.GetAttributeType(tableName, attributeName),
                 tableName,
                 attributeName,
-                Depth);
+                DepthCalculator);
             histogram.GenerateSegmentationsFromSortedGroups(await DataGatherer.GetSortedGroupsFromDb(tableName, attributeName));
             return histogram;
         }
 
         protected override string[] GetCacheHashString(string tableName, string attributeName, string columnHash) =>
-            new string[] { tableName, attributeName, columnHash, Depth.ToString(), RunnerName, ExperimentName, typeof(HistogramMinDepth).Name };
+            new string[] { tableName, attributeName, columnHash, DepthCalculator.GetHashCode().ToString(), RunnerName, ExperimentName, typeof(HistogramMinDepth).Name };
     }
 }

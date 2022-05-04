@@ -1,9 +1,10 @@
-﻿using System.Data;
+﻿using Histograms.DepthCalculators;
+using System.Data;
 
 namespace Histograms.Models
 {
     public interface IDepthHistogram : IHistogram
     {
-        public int Depth { get; }
+        public IDepthCalculator DepthCalculator { get; }
     }
 }
