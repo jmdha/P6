@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryEstimator", "Jantimize
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryEstimatorTests", "Jantimizer\QueryEstimatorTests\QueryEstimatorTests.csproj", "{E3952B93-B22D-4C22-8CFE-A0EA81372145}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Segmentator", "Jantimizer\Segmentator\Segmentator.csproj", "{259D61D6-34D6-4C40-A757-01E7DB1880AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Milestonator", "Jantimizer\Milestonator\Milestonator.csproj", "{259D61D6-34D6-4C40-A757-01E7DB1880AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

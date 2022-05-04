@@ -22,7 +22,6 @@
     <ProjectReference Include="..\QueryEstimator\QueryEstimator.csproj" />
     <ProjectReference Include="..\QueryPlanParser\QueryPlanParser.csproj" />
     <ProjectReference Include="..\ResultsSentinel\ResultsSentinel.csproj" />
-    <ProjectReference Include="..\Segmentator\Segmentator.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 
