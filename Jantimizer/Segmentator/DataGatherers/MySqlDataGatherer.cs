@@ -1,5 +1,5 @@
-﻿using Histograms.Caches;
-using Histograms.Models;
+﻿using DatabaseConnector.Connectors;
+using Segmentator.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,10 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Caches;
 using Tools.Models;
-using DatabaseConnector;
-using DatabaseConnector.Connectors;
+using Tools.Models.JsonModels;
 
-namespace Histograms.DataGatherers
+namespace Segmentator.DataGatherers
 {
     public class MySqlDataGatherer : BaseDataGatherer, IDataGatherer
     {
@@ -48,57 +47,20 @@ namespace Histograms.DataGatherers
                     .Select(r => ((string)r["COLUMN_NAME"]).ToLower());
         }
 
-        public override async Task<List<ValueCount>> GetSortedGroupsFromDb(string tableName, string attributeName)
+        public override async Task<List<ValueCount>> GetSortedGroupsFromDb(TableAttribute attr)
         {
             var sortedGroupsDs = new DataSet();
             using (var connector = new MyConnector(ConnectionProperties))
                 sortedGroupsDs = await connector.CallQueryAsync(@$"
                     SELECT
-                        `{attributeName}` AS val,
-                        COUNT(`{attributeName}`) AS c
-                    FROM `{tableName}` WHERE
-                        `{attributeName}` IS NOT NULL
-                    GROUP BY `{attributeName}`
+                        `{attr.Attribute.ToLower()}` AS val,
+                        COUNT(`{attr.Attribute.ToLower()}`) AS c
+                    FROM `{attr.Table.TableName.ToLower()}` WHERE
+                        `{attr.Attribute.ToLower()}` IS NOT NULL
+                    GROUP BY `{attr.Attribute.ToLower()}`
                 ");
 
             return GetValueCounts(sortedGroupsDs, "val", "c").OrderBy(x => x.Value).ToList();
-        }
-
-        public override async Task<string> GetTableAttributeColumnHash(string tableName, string attributeName)
-        {
-            return HashCode.Combine(tableName, attributeName).ToString();
-
-            // Disabled for now, just dont work with some of the larger datasets
-#pragma warning disable CS0162 // Unreachable code detected
-            var columnHash = new DataSet();
-            using (var connector = new MyConnector(ConnectionProperties))
-                columnHash = await connector.CallQueryAsync($"SET SESSION group_concat_max_len = 100000000000; SELECT md5(group_concat(md5(`{attributeName}`))) as hash FROM `{tableName}`;");
-            if (columnHash.Tables.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
-            if (columnHash.Tables[0].Rows.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
-            DataRow hashRow = columnHash.Tables[0].Rows[0];
-            if (!hashRow.Table.Columns.Contains("hash"))
-                throw new ArgumentNullException($"Error! The database did not return a hash value for the column '{tableName}.{attributeName}'");
-            string hashValue = (string)hashRow["hash"];
-            return hashValue;
-#pragma warning restore CS0162 // Unreachable code detected
-        }
-
-        public override async Task<Type> GetAttributeType(string tableName, string attributeName)
-        {
-            var result = new DataSet();
-            using (var connector = new MyConnector(ConnectionProperties))
-                result = await connector.CallQueryAsync($"SELECT `{attributeName}` FROM `{tableName}` LIMIT 1;");
-            if (result.Tables.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            if (result.Tables[0].Rows.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            if (result.Tables[0].Columns.Count == 0)
-                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{tableName}.{attributeName}'");
-            DataColumn rowResult = result.Tables[0].Columns[0];
-            Type typeValue = rowResult.DataType;
-            return typeValue;
         }
     }
 }
