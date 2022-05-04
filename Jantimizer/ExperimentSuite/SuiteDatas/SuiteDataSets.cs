@@ -2,9 +2,9 @@
 using ExperimentSuite.Models;
 using QueryEstimator;
 using QueryPlanParser.Parsers;
-using Segmentator.DataGatherers;
-using Segmentator.DepthCalculators;
-using Segmentator.Milestoners;
+using Milestoner.DataGatherers;
+using Milestoner.DepthCalculators;
+using Milestoner.Milestoners;
 using System;
 using System.Collections.Generic;
 using System.Linq;

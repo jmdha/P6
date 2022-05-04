@@ -1,4 +1,4 @@
-﻿using Segmentator.Models.Milestones;
+﻿using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Tools.Helpers;
 using Tools.Models.JsonModels;
 
-namespace Segmentator.MilestoneComparers
+namespace Milestoner.MilestoneComparers
 {
     public class MilestoneComparer : IMilestoneComparers
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
-namespace Segmentator.Models.Milestones
+namespace Milestoner.Models.Milestones
 {
     public interface IMilestone
     {

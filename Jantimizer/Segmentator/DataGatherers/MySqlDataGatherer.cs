@@ -1,5 +1,5 @@
 ﻿using DatabaseConnector.Connectors;
-using Segmentator.Models;
+using Milestoner.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,7 +10,7 @@ using Tools.Caches;
 using Tools.Models;
 using Tools.Models.JsonModels;
 
-namespace Segmentator.DataGatherers
+namespace Milestoner.DataGatherers
 {
     public class MySqlDataGatherer : BaseDataGatherer, IDataGatherer
     {

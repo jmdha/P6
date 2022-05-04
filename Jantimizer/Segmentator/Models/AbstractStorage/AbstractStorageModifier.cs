@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Segmentator.Models.AbstractStorage
+namespace Milestoner.Models.AbstractStorage
 {
     internal static class AbstractStorageModifier
     {

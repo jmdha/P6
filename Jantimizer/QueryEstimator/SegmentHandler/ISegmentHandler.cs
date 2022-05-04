@@ -1,5 +1,5 @@
-﻿using Segmentator;
-using Segmentator.Models.Milestones;
+﻿using Milestoner;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,8 +1,8 @@
-﻿using Segmentator.DataGatherers;
-using Segmentator.DepthCalculators;
-using Segmentator.MilestoneComparers;
-using Segmentator.Models;
-using Segmentator.Models.Milestones;
+﻿using Milestoner.DataGatherers;
+using Milestoner.DepthCalculators;
+using Milestoner.MilestoneComparers;
+using Milestoner.Models;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
-namespace Segmentator.Milestoners
+namespace Milestoner.Milestoners
 {
     public abstract class BaseMilestoner : IMilestoner
     {

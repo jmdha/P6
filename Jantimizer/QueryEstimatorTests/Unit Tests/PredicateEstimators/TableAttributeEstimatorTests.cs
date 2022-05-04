@@ -2,7 +2,7 @@
 using QueryEstimator.Models;
 using QueryEstimator.PredicateEstimators;
 using QueryEstimatorTests.Stubs;
-using Segmentator.Models;
+using Milestoner.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

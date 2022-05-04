@@ -1,6 +1,6 @@
 ﻿using QueryEstimator.Models;
 using QueryEstimator.PredicateEstimators;
-using Segmentator;
+using Milestoner;
 using Tools.Models.JsonModels;
 
 namespace QueryEstimator

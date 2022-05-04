@@ -1,9 +1,9 @@
-﻿using Segmentator.Models;
-using Segmentator;
-using Segmentator.DataGatherers;
-using Segmentator.DepthCalculators;
-using Segmentator.MilestoneComparers;
-using Segmentator.Models.Milestones;
+﻿using Milestoner.Models;
+using Milestoner;
+using Milestoner.DataGatherers;
+using Milestoner.DepthCalculators;
+using Milestoner.MilestoneComparers;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿using Segmentator.Models.AbstractStorage;
+﻿using Milestoner.Models.AbstractStorage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
-namespace Segmentator.Models.Milestones
+namespace Milestoner.Models.Milestones
 {
     public class Milestone : IMilestone
     {

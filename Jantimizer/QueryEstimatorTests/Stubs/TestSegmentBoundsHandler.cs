@@ -1,5 +1,5 @@
 ﻿using QueryEstimator.SegmentHandler;
-using Segmentator;
+using Milestoner;
 using System;
 using System.Collections.Generic;
 using System.Linq;

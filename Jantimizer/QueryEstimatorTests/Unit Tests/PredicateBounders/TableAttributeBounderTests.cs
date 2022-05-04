@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QueryEstimator.PredicateBounders;
 using QueryEstimatorTests.Stubs;
-using Segmentator.Models;
+using Milestoner.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

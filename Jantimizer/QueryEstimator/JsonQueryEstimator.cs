@@ -13,7 +13,7 @@ using QueryEstimator.PredicateScanners;
 using QueryEstimator.PredicateBounders;
 using QueryEstimator.Models.BoundResults;
 using QueryEstimator.Helpers;
-using Segmentator;
+using Milestoner;
 
 namespace QueryEstimator
 {

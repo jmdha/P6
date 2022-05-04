@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Segmentator.Models
+namespace Milestoner.Models
 {
     public class ValueCount
     {
