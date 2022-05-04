@@ -44,8 +44,8 @@ namespace Segmentator.Milestoners
                     {
                         if (currentCount + currentValueCount > depth)
                         {
-                            currentValueCount -= depth - currentCount;
-                            currentCount += currentValueCount;
+                            currentValueCount -= depth;
+                            currentCount += depth;
                         }
                         else
                         {

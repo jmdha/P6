@@ -24,6 +24,7 @@ namespace Segmentator.Milestoners
 
             Queue<ValueCount> groupQueue = new Queue<ValueCount>(sorted);
 
+            // Add all segment
             while (groupQueue.Count > 0)
             {
                 ValueCount currentGrp = groupQueue.Dequeue();
@@ -36,13 +37,22 @@ namespace Segmentator.Milestoners
                     count += groupQueue.Dequeue().Count;
                 }
 
-                if (groupQueue.Count == 1)
-                    AddOrUpdate(attr, new Milestone(minValue, count - 1));
-                else
-                    AddOrUpdate(attr, new Milestone(minValue, count));
+                AddOrUpdate(attr, new Milestone(minValue, count));
             }
+
+            // Make sure the last segment is there
             if (sorted.Count > 0)
-                AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
+            {
+                var list = GetIfThere(attr);
+                if (list.Count > 0)
+                {
+                    if (list[list.Count - 1].ElementsBeforeNextSegmentation > 1)
+                    {
+                        list[list.Count - 1].ElementsBeforeNextSegmentation--;
+                        AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
+                    }
+                }
+            }
         }
     }
 }

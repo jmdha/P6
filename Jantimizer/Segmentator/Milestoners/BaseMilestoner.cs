@@ -66,6 +66,14 @@ namespace Segmentator.Milestoners
                 Milestones.Add(attr, new List<IMilestone>() { milestone });
         }
 
+        internal List<IMilestone> GetIfThere(TableAttribute attr)
+        {
+            if (Milestones.ContainsKey(attr))
+                return Milestones[attr];
+            else
+                return new List<IMilestone>();
+        }
+
         public ulong GetAbstractMilestoneStorageBytes()
         {
             ulong result = 0;
