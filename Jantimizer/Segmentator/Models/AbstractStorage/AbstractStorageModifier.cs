@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Histograms.Models.Segmentations
+namespace Segmentator.Models.AbstractStorage
 {
     internal static class AbstractStorageModifier
     {
