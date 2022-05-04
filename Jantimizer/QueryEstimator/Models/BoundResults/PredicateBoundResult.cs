@@ -33,5 +33,10 @@ namespace QueryEstimator.Models.BoundResults
             UpperBound = res.UpperBound;
             LowerBound = res.LowerBound;
         }
+
+        public bool HaveChanged(Dictionary<TableAttribute, int> lowerBounds, Dictionary<TableAttribute, int> upperBounds)
+        {
+            return LowerBound != lowerBounds[Left] || UpperBound != upperBounds[Left];
+        }
     }
 }

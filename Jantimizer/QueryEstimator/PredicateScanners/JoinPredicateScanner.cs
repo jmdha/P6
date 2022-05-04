@@ -1,19 +1,23 @@
-﻿using QueryEstimator.Helpers;
+﻿using QueryEstimator.Exceptions;
+using QueryEstimator.Helpers;
 using QueryEstimator.Models.PredicateScanners;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
 
+[assembly: InternalsVisibleTo("QueryEstimatorTests")]
+
 namespace QueryEstimator.PredicateScanners
 {
-    internal class JoinPredicateScanner : IPredicateScanner<List<JoinNode>>
+    public class JoinPredicateScanner : IPredicateScanner<List<JoinNode>>
     {
         public Dictionary<Type, List<IPredicate>> Predicates { get; }
-        private List<TableAttribute> _usedAttributes;
-        private List<FilterPredicate> _baseFilters;
+        internal List<TableAttribute> _usedAttributes;
+        internal List<FilterPredicate> _baseFilters;
 
         public JoinPredicateScanner()
         {
@@ -38,20 +42,23 @@ namespace QueryEstimator.PredicateScanners
                     if (!foundAny)
                         foundAny = AddFilterIfValid(predicate);
                     if (!foundAny)
-                        throw new Exception("Impossible predicate detected.");
+                        throw new PredicateScannerException("Impossible predicate detected.", PredicateScannerErrorType.Unscannable);
                 }
             }
+
+            if (_usedAttributes.Count == 0)
+                throw new PredicateScannerException("No predicates in the join node!", PredicateScannerErrorType.NoTableAttributePrediacte);
 
             // Make sure filter attributes are used in the predicates
             foreach (var filter in _baseFilters)
             {
                 if (!_usedAttributes.Contains(filter.LeftTable))
-                    throw new Exception("Invalid filter! Cannot have a filter that is not included in any of the JOIN predicates!");
+                    throw new PredicateScannerException("Invalid filter! Cannot have a filter that is not included in any of the JOIN predicates!", PredicateScannerErrorType.IlligalFilter);
                 AddToDict<FilterPredicate>(new FilterPredicate(filter.LeftTable, filter.ConstantValue, filter.ComType));
             }
         }
 
-        private bool AddFilterIfValid(JoinPredicate predicate)
+        internal bool AddFilterIfValid(JoinPredicate predicate)
         {
             // Check if the filter is inverted, e.g. "50 < a.v"
             // If it is, add it but turn the order back to normal
@@ -74,16 +81,30 @@ namespace QueryEstimator.PredicateScanners
             return false;
         }
 
-        private bool AddPredicateIfValid(JoinPredicate predicate)
+        internal bool AddPredicateIfValid(JoinPredicate predicate)
         {
             if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
             {
-                AddToDict<TableAttributePredicate>(new TableAttributePredicate(
-                    predicate.LeftAttribute.Attribute,
-                    predicate.RightAttribute.Attribute,
-                    predicate.GetComType()));
-                _usedAttributes.Add(predicate.LeftAttribute.Attribute);
-                _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                if (_usedAttributes.Count > 0 && !_usedAttributes.Contains(predicate.LeftAttribute.Attribute) && !_usedAttributes.Contains(predicate.RightAttribute.Attribute))
+                    return false;
+
+                if (_usedAttributes.Contains(predicate.LeftAttribute.Attribute) && !_usedAttributes.Contains(predicate.RightAttribute.Attribute))
+                {
+                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                        predicate.RightAttribute.Attribute,
+                        predicate.LeftAttribute.Attribute,
+                        ComparisonTypeHelper.InvertType(predicate.GetComType())));
+                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                } 
+                else
+                {
+                    AddToDict<TableAttributePredicate>(new TableAttributePredicate(
+                        predicate.LeftAttribute.Attribute,
+                        predicate.RightAttribute.Attribute,
+                        predicate.GetComType()));
+                    _usedAttributes.Add(predicate.LeftAttribute.Attribute);
+                    _usedAttributes.Add(predicate.RightAttribute.Attribute);
+                }
                 return true;
             }
             return false;
