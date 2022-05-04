@@ -27,6 +27,9 @@ namespace Histograms.Models
         public HistogramEquiDepth(string tableName, string attributeName, IDepthCalculator depthCalculator) : this(Guid.NewGuid(), tableName, attributeName, depthCalculator)
         {
         }
+        public HistogramEquiDepth(string tableName, string attributeName, int constDepth) : this(Guid.NewGuid(), tableName, attributeName, new ConstantDepth(constDepth))
+        {
+        }
 
         public HistogramEquiDepth(Guid histogramId, string tableName, string attributeName, IDepthCalculator depthCalculator) : base(histogramId, tableName, attributeName)
         {
