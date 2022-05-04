@@ -7,7 +7,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models
 {
-    internal class SegmentResult : ISegmentResult
+    public class SegmentResult : ISegmentResult
     {
         public ISegmentResult Left { get; set; }
         public ISegmentResult Right { get; set; }

@@ -16,6 +16,7 @@ namespace QueryEstimator.Models.BoundResults
         public ComparisonType.Type ComType { get; }
         public int UpperBound { get; set; }
         public int LowerBound { get; set; }
+        public bool HaveChanged(Dictionary<TableAttribute, int> lowerBounds, Dictionary<TableAttribute, int> upperBounds);
 
         public void RecalculateBounds();
     }

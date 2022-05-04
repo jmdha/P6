@@ -2,6 +2,7 @@
 using Histograms.Models;
 using QueryEstimator.Models;
 using QueryEstimator.Models.BoundResults;
+using QueryEstimator.SegmentHandler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,13 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.PredicateBounders
 {
-    public class TableAttributeBounder : BasePredicateBounder<TableAttribute>
+    public class TableAttributeBounder : BaseSegmentBoundsHandler, IPredicateBounder<TableAttribute>
     {
-        private IHistogramSegmentationComparative? _lastEqual = null;
         public TableAttributeBounder(Dictionary<TableAttribute, int> upperBounds, Dictionary<TableAttribute, int> lowerBounds, IHistogramManager histogramManager) : base(upperBounds, lowerBounds, histogramManager)
         {
         }
 
-        public override IPredicateBoundResult<TableAttribute> Bound(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
+        public IPredicateBoundResult<TableAttribute> Bound(TableAttribute source, TableAttribute compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllSegmentsForAttribute(source);
@@ -27,16 +27,12 @@ namespace QueryEstimator.PredicateBounders
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             int newSourceUpperBound = currentSourceUpperBound;
 
-            // Only check for new bounds if the bound have not already been reduced to the max
-            if (currentSourceLowerBound < currentSourceUpperBound)
-            {
-                // Skip the first lower bound if the predicate is equal
-                if (type == ComparisonType.Type.Equal)
-                {
-                    _lastEqual = allSourceSegments[currentSourceLowerBound];
-                    currentSourceLowerBound++;
-                }
+            // Initialise the new source bounds for edge cases
 
+
+            // Only check for new bounds if the bound have not already been reduced to the max
+            if (currentSourceLowerBound <= currentSourceUpperBound)
+            {
                 // Check within the bounds until a given predicate is no longer correct
                 bool foundAny = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
@@ -45,10 +41,7 @@ namespace QueryEstimator.PredicateBounders
                     switch (type)
                     {
                         case ComparisonType.Type.Equal:
-                            if (_lastEqual == null)
-                                throw new ArgumentNullException("_lastEqual cannot be null");
-                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && _lastEqual.IsAnyLargerThanNoAlias(compare);
-                            _lastEqual = allSourceSegments[i];
+                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
                             break;
                         case ComparisonType.Type.More:
                         case ComparisonType.Type.EqualOrMore:
@@ -65,10 +58,23 @@ namespace QueryEstimator.PredicateBounders
                         newSourceUpperBound = i - 1;
                         break;
                     }
+                    else if (isAny && !foundAny && i == currentSourceUpperBound)
+                    {
+                        newSourceLowerBound = i;
+                        newSourceUpperBound = i;
+                        foundAny = true;
+                        break;
+                    }
                     else if (!isAny)
                         newSourceLowerBound = i;
                     else
                         foundAny = true;
+                }
+
+                if (!foundAny)
+                {
+                    newSourceLowerBound = currentSourceLowerBound;
+                    newSourceUpperBound = -1;
                 }
 
                 // Add to dictionary if not there

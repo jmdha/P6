@@ -7,7 +7,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models
 {
-    internal class ValueTableAttributeResult : ISegmentResult
+    public class ValueTableAttributeResult : ISegmentResult
     {
         public TableAttribute TableA { get; set; }
         public TableAttribute TableB { get; set; }
