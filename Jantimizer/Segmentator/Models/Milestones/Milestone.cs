@@ -63,6 +63,9 @@ namespace Segmentator.Models.Milestones
                 returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(value.GetTypeCode()));
             }
 
+            returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(LowestValue.GetType())));
+            returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(ElementsBeforeNextSegmentation.GetTypeCode()));
+
             return returnValue;
         }
     }
