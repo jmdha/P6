@@ -1,4 +1,6 @@
-﻿using Milestoner.Models.Milestones;
+﻿using Milestoner.DataGatherers;
+using Milestoner.Models;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,69 +14,71 @@ namespace Milestoner.MilestoneComparers
     public class MilestoneComparer : IMilestoneComparers
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
+        private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
 
-        public MilestoneComparer(Dictionary<TableAttribute, List<IMilestone>> milestones)
+        public MilestoneComparer(Dictionary<TableAttribute, List<IMilestone>> milestones, Dictionary<TableAttribute, List<ValueCount>> dataCache)
         {
             Milestones = milestones;
+            _dataCache = dataCache;
         }
 
         public void DoMilestoneComparisons()
         {
-            foreach (var milestoneList in Milestones)
+            foreach (var compareKey in Milestones.Keys)
             {
-                foreach (var milestone in milestoneList.Value)
+                if (_dataCache.ContainsKey(compareKey) && _dataCache[compareKey].Count > 0)
                 {
-                    if (!IsNumericType(milestone.LowestValue.GetType()))
-                        break;
-                    DoMilestoneComparison(milestone);
+                    var data = _dataCache[compareKey];
+                    foreach (var milestoneList in Milestones)
+                    {
+                        foreach (var sourceMilestone in milestoneList.Value)
+                        {
+                            // We really need to find a better solution for this!
+                            if (Type.GetTypeCode(sourceMilestone.LowestValue.GetType()) != Type.GetTypeCode(data[0].Value.GetType()))
+                                continue;
+
+                            DoMilestoneComparison(sourceMilestone, compareKey, data);
+                        }
+                    }
                 }
             }
         }
 
-        private void DoMilestoneComparison(IMilestone sourceMilestone)
+        private void DoMilestoneComparison(IMilestone sourceMilestone, TableAttribute compareKey, List<ValueCount> compareValues)
         {
-            foreach (var milestones in Milestones)
+            ulong smaller = 0;
+            ulong larger = 0;
+
+            foreach (var value in compareValues)
             {
-                ulong smaller = 0;
-                ulong larger = 0;
-                if (!IsNumericType(milestones.Value[0].LowestValue.GetType()))
-                    continue;
+                var checkValue = ConvertCompareTypes(sourceMilestone.LowestValue, value.Value);
+                if (checkValue.IsLessThan(sourceMilestone.LowestValue))
+                    smaller += (ulong)value.Count;
+                else if (checkValue.IsLargerThan(sourceMilestone.LowestValue))
+                    larger += (ulong)value.Count;
+            }
 
-                // We really need to find a better solution for this!
-                if (Type.GetTypeCode(milestones.Value[0].LowestValue.GetType()) != Type.GetTypeCode(sourceMilestone.LowestValue.GetType()))
-                    continue;
-
-                foreach (var milestone in milestones.Value)
-                {
-                    var checkValue = ConvertCompareTypes(sourceMilestone.LowestValue, milestone.LowestValue);
-                    if (checkValue.IsLessThan(sourceMilestone.LowestValue))
-                        smaller += (ulong)milestone.ElementsBeforeNextSegmentation;
-                    else if (checkValue.IsLargerThan(sourceMilestone.LowestValue))
-                        larger += (ulong)milestone.ElementsBeforeNextSegmentation;
-                }
-
-                if (smaller > 0)
-                {
-                    if (smaller < byte.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (byte)smaller);
-                    if (smaller < ushort.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (ushort)smaller);
-                    else if (smaller < uint.MaxValue)
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, (uint)smaller);
-                    else
-                        sourceMilestone.CountSmallerThan.AddOrUpdate(milestones.Key, smaller);
-                }
-                if (larger > 0)
-                {
-                    if (larger < byte.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (byte)larger);
-                    if (larger < ushort.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (ushort)larger);
-                    else if (larger < uint.MaxValue)
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, (uint)larger);
-                    else
-                        sourceMilestone.CountLargerThan.AddOrUpdate(milestones.Key, larger);
-                }
+            if (smaller > 0)
+            {
+                if (smaller < byte.MaxValue)
+                    sourceMilestone.CountSmallerThan.AddOrUpdate(compareKey, (byte)smaller);
+                if (smaller < ushort.MaxValue)
+                    sourceMilestone.CountSmallerThan.AddOrUpdate(compareKey, (ushort)smaller);
+                else if (smaller < uint.MaxValue)
+                    sourceMilestone.CountSmallerThan.AddOrUpdate(compareKey, (uint)smaller);
+                else
+                    sourceMilestone.CountSmallerThan.AddOrUpdate(compareKey, smaller);
+            }
+            if (larger > 0)
+            {
+                if (larger < byte.MaxValue)
+                    sourceMilestone.CountLargerThan.AddOrUpdate(compareKey, (byte)larger);
+                if (larger < ushort.MaxValue)
+                    sourceMilestone.CountLargerThan.AddOrUpdate(compareKey, (ushort)larger);
+                else if (larger < uint.MaxValue)
+                    sourceMilestone.CountLargerThan.AddOrUpdate(compareKey, (uint)larger);
+                else
+                    sourceMilestone.CountLargerThan.AddOrUpdate(compareKey, larger);
             }
         }
 
@@ -86,27 +90,6 @@ namespace Milestoner.MilestoneComparers
                 return (IComparable)Convert.ChangeType(compare, valueType);
 
             return compare;
-        }
-
-        private bool IsNumericType(Type type)
-        {
-            switch (Type.GetTypeCode(type))
-            {
-                case TypeCode.Byte:
-                case TypeCode.SByte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    return true;
-                default:
-                    return false;
-            }
         }
     }
 }

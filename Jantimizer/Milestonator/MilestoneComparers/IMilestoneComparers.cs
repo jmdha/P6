@@ -1,4 +1,5 @@
-﻿using Milestoner.Models.Milestones;
+﻿using Milestoner.DataGatherers;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -15,6 +15,7 @@ namespace Milestoner.Milestoners
     public abstract class BaseMilestoner : IMilestoner
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
+        private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
         public IMilestoneComparers Comparer { get; }
         public IDepthCalculator DepthCalculator { get; }
         public IDataGatherer DataGatherer { get; }
@@ -22,7 +23,8 @@ namespace Milestoner.Milestoners
         public BaseMilestoner(IDataGatherer dataGatherer, IDepthCalculator depthCalculator)
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
-            Comparer = new MilestoneComparer(Milestones);
+            _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
+            Comparer = new MilestoneComparer(Milestones, _dataCache);
             DepthCalculator = depthCalculator;
             DataGatherer = dataGatherer;
         }
@@ -36,11 +38,14 @@ namespace Milestoner.Milestoners
                 {
                     var newAttr = new TableAttribute(tableName, attributeName);
                     var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
+                    _dataCache.Add(newAttr, data);
                     AddMilestonesFromValueCount(newAttr, data);
                 }
             }
 
             Comparer.DoMilestoneComparisons();
+
+            _dataCache.Clear();
         }
 
         public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
@@ -55,6 +60,7 @@ namespace Milestoner.Milestoners
 
         public void ClearMilestones()
         {
+            _dataCache.Clear();
             Milestones.Clear();
         }
 
