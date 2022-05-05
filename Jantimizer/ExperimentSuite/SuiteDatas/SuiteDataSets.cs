@@ -23,6 +23,21 @@ namespace ExperimentSuite.SuiteDatas
 
         #region MySQL
 
+        public static Dictionary<string, Delegate> SuiteDatas = new Dictionary<string, Delegate>()
+        {
+            { "EquiDepth MYSQL", GetMySQLSD_EquiDepth },
+            { "EquiDepth POSGRESQL", GetPostgresSD_EquiDepth },
+
+            { "MinDepth MYSQL", GetMySQLSD_MinDepth },
+            { "MinDepth POSGRESQL", GetPostgresSD_MinDepth },
+
+            { "EquiDepth_SquareRootDynamicDepth MYSQL", GetMySQLSD_EquiDepth_DynamicDepth },
+            { "EquiDepth_SquareRootDynamicDepth POSGRESQL", GetPostgresSD_EquiDepth_DynamicDepth },
+
+            { "MinDepth_SquareRootDynamicDepth MYSQL", GetMySQLSD_MinDepth_DynamicDepth },
+            { "MinDepth_SquareRootDynamicDepth POSGRESQL", GetPostgresSD_MinDepth_DynamicDepth },
+        };
+
         public static SuiteData GetMySQLSD_EquiDepth(JsonObject optionalTestSettings)
         {
             var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
@@ -49,11 +64,14 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new EquiDepthMilestoner(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                new DynamicDepth(useUniqueValueCount: false));
+                new TotalSquareRootDynDepth(
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
-                "EquiDepth_DynamicDepth",
+                "EquiDepth_SquareRootDynamicDepth",
                 "MYSQL",
                 mySQLConnector,
                 mySQLPlanParser,
@@ -87,11 +105,14 @@ namespace ExperimentSuite.SuiteDatas
             var mySQLPlanParser = new MySQLParser();
             var mySQLHistoManager = new MinDepthMilestoner(
                 new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                new DynamicDepth());
+                new UniqueSquareRootDynDepth(
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
             var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var mySQLModel = new SuiteData(
                 new TestSettings(mySQLConnectionProperties),
-                "MinDepth_DynamicDepth",
+                "MinDepth_SquareRootDynamicDepth",
                 "MYSQL",
                 mySQLConnector,
                 mySQLPlanParser,
@@ -130,11 +151,14 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new EquiDepthMilestoner(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new DynamicDepth(useUniqueValueCount: false));
+                new UniqueSquareRootDynDepth(
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
-                "EquiDepth_DynamicDepth",
+                "EquiDepth_SquareRootDynamicDepth",
                 "POSGRESQL",
                 postConnector,
                 postPlanParser,
@@ -169,11 +193,14 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new MinDepthMilestoner(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new DynamicDepth());
+                new UniqueSquareRootDynDepth(
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
             var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
             var postgresModel = new SuiteData(
                 new TestSettings(postConnectionProperties),
-                "MinDepth_DynamicDepth",
+                "MinDepth_SquareRootDynamicDepth",
                 "POSGRESQL",
                 postConnector,
                 postPlanParser,
@@ -183,28 +210,5 @@ namespace ExperimentSuite.SuiteDatas
         }
 
         #endregion
-
-        public static List<SuiteData> GetSuiteDatas(JsonObject optionalSettings)
-        {
-            var connectorSet = new List<SuiteData>() {
-                // EquiDepth
-                GetPostgresSD_EquiDepth(optionalSettings),
-                GetPostgresSD_EquiDepth_DynamicDepth(optionalSettings),
-
-                GetMySQLSD_EquiDepth(optionalSettings),
-                GetMySQLSD_EquiDepth_DynamicDepth(optionalSettings),
-
-                // MinDepth
-                GetPostgresSD_MinDepth(optionalSettings),
-                GetPostgresSD_MinDepth_DynamicDepth(optionalSettings),
-
-                GetMySQLSD_MinDepth(optionalSettings),
-                GetMySQLSD_MinDepth_DynamicDepth(optionalSettings)
-            };
-
-            return connectorSet;
-        }
-
-
     }
 }

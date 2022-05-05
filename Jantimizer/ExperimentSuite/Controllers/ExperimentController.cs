@@ -60,7 +60,7 @@ namespace ExperimentSuite.Controllers
                         AddNewElement?.Invoke(GetSeperatorLabel(experiment.ExperimentName),0);
 
                         // Find fitting suite data
-                          var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
+                        //var connectorSet = SuiteDataSets.GetSuiteDatas(experiment.OptionalTestSettings);
 
                         // Setup labels
                         var awaitingLable = GetSeperatorLabel("Waiting...", 14);
@@ -70,8 +70,8 @@ namespace ExperimentSuite.Controllers
                         AddNewElement?.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         var delDict = GetTestRunnerDelegatesFromTestFiles(
                             experiment.ExperimentName, 
-                            experiment.PreRunData, 
-                            connectorSet, 
+                            experiment.PreRunData,
+                            experiment.OptionalTestSettings, 
                             testsPath, 
                             rootResultPath);
                         await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
@@ -82,12 +82,11 @@ namespace ExperimentSuite.Controllers
                         delDict = GetTestRunnerDelegatesFromTestFiles(
                             experiment.ExperimentName,
                             experiment.RunData,
-                            connectorSet,
+                            experiment.OptionalTestSettings,
                             testsPath,
                             rootResultPath);
                         await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
                         delDict.Clear();
-                        connectorSet.Clear();
 
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
@@ -128,25 +127,23 @@ namespace ExperimentSuite.Controllers
             CSVMerger.Merge<TestCaseTimeReport, TestCaseTimeReportMap>($"{path}/CaseTimes", ResultCSVFileName);
         }
 
-        private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, List<SuiteData> connectorSet, DirectoryInfo baseTestPath, string rootResultPath)
+        private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, JsonObject properties, DirectoryInfo baseTestPath, string rootResultPath)
         {
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
             foreach (TestRunData data in runData)
             {
-                foreach (SuiteData suitData in connectorSet)
+                var suitDataDelegate = SuiteDataSets.SuiteDatas[$"{data.ConnectorID} {data.ConnectorName}"];
+                var suitData = suitDataDelegate.DynamicInvoke(properties) as SuiteData;
+                if (suitData == null)
+                    throw new Exception("Invalid connector!");
+                foreach (string testFile in data.TestFiles)
                 {
-                    if (data.ConnectorName == suitData.Name && data.ConnectorID == suitData.ID)
-                    {
-                        foreach (string testFile in data.TestFiles)
-                        {
-                            var runFunc = CreateNewTestRunnerDelegate(testFile, experimentName, rootResultPath, suitData);
+                    var runFunc = CreateNewTestRunnerDelegate(testFile, experimentName, rootResultPath, suitData);
 
-                            if (returnTasks.ContainsKey(testFile))
-                                returnTasks[testFile].Add(runFunc);
-                            else
-                                returnTasks.Add(testFile, new List<Func<Task>>() { runFunc });
-                        }
-                    }
+                    if (returnTasks.ContainsKey(testFile))
+                        returnTasks[testFile].Add(runFunc);
+                    else
+                        returnTasks.Add(testFile, new List<Func<Task>>() { runFunc });
                 }
             }
             return returnTasks;
