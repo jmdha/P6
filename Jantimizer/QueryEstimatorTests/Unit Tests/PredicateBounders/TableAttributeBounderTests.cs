@@ -108,11 +108,6 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             4)]
         [DataRow(
             new int[] { 60, 65, 70, 80, 90 },
-            new int[] { 10, 20, 30, 40, 64 },
-            0,
-            -1)]
-        [DataRow(
-            new int[] { 60, 65, 70, 80, 90 },
             new int[] { 59, 64, 69, 79, 89 },
             0,
             3)]
