@@ -12,17 +12,33 @@ namespace ExperimentSuite.Models.ExperimentParsing
         public string ExperimentName { get; set; }
         public bool RunParallel { get; set; }
         public bool RunExperiment { get; set; }
-        public List<TestRunData> RunData { get; set; }
-        public List<TestRunData> PreRunData { get; set; }
+        public List<string> SetupFiles { get; set; }
+        public List<string> TestFiles { get; set; }
+        public List<string> ConnectorNames { get; set; }
+        public string MilestoneType { get; set; }
         public JsonObject OptionalTestSettings { get; set; }
 
-        public ExperimentData(string experimentName, bool runParallel, bool runExperiment, List<TestRunData> runData, List<TestRunData> preRunData, JsonObject optionalTestSettings)
+        public ExperimentData()
+        {
+            ExperimentName = "";
+            RunParallel = false;
+            RunExperiment = false;
+            SetupFiles = new List<string>();
+            TestFiles = new List<string>();
+            ConnectorNames = new List<string>();
+            MilestoneType = "";
+            OptionalTestSettings = new JsonObject();
+        }
+
+        public ExperimentData(string experimentName, bool runParallel, bool runExperiment, List<string> setupFiles, List<string> testFiles, List<string> connectorName, string milestoneType, JsonObject optionalTestSettings)
         {
             ExperimentName = experimentName;
             RunParallel = runParallel;
             RunExperiment = runExperiment;
-            RunData = runData;
-            PreRunData = preRunData;
+            SetupFiles = setupFiles;
+            TestFiles = testFiles;
+            ConnectorNames = connectorName;
+            MilestoneType = milestoneType;
             OptionalTestSettings = optionalTestSettings;
         }
     }

@@ -62,5 +62,21 @@ namespace Milestoner.DataGatherers
 
             return GetValueCounts(sortedGroupsDs, "val", "c").OrderBy(x => x.Value).ToList();
         }
+
+        public override async Task<TypeCode> GetTypeCodeFromDb(TableAttribute attribute)
+        {
+            var result = new DataSet();
+            using (var connector = new MyConnector(ConnectionProperties))
+                result = await connector.CallQueryAsync($"SELECT `{attribute.Attribute}` FROM `{attribute.Table.TableName}` LIMIT 1;");
+            if (result.Tables.Count == 0)
+                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{attribute}'");
+            if (result.Tables[0].Rows.Count == 0)
+                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{attribute}'");
+            if (result.Tables[0].Columns.Count == 0)
+                throw new ArgumentNullException($"Error! The database did not return a value for the attribute '{attribute}'");
+            DataColumn rowResult = result.Tables[0].Columns[0];
+            Type typeValue = rowResult.DataType;
+            return Type.GetTypeCode(typeValue);
+        }
     }
 }

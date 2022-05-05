@@ -2,6 +2,7 @@
 using Milestoner.DepthCalculators;
 using Milestoner.MilestoneComparers;
 using Milestoner.Models;
+using Milestoner.Models.AbstractStorage;
 using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ namespace Milestoner.Milestoners
     public abstract class BaseMilestoner : IMilestoner
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
+        private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
+        private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
         public IMilestoneComparers Comparer { get; }
         public IDepthCalculator DepthCalculator { get; }
         public IDataGatherer DataGatherer { get; }
@@ -22,28 +25,52 @@ namespace Milestoner.Milestoners
         public BaseMilestoner(IDataGatherer dataGatherer, IDepthCalculator depthCalculator)
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
-            Comparer = new MilestoneComparer(Milestones);
+            _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
+            _dataTypeCache = new Dictionary<TableAttribute, TypeCode>();
+            Comparer = new MilestoneComparer(Milestones, _dataCache, _dataTypeCache);
             DepthCalculator = depthCalculator;
             DataGatherer = dataGatherer;
         }
 
-        public async Task AddMilestonesFromDB()
+        public List<Func<Task>> CompareMilestonesWithDBDataTasks()
         {
+            // Note, this function is just for progressbars later
+            return Comparer.DoMilestoneComparisonsTasks();
+        }
+
+        public async Task<List<Func<Task>>> AddMilestonesFromDBTasks()
+        {
+            // Note, this function is just for progressbars later
+            var newList = new List<Func<Task>>();
             ClearMilestones();
-            foreach (string tableName in await DataGatherer.GetTableNamesInSchema())
+
+            // Get all tables and attributes from the database
+            var tableAttributes = new List<TableAttribute>();
+            foreach (var tableName in await DataGatherer.GetTableNamesInSchema())
             {
                 foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
                 {
-                    var newAttr = new TableAttribute(tableName, attributeName);
-                    var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
-                    AddMilestonesFromValueCount(newAttr, data);
+                    tableAttributes.Add(new TableAttribute(tableName, attributeName));
                 }
             }
 
-            Comparer.DoMilestoneComparisons();
+            // Make a Func to start gathering from the database later
+            foreach(var attr in tableAttributes)
+            {
+                Func<Task> runFunc = async () => {
+                    var data = await DataGatherer.GetSortedGroupsFromDb(attr);
+                    var dataTypeCode = await DataGatherer.GetTypeCodeFromDb(attr);
+                    _dataCache.Add(attr, data);
+                    _dataTypeCache.Add(attr, dataTypeCode);
+                    AddMilestonesFromValueCount(attr, data);
+                };
+                newList.Add(runFunc);
+            }
+
+            return newList;
         }
 
-        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
+        public List<IMilestone> GetMilestonesNoAlias(TableAttribute attr)
         {
             var tempAttr = new TableAttribute(attr.Table.TableName, attr.Attribute);
             if (Milestones.ContainsKey(tempAttr))
@@ -55,23 +82,14 @@ namespace Milestoner.Milestoners
 
         public void ClearMilestones()
         {
+            _dataCache.Clear();
+            _dataTypeCache.Clear();
             Milestones.Clear();
         }
 
-        internal void AddOrUpdate(TableAttribute attr, IMilestone milestone)
+        public void ClearDataCache()
         {
-            if (Milestones.ContainsKey(attr))
-                Milestones[attr].Add(milestone);
-            else
-                Milestones.Add(attr, new List<IMilestone>() { milestone });
-        }
-
-        internal List<IMilestone> GetIfThere(TableAttribute attr)
-        {
-            if (Milestones.ContainsKey(attr))
-                return Milestones[attr];
-            else
-                return new List<IMilestone>();
+            _dataCache.Clear();
         }
 
         public ulong GetAbstractMilestoneStorageBytes()
@@ -92,7 +110,7 @@ namespace Milestoner.Milestoners
             // Get all bytes from all segments.
             foreach (var segments in Milestones.Values)
                 foreach (var segment in segments)
-                    result += segment.GetTotalAbstractStorageUse() * (ulong)segment.ElementsBeforeNextSegmentation;
+                    result += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(segment.LowestValue.GetType()))) * (ulong)segment.ElementsBeforeNextSegmentation;
             // Converting from bit to bytes
             result = result / 8;
             return result;

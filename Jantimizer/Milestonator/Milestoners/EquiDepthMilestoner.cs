@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 using Tools.Models.JsonModels;
 
 namespace Milestoner.Milestoners
@@ -20,16 +21,15 @@ namespace Milestoner.Milestoners
 
         public override void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
         {
-            long totalValues = 0;
-            foreach (var value in sorted)
-                totalValues += value.Count;
-            var depth = DepthCalculator.GetDepth(sorted.Count, totalValues);
+            var depth = DepthCalculator.GetDepth(sorted.Count(), sorted.Sum(x => x.Count));
 
             IComparable? currentStart = null;
+            IComparable? currentEnd = null;
             long currentCount = 0;
             foreach (var value in sorted)
             {
                 long currentValueCount = value.Count;
+                currentEnd = value.Value;
 
                 while (currentValueCount > 0)
                 {
@@ -53,19 +53,17 @@ namespace Milestoner.Milestoners
                             currentValueCount = 0;
                         }
                         if (currentStart != null)
-                            AddOrUpdate(attr, new Milestone(currentStart, currentCount));
+                            Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
                         currentStart = null;
                         currentCount = 0;
                     }
                 }
             }
-            if (currentCount == 0 && currentStart != null)
-                AddOrUpdate(attr, new Milestone(currentStart, currentCount));
-            if (currentCount > 0 && currentStart != null)
+            if (currentCount == 0 && currentStart != null && currentEnd != null)
+                Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
+            if (currentCount > 0 && currentStart != null && currentEnd != null)
             {
-                AddOrUpdate(attr, new Milestone(currentStart, currentCount - 1));
-                var addFinal = sorted[sorted.Count - 1];
-                AddOrUpdate(attr, new Milestone(addFinal.Value, 1));
+                Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
             }
         }
     }

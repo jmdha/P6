@@ -13,5 +13,6 @@ namespace Milestoner.DataGatherers
         public Task<IEnumerable<string>> GetTableNamesInSchema();
         public Task<IEnumerable<string>> GetAttributeNamesForTable(string tableName);
         public Task<List<ValueCount>> GetSortedGroupsFromDb(TableAttribute attribute);
+        public Task<TypeCode> GetTypeCodeFromDb(TableAttribute attribute);
     }
 }

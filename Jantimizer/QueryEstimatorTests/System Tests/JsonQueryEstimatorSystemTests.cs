@@ -19,7 +19,7 @@ namespace QueryEstimatorTests.System_Tests
         // "(A JOIN B ON A.v < B.v)" : (60 * 10) + (60 * 10) + (60 * 10) + (50 * 10) + (40 * 10) + (30 * 10) = 3000
         // Followed by "... JOIN C ON B.v < C.v",
         //      flipped to most significant table: "...  JOIN C ON C.v >= B.v"
-        //      Then gives: 3000 (from above) * 50 (total rows within bounds of C.v) = 150.000 total rows estimation
+        //      Then gives: 3000 (from above) * 40 (total rows within bounds of C.v) = 120.000 total rows estimation
         public void Can_GetQueryEstimation_1()
         {
             // ARRANGE
@@ -48,7 +48,7 @@ namespace QueryEstimatorTests.System_Tests
             var result = estimator.GetQueryEstimation(query);
 
             // ASSERT
-            Assert.AreEqual(150000UL, result.EstimatedCardinality);
+            Assert.AreEqual(120000UL, result.EstimatedCardinality);
         }
 
         [TestMethod]
@@ -90,10 +90,10 @@ namespace QueryEstimatorTests.System_Tests
 
         [TestMethod]
         // SELECT * FROM (A JOIN B ON A.v = B.v) JOIN C ON B.v > C.v
-        // "(A JOIN B ON A.v = B.v)" : Count(A.v) * Count(B.v) = 20 * 30 = 600
+        // "(A JOIN B ON A.v = B.v)" : Count(A.v) * Count(B.v) = 20 * 20 = 400
         // Followed by "... JOIN C ON B.v > C.v",
         //      flipped to most significant table: "...  JOIN C ON C.v < B.v"
-        //      Then gives: 600 (from above) * 20 (total rows within bounds of C.v) = 12000 total rows estimation
+        //      Then gives: 400 (from above) * 20 (total rows within bounds of C.v) = 8000 total rows estimation
         public void Can_GetQueryEstimation_3()
         {
             // ARRANGE
@@ -122,15 +122,15 @@ namespace QueryEstimatorTests.System_Tests
             var result = estimator.GetQueryEstimation(query);
 
             // ASSERT
-            Assert.AreEqual(12000UL, result.EstimatedCardinality);
+            Assert.AreEqual(8000UL, result.EstimatedCardinality);
         }
 
         [TestMethod]
         // SELECT * FROM (A JOIN B ON A.v = B.v) JOIN C ON B.v = C.v
-        // "(A JOIN B ON A.v = B.v)" : 10 + 10 + 10 = 30
+        // "(A JOIN B ON A.v = B.v)" : 20 * 20 = 400
         // Followed by "... JOIN C ON B.v = C.v",
         //      flipped to most significant table: "...  JOIN C ON C.v = B.v"
-        //      Then gives: 30 (from above) * 0 (total rows within bounds of C.v) = 0 total rows estimation
+        //      Then gives: 400 (from above) * 0 (total rows within bounds of C.v) = 0 total rows estimation
         public void Can_GetQueryEstimation_4()
         {
             // ARRANGE
@@ -169,16 +169,16 @@ namespace QueryEstimatorTests.System_Tests
             TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var tabelAttr1HistoValues = GetTableAttr1Values();
-            testManager.AddMilestonesFromValueCount(tableAttr1, tabelAttr1HistoValues);
+            foreach(var value in GetTableAttr1Values())
+                testManager.AddMilestonesFromValueCountManual(tableAttr1, value.Value, value.Value, 10);
 
             // Add B table
-            var tabelAttr2HistoValues = GetTableAttr2Values();
-            testManager.AddMilestonesFromValueCount(tableAttr2, tabelAttr2HistoValues);
+            foreach (var value in GetTableAttr2Values())
+                testManager.AddMilestonesFromValueCountManual(tableAttr2, value.Value, value.Value, 10);
 
             // Add C table
-            var tabelAttr3HistoValues = GetTableAttr3Values();
-            testManager.AddMilestonesFromValueCount(tableAttr3, tabelAttr3HistoValues);
+            foreach (var value in GetTableAttr3Values())
+                testManager.AddMilestonesFromValueCountManual(tableAttr3, value.Value, value.Value, 10);
 
             testManager.Comparer.DoMilestoneComparisons();
 

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Tools.Models.JsonModels;
+using Tools.Helpers;
 
 namespace QueryEstimator.PredicateBounders
 {
@@ -26,9 +27,6 @@ namespace QueryEstimator.PredicateBounders
             int currentSourceUpperBound = GetUpperBoundOrAlt(source, allSourceSegments.Count - 1);
             int newSourceUpperBound = currentSourceUpperBound;
 
-            // Initialise the new source bounds for edge cases
-
-
             // Only check for new bounds if the bound have not already been reduced to the max
             if (currentSourceLowerBound <= currentSourceUpperBound)
             {
@@ -36,11 +34,13 @@ namespace QueryEstimator.PredicateBounders
                 bool foundAny = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
+                    if (!foundAny)
+                        newSourceLowerBound = i;
                     bool isAny = false;
                     switch (type)
                     {
                         case ComparisonType.Type.Equal:
-                            isAny = allSourceSegments[i].IsAnySmallerThanNoAlias(compare) && allSourceSegments[i].IsAnyLargerThanNoAlias(compare);
+                            isAny = allSourceSegments[i].IsAnyLargerThanNoAlias(compare) && allSourceSegments[i].IsAnySmallerThanNoAlias(compare);
                             break;
                         case ComparisonType.Type.More:
                         case ComparisonType.Type.EqualOrMore:
@@ -64,10 +64,14 @@ namespace QueryEstimator.PredicateBounders
                         foundAny = true;
                         break;
                     }
-                    else if (!isAny)
-                        newSourceLowerBound = i;
+                    else if (isAny && foundAny && i == currentSourceUpperBound)
+                    {
+                        newSourceUpperBound = i;
+                        break;
+                    }
                     else
-                        foundAny = true;
+                        if (isAny)
+                            foundAny = true;
                 }
 
                 if (!foundAny)

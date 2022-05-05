@@ -1,4 +1,5 @@
-﻿using Milestoner.Models.Milestones;
+﻿using Milestoner.DataGatherers;
+using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,7 @@ namespace Milestoner.MilestoneComparers
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         public void DoMilestoneComparisons();
+        public List<Func<Task>> DoMilestoneComparisonsTasks();
+        public void DoMilestoneComparison(TableAttribute tableAttribute);
     }
 }

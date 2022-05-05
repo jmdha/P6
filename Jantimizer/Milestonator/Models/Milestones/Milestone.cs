@@ -11,13 +11,15 @@ namespace Milestoner.Models.Milestones
     public class Milestone : IMilestone
     {
         public IComparable LowestValue { get; set; }
+        public IComparable HighestValue { get; set; }
         public long ElementsBeforeNextSegmentation { get; set; }
         public Dictionary<TableAttribute, IConvertible> CountSmallerThan { get; }
         public Dictionary<TableAttribute, IConvertible> CountLargerThan { get; }
 
-        public Milestone(IComparable lowestValue, long elementsBeforeNextSegmentation)
+        public Milestone(IComparable lowestValue, IComparable highestValue, long elementsBeforeNextSegmentation)
         {
             LowestValue = lowestValue;
+            HighestValue = highestValue;
             ElementsBeforeNextSegmentation = elementsBeforeNextSegmentation;
             CountSmallerThan = new Dictionary<TableAttribute, IConvertible>();
             CountLargerThan = new Dictionary<TableAttribute, IConvertible>();
@@ -64,6 +66,7 @@ namespace Milestoner.Models.Milestones
             }
 
             returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(LowestValue.GetType())));
+            returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(HighestValue.GetType())));
             returnValue += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(ElementsBeforeNextSegmentation.GetTypeCode()));
 
             return returnValue;

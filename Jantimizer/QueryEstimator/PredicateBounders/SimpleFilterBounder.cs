@@ -37,6 +37,12 @@ namespace QueryEstimator.PredicateBounders
                 // Convert the type to compare against to be the same as the one in the segments (assuming its correct)
                 compare = ConvertCompareTypes(allSourceSegments[currentSourceLowerBound], compare);
 
+                if (type == ComparisonType.Type.Equal)
+                {
+                    newSourceLowerBound = 0;
+                    newSourceUpperBound = -1;
+                }
+
                 // Check within the bounds until a given predicate is no longer correct
                 bool foundLower = false;
                 bool exitSentinel = false;
@@ -55,7 +61,7 @@ namespace QueryEstimator.PredicateBounders
                                 exitSentinel = true;
                             break;
                         case ComparisonType.Type.Less:
-                            if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
+                            if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
                             {
                                 if (newSourceUpperBound == currentSourceUpperBound)
                                     newSourceUpperBound = -1;
@@ -65,7 +71,7 @@ namespace QueryEstimator.PredicateBounders
                             newSourceUpperBound = i;
                             break;
                         case ComparisonType.Type.EqualOrLess:
-                            if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                            if (allSourceSegments[i].HighestValue.IsLargerThan(compare))
                             {
                                 if (newSourceUpperBound == currentSourceUpperBound)
                                     newSourceUpperBound = -1;
@@ -77,18 +83,16 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.Equal:
                             if (!foundLower)
                             {
-                                if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
+                                if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
                                 {
+                                    newSourceLowerBound = i;
+                                    newSourceUpperBound = i;
                                     foundLower = true;
                                 }
-                                if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
-                                    break;
-                                newSourceLowerBound = i;
-                                newSourceUpperBound = i;
                             }
                             else
                             {
-                                if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                                if (allSourceSegments[i].HighestValue.IsLargerThan(compare))
                                     exitSentinel = true;
                                 else 
                                     newSourceUpperBound = i;

@@ -24,7 +24,7 @@ namespace QueryEstimator.SegmentHandler
 
         public List<IMilestone> GetAllMilestonesForAttribute(TableAttribute attr)
         {
-            return Milestoner.GetSegmentsNoAlias(attr);
+            return Milestoner.GetMilestonesNoAlias(attr);
         }
 
         public void AddOrReduceUpperBound(TableAttribute key, int bound)

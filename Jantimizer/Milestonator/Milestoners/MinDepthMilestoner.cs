@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 using Tools.Models.JsonModels;
 
 namespace Milestoner.Milestoners
@@ -24,34 +25,22 @@ namespace Milestoner.Milestoners
 
             Queue<ValueCount> groupQueue = new Queue<ValueCount>(sorted);
 
-            // Add all segment
             while (groupQueue.Count > 0)
             {
                 ValueCount currentGrp = groupQueue.Dequeue();
 
                 IComparable minValue = currentGrp.Value;
+                IComparable maxValue = currentGrp.Value;
                 long count = currentGrp.Count;
 
                 while (count < depth && groupQueue.Count() > 0)
                 {
-                    count += groupQueue.Dequeue().Count;
+                    var addValue = groupQueue.Dequeue();
+                    maxValue = addValue.Value;
+                    count += addValue.Count;
                 }
 
-                AddOrUpdate(attr, new Milestone(minValue, count));
-            }
-
-            // Make sure the last segment is there
-            if (sorted.Count > 0)
-            {
-                var list = GetIfThere(attr);
-                if (list.Count > 0)
-                {
-                    if (list[list.Count - 1].ElementsBeforeNextSegmentation > 1)
-                    {
-                        list[list.Count - 1].ElementsBeforeNextSegmentation--;
-                        AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
-                    }
-                }
+                Milestones.AddOrUpdateList(attr, new Milestone(minValue, maxValue, count));
             }
         }
     }

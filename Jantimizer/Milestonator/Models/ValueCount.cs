@@ -20,10 +20,5 @@ namespace Milestoner.Models
         {
             return $"|{{value={Value}}}|={Count}";
         }
-
-        public override int GetHashCode()
-        {
-            return  HashCode.Combine(Value, Count);
-        }
     }
 }
