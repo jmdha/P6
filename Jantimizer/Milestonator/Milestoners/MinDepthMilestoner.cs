@@ -42,20 +42,6 @@ namespace Milestoner.Milestoners
 
                 AddOrUpdate(attr, new Milestone(minValue, maxValue, count));
             }
-
-            // Make sure the last segment is there
-            //if (sorted.Count > 0)
-            //{
-            //    var list = GetIfThere(attr);
-            //    if (list.Count > 0)
-            //    {
-            //        if (list[list.Count - 1].ElementsBeforeNextSegmentation > 1)
-            //        {
-            //            list[list.Count - 1].ElementsBeforeNextSegmentation--;
-            //            AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
-            //        }
-            //    }
-            //}
         }
     }
 }

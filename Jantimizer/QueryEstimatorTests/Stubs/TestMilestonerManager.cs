@@ -84,5 +84,20 @@ namespace QueryEstimatorTests.Stubs
                 return Milestones[tempAttr];
             return new List<IMilestone>();
         }
+
+        public Task<List<Func<Task>>> AddMilestonesFromDBTasks()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Func<Task>> CompareMilestonesWithDBDataTasks()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearDataCache()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

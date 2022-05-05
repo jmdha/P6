@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - EquiDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "MilestoneType": "EquiDepth",
       "ConnectorNames": [
         "POSGRESQL",
@@ -57,7 +57,7 @@
     {
       "ExperimentName": "Experiment Three - EquiDepth_TotalSquareDynDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "MilestoneType": "EquiDepth_TotalSquareDynDepth",
       "ConnectorNames": [
         "POSGRESQL",
