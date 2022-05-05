@@ -53,18 +53,12 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.More:
                             newSourceLowerBound = i;
                             if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
-                            {
                                 exitSentinel = true;
-                                break;
-                            }
                             break;
                         case ComparisonType.Type.EqualOrMore:
                             newSourceLowerBound = i;
                             if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
-                            {
                                 exitSentinel = true;
-                                break;
-                            }
                             break;
                         case ComparisonType.Type.Less:
                             if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
