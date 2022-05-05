@@ -11,7 +11,7 @@ namespace ExperimentSuite.Models
         public string ExperimentName { get; set; }
         public string Category { get; set; }
         public string CaseName { get; set; }
-        internal string DatabaseName { get; set; }
+        public string DatabaseName { get; set; }
         public ulong DatabasePredicted { get; set; }
         public ulong DatabaseActual { get; set; }
         public ulong EstimatorPredicted { get; set; }
