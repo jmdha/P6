@@ -39,8 +39,14 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
                 { attr2, new List<ValueCount>() { new ValueCount(10, 10), new ValueCount(20, 10), new ValueCount(30, 10) } },
                 { attr3, new List<ValueCount>() { new ValueCount(40, 10), new ValueCount(50, 10), new ValueCount(60, 10) } }
             };
+            Dictionary<TableAttribute, TypeCode> dataTypeCodes = new Dictionary<TableAttribute, TypeCode>()
+            {
+                { attr1, TypeCode.Int32 },
+                { attr2, TypeCode.Int32 },
+                { attr3, TypeCode.Int32 },
+            };
 
-            IMilestoneComparers comparer = new MilestoneComparer(milestones, data);
+            IMilestoneComparers comparer = new MilestoneComparer(milestones, data, dataTypeCodes);
 
             // ACT
             comparer.DoMilestoneComparisons();
@@ -95,8 +101,14 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
                 { attr2, new List<ValueCount>() { new ValueCount(10, 10), new ValueCount(20, 10), new ValueCount(30, 10) } },
                 { attr3, new List<ValueCount>() { new ValueCount(40, 10), new ValueCount(50, 10), new ValueCount(60, 10) } }
             };
+            Dictionary<TableAttribute, TypeCode> dataTypeCodes = new Dictionary<TableAttribute, TypeCode>()
+            {
+                { attr1, TypeCode.Int32 },
+                { attr2, TypeCode.Int32 },
+                { attr3, TypeCode.Int32 },
+            };
 
-            IMilestoneComparers comparer = new MilestoneComparer(milestones, data);
+            IMilestoneComparers comparer = new MilestoneComparer(milestones, data, dataTypeCodes);
 
             // ACT
             comparer.DoMilestoneComparisons();
@@ -140,16 +152,22 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
 
             Dictionary<TableAttribute, List<IMilestone>> milestones = new Dictionary<TableAttribute, List<IMilestone>>() {
                 { attr1, new List<IMilestone>() { new Milestone(0, 0, 10), new Milestone(10, 10, 10), new Milestone(20, 20, 10) } },
-                { attr2, new List<IMilestone>() { new Milestone("a", "a", 10), new Milestone("b", "b", 10), new Milestone("c", "c", 10) } },
+                { attr2, new List<IMilestone>() { new Milestone(20U, 20U, 10), new Milestone(30U, 30U, 10), new Milestone(40U, 40U, 10) } },
                 { attr3, new List<IMilestone>() { new Milestone(40, 40, 10), new Milestone(50, 50, 10), new Milestone(60, 60, 10) } }
             };
             Dictionary<TableAttribute, List<ValueCount>> data = new Dictionary<TableAttribute, List<ValueCount>>() {
                 { attr1, new List<ValueCount>() { new ValueCount(0, 10), new ValueCount(10, 10), new ValueCount(20, 10) } },
-                { attr2, new List<ValueCount>() { new ValueCount("a", 10), new ValueCount("b", 10), new ValueCount("c", 10) } },
+                { attr2, new List<ValueCount>() { new ValueCount(20U, 10), new ValueCount(30U, 10), new ValueCount(40U, 10) } },
                 { attr3, new List<ValueCount>() { new ValueCount(40, 10), new ValueCount(50, 10), new ValueCount(60, 10) } }
             };
+            Dictionary<TableAttribute, TypeCode> dataTypeCodes = new Dictionary<TableAttribute, TypeCode>()
+            {
+                { attr1, TypeCode.Int32 },
+                { attr2, TypeCode.UInt32 },
+                { attr3, TypeCode.Int32 },
+            };
 
-            IMilestoneComparers comparer = new MilestoneComparer(milestones, data);
+            IMilestoneComparers comparer = new MilestoneComparer(milestones, data, dataTypeCodes);
 
             // ACT
             comparer.DoMilestoneComparisons();

@@ -13,5 +13,7 @@ namespace Milestoner.MilestoneComparers
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         public void DoMilestoneComparisons();
+        public List<Task> DoMilestoneComparisonsTasks();
+        public void DoMilestoneComparison(TableAttribute tableAttribute);
     }
 }

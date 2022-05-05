@@ -16,6 +16,7 @@ namespace Milestoner.Milestoners
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
+        private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
         public IMilestoneComparers Comparer { get; }
         public IDepthCalculator DepthCalculator { get; }
         public IDataGatherer DataGatherer { get; }
@@ -24,7 +25,8 @@ namespace Milestoner.Milestoners
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
             _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
-            Comparer = new MilestoneComparer(Milestones, _dataCache);
+            _dataTypeCache = new Dictionary<TableAttribute, TypeCode>();
+            Comparer = new MilestoneComparer(Milestones, _dataCache, _dataTypeCache);
             DepthCalculator = depthCalculator;
             DataGatherer = dataGatherer;
         }
@@ -38,14 +40,17 @@ namespace Milestoner.Milestoners
                 {
                     var newAttr = new TableAttribute(tableName, attributeName);
                     var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
+                    var dataTypeCode = await DataGatherer.GetTypeCodeFromDb(newAttr);
                     _dataCache.Add(newAttr, data);
+                    _dataTypeCache.Add(newAttr, dataTypeCode);
                     AddMilestonesFromValueCount(newAttr, data);
                 }
             }
 
-            Comparer.DoMilestoneComparisons();
+            await Task.WhenAll(Comparer.DoMilestoneComparisonsTasks());
 
             _dataCache.Clear();
+            _dataTypeCache.Clear();
         }
 
         public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
@@ -61,6 +66,7 @@ namespace Milestoner.Milestoners
         public void ClearMilestones()
         {
             _dataCache.Clear();
+            _dataTypeCache.Clear();
             Milestones.Clear();
         }
 

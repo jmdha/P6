@@ -17,6 +17,7 @@ namespace QueryEstimatorTests.Stubs
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
+        private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
 
         public IMilestoneComparers Comparer { get; }
 
@@ -28,7 +29,8 @@ namespace QueryEstimatorTests.Stubs
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
             _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
-            Comparer = new MilestoneComparer(Milestones, _dataCache);
+            _dataTypeCache = new Dictionary<TableAttribute, TypeCode>();
+            Comparer = new MilestoneComparer(Milestones, _dataCache, _dataTypeCache);
         }
 
         public Task AddMilestonesFromDB()
@@ -46,6 +48,8 @@ namespace QueryEstimatorTests.Stubs
         {
             if (!_dataCache.ContainsKey(attr))
                 _dataCache[attr] = new List<ValueCount>();
+            if (!_dataTypeCache.ContainsKey(attr))
+                _dataTypeCache.Add(attr, Type.GetTypeCode(from.GetType()));
             _dataCache[attr].Add(new ValueCount(from, count));
             AddOrUpdate(attr, new Milestone(from, to, count));
         }

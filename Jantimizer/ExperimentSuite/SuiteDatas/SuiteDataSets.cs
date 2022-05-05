@@ -151,7 +151,7 @@ namespace ExperimentSuite.SuiteDatas
             var postPlanParser = new PostgreSqlParser();
             var postHistoManager = new EquiDepthMilestoner(
                 new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new UniqueSquareRootDynDepth(
+                new TotalSquareRootDynDepth(
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));

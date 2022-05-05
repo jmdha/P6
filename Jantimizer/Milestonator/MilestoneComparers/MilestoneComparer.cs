@@ -15,30 +15,45 @@ namespace Milestoner.MilestoneComparers
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
+        private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
 
-        public MilestoneComparer(Dictionary<TableAttribute, List<IMilestone>> milestones, Dictionary<TableAttribute, List<ValueCount>> dataCache)
+        public MilestoneComparer(Dictionary<TableAttribute, List<IMilestone>> milestones, Dictionary<TableAttribute, List<ValueCount>> dataCache, Dictionary<TableAttribute, TypeCode> dataTypeCache)
         {
             Milestones = milestones;
             _dataCache = dataCache;
+            _dataTypeCache = dataTypeCache;
+        }
+
+        public List<Task> DoMilestoneComparisonsTasks()
+        {
+            var newList = new List<Task>();
+            foreach (var tableAttribute in Milestones.Keys)
+                newList.Add(Task.Run(() => DoMilestoneComparison(tableAttribute)));
+            return newList;
         }
 
         public void DoMilestoneComparisons()
         {
-            foreach (var compareKey in Milestones.Keys)
+            foreach (var tableAttribute in Milestones.Keys)
             {
-                if (_dataCache.ContainsKey(compareKey) && _dataCache[compareKey].Count > 0)
-                {
-                    var data = _dataCache[compareKey];
-                    foreach (var milestoneList in Milestones)
-                    {
-                        foreach (var sourceMilestone in milestoneList.Value)
-                        {
-                            // We really need to find a better solution for this!
-                            if (Type.GetTypeCode(sourceMilestone.LowestValue.GetType()) != Type.GetTypeCode(data[0].Value.GetType()))
-                                continue;
+                DoMilestoneComparison(tableAttribute);
+            }
+        }
 
-                            DoMilestoneComparison(sourceMilestone, compareKey, data);
-                        }
+        public void DoMilestoneComparison(TableAttribute tableAttribute)
+        {
+            if (_dataCache.ContainsKey(tableAttribute) && _dataTypeCache.ContainsKey(tableAttribute))
+            {
+                if (!IsNumericType(_dataTypeCache[tableAttribute]))
+                    return;
+
+                foreach (var milestone in Milestones[tableAttribute])
+                {
+                    foreach (var otherTableAttribute in Milestones.Keys)
+                    {
+                        if (_dataTypeCache[otherTableAttribute] != _dataTypeCache[tableAttribute])
+                            continue;
+                        DoMilestoneComparison(milestone, otherTableAttribute, _dataCache[otherTableAttribute]);
                     }
                 }
             }
@@ -51,11 +66,9 @@ namespace Milestoner.MilestoneComparers
 
             foreach (var value in compareValues)
             {
-                var checkLowestValue = ConvertCompareTypes(sourceMilestone.LowestValue, value.Value);
-                var checkHighestValue = ConvertCompareTypes(sourceMilestone.HighestValue, value.Value);
-                if (checkHighestValue.IsLessThan(sourceMilestone.HighestValue))
+                if (value.Value.IsLessThan(sourceMilestone.HighestValue))
                     smaller += (ulong)value.Count;
-                else if (checkLowestValue.IsLargerThan(sourceMilestone.LowestValue))
+                else if (value.Value.IsLargerThan(sourceMilestone.LowestValue))
                     larger += (ulong)value.Count;
             }
 
@@ -91,6 +104,27 @@ namespace Milestoner.MilestoneComparers
                 return (IComparable)Convert.ChangeType(compare, valueType);
 
             return compare;
+        }
+
+        private bool IsNumericType(TypeCode typeCode)
+        {
+            switch (typeCode)
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

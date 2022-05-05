@@ -20,10 +20,7 @@ namespace Milestoner.Milestoners
 
         public override void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
         {
-            long totalValues = 0;
-            foreach (var value in sorted)
-                totalValues += value.Count;
-            var depth = DepthCalculator.GetDepth(sorted.Count, totalValues);
+            var depth = DepthCalculator.GetDepth(sorted.Count(), sorted.Sum(x => x.Count));
 
             IComparable? currentStart = null;
             IComparable? currentEnd = null;
@@ -63,12 +60,10 @@ namespace Milestoner.Milestoners
             }
             if (currentCount == 0 && currentStart != null && currentEnd != null)
                 AddOrUpdate(attr, new Milestone(currentStart, currentEnd, currentCount));
-            //if (currentCount > 0 && currentStart != null)
-            //{
-            //    AddOrUpdate(attr, new Milestone(currentStart, currentCount - 1));
-            //    var addFinal = sorted[sorted.Count - 1];
-            //    AddOrUpdate(attr, new Milestone(addFinal.Value, 1));
-            //}
+            if (currentCount > 0 && currentStart != null && currentEnd != null)
+            {
+                AddOrUpdate(attr, new Milestone(currentStart, currentEnd, currentCount));
+            }
         }
     }
 }
