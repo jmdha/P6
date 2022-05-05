@@ -30,9 +30,9 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
             var expLessThanAttr3Count = new int[] { 2, 3, 3 };
 
             Dictionary<TableAttribute, List<IMilestone>> milestones = new Dictionary<TableAttribute, List<IMilestone>>() {
-                { attr1, new List<IMilestone>() { new Milestone(0, 9, 10), new Milestone(10, 19, 10), new Milestone(20, 29, 10) } },
-                { attr2, new List<IMilestone>() { new Milestone(10, 19, 10), new Milestone(20, 29, 10), new Milestone(30, 39, 10) } },
-                { attr3, new List<IMilestone>() { new Milestone(40, 49, 10), new Milestone(50, 59, 10), new Milestone(60, 69, 10) } }
+                { attr1, new List<IMilestone>() { new Milestone(0, 0, 10), new Milestone(10, 10, 10), new Milestone(20, 20, 10) } },
+                { attr2, new List<IMilestone>() { new Milestone(10, 10, 10), new Milestone(20, 20, 10), new Milestone(30, 30, 10) } },
+                { attr3, new List<IMilestone>() { new Milestone(40, 40, 10), new Milestone(50, 50, 10), new Milestone(60, 60, 10) } }
             };
             Dictionary<TableAttribute, List<ValueCount>> data = new Dictionary<TableAttribute, List<ValueCount>>() {
                 { attr1, new List<ValueCount>() { new ValueCount(0, 10), new ValueCount(10, 10), new ValueCount(20, 10) } },
@@ -85,13 +85,13 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
             var expLessThanAttr3 = new ulong[] { 30, 20, 0 };
 
             Dictionary<TableAttribute, List<IMilestone>> milestones = new Dictionary<TableAttribute, List<IMilestone>>() {
-                { attr1, new List<IMilestone>() { new Milestone(0, 9, 10), new Milestone(10, 19, 10), new Milestone(20, 29, 10) } },
+                { attr1, new List<IMilestone>() { new Milestone(0, 0, 10), new Milestone(10, 10, 10), new Milestone(20, 20, 10) } },
                                                // Key 1                  Key 2                  Key 3
-                { attr2, new List<IMilestone>() { new Milestone(10, 19, 10), new Milestone(20, 29, 10), new Milestone(30, 39, 10) } },
-                { attr3, new List<IMilestone>() { new Milestone(40, 49, 10), new Milestone(50, 59, 10), new Milestone(60, 69, 10) } }
+                { attr2, new List<IMilestone>() { new Milestone(10, 10, 10), new Milestone(20, 20, 10), new Milestone(30, 30, 10) } },
+                { attr3, new List<IMilestone>() { new Milestone(40, 40, 10), new Milestone(50, 50, 10), new Milestone(60, 60, 10) } }
             };
             Dictionary<TableAttribute, List<ValueCount>> data = new Dictionary<TableAttribute, List<ValueCount>>() {
-                { attr1, new List<ValueCount>() { new ValueCount(0, 9), new ValueCount(9, 1), new ValueCount(10, 10), new ValueCount(20, 10) } },
+                { attr1, new List<ValueCount>() { new ValueCount(0, 10), new ValueCount(10, 10), new ValueCount(20, 10) } },
                 { attr2, new List<ValueCount>() { new ValueCount(10, 10), new ValueCount(20, 10), new ValueCount(30, 10) } },
                 { attr3, new List<ValueCount>() { new ValueCount(40, 10), new ValueCount(50, 10), new ValueCount(60, 10) } }
             };
@@ -139,9 +139,9 @@ namespace MilestonatorTests.UnitTests.MilestoneComparers
             TableAttribute attr3 = new TableAttribute("C", "v");
 
             Dictionary<TableAttribute, List<IMilestone>> milestones = new Dictionary<TableAttribute, List<IMilestone>>() {
-                { attr1, new List<IMilestone>() { new Milestone(0, 10, 10), new Milestone(10, 20, 10), new Milestone(20, 30, 10) } },
-                { attr2, new List<IMilestone>() { new Milestone("a", "b", 10), new Milestone("b", "c", 10), new Milestone("c", "d", 10) } },
-                { attr3, new List<IMilestone>() { new Milestone(40, 50, 10), new Milestone(50, 60, 10), new Milestone(60, 70, 10) } }
+                { attr1, new List<IMilestone>() { new Milestone(0, 0, 10), new Milestone(10, 10, 10), new Milestone(20, 20, 10) } },
+                { attr2, new List<IMilestone>() { new Milestone("a", "a", 10), new Milestone("b", "b", 10), new Milestone("c", "c", 10) } },
+                { attr3, new List<IMilestone>() { new Milestone(40, 40, 10), new Milestone(50, 50, 10), new Milestone(60, 60, 10) } }
             };
             Dictionary<TableAttribute, List<ValueCount>> data = new Dictionary<TableAttribute, List<ValueCount>>() {
                 { attr1, new List<ValueCount>() { new ValueCount(0, 10), new ValueCount(10, 10), new ValueCount(20, 10) } },
