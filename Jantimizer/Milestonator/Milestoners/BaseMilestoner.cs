@@ -18,7 +18,6 @@ namespace Milestoner.Milestoners
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
         private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
-        private List<TableAttribute> _tableAttributes;
         public IMilestoneComparers Comparer { get; }
         public IDepthCalculator DepthCalculator { get; }
         public IDataGatherer DataGatherer { get; }
@@ -28,7 +27,6 @@ namespace Milestoner.Milestoners
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
             _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
             _dataTypeCache = new Dictionary<TableAttribute, TypeCode>();
-            _tableAttributes = new List<TableAttribute>();
             Comparer = new MilestoneComparer(Milestones, _dataCache, _dataTypeCache);
             DepthCalculator = depthCalculator;
             DataGatherer = dataGatherer;
@@ -36,25 +34,28 @@ namespace Milestoner.Milestoners
 
         public List<Func<Task>> CompareMilestonesWithDBDataTasks()
         {
+            // Note, this function is just for progressbars later
             return Comparer.DoMilestoneComparisonsTasks();
         }
 
         public async Task<List<Func<Task>>> AddMilestonesFromDBTasks()
         {
+            // Note, this function is just for progressbars later
             var newList = new List<Func<Task>>();
             ClearMilestones();
 
             // Get all tables and attributes from the database
-            foreach(var tableName in await DataGatherer.GetTableNamesInSchema())
+            var tableAttributes = new List<TableAttribute>();
+            foreach (var tableName in await DataGatherer.GetTableNamesInSchema())
             {
                 foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
                 {
-                    _tableAttributes.Add(new TableAttribute(tableName, attributeName));
+                    tableAttributes.Add(new TableAttribute(tableName, attributeName));
                 }
             }
 
             // Make a Func to start gathering from the database later
-            foreach(var attr in _tableAttributes)
+            foreach(var attr in tableAttributes)
             {
                 Func<Task> runFunc = async () => {
                     var data = await DataGatherer.GetSortedGroupsFromDb(attr);
@@ -83,7 +84,6 @@ namespace Milestoner.Milestoners
         {
             _dataCache.Clear();
             _dataTypeCache.Clear();
-            _tableAttributes.Clear();
             Milestones.Clear();
         }
 

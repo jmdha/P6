@@ -145,6 +145,7 @@ namespace ExperimentSuite.Controllers
                 timer = TimerHelper.GetWatchAndStart();
                 await GenerateMilestones(RunData.Milestoner);
                 await BindMilestones(RunData.Milestoner);
+                RunData.Milestoner.ClearDataCache();
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
 

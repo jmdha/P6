@@ -26,6 +26,8 @@ namespace Milestoner.MilestoneComparers
 
         public List<Func<Task>> DoMilestoneComparisonsTasks()
         {
+            // Note, this function is just for progressbars later
+            // Make a list of Func's that can be used to calculate all the comparisons at the same time later
             var newList = new List<Func<Task>>();
             foreach (var tableAttribute in Milestones.Keys)
             {
@@ -37,28 +39,31 @@ namespace Milestoner.MilestoneComparers
 
         public void DoMilestoneComparisons()
         {
+            // Compare each TableAttribute
             foreach (var tableAttribute in Milestones.Keys)
             {
+                // Make sure this key is actually in the data caches
+                if (!_dataCache.ContainsKey(tableAttribute) || !_dataTypeCache.ContainsKey(tableAttribute))
+                    throw new Exception("Error! Cannot attempt comparing milestones with missing data!");
+                // If its not a number, just continue
+                if (!IsNumericType(_dataTypeCache[tableAttribute]))
+                    continue;
+
                 DoMilestoneComparison(tableAttribute);
             }
         }
 
         public void DoMilestoneComparison(TableAttribute tableAttribute)
         {
-            if (_dataCache.ContainsKey(tableAttribute) && _dataTypeCache.ContainsKey(tableAttribute))
+            foreach (var otherTableAttribute in Milestones.Keys)
             {
-                if (!IsNumericType(_dataTypeCache[tableAttribute]))
-                    return;
+                // If datatypes are not the same, skip
+                if (_dataTypeCache[otherTableAttribute] != _dataTypeCache[tableAttribute])
+                    continue;
 
+                // Do comparisons for each other valid attribute
                 foreach (var milestone in Milestones[tableAttribute])
-                {
-                    foreach (var otherTableAttribute in Milestones.Keys)
-                    {
-                        if (_dataTypeCache[otherTableAttribute] != _dataTypeCache[tableAttribute])
-                            continue;
-                        DoMilestoneComparison(milestone, otherTableAttribute, _dataCache[otherTableAttribute]);
-                    }
-                }
+                    DoMilestoneComparison(milestone, otherTableAttribute, _dataCache[otherTableAttribute]);
             }
         }
 
@@ -67,6 +72,7 @@ namespace Milestoner.MilestoneComparers
             ulong smaller = 0;
             ulong larger = 0;
 
+            // Compare the value against the "HighestValue" and "LowestValue" of the source milestone
             foreach (var value in compareValues)
             {
                 if (value.Value.IsLessThan(sourceMilestone.HighestValue))
@@ -75,6 +81,7 @@ namespace Milestoner.MilestoneComparers
                     larger += (ulong)value.Count;
             }
 
+            // Compress the value (if possible)
             if (smaller > 0)
             {
                 if (smaller < byte.MaxValue)
@@ -86,6 +93,7 @@ namespace Milestoner.MilestoneComparers
                 else
                     sourceMilestone.CountSmallerThan.AddOrUpdate(compareKey, smaller);
             }
+            // Compress the value (if possible)
             if (larger > 0)
             {
                 if (larger < byte.MaxValue)
@@ -97,16 +105,6 @@ namespace Milestoner.MilestoneComparers
                 else
                     sourceMilestone.CountLargerThan.AddOrUpdate(compareKey, larger);
             }
-        }
-
-        internal IComparable ConvertCompareTypes(IComparable segment, IComparable compare)
-        {
-            var compType = compare.GetType();
-            var valueType = segment.GetType();
-            if (compType != valueType)
-                return (IComparable)Convert.ChangeType(compare, valueType);
-
-            return compare;
         }
 
         private bool IsNumericType(TypeCode typeCode)
