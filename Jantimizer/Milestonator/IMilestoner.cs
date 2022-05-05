@@ -21,7 +21,7 @@ namespace Milestoner
 
         public ulong GetAbstractMilestoneStorageBytes();
         public ulong GetAbstractDatabaseStorageBytes();
-        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr);
+        public List<IMilestone> GetMilestonesNoAlias(TableAttribute attr);
         public Task<List<Func<Task>>> AddMilestonesFromDBTasks();
         public List<Func<Task>> CompareMilestonesWithDBDataTasks();
         public void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted);

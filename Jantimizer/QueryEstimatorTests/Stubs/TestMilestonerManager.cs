@@ -77,7 +77,7 @@ namespace QueryEstimatorTests.Stubs
                 Milestones.Add(attr, new List<IMilestone>() { milestone });
         }
 
-        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
+        public List<IMilestone> GetMilestonesNoAlias(TableAttribute attr)
         {
             var tempAttr = new TableAttribute(attr.Table.TableName, attr.Attribute);
             if (Milestones.ContainsKey(tempAttr))

@@ -44,6 +44,7 @@ namespace Milestoner.Milestoners
             var newList = new List<Func<Task>>();
             ClearMilestones();
 
+            // Get all tables and attributes from the database
             foreach(var tableName in await DataGatherer.GetTableNamesInSchema())
             {
                 foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
@@ -52,6 +53,7 @@ namespace Milestoner.Milestoners
                 }
             }
 
+            // Make a Func to start gathering from the database later
             foreach(var attr in _tableAttributes)
             {
                 Func<Task> runFunc = async () => {
@@ -67,7 +69,7 @@ namespace Milestoner.Milestoners
             return newList;
         }
 
-        public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
+        public List<IMilestone> GetMilestonesNoAlias(TableAttribute attr)
         {
             var tempAttr = new TableAttribute(attr.Table.TableName, attr.Attribute);
             if (Milestones.ContainsKey(tempAttr))
@@ -88,22 +90,6 @@ namespace Milestoner.Milestoners
         public void ClearDataCache()
         {
             _dataCache.Clear();
-        }
-
-        internal void AddOrUpdate(TableAttribute attr, IMilestone milestone)
-        {
-            if (Milestones.ContainsKey(attr))
-                Milestones[attr].Add(milestone);
-            else
-                Milestones.Add(attr, new List<IMilestone>() { milestone });
-        }
-
-        internal List<IMilestone> GetIfThere(TableAttribute attr)
-        {
-            if (Milestones.ContainsKey(attr))
-                return Milestones[attr];
-            else
-                return new List<IMilestone>();
         }
 
         public ulong GetAbstractMilestoneStorageBytes()

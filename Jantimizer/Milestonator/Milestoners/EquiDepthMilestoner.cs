@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tools.Helpers;
 using Tools.Models.JsonModels;
 
 namespace Milestoner.Milestoners
@@ -52,17 +53,17 @@ namespace Milestoner.Milestoners
                             currentValueCount = 0;
                         }
                         if (currentStart != null)
-                            AddOrUpdate(attr, new Milestone(currentStart, currentEnd, currentCount));
+                            Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
                         currentStart = null;
                         currentCount = 0;
                     }
                 }
             }
             if (currentCount == 0 && currentStart != null && currentEnd != null)
-                AddOrUpdate(attr, new Milestone(currentStart, currentEnd, currentCount));
+                Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
             if (currentCount > 0 && currentStart != null && currentEnd != null)
             {
-                AddOrUpdate(attr, new Milestone(currentStart, currentEnd, currentCount));
+                Milestones.AddOrUpdateList(attr, new Milestone(currentStart, currentEnd, currentCount));
             }
         }
     }
