@@ -69,10 +69,11 @@ namespace ExperimentSuite.Controllers
                         // Pre run data
                         AddNewElement?.Invoke(GetSeperatorLabel("Setup", 14), 1);
                         var delDict = GetTestRunnerDelegatesFromTestFiles(
-                            experiment.ExperimentName, 
-                            experiment.PreRunData,
-                            experiment.OptionalTestSettings, 
-                            testsPath, 
+                            experiment.ExperimentName,
+                            experiment.ConnectorNames,
+                            experiment.MilestoneType,
+                            experiment.SetupFiles,
+                            experiment.OptionalTestSettings,
                             rootResultPath);
                         await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
                         delDict.Clear();
@@ -81,9 +82,10 @@ namespace ExperimentSuite.Controllers
                         AddNewElement?.Invoke(GetSeperatorLabel("Tests", 14), 1);
                         delDict = GetTestRunnerDelegatesFromTestFiles(
                             experiment.ExperimentName,
-                            experiment.RunData,
+                            experiment.ConnectorNames,
+                            experiment.MilestoneType,
+                            experiment.TestFiles,
                             experiment.OptionalTestSettings,
-                            testsPath,
                             rootResultPath);
                         await TaskRunnerHelper.RunDelegates(delDict, experiment.RunParallel);
                         delDict.Clear();
@@ -127,16 +129,15 @@ namespace ExperimentSuite.Controllers
             CSVMerger.Merge<TestCaseTimeReport, TestCaseTimeReportMap>($"{path}/CaseTimes", ResultCSVFileName);
         }
 
-        private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<TestRunData> runData, JsonObject properties, DirectoryInfo baseTestPath, string rootResultPath)
+        private Dictionary<string, List<Func<Task>>> GetTestRunnerDelegatesFromTestFiles(string experimentName, List<string> connectorNames, string milestonerName, List<string> testFiles, JsonObject properties, string rootResultPath)
         {
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
-            foreach (TestRunData data in runData)
+            foreach (var connectorName in connectorNames)
             {
-                var suitDataDelegate = SuiteDataSets.SuiteDatas[$"{data.ConnectorID} {data.ConnectorName}"];
-                var suitData = suitDataDelegate.DynamicInvoke(properties) as SuiteData;
+                var suitData = SuiteDataSets.BuildSuiteData(connectorName, milestonerName, properties);
                 if (suitData == null)
                     throw new Exception("Invalid connector!");
-                foreach (string testFile in data.TestFiles)
+                foreach (string testFile in testFiles)
                 {
                     var runFunc = CreateNewTestRunnerDelegate(testFile, experimentName, rootResultPath, suitData);
 

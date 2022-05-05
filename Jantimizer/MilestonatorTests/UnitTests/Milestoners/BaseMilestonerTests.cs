@@ -10,5 +10,19 @@ namespace MilestonatorTests.UnitTests.Milestoners
     [TestClass]
     public class BaseMilestonerTests
     {
+        #region GetAbstractMilestoneStorageBytes
+
+        [TestMethod]
+        public void Can_GetAbstractMilestoneStorageBytes()
+        {
+            // ARRANGE
+
+            // ACT
+
+            // ASSERT
+
+        }
+
+        #endregion
     }
 }

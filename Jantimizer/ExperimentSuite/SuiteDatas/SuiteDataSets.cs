@@ -14,6 +14,10 @@ using System.Threading.Tasks;
 using Tools.Helpers;
 using Tools.Models;
 using Tools.Services;
+using DatabaseConnector;
+using QueryPlanParser;
+using Milestoner;
+using Tools.Models.JsonModels;
 
 namespace ExperimentSuite.SuiteDatas
 {
@@ -21,194 +25,151 @@ namespace ExperimentSuite.SuiteDatas
     {
         internal static SecretsService<MainWindow> secrets = new SecretsService<MainWindow>();
 
-        #region MySQL
-
-        public static Dictionary<string, Delegate> SuiteDatas = new Dictionary<string, Delegate>()
+        private static Dictionary<string, Delegate> _connectionProps = new Dictionary<string, Delegate>()
         {
-            { "EquiDepth MYSQL", GetMySQLSD_EquiDepth },
-            { "EquiDepth POSGRESQL", GetPostgresSD_EquiDepth },
-
-            { "MinDepth MYSQL", GetMySQLSD_MinDepth },
-            { "MinDepth POSGRESQL", GetPostgresSD_MinDepth },
-
-            { "EquiDepth_SquareRootDynamicDepth MYSQL", GetMySQLSD_EquiDepth_DynamicDepth },
-            { "EquiDepth_SquareRootDynamicDepth POSGRESQL", GetPostgresSD_EquiDepth_DynamicDepth },
-
-            { "MinDepth_SquareRootDynamicDepth MYSQL", GetMySQLSD_MinDepth_DynamicDepth },
-            { "MinDepth_SquareRootDynamicDepth POSGRESQL", GetPostgresSD_MinDepth_DynamicDepth },
+            { "MYSQL", GetMySQLConnectionProperties },
+            { "POSGRESQL", GetPostgresConnectionProperties }
         };
 
-        public static SuiteData GetMySQLSD_EquiDepth(JsonObject optionalTestSettings)
+        private static Dictionary<string, Delegate> _connectors = new Dictionary<string, Delegate>()
         {
-            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new EquiDepthMilestoner(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
-            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var mySQLModel = new SuiteData(
-                new TestSettings(mySQLConnectionProperties),
-                "EquiDepth",
-                "MYSQL",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLEstimator);
-            return mySQLModel;
+            { "MYSQL", GetMySQLConnector },
+            { "POSGRESQL", GetPostgresConnector },
+        };
+
+        private static Dictionary<string, Delegate> _parsers = new Dictionary<string, Delegate>()
+        {
+            { "MYSQL", GetMySQLPlanParser },
+            { "POSGRESQL", GetPostgresPlanParser }
+        };
+
+        private static Dictionary<string, Delegate> _milestoners = new Dictionary<string, Delegate>()
+        {
+            { "EquiDepth", GetMilestoner_EquiDepth },
+            { "MinDepth", GetMilestoner_MinDepth },
+            { "EquiDepth_TotalSquareDynDepth", GetMilestoner_EquiDepth_TotalSquare },
+            { "EquiDepth_UniqueSquareDynDepth", GetMilestoner_EquiDepth_UniqueSquare },
+            { "MinDepth_TotalSquareDynDepth", GetMilestoner_MinDepth_TotalSquare },
+            { "MinDepth_UniqueSquareDynDepth", GetMilestoner_MinDepth_UniqueSquare }
+        };
+
+        private static Dictionary<string, Delegate> _dataGatheres = new Dictionary<string, Delegate>()
+        {
+            { "MYSQL", GetMySQLDataGathere },
+            { "POSGRESQL", GetPostgresDataGathere }
+        };
+
+        private static Dictionary<string, Delegate> _estimators = new Dictionary<string, Delegate>()
+        {
+            { "JSON", GetJsonEstimator }
+        };
+
+        public static SuiteData BuildSuiteData(string connectorName, string milestoneName, JsonObject optionalTestSettings)
+        {
+            var connProperties = _connectionProps[connectorName].DynamicInvoke() as ConnectionProperties;
+            if (connProperties == null)
+                throw new ArgumentNullException("Could not build suite data!");
+            var connector = _connectors[connectorName].DynamicInvoke(connProperties) as IDbConnector;
+            if (connector == null)
+                throw new ArgumentNullException("Could not build suite data!");
+            var parser = _parsers[connectorName].DynamicInvoke() as IPlanParser;
+            if (parser == null)
+                throw new ArgumentNullException("Could not build suite data!");
+
+            var dataGathere = _dataGatheres[connectorName].DynamicInvoke(connProperties) as IDataGatherer;
+            if (dataGathere == null)
+                throw new ArgumentNullException("Could not build suite data!");
+            var milestoner = _milestoners[milestoneName].DynamicInvoke(dataGathere, optionalTestSettings) as IMilestoner;
+            if (milestoner == null)
+                throw new ArgumentNullException("Could not build suite data!");
+
+            var estimator = _estimators["JSON"].DynamicInvoke(milestoner, optionalTestSettings) as IQueryEstimator<JsonQuery>;
+            if (estimator == null)
+                throw new ArgumentNullException("Could not build suite data!");
+
+            return new SuiteData(
+                new TestSettings(connProperties),
+                milestoneName,
+                connectorName,
+                connector,
+                parser,
+                milestoner,
+                estimator
+                );
         }
-        public static SuiteData GetMySQLSD_EquiDepth_DynamicDepth(JsonObject optionalTestSettings)
+
+        // Connection properties
+        private static ConnectionProperties GetMySQLConnectionProperties() => new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
+        private static ConnectionProperties GetPostgresConnectionProperties() => new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
+        
+        // Connectors
+        private static IDbConnector GetMySQLConnector(ConnectionProperties props) => new MyConnector(props);
+        private static IDbConnector GetPostgresConnector(ConnectionProperties props) => new PostgreSqlConnector(props);
+        
+        // Plan Parsers
+        private static IPlanParser GetMySQLPlanParser() => new MySQLParser();
+        private static IPlanParser GetPostgresPlanParser() => new PostgreSqlParser();
+        
+        // Data Gatheres
+        private static IDataGatherer GetMySQLDataGathere(ConnectionProperties props) => new MySqlDataGatherer(props);
+        private static IDataGatherer GetPostgresDataGathere(ConnectionProperties props) => new PostgresDataGatherer(props);
+
+        // Estimators
+        private static IQueryEstimator<JsonQuery> GetJsonEstimator(IMilestoner milestoner, JsonObject optionalTestSettings) => new JsonQueryEstimator(milestoner, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
+
+        // Milestoners
+        private static IMilestoner GetMilestoner_EquiDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new EquiDepthMilestoner(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
+            return new EquiDepthMilestoner(
+                gathere,
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
+        }
+
+        private static IMilestoner GetMilestoner_MinDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
+        {
+            return new MinDepthMilestoner(
+                gathere,
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
+        }
+
+        private static IMilestoner GetMilestoner_EquiDepth_TotalSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
+        {
+            return new EquiDepthMilestoner(
+                gathere,
                 new TotalSquareRootDynDepth(
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
-            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var mySQLModel = new SuiteData(
-                new TestSettings(mySQLConnectionProperties),
-                "EquiDepth_SquareRootDynamicDepth",
-                "MYSQL",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLEstimator);
-            return mySQLModel;
         }
-        public static SuiteData GetMySQLSD_MinDepth(JsonObject optionalTestSettings)
+
+        private static IMilestoner GetMilestoner_EquiDepth_UniqueSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new MinDepthMilestoner(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
-            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var mySQLModel = new SuiteData(
-                new TestSettings(mySQLConnectionProperties),
-                "MinDepth",
-                "MYSQL",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLEstimator);
-            return mySQLModel;
-        }
-        public static SuiteData GetMySQLSD_MinDepth_DynamicDepth(JsonObject optionalTestSettings)
-        {
-            var mySQLConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("MYSQL"));
-            var mySQLConnector = new MyConnector(mySQLConnectionProperties);
-            var mySQLPlanParser = new MySQLParser();
-            var mySQLHistoManager = new MinDepthMilestoner(
-                new MySqlDataGatherer(mySQLConnector.ConnectionProperties),
+            return new EquiDepthMilestoner(
+                gathere,
                 new UniqueSquareRootDynDepth(
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
-            var mySQLEstimator = new JsonQueryEstimator(mySQLHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var mySQLModel = new SuiteData(
-                new TestSettings(mySQLConnectionProperties),
-                "MinDepth_SquareRootDynamicDepth",
-                "MYSQL",
-                mySQLConnector,
-                mySQLPlanParser,
-                mySQLHistoManager,
-                mySQLEstimator);
-            return mySQLModel;
         }
 
-        #endregion
-
-        #region Postgres
-
-        public static SuiteData GetPostgresSD_EquiDepth(JsonObject optionalTestSettings)
+        private static IMilestoner GetMilestoner_MinDepth_TotalSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new EquiDepthMilestoner(
-                new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
-            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var postgresModel = new SuiteData(
-                new TestSettings(postConnectionProperties),
-                "EquiDepth",
-                "POSGRESQL",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postEstimator);
-            return postgresModel;
-        }
-        public static SuiteData GetPostgresSD_EquiDepth_DynamicDepth(JsonObject optionalTestSettings)
-        {
-            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new EquiDepthMilestoner(
-                new PostgresDataGatherer(postConnector.ConnectionProperties),
+            return new MinDepthMilestoner(
+                gathere,
                 new TotalSquareRootDynDepth(
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
-            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var postgresModel = new SuiteData(
-                new TestSettings(postConnectionProperties),
-                "EquiDepth_SquareRootDynamicDepth",
-                "POSGRESQL",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postEstimator);
-            return postgresModel;
         }
 
-        public static SuiteData GetPostgresSD_MinDepth(JsonObject optionalTestSettings)
+        private static IMilestoner GetMilestoner_MinDepth_UniqueSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new MinDepthMilestoner(
-                new PostgresDataGatherer(postConnector.ConnectionProperties),
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
-            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var postgresModel = new SuiteData(
-                new TestSettings(postConnectionProperties),
-                "MinDepth",
-                "POSGRESQL",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postEstimator);
-            return postgresModel;
-        }
-        public static SuiteData GetPostgresSD_MinDepth_DynamicDepth(JsonObject optionalTestSettings)
-        {
-            var postConnectionProperties = new ConnectionProperties(secrets.GetSecretsItem("POSGRESQL"));
-            var postConnector = new PostgreSqlConnector(postConnectionProperties);
-            var postPlanParser = new PostgreSqlParser();
-            var postHistoManager = new MinDepthMilestoner(
-                new PostgresDataGatherer(postConnector.ConnectionProperties),
+            return new MinDepthMilestoner(
+                gathere,
                 new UniqueSquareRootDynDepth(
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
-            var postEstimator = new JsonQueryEstimator(postHistoManager, JsonHelper.GetValue<int>(optionalTestSettings, "MaxEstimatorSweeps"));
-            var postgresModel = new SuiteData(
-                new TestSettings(postConnectionProperties),
-                "MinDepth_SquareRootDynamicDepth",
-                "POSGRESQL",
-                postConnector,
-                postPlanParser,
-                postHistoManager,
-                postEstimator);
-            return postgresModel;
         }
-
-        #endregion
     }
 }
