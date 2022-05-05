@@ -2,6 +2,7 @@
 using Milestoner.DepthCalculators;
 using Milestoner.MilestoneComparers;
 using Milestoner.Models;
+using Milestoner.Models.AbstractStorage;
 using Milestoner.Models.Milestones;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Milestoner.Milestoners
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
         private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
         private Dictionary<TableAttribute, TypeCode> _dataTypeCache { get; }
+        private List<TableAttribute> _tableAttributes;
         public IMilestoneComparers Comparer { get; }
         public IDepthCalculator DepthCalculator { get; }
         public IDataGatherer DataGatherer { get; }
@@ -26,31 +28,43 @@ namespace Milestoner.Milestoners
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
             _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
             _dataTypeCache = new Dictionary<TableAttribute, TypeCode>();
+            _tableAttributes = new List<TableAttribute>();
             Comparer = new MilestoneComparer(Milestones, _dataCache, _dataTypeCache);
             DepthCalculator = depthCalculator;
             DataGatherer = dataGatherer;
         }
 
-        public async Task AddMilestonesFromDB()
+        public List<Func<Task>> CompareMilestonesWithDBDataTasks()
         {
+            return Comparer.DoMilestoneComparisonsTasks();
+        }
+
+        public async Task<List<Func<Task>>> AddMilestonesFromDBTasks()
+        {
+            var newList = new List<Func<Task>>();
             ClearMilestones();
-            foreach (string tableName in await DataGatherer.GetTableNamesInSchema())
+
+            foreach(var tableName in await DataGatherer.GetTableNamesInSchema())
             {
                 foreach (string attributeName in (await DataGatherer.GetAttributeNamesForTable(tableName)))
                 {
-                    var newAttr = new TableAttribute(tableName, attributeName);
-                    var data = await DataGatherer.GetSortedGroupsFromDb(newAttr);
-                    var dataTypeCode = await DataGatherer.GetTypeCodeFromDb(newAttr);
-                    _dataCache.Add(newAttr, data);
-                    _dataTypeCache.Add(newAttr, dataTypeCode);
-                    AddMilestonesFromValueCount(newAttr, data);
+                    _tableAttributes.Add(new TableAttribute(tableName, attributeName));
                 }
             }
 
-            await Task.WhenAll(Comparer.DoMilestoneComparisonsTasks());
+            foreach(var attr in _tableAttributes)
+            {
+                Func<Task> runFunc = async () => {
+                    var data = await DataGatherer.GetSortedGroupsFromDb(attr);
+                    var dataTypeCode = await DataGatherer.GetTypeCodeFromDb(attr);
+                    _dataCache.Add(attr, data);
+                    _dataTypeCache.Add(attr, dataTypeCode);
+                    AddMilestonesFromValueCount(attr, data);
+                };
+                newList.Add(runFunc);
+            }
 
-            _dataCache.Clear();
-            _dataTypeCache.Clear();
+            return newList;
         }
 
         public List<IMilestone> GetSegmentsNoAlias(TableAttribute attr)
@@ -67,7 +81,13 @@ namespace Milestoner.Milestoners
         {
             _dataCache.Clear();
             _dataTypeCache.Clear();
+            _tableAttributes.Clear();
             Milestones.Clear();
+        }
+
+        public void ClearDataCache()
+        {
+            _dataCache.Clear();
         }
 
         internal void AddOrUpdate(TableAttribute attr, IMilestone milestone)
@@ -104,7 +124,7 @@ namespace Milestoner.Milestoners
             // Get all bytes from all segments.
             foreach (var segments in Milestones.Values)
                 foreach (var segment in segments)
-                    result += segment.GetTotalAbstractStorageUse() * (ulong)segment.ElementsBeforeNextSegmentation;
+                    result += Convert.ToUInt64(AbstractStorageModifier.GetModifierOrOne(Type.GetTypeCode(segment.LowestValue.GetType()))) * (ulong)segment.ElementsBeforeNextSegmentation;
             // Converting from bit to bytes
             result = result / 8;
             return result;

@@ -24,11 +24,14 @@ namespace Milestoner.MilestoneComparers
             _dataTypeCache = dataTypeCache;
         }
 
-        public List<Task> DoMilestoneComparisonsTasks()
+        public List<Func<Task>> DoMilestoneComparisonsTasks()
         {
-            var newList = new List<Task>();
+            var newList = new List<Func<Task>>();
             foreach (var tableAttribute in Milestones.Keys)
-                newList.Add(Task.Run(() => DoMilestoneComparison(tableAttribute)));
+            {
+                Func<Task> runFunc = () => Task.Run(() => DoMilestoneComparison(tableAttribute));
+                newList.Add(runFunc);
+            }
             return newList;
         }
 

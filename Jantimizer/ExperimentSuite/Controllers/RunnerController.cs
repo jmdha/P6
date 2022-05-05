@@ -1,6 +1,7 @@
 ﻿using ExperimentSuite.Helpers;
 using ExperimentSuite.Models;
 using ExperimentSuite.UserControls;
+using Milestoner;
 using QueryEstimator;
 using QueryEstimator.Models;
 using QueryPlanParser.Caches;
@@ -142,8 +143,8 @@ namespace ExperimentSuite.Controllers
             {
                 PrintTestUpdate?.Invoke("Generating Histograms for:", RunData.Name);
                 timer = TimerHelper.GetWatchAndStart();
-                await RunData.Milestoner.AddMilestonesFromDB();
-                UpdateHistogramProgressBar?.Invoke(1,1);
+                await GenerateMilestones(RunData.Milestoner);
+                await BindMilestones(RunData.Milestoner);
                 TimeResults.Add(timer.StopAndGetReportFromWatch(ExperimentName, RunData.Name, RunnerName, "Generate Histograms"));
             }
 
@@ -338,6 +339,54 @@ namespace ExperimentSuite.Controllers
             DataInsertsFile = null;
             DataAnalyseFile = null;
             CleanupFile = null;
+        }
+
+        private async Task GenerateMilestones(IMilestoner milestoner)
+        {
+            milestoner.ClearMilestones();
+
+            List<Func<Task>> milestoneTasks = await milestoner.AddMilestonesFromDBTasks();
+
+            int value = 0;
+            int max = milestoneTasks.Count;
+
+            List<Task> results = new List<Task>();
+            foreach (Func<Task> funcs in milestoneTasks)
+            {
+                results.Add(funcs.Invoke());
+            }
+            UpdateHistogramProgressBar?.Invoke(value, max);
+            while (results.Any())
+            {
+                var finishedTask = await Task.WhenAny(results);
+                results.Remove(finishedTask);
+                await finishedTask;
+                UpdateHistogramProgressBar?.Invoke(value++);
+            }
+            UpdateHistogramProgressBar?.Invoke(max);
+        }
+
+        private async Task BindMilestones(IMilestoner milestoner)
+        {
+            List<Func<Task>> compareTasks = milestoner.CompareMilestonesWithDBDataTasks();
+
+            int value = 0;
+            int max = compareTasks.Count;
+
+            List<Task> results = new List<Task>();
+            foreach (Func<Task> funcs in compareTasks)
+            {
+                results.Add(funcs.Invoke());
+            }
+            UpdateHistogramProgressBar?.Invoke(value, max);
+            while (results.Any())
+            {
+                var finishedTask = await Task.WhenAny(results);
+                results.Remove(finishedTask);
+                await finishedTask;
+                UpdateHistogramProgressBar?.Invoke(value++);
+            }
+            UpdateHistogramProgressBar?.Invoke(max);
         }
     }
 }
