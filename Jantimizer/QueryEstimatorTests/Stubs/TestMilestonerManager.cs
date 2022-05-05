@@ -16,6 +16,7 @@ namespace QueryEstimatorTests.Stubs
     internal class TestMilestonerManager : IMilestoner
     {
         public Dictionary<TableAttribute, List<IMilestone>> Milestones { get; }
+        private Dictionary<TableAttribute, List<ValueCount>> _dataCache { get; }
 
         public IMilestoneComparers Comparer { get; }
 
@@ -26,7 +27,8 @@ namespace QueryEstimatorTests.Stubs
         public TestMilestonerManager()
         {
             Milestones = new Dictionary<TableAttribute, List<IMilestone>>();
-            Comparer = new MilestoneComparer(Milestones);
+            _dataCache = new Dictionary<TableAttribute, List<ValueCount>>();
+            Comparer = new MilestoneComparer(Milestones, _dataCache);
         }
 
         public Task AddMilestonesFromDB()
@@ -37,7 +39,15 @@ namespace QueryEstimatorTests.Stubs
         public void AddMilestonesFromValueCount(TableAttribute attr, List<ValueCount> sorted)
         {
             foreach (ValueCount value in sorted)
-                AddOrUpdate(attr, new Milestone(value.Value, value.Count));
+                AddOrUpdate(attr, new Milestone(value.Value, value.Value, value.Count));
+        }
+
+        public void AddMilestonesFromValueCountManual(TableAttribute attr, IComparable from, IComparable to, long count)
+        {
+            if (!_dataCache.ContainsKey(attr))
+                _dataCache[attr] = new List<ValueCount>();
+            _dataCache[attr].Add(new ValueCount(from, count));
+            AddOrUpdate(attr, new Milestone(from, to, count));
         }
 
         public void ClearMilestones()

@@ -133,20 +133,20 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         }
 
         [TestMethod]
-        [DataRow(19, 1, 1)]
+        [DataRow(19, 2, 2)]
         [DataRow(20, 2, 2)]
-        [DataRow(21, 2, 2)]
+        [DataRow(21, 3, 3)]
 
-        [DataRow(9, 0, 0)]
+        [DataRow(9, 1, 1)]
         [DataRow(10, 1, 1)]
-        [DataRow(11, 1, 1)]
+        [DataRow(11, 2, 2)]
 
         [DataRow(0, 0, 0)]
-        [DataRow(1, 0, 0)]
+        [DataRow(1, 1, 1)]
 
-        [DataRow(49, 4, 4)]
+        [DataRow(49, 5, 5)]
         [DataRow(50, 5, 5)]
-        [DataRow(51, 5, 5)]
+        [DataRow(51, 0, -1)]
         public void Can_Bound_Equal_1(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
@@ -162,9 +162,9 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         }
 
         [TestMethod]
-        [DataRow(19, 1, 1)]
+        [DataRow(19, 2, 2)]
         [DataRow(20, 2, 4)]
-        [DataRow(21, 4, 4)]
+        [DataRow(21, 5, 5)]
         public void Can_Bound_Equal_2(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE

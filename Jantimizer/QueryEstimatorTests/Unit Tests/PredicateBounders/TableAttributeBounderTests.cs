@@ -25,12 +25,12 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         [DataRow(
             new int[] { 10, 20, 30, 41, 50 },
             new int[] { 40, 50, 60, 70, 80 },
-            2,
+            3,
             4)]
         [DataRow(
             new int[] { 10, 40, 50, 60, 70 },
             new int[] { 40, 50, 60, 70, 80 },
-            1,
+            2,
             4)]
         [DataRow(
             new int[] { 10, 40, 50, 60, 70 },
@@ -110,7 +110,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             new int[] { 60, 65, 70, 80, 90 },
             new int[] { 10, 20, 30, 40, 64 },
             0,
-            0)]
+            -1)]
         [DataRow(
             new int[] { 60, 65, 70, 80, 90 },
             new int[] { 59, 64, 69, 79, 89 },
@@ -153,16 +153,12 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var sourceHistoValues = new List<ValueCount>();
-            foreach (var value in sourceValues)
-                sourceHistoValues.Add(new ValueCount(value, 10));
-            testManager.AddMilestonesFromValueCount(sourceAttr, sourceHistoValues);
+            for (int i = 0; i < sourceValues.Length; i++)
+                testManager.AddMilestonesFromValueCountManual(sourceAttr, sourceValues[i], sourceValues[i], 10);
 
             // Add B table
-            var compareHistoValues = new List<ValueCount>();
-            foreach (var value in compareValues)
-                compareHistoValues.Add(new ValueCount(value, 10));
-            testManager.AddMilestonesFromValueCount(compareAttr, compareHistoValues);
+            for (int i = 0; i < compareValues.Length; i++)
+                testManager.AddMilestonesFromValueCountManual(compareAttr, compareValues[i], compareValues[i], 10);
 
             testManager.Comparer.DoMilestoneComparisons();
 

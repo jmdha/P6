@@ -13,17 +13,18 @@ namespace MilestonatorTests.UnitTests.Models
     public class MilestoneTests
     {
         [TestMethod]
-        [DataRow(1,1)]
-        [DataRow(1.5,10)]
-        [DataRow(-40,200)]
-        public void Can_SetProperties(IComparable lowestValue, long elements)
+        [DataRow(1, 2, 1)]
+        [DataRow(1.5, 5.3,10)]
+        [DataRow(-40, 10,200)]
+        public void Can_SetProperties(IComparable lowestValue, IComparable highestValue, long elements)
         {
             // ARRANGE
             // ACT
-            IMilestone milestone = new Milestone(lowestValue, elements);
+            IMilestone milestone = new Milestone(lowestValue, highestValue, elements);
 
             // ASSERT
             Assert.AreEqual(lowestValue, milestone.LowestValue);
+            Assert.AreEqual(highestValue, milestone.HighestValue);
             Assert.AreEqual(elements, milestone.ElementsBeforeNextSegmentation);
         }
 
@@ -35,7 +36,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountSmallerThan.Add(new TableAttribute(tableName, attribute), expCount);
 
             // ACT
@@ -53,7 +54,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountLargerThan.Add(new TableAttribute(tableName, attribute), expCount);
 
             // ACT
@@ -73,7 +74,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountSmallerThan.Add(new TableAttribute(tableName, attribute), 10UL);
 
             // ACT
@@ -91,7 +92,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountSmallerThan.Add(new TableAttribute(tableName, attribute), 0);
 
             // ACT
@@ -113,7 +114,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountLargerThan.Add(new TableAttribute(tableName, attribute), 10UL);
 
             // ACT
@@ -131,7 +132,7 @@ namespace MilestonatorTests.UnitTests.Models
             // ARRANGE
             var attrOrg = new TableAttribute(new TableReferenceNode(tableName, alias), attribute);
 
-            IMilestone milestone = new Milestone(1, 1);
+            IMilestone milestone = new Milestone(1, 2, 1);
             milestone.CountLargerThan.Add(new TableAttribute(tableName, attribute), 0);
 
             // ACT
@@ -150,6 +151,7 @@ namespace MilestonatorTests.UnitTests.Models
         {
             // ARRANGE
             int lowestValue = 50;
+            int highestValue = 50;
             long count = 50;
 
             var value1Attr = new TableAttribute("A", "v");
@@ -159,7 +161,7 @@ namespace MilestonatorTests.UnitTests.Models
             var value3Attr = new TableAttribute("C", "v");
             ulong value3 = 1000;
 
-            IMilestone milestone = new Milestone(lowestValue, count);
+            IMilestone milestone = new Milestone(lowestValue, highestValue, count);
             milestone.CountLargerThan.Add(value1Attr, value1);
             milestone.CountLargerThan.Add(value2Attr, value2);
             milestone.CountLargerThan.Add(value3Attr, value3);
@@ -168,8 +170,8 @@ namespace MilestonatorTests.UnitTests.Models
             var result = milestone.GetTotalAbstractStorageUse();
 
             // ASSERT
-            // Size(lowestValue) + Size(count) + Size(value1) + Size(value2) + Size(value3)
-            Assert.AreEqual(32UL + 64UL + 64UL + 64UL + 64UL, result);
+            // Size(highestValue) + Size(lowestValue) + Size(count) + Size(value1) + Size(value2) + Size(value3)
+            Assert.AreEqual(32UL + 32UL + 64UL + 64UL + 64UL + 64UL, result);
         }
 
         [TestMethod]
@@ -177,6 +179,7 @@ namespace MilestonatorTests.UnitTests.Models
         {
             // ARRANGE
             int lowestValue = 50;
+            int highestValue = 60;
             long count = 50;
 
             var value1Attr = new TableAttribute("A", "v");
@@ -186,7 +189,7 @@ namespace MilestonatorTests.UnitTests.Models
             var value3Attr = new TableAttribute("C", "v");
             byte value3 = 1;
 
-            IMilestone milestone = new Milestone(lowestValue, count);
+            IMilestone milestone = new Milestone(lowestValue, highestValue, count);
             milestone.CountLargerThan.Add(value1Attr, value1);
             milestone.CountLargerThan.Add(value2Attr, value2);
             milestone.CountLargerThan.Add(value3Attr, value3);
@@ -195,8 +198,8 @@ namespace MilestonatorTests.UnitTests.Models
             var result = milestone.GetTotalAbstractStorageUse();
 
             // ASSERT
-            // Size(lowestValue) + Size(count) + Size(value1) + Size(value2) + Size(value3)
-            Assert.AreEqual(32UL + 64UL + 64UL + 32UL + 8UL, result);
+            // Size(highestValue) + Size(lowestValue) + Size(count) + Size(value1) + Size(value2) + Size(value3)
+            Assert.AreEqual(32UL + 32UL + 64UL + 64UL + 32UL + 8UL, result);
         }
 
         #endregion

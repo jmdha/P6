@@ -303,16 +303,12 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
             TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var sourceHistoValues = new List<ValueCount>();
-            for(int i = 0; i < sourceValues.Length; i++)
-                sourceHistoValues.Add(new ValueCount(sourceValues[i], sourceCounts[i]));
-            testManager.AddMilestonesFromValueCount(sourceAttr, sourceHistoValues);
+            for (int i = 0; i < sourceValues.Length; i++)
+                testManager.AddMilestonesFromValueCountManual(sourceAttr, sourceValues[i], sourceValues[i], 10);
 
             // Add B table
-            var compareHistoValues = new List<ValueCount>();
             for (int i = 0; i < compareValues.Length; i++)
-                compareHistoValues.Add(new ValueCount(compareValues[i], compareCounts[i]));
-            testManager.AddMilestonesFromValueCount(compareAttr, compareHistoValues);
+                testManager.AddMilestonesFromValueCountManual(compareAttr, compareValues[i], compareValues[i], 10);
 
             testManager.Comparer.DoMilestoneComparisons();
 
@@ -326,22 +322,16 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateEstimators
             TestMilestonerManager testManager = new TestMilestonerManager();
 
             // Add A table
-            var sourceHistoValues = new List<ValueCount>();
             for (int i = 0; i < sourceValues.Length; i++)
-                sourceHistoValues.Add(new ValueCount(sourceValues[i], sourceCounts[i]));
-            testManager.AddMilestonesFromValueCount(sourceAttr, sourceHistoValues);
+                testManager.AddMilestonesFromValueCountManual(sourceAttr, sourceValues[i], sourceValues[i], 10);
 
-            // Add Compare A table
-            var compareAHistoValues = new List<ValueCount>();
+            // Add B table
             for (int i = 0; i < compareValuesA.Length; i++)
-                compareAHistoValues.Add(new ValueCount(compareValuesA[i], compareCountsA[i]));
-            testManager.AddMilestonesFromValueCount(compareAttrA, compareAHistoValues);
+                testManager.AddMilestonesFromValueCountManual(compareAttrA, compareValuesA[i], compareValuesA[i], 10);
 
             // Add Compare B table
-            var compareBHistoValues = new List<ValueCount>();
             for (int i = 0; i < compareValuesB.Length; i++)
-                compareBHistoValues.Add(new ValueCount(compareValuesB[i], compareCountsB[i]));
-            testManager.AddMilestonesFromValueCount(compareAttrB, compareBHistoValues);
+                testManager.AddMilestonesFromValueCountManual(compareAttrB, compareValuesB[i], compareValuesB[i], 10);
 
             testManager.Comparer.DoMilestoneComparisons();
 

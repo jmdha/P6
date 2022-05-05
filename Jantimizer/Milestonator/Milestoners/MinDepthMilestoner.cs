@@ -30,29 +30,32 @@ namespace Milestoner.Milestoners
                 ValueCount currentGrp = groupQueue.Dequeue();
 
                 IComparable minValue = currentGrp.Value;
+                IComparable maxValue = currentGrp.Value;
                 long count = currentGrp.Count;
 
                 while (count < depth && groupQueue.Count() > 0)
                 {
-                    count += groupQueue.Dequeue().Count;
+                    var addValue = groupQueue.Dequeue();
+                    maxValue = addValue.Value;
+                    count += addValue.Count;
                 }
 
-                AddOrUpdate(attr, new Milestone(minValue, count));
+                AddOrUpdate(attr, new Milestone(minValue, maxValue, count));
             }
 
             // Make sure the last segment is there
-            if (sorted.Count > 0)
-            {
-                var list = GetIfThere(attr);
-                if (list.Count > 0)
-                {
-                    if (list[list.Count - 1].ElementsBeforeNextSegmentation > 1)
-                    {
-                        list[list.Count - 1].ElementsBeforeNextSegmentation--;
-                        AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
-                    }
-                }
-            }
+            //if (sorted.Count > 0)
+            //{
+            //    var list = GetIfThere(attr);
+            //    if (list.Count > 0)
+            //    {
+            //        if (list[list.Count - 1].ElementsBeforeNextSegmentation > 1)
+            //        {
+            //            list[list.Count - 1].ElementsBeforeNextSegmentation--;
+            //            AddOrUpdate(attr, new Milestone(sorted[sorted.Count - 1].Value, 1));
+            //        }
+            //    }
+            //}
         }
     }
 }

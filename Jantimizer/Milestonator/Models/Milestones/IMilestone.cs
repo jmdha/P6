@@ -10,6 +10,7 @@ namespace Milestoner.Models.Milestones
     public interface IMilestone
     {
         public IComparable LowestValue { get; set; }
+        public IComparable HighestValue { get; set; }
         public long ElementsBeforeNextSegmentation { get; set; }
 
         public Dictionary<TableAttribute, IConvertible> CountSmallerThan { get; }

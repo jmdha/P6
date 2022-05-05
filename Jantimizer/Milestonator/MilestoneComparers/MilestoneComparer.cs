@@ -51,10 +51,11 @@ namespace Milestoner.MilestoneComparers
 
             foreach (var value in compareValues)
             {
-                var checkValue = ConvertCompareTypes(sourceMilestone.LowestValue, value.Value);
-                if (checkValue.IsLessThan(sourceMilestone.LowestValue))
+                var checkLowestValue = ConvertCompareTypes(sourceMilestone.LowestValue, value.Value);
+                var checkHighestValue = ConvertCompareTypes(sourceMilestone.HighestValue, value.Value);
+                if (checkHighestValue.IsLessThan(sourceMilestone.HighestValue))
                     smaller += (ulong)value.Count;
-                else if (checkValue.IsLargerThan(sourceMilestone.LowestValue))
+                else if (checkLowestValue.IsLargerThan(sourceMilestone.LowestValue))
                     larger += (ulong)value.Count;
             }
 
