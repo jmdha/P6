@@ -45,5 +45,6 @@
         <StackPanel x:Name="CaseTimeReportPanel" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" Background="LightGray" Margin="5"/>
 
         <Button x:Name="CollapseButton" Content="Collapse" Margin="5" Grid.Column="3" Click="CollapseButton_Click"/>
+        <Button x:Name="ShowMilestonesButton" Content="Milestones" Margin="5" Grid.Column="3" Grid.Row="1" Click="ShowMilestonesButton_Click"/>
     </Grid>
 </UserControl>

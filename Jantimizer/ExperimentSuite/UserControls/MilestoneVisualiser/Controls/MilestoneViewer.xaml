@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="ExperimentSuite.UserControls.MilestoneVisualiser.Controls.MilestoneViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExperimentSuite.UserControls.MilestoneVisualiser.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Label x:Name="LowestValueLabel" Grid.Column="0" Content="Lowest Value"/>
+        <Label x:Name="HighestValueLabel" Grid.Column="1" Content="Highest Value"/>
+        <Label x:Name="CountValueLabel" Grid.Column="2" Content="Count in Milestone"/>
+
+        <ComboBox x:Name="LowerThanCombobox" Grid.Column="3" Text="Count Lower Than" DropDownOpened="LowerThanCombobox_DropDownOpened"/>
+        <ComboBox x:Name="HigherThanCombobox" Grid.Column="4" Text="Count Higher Than" DropDownOpened="HigherThanCombobox_DropDownOpened"/>
+    </Grid>
+</UserControl>

@@ -1,5 +1,6 @@
 ﻿using ExperimentSuite.Controllers;
 using ExperimentSuite.Models;
+using ExperimentSuite.UserControls.MilestoneVisualiser;
 using QueryPlanParser.Caches;
 using QueryPlanParser.Models;
 using System;
@@ -144,6 +145,12 @@ namespace ExperimentSuite.UserControls
                 RunnerGrid.Height = CollapsedSize;
             else
                 RunnerGrid.Height = ExpandedSize;
+        }
+
+        private void ShowMilestonesButton_Click(object sender, RoutedEventArgs e)
+        {
+            var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner);
+            milestoneView.Show();
         }
     }
 }
