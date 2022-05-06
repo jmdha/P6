@@ -17,8 +17,8 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
-        "BasicTests_ConstantNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
@@ -45,8 +45,8 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
-        "BasicTests_ConstantNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
@@ -73,8 +73,8 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
-        "BasicTests_ConstantNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
@@ -103,8 +103,8 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
-        "BasicTests_ConstantNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
