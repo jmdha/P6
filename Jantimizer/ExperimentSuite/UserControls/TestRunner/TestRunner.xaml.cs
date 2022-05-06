@@ -73,7 +73,43 @@ namespace ExperimentSuite.UserControls
             if (RunnerStartedEvent != null)
                 RunnerStartedEvent.Invoke(this);
             await controller.Run();
+
+            if (controller.Results.Count > 0)
+            {
+                decimal totalEstimatorAcc = 0;
+                foreach (var result in controller.Results)
+                    totalEstimatorAcc += result.EstimatorAcc;
+                totalEstimatorAcc /= controller.Results.Count;
+
+                UpdateLabelWithColor(TotalEstimatorAccuracyLabel, totalEstimatorAcc, "Estimator total accuracy:");
+
+                decimal totalDatabaseAcc = 0;
+                foreach (var result in controller.Results)
+                    totalDatabaseAcc += result.DatabaseAcc;
+                totalDatabaseAcc /= controller.Results.Count;
+
+                UpdateLabelWithColor(TotalDatabaseAccuracyLabel, totalDatabaseAcc, "Database total accuracy:");
+            }
+
             controller.Dispose();
+        }
+
+        private void UpdateLabelWithColor(Label control, decimal totalAcc, string additionalText)
+        {
+            if (totalAcc < 15)
+                control.Foreground = Brushes.Red;
+            else if (totalAcc < 30)
+                control.Foreground = Brushes.DarkOrange;
+            else if (totalAcc < 50)
+                control.Foreground = Brushes.Orange;
+            else if (totalAcc < 80)
+                control.Foreground = Brushes.Yellow;
+            else if (totalAcc < 90)
+                control.Foreground = Brushes.DarkGreen;
+            else
+                control.Foreground = Brushes.Green;
+
+            control.Content = $"{additionalText} {Math.Round(totalAcc, 2)}%";
         }
 
         private void UpdateHistogramProgressBar(double value, double max = 0)
