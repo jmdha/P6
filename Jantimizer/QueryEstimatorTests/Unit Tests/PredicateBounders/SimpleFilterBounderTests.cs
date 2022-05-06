@@ -133,18 +133,18 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         }
 
         [TestMethod]
-        [DataRow(19, 2, 2)]
+        [DataRow(19, 0, -1)]
         [DataRow(20, 2, 2)]
-        [DataRow(21, 3, 3)]
+        [DataRow(21, 0, -1)]
 
-        [DataRow(9, 1, 1)]
+        [DataRow(9, 0, -1)]
         [DataRow(10, 1, 1)]
-        [DataRow(11, 2, 2)]
+        [DataRow(11, 0, -1)]
 
         [DataRow(0, 0, 0)]
-        [DataRow(1, 1, 1)]
+        [DataRow(1, 0, -1)]
 
-        [DataRow(49, 5, 5)]
+        [DataRow(49, 0, -1)]
         [DataRow(50, 5, 5)]
         [DataRow(51, 0, -1)]
         public void Can_Bound_Equal_1(int compareTo, int expLowerBound, int expUpperBound)
@@ -162,9 +162,9 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         }
 
         [TestMethod]
-        [DataRow(19, 2, 2)]
+        [DataRow(19, 0, -1)]
         [DataRow(20, 2, 4)]
-        [DataRow(21, 5, 5)]
+        [DataRow(21, 0, -1)]
         public void Can_Bound_Equal_2(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
@@ -180,6 +180,35 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
             overrideValues.Add(new ValueCount(40, 10));
             overrideValues.Add(new ValueCount(50, 10));
             IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, overrideValues);
+
+            // ACT
+            var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Equal);
+
+            // ASSERT
+            Assert.AreEqual(expLowerBound, result.LowerBound);
+            Assert.AreEqual(expUpperBound, result.UpperBound);
+        }
+
+        [TestMethod]
+        [DataRow(19, 1, 1)]
+        [DataRow(20, 2, 2)]
+        [DataRow(21, 2, 2)]
+
+        [DataRow(9, 0, 0)]
+        [DataRow(10, 1, 1)]
+        [DataRow(11, 1, 1)]
+
+        [DataRow(0, 0, 0)]
+        [DataRow(1, 0, 0)]
+
+        [DataRow(49, 4, 4)]
+        [DataRow(50, 4, 4)]
+        [DataRow(51, 0, -1)]
+        public void Can_Bound_Equal_3(int compareTo, int expLowerBound, int expUpperBound)
+        {
+            // ARRANGE
+            var tableAttr = new TableAttribute("A", "v");
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, null, true);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Equal);
@@ -221,24 +250,37 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
         #region Private Test Methods
 
-        private IPredicateBounder<IComparable> GetBaseBounder(TableAttribute tableAttr, List<ValueCount>? overrideList = null)
+        private IPredicateBounder<IComparable> GetBaseBounder(TableAttribute tableAttr, List<ValueCount>? overrideList = null, bool trail = false)
         {
             Dictionary<TableAttribute, int> upperBounds = new Dictionary<TableAttribute, int>();
             Dictionary<TableAttribute, int> lowerBounds = new Dictionary<TableAttribute, int>();
             TestMilestonerManager testManager = new TestMilestonerManager();
+            var histoValues = new List<ValueCount>();
             if (overrideList == null)
             {
-                var histoValues = new List<ValueCount>();
+                histoValues = new List<ValueCount>();
                 histoValues.Add(new ValueCount(0, 10));
                 histoValues.Add(new ValueCount(10, 10));
                 histoValues.Add(new ValueCount(20, 10));
                 histoValues.Add(new ValueCount(30, 10));
                 histoValues.Add(new ValueCount(40, 10));
                 histoValues.Add(new ValueCount(50, 10));
-                testManager.AddMilestonesFromValueCount(tableAttr, histoValues);
             }
             else
-                testManager.AddMilestonesFromValueCount(tableAttr, overrideList);
+                histoValues = overrideList;
+
+            if (trail)
+            {
+                for (int i = 0; i < histoValues.Count - 1; i++)
+                    if (i == histoValues.Count - 2)
+                        testManager.AddMilestonesFromValueCountManual(tableAttr, histoValues[i].Value, (int)histoValues[i + 1].Value, histoValues[i].Count);
+                    else
+                        testManager.AddMilestonesFromValueCountManual(tableAttr, histoValues[i].Value, (int)histoValues[i + 1].Value - 1, histoValues[i].Count);
+            }
+            else
+            {
+                testManager.AddMilestonesFromValueCount(tableAttr, histoValues);
+            }
 
             return new SimpleFilterBounder(upperBounds, lowerBounds, testManager);
         }

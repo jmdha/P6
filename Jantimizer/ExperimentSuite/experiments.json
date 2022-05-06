@@ -1,36 +1,7 @@
 ﻿{
   "Experiments": [
     {
-      "ExperimentName": "Experiment One - EquiDepth",
-      "RunParallel": true,
-      "RunExperiment": false,
-      "MilestoneType": "EquiDepth",
-      "ConnectorNames": [
-        "POSGRESQL",
-        "MYSQL"
-      ],
-      "SetupFiles": [
-        "BasicTests_SetupTables",
-        "WorldHappiness_With_GDP_Setup",
-        "Census_2013_Setup",
-        "COVID_Funding_Setup"
-      ],
-      "TestFiles": [
-        "BasicTests_RandomNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks_Possible",
-        "BasicTests_ClumpedNumberBlocks_Difficult",
-        "BasicTests_ConstantNumberBlocks",
-        "WorldHappiness_With_GDP",
-        "Census_2013",
-        "COVID_Funding"
-      ],
-      "OptionalTestSettings": {
-        "BucketSize": 256,
-        "MaxEstimatorSweeps": 10
-      }
-    },
-    {
-      "ExperimentName": "Experiment Two - MinDepth",
+      "ExperimentName": "Experiment One - MinDepth",
       "RunParallel": true,
       "RunExperiment": true,
       "MilestoneType": "MinDepth",
@@ -59,38 +30,7 @@
       }
     },
     {
-      "ExperimentName": "Experiment Three - EquiDepth_TotalSquareDynDepth",
-      "RunParallel": true,
-      "RunExperiment": false,
-      "MilestoneType": "EquiDepth_TotalSquareDynDepth",
-      "ConnectorNames": [
-        "POSGRESQL",
-        "MYSQL"
-      ],
-      "SetupFiles": [
-        "BasicTests_SetupTables",
-        "WorldHappiness_With_GDP_Setup",
-        "Census_2013_Setup",
-        "COVID_Funding_Setup"
-      ],
-      "TestFiles": [
-        "BasicTests_RandomNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks_Possible",
-        "BasicTests_ClumpedNumberBlocks_Difficult",
-        "BasicTests_ConstantNumberBlocks",
-        "WorldHappiness_With_GDP",
-        "Census_2013",
-        "COVID_Funding"
-      ],
-      "OptionalTestSettings": {
-        "MaxEstimatorSweeps": 10,
-        "SquareRootDynDepth_YOffset": -50,
-        "SquareRootDynDepth_RootMultiplier": 10,
-        "SquareRootDynDepth_RootOffset": 25
-      }
-    },
-    {
-      "ExperimentName": "Experiment Four - MinDepth_UniqueSquareDynDepth",
+      "ExperimentName": "Experiment Two - MinDepth_UniqueSquareDynDepth",
       "RunParallel": true,
       "RunExperiment": true,
       "MilestoneType": "MinDepth_UniqueSquareDynDepth",
