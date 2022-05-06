@@ -1,0 +1,52 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM (c JOIN d ON c.v = d.v) JOIN b ON d.v = b.v",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "c"
+              },
+              "Attribute": "v"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "d"
+              },
+              "Attribute": "v"
+            }
+          },
+          "ComType": "="
+        }
+      ]
+    },
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "d"
+              },
+              "Attribute": "v"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
+          },
+          "ComType": "="
+        }
+      ]
+    }
+  ]
+}
