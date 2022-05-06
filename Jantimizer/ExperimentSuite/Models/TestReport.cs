@@ -64,9 +64,9 @@ namespace ExperimentSuite.Models
             if (actualValue == 0 && predictedValue == 0)
                 return 100;
             if (actualValue == 0)
-                return -1;
+                return 0;
             if (actualValue != 0 && predictedValue == 0)
-                return -1;
+                return 0;
             if (actualValue < predictedValue)
             {
                 decimal value = ((decimal)actualValue / (decimal)predictedValue) * 100;
