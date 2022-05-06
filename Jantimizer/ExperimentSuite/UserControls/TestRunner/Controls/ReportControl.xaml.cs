@@ -28,7 +28,15 @@ namespace ExperimentSuite.UserControls
 
         public void GenerateReport<T>(List<T> reportLines)
         {
-            MainGrid.ItemsSource = reportLines;
+            if (reportLines is List<TestReport> rep)
+            {
+                var newList = new List<TestReportView>();
+                foreach(var report in rep)
+                    newList.Add(new TestReportView(report));
+                MainGrid.ItemsSource = newList;
+            }
+            else
+                MainGrid.ItemsSource = reportLines;
         }
     }
 }
