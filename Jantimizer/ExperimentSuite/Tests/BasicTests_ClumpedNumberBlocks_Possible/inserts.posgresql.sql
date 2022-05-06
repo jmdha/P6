@@ -22,7 +22,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO b (v) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO b (v) VALUES ( 100 + sin(v_counter) * 100 );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;
@@ -37,7 +37,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO c (v) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO c (v) VALUES ( 200 + sin(v_counter) * 100 );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;
@@ -52,7 +52,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO d (v) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO d (v) VALUES ( 300 + sin(v_counter) * 100 );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;

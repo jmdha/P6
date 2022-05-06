@@ -20,7 +20,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO b (V) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO b (V) VALUES ( 100 + sin(v_counter) * 100 );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -34,7 +34,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO c (V) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO c (V) VALUES ( 200 + sin(v_counter) * 100 );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -48,7 +48,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO d (V) VALUES ( sin(v_counter) * 100 );
+		INSERT INTO d (V) VALUES ( 300 + sin(v_counter) * 100 );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
