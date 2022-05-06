@@ -8,6 +8,7 @@ namespace ExperimentSuite.Models
 {
     public class TestReportView
     {
+        public string CaseName { get; set; }
         public ulong DatabasePredicted { get; set; }
         public ulong DatabaseActual { get; set; }
         public ulong EstimatorPredicted { get; set; }
@@ -21,8 +22,9 @@ namespace ExperimentSuite.Models
         public ulong AbstractStorageUsageBytes { get; }
         public ulong AbstractDatabaseSizeBytes { get; }
 
-        public TestReportView(ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, decimal databaseAcc, decimal estimatorAcc, ulong databaseOffBy, ulong estimatorOffBy, bool isBetter, bool overEstimated, bool underEstimated, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes)
+        public TestReportView(string caseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, decimal databaseAcc, decimal estimatorAcc, ulong databaseOffBy, ulong estimatorOffBy, bool isBetter, bool overEstimated, bool underEstimated, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes)
         {
+            CaseName = caseName;
             DatabasePredicted = databasePredicted;
             DatabaseActual = databaseActual;
             EstimatorPredicted = estimatorPredicted;
@@ -39,6 +41,7 @@ namespace ExperimentSuite.Models
 
         public TestReportView(TestReport report)
         {
+            CaseName=report.CaseName;
             DatabasePredicted = report.DatabasePredicted;
             DatabaseActual= report.DatabaseActual;
             EstimatorPredicted= report.EstimatorPredicted;
