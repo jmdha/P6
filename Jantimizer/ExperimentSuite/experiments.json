@@ -17,6 +17,7 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
+        "BasicTests_ConstantNumberBlocks",
         "BasicTests_ClumpedNumberBlocks",
         "WorldHappiness_With_GDP",
         "Census_2013",
@@ -44,6 +45,7 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
+        "BasicTests_ConstantNumberBlocks",
         "BasicTests_ClumpedNumberBlocks",
         "WorldHappiness_With_GDP",
         "Census_2013",
@@ -71,6 +73,7 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
+        "BasicTests_ConstantNumberBlocks",
         "BasicTests_ClumpedNumberBlocks",
         "WorldHappiness_With_GDP",
         "Census_2013",
@@ -100,6 +103,7 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
+        "BasicTests_ConstantNumberBlocks",
         "BasicTests_ClumpedNumberBlocks",
         "WorldHappiness_With_GDP",
         "Census_2013",
