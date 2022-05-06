@@ -6,7 +6,8 @@
       "RunExperiment": true,
       "MilestoneType": "MinDepth",
       "ConnectorNames": [
-        "POSGRESQL"
+        "POSGRESQL",
+        "MYSQL"
       ],
       "SetupFiles": [
         "BasicTests_SetupTables",
@@ -15,17 +16,23 @@
         "COVID_Funding_Setup"
       ],
       "TestFiles": [
-        "BasicTests_RandomNumberBlocks"
+        "BasicTests_RandomNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
+        "BasicTests_ConstantNumberBlocks",
+        "WorldHappiness_With_GDP",
+        "Census_2013",
+        "COVID_Funding"
       ],
       "OptionalTestSettings": {
-        "BucketSize": 1,
+        "BucketSize": 256,
         "MaxEstimatorSweeps": 10
       }
     },
     {
       "ExperimentName": "Experiment Two - MinDepth_UniqueSquareDynDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "MilestoneType": "MinDepth_UniqueSquareDynDepth",
       "ConnectorNames": [
         "POSGRESQL",

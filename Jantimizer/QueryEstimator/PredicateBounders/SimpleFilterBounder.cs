@@ -90,7 +90,7 @@ namespace QueryEstimator.PredicateBounders
                                     exitSentinel = true;
                                     break;
                                 }
-                                else if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare) && allSourceSegments[i].HighestValue.IsLessThanOrEqual(compare))
+                                else if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
                                 {
                                     newSourceLowerBound = i;
                                     newSourceUpperBound = i;
