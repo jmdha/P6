@@ -83,7 +83,14 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.Equal:
                             if (!foundLower)
                             {
-                                if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
+                                if (allSourceSegments[i].LowestValue.IsLargerThan(compare) && allSourceSegments[i].HighestValue.IsLargerThan(compare))
+                                {
+                                    newSourceLowerBound = 0;
+                                    newSourceUpperBound = -1;
+                                    exitSentinel = true;
+                                    break;
+                                }
+                                else if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare) && allSourceSegments[i].HighestValue.IsLessThanOrEqual(compare))
                                 {
                                     newSourceLowerBound = i;
                                     newSourceUpperBound = i;
@@ -92,10 +99,10 @@ namespace QueryEstimator.PredicateBounders
                             }
                             else
                             {
-                                if (allSourceSegments[i].HighestValue.IsLargerThan(compare))
-                                    exitSentinel = true;
-                                else 
+                                if (allSourceSegments[i].HighestValue.IsLessThanOrEqual(compare))
                                     newSourceUpperBound = i;
+                                else
+                                    exitSentinel = true;
 
                             }
                             break;
