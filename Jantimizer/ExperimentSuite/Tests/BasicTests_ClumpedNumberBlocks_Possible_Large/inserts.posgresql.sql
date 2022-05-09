@@ -1,9 +1,11 @@
-﻿DROP PROCEDURE IF EXISTS LoadTestData_A;
+﻿-- 5 times larger
+
+DROP PROCEDURE IF EXISTS LoadTestData_A;
 CREATE PROCEDURE LoadTestData_A()
 language plpgsql    
 AS $$
 DECLARE
-	v_max INT := 10;
+	v_max INT := 50;
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
@@ -18,7 +20,7 @@ CREATE PROCEDURE LoadTestData_B()
 language plpgsql    
 AS $$
 DECLARE
-	v_max INT := 50;
+	v_max INT := 250;
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
@@ -33,7 +35,7 @@ CREATE PROCEDURE LoadTestData_C()
 language plpgsql    
 AS $$
 DECLARE
-	v_max INT := 100;
+	v_max INT := 500;
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
@@ -48,7 +50,7 @@ CREATE PROCEDURE LoadTestData_D()
 language plpgsql    
 AS $$
 DECLARE
-	v_max INT := 500;
+	v_max INT := 2500;
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
