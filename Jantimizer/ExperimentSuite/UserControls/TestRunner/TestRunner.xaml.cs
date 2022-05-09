@@ -91,6 +91,9 @@ namespace ExperimentSuite.UserControls
                 UpdateLabelWithColor(TotalDatabaseAccuracyLabel, totalDatabaseAcc, "Database total accuracy:");
             }
 
+            ShowMilestonesButton.IsEnabled = true;
+            ShowEstimatorButton.IsEnabled = true;
+
             controller.Dispose();
         }
 
@@ -187,6 +190,12 @@ namespace ExperimentSuite.UserControls
         {
             var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner);
             milestoneView.Show();
+        }
+
+        private void ShowEstimatorButton_Click(object sender, RoutedEventArgs e)
+        {
+            var estimatorView = new EstimatorVisualiser.EstimatorVisualiser(controller.RunData.Estimator);
+            estimatorView.Show();
         }
     }
 }
