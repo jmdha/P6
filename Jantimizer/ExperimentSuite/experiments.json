@@ -15,8 +15,7 @@
         "COVID_Funding_Setup"
       ],
       "TestFiles": [
-        "BasicTests_RandomNumberBlocks",
-        "BasicTests_ClumpedNumberBlocks_Possible"
+        "BasicTests_RandomNumberBlocks"
       ],
       "OptionalTestSettings": {
         "BucketSize": 1,

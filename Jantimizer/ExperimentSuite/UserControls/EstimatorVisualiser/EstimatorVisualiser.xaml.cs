@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Tools.Models.JsonModels;
+using System.Linq;
 
 namespace ExperimentSuite.UserControls.EstimatorVisualiser
 {
@@ -24,10 +25,11 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
     {
         private TreeViewItem _currentItem;
         private EstimatorResult _estimatorResult;
-        public EstimatorVisualiser(EstimatorResult estimatorResult)
+        public EstimatorVisualiser(EstimatorResult estimatorResult, string titleName)
         {
             _estimatorResult = estimatorResult;
             InitializeComponent();
+            Title = titleName;
             _currentItem = new TreeViewItem();
             _currentItem.IsExpanded = true;
             ResultTreeView.Items.Add(_currentItem);
@@ -37,7 +39,8 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
         {
             if (_estimatorResult.ResultChain != null)
                 TraverseTreeRec(_estimatorResult.ResultChain);
-            int count = 0;
+            int count = 1;
+            var added = new List<string>();
             foreach (var bounds in _estimatorResult.TableAttributeBounds)
             {
                 var newTreeItem = new TreeViewItem();
@@ -45,30 +48,35 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
                 BoundsView.Items.Add(newTreeItem);
                 foreach (var bound in bounds.Value)
                 {
-                    var newAttributeItem = new TreeViewItem();
-                    newAttributeItem.IsExpanded = true;
-                    newAttributeItem.Header = bound.Left.ToString();
-
-                    var newLowerBoundItem = new TreeViewItem();
-                    newLowerBoundItem.Background = Brushes.Red;
-                    newLowerBoundItem.Header = $"{bound.MinLowerBound}...{bound.LowerBound - 1}";
-                    var newUpperBoundItem = new TreeViewItem();
-                    newUpperBoundItem.Background = Brushes.Red;
-                    newUpperBoundItem.Header = $"{bound.UpperBound + 1}...{bound.MaxUpperBound}";
-
-                    if (bound.LowerBound != bound.MinLowerBound)
-                        newAttributeItem.Items.Add(newLowerBoundItem);
-                    for (int i = bound.LowerBound; i <= bound.UpperBound; i++)
+                    if (!added.Contains($"{bound.Left}"))
                     {
-                        var newInnerTreeItem = new TreeViewItem();
-                        newInnerTreeItem.Header = $"ID {i}";
-                        newInnerTreeItem.Background = Brushes.Green;
-                        newAttributeItem.Items.Add(newInnerTreeItem);
+                        added.Add($"{bound.Left}");
+                        var newAttributeItem = new TreeViewItem();
+                        newAttributeItem.IsExpanded = true;
+                        newAttributeItem.Header = bound.Left.ToString();
+
+                        var newLowerBoundItem = new TreeViewItem();
+                        newLowerBoundItem.Background = Brushes.Red;
+                        newLowerBoundItem.Header = $"{bound.MinLowerBound}...{bound.LowerBound - 1}";
+                        var newUpperBoundItem = new TreeViewItem();
+                        newUpperBoundItem.Background = Brushes.Red;
+                        newUpperBoundItem.Header = $"{bound.UpperBound + 1}...{bound.MaxUpperBound}";
+
+                        if (bound.LowerBound != bound.MinLowerBound)
+                            newAttributeItem.Items.Add(newLowerBoundItem);
+                        for (int i = bound.LowerBound; i <= bound.UpperBound; i++)
+                        {
+                            var newInnerTreeItem = new TreeViewItem();
+                            newInnerTreeItem.Header = $"ID {i}";
+                            newInnerTreeItem.Background = Brushes.Green;
+                            newAttributeItem.Items.Add(newInnerTreeItem);
+                        }
+                        if (bound.UpperBound != bound.MaxUpperBound)
+                            newAttributeItem.Items.Add(newUpperBoundItem);
+                        newTreeItem.Items.Add(newAttributeItem);
                     }
-                    if (bound.UpperBound != bound.MaxUpperBound)
-                        newAttributeItem.Items.Add(newUpperBoundItem);
-                    newTreeItem.Items.Add(newAttributeItem);
                 }
+                added.Clear();
                 count++;
             }
         }

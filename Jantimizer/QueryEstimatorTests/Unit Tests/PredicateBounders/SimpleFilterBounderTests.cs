@@ -59,7 +59,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
         [DataRow(49, 0, 4)]
         [DataRow(50, 0, 4)]
-        [DataRow(51, 0, -1)]
+        [DataRow(51, 0, 5)]
         public void Can_Bound_Less(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE

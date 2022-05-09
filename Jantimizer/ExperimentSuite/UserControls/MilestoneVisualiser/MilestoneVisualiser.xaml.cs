@@ -23,10 +23,11 @@ namespace ExperimentSuite.UserControls.MilestoneVisualiser
     {
         private IMilestoner _milestoner;
 
-        public MilestoneVisualiser(IMilestoner milestoner)
+        public MilestoneVisualiser(IMilestoner milestoner, string titleName)
         {
             _milestoner = milestoner;
             InitializeComponent();
+            Title = titleName;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

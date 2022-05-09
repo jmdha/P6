@@ -97,8 +97,6 @@ namespace ExperimentSuite.UserControls
 
             ShowMilestonesButton.IsEnabled = true;
             ShowEstimatorResultCombobox.IsEnabled = true;
-
-            controller.Dispose();
         }
 
         private void UpdateLabelWithColor(Label control, decimal totalAcc, string additionalText)
@@ -192,13 +190,8 @@ namespace ExperimentSuite.UserControls
 
         private void ShowMilestonesButton_Click(object sender, RoutedEventArgs e)
         {
-            var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner);
+            var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner, $"Milestone Data for '{controller.RunnerName}'");
             milestoneView.Show();
-        }
-
-        private void ShowEstimatorButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void ShowEstimatorResultCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -209,7 +202,7 @@ namespace ExperimentSuite.UserControls
                 {
                     if (box.SelectedItem != null && result.CaseName == box.SelectedItem.ToString() && result.EstimatorResult != null)
                     {
-                        var estimatorView = new EstimatorVisualiser.EstimatorVisualiser(result.EstimatorResult);
+                        var estimatorView = new EstimatorVisualiser.EstimatorVisualiser(result.EstimatorResult, $"Estimator Result for '{result.CaseName}'");
                         estimatorView.Show();
                         break;
                     }

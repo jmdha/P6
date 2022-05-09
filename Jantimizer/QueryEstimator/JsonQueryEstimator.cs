@@ -137,9 +137,9 @@ namespace QueryEstimator
 
         private void SweepBounds(List<IReboundableResult<IComparable>> filterBounds, List<IReboundableResult<TableAttribute>> tableAttributeBounds)
         {
-            bool anyChanged = false;
             for (int i = 0; i < _maxSweeps; i++)
             {
+                bool anyChanged = false;
                 _tableAttributeBounds.Add(i, CopyBounds(tableAttributeBounds));
                 _filterBounds.Add(i, CopyBounds(filterBounds));
 
