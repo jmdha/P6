@@ -13,9 +13,9 @@
         </Grid.ColumnDefinitions>
 
         <ScrollViewer>
-            <StackPanel x:Name="BoundsPanel">
-                
-            </StackPanel>
+            <TreeView x:Name="BoundsView" Grid.Column="1">
+
+            </TreeView>
         </ScrollViewer>
 
         <TreeView x:Name="ResultTreeView" Grid.Column="1">

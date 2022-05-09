@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - MinDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "MilestoneType": "MinDepth",
       "ConnectorNames": [
         "POSGRESQL"
@@ -25,7 +25,7 @@
     {
       "ExperimentName": "Experiment Two - MinDepth_UniqueSquareDynDepth",
       "RunParallel": true,
-      "RunExperiment": true,
+      "RunExperiment": false,
       "MilestoneType": "MinDepth_UniqueSquareDynDepth",
       "ConnectorNames": [
         "POSGRESQL",
