@@ -45,6 +45,7 @@ namespace QueryEstimator.PredicateBounders
 
                 // Check within the bounds until a given predicate is no longer correct
                 bool foundLower = false;
+                bool foundAny = false;
                 bool exitSentinel = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
@@ -53,7 +54,10 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.More:
                             newSourceLowerBound = i;
                             if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                            {
                                 exitSentinel = true;
+                                foundAny = true;
+                            }
                             break;
                         case ComparisonType.Type.Less:
                             if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
@@ -61,6 +65,7 @@ namespace QueryEstimator.PredicateBounders
                                 if (newSourceUpperBound == currentSourceUpperBound)
                                     newSourceUpperBound = -1;
                                 exitSentinel = true;
+                                foundAny = true;
                                 break;
                             }
                             newSourceUpperBound = i;
@@ -70,8 +75,7 @@ namespace QueryEstimator.PredicateBounders
                             {
                                 if (allSourceSegments[i].LowestValue.IsLargerThan(compare) && allSourceSegments[i].HighestValue.IsLargerThan(compare))
                                 {
-                                    newSourceLowerBound = 0;
-                                    newSourceUpperBound = -1;
+                                    foundAny = false;
                                     exitSentinel = true;
                                     break;
                                 }
@@ -79,6 +83,7 @@ namespace QueryEstimator.PredicateBounders
                                 {
                                     newSourceLowerBound = i;
                                     newSourceUpperBound = i;
+                                    foundAny = true;
                                     foundLower = true;
                                 }
                             }
@@ -94,6 +99,12 @@ namespace QueryEstimator.PredicateBounders
                     }
                     if (exitSentinel)
                         break;
+                }
+
+                if (!foundAny)
+                {
+                    newSourceLowerBound = currentSourceLowerBound;
+                    newSourceUpperBound = -1;
                 }
 
                 // Add to dictionary if not there
