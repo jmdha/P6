@@ -22,7 +22,8 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
     /// </summary>
     public partial class EstimatorVisualiser : Window
     {
-        EstimatorResult _estimatorResult;
+        private TreeViewItem _currentItem;
+        private EstimatorResult _estimatorResult;
         public EstimatorVisualiser(EstimatorResult estimatorResult)
         {
             _estimatorResult = estimatorResult;
@@ -72,7 +73,6 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
             }
         }
 
-        private TreeViewItem _currentItem;
         private void TraverseTreeRec(ISegmentResult result)
         {
             if (result is SegmentResult seg)
