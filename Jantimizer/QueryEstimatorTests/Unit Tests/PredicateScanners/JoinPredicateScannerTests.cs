@@ -191,9 +191,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
         [TestMethod]
         [DataRow("A", "v", "50", ComparisonType.Type.Equal)]
         [DataRow("A", "v", "10000", ComparisonType.Type.Less)]
-        [DataRow("A", "v", "abc", ComparisonType.Type.EqualOrLess)]
         [DataRow("A", "v", "1513541", ComparisonType.Type.More)]
-        [DataRow("A", "v", "0.5", ComparisonType.Type.EqualOrMore)]
         public void Can_AddFilterIfValid_CorrectWay(string tableName, string attrName, string constant, ComparisonType.Type comType)
         {
             // ARRANGE
@@ -218,9 +216,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
         [TestMethod]
         [DataRow("A", "v", "50", ComparisonType.Type.Equal)]
         [DataRow("A", "v", "10000", ComparisonType.Type.Less)]
-        [DataRow("A", "v", "abc", ComparisonType.Type.EqualOrLess)]
         [DataRow("A", "v", "1513541", ComparisonType.Type.More)]
-        [DataRow("A", "v", "0.5", ComparisonType.Type.EqualOrMore)]
         public void Can_AddFilterIfValid_Invert(string tableName, string attrName, string constant, ComparisonType.Type comType)
         {
             // ARRANGE
@@ -268,9 +264,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
         [TestMethod]
         [DataRow("A", "v", "B", "v" , ComparisonType.Type.Equal)]
         [DataRow("A", "v", "B", "v" , ComparisonType.Type.Less)]
-        [DataRow("A", "v", "B", "v" , ComparisonType.Type.EqualOrLess)]
         [DataRow("A", "v", "B", "v" , ComparisonType.Type.More)]
-        [DataRow("A", "v", "B", "v" , ComparisonType.Type.EqualOrMore)]
         public void Can_AddPredicateIfValid_First(string rightTableName, string rightAttrName, string leftTableName, string leftAttrName, ComparisonType.Type comType)
         {
             // ARRANGE
@@ -283,7 +277,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
                 ComparisonType.GetOperatorString(comType));
 
             // ACT
-            var wasSuccess = scanner.AddPredicateIfValid(predicate);
+            var wasSuccess = scanner.AddPredicateIfValid(predicate, false);
 
             // ASSERT
             Assert.IsTrue(wasSuccess);
@@ -299,9 +293,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
         [TestMethod]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.Equal)]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.Less)]
-        [DataRow("A", "v", "B", "v", ComparisonType.Type.EqualOrLess)]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.More)]
-        [DataRow("A", "v", "B", "v", ComparisonType.Type.EqualOrMore)]
         public void Can_AddPredicateIfValid_SignificantFirst_Left(string rightTableName, string rightAttrName, string leftTableName, string leftAttrName, ComparisonType.Type comType)
         {
             // ARRANGE
@@ -315,7 +307,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
 
             // ACT
             scanner._usedAttributes.Add(leftTableAttr);
-            var wasSuccess = scanner.AddPredicateIfValid(predicate);
+            var wasSuccess = scanner.AddPredicateIfValid(predicate, false);
 
             // ASSERT
             Assert.IsTrue(wasSuccess);
@@ -331,9 +323,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
         [TestMethod]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.Equal)]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.Less)]
-        [DataRow("A", "v", "B", "v", ComparisonType.Type.EqualOrLess)]
         [DataRow("A", "v", "B", "v", ComparisonType.Type.More)]
-        [DataRow("A", "v", "B", "v", ComparisonType.Type.EqualOrMore)]
         public void Can_AddPredicateIfValid_SignificantFirst_Right(string rightTableName, string rightAttrName, string leftTableName, string leftAttrName, ComparisonType.Type comType)
         {
             // ARRANGE
@@ -347,7 +337,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
 
             // ACT
             scanner._usedAttributes.Add(rightTableAttr);
-            var wasSuccess = scanner.AddPredicateIfValid(predicate);
+            var wasSuccess = scanner.AddPredicateIfValid(predicate, false);
 
             // ASSERT
             Assert.IsTrue(wasSuccess);
@@ -372,7 +362,7 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateScanners
                 "=");
 
             // ACT
-            var wasSuccess = scanner.AddPredicateIfValid(predicate);
+            var wasSuccess = scanner.AddPredicateIfValid(predicate, false);
 
             // ASSERT
             Assert.IsFalse(wasSuccess);

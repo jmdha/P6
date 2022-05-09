@@ -12,6 +12,6 @@ namespace QueryEstimator.PredicateBounders
 {
     public interface IPredicateBounder<TRight> : ISegmentHandler
     {
-        public IPredicateBoundResult<TRight> Bound(TableAttribute source, TRight compare, ComparisonType.Type type);
+        public IReboundableResult<TRight> Bound(TableAttribute source, TRight compare, ComparisonType.Type type);
     }
 }

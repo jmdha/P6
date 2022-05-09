@@ -134,11 +134,11 @@ namespace ExperimentSuite.Controllers
             Dictionary<string, List<Func<Task>>> returnTasks = new Dictionary<string, List<Func<Task>>>();
             foreach (var connectorName in connectorNames)
             {
-                var suitData = SuiteDataSets.BuildSuiteData(connectorName, milestonerName, properties);
-                if (suitData == null)
-                    throw new Exception("Invalid connector!");
                 foreach (string testFile in testFiles)
                 {
+                    var suitData = SuiteDataSets.BuildSuiteData(connectorName, milestonerName, properties);
+                    if (suitData == null)
+                        throw new Exception("Invalid connector!");
                     var runFunc = CreateNewTestRunnerDelegate(testFile, experimentName, rootResultPath, suitData);
 
                     if (returnTasks.ContainsKey(testFile))

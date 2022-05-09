@@ -271,7 +271,8 @@ namespace ExperimentSuite.Controllers
                             analysisResult.ActualCardinality,
                             jantimatorResult.EstimatedCardinality,
                             RunData.Milestoner.GetAbstractMilestoneStorageBytes(),
-                            RunData.Milestoner.GetAbstractDatabaseStorageBytes())
+                            RunData.Milestoner.GetAbstractDatabaseStorageBytes(),
+                            jantimatorResult)
                         );
                 }
             }

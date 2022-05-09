@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QueryEstimator.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace ExperimentSuite.Models
         public bool UnderEstimated { get; }
         public ulong AbstractStorageUsageBytes { get; }
         public ulong AbstractDatabaseSizeBytes { get; }
+        internal EstimatorResult? EstimatorResult;
 
         public TestReport()
         {
@@ -36,9 +38,10 @@ namespace ExperimentSuite.Models
             EstimatorPredicted = 0;
             DatabaseAcc = 0;
             EstimatorAcc = 0;
+            EstimatorResult = null;
         }
 
-        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes)
+        public TestReport(string experimentName, string category, string caseName, string databaseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes, EstimatorResult result)
         {
             ExperimentName = experimentName;
             Category = category;
@@ -57,6 +60,8 @@ namespace ExperimentSuite.Models
             IsBetter = EstimatorOffBy < DatabaseOffBy;
             OverEstimated = estimatorPredicted > databaseActual;
             UnderEstimated = estimatorPredicted < databaseActual;
+
+            EstimatorResult = result;
         }
 
         private decimal GetAccuracy(ulong actualValue, ulong predictedValue)

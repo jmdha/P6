@@ -29,8 +29,8 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         [DataRow(1, 1, 5)]
 
         [DataRow(49, 5, 5)]
-        [DataRow(50, 5, 5)]
-        [DataRow(51, 5, 5)]
+        [DataRow(50, 0, -1)]
+        [DataRow(51, 0, -1)]
         public void Can_Bound_More(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
@@ -39,35 +39,6 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.More);
-
-            // ASSERT
-            Assert.AreEqual(expLowerBound, result.LowerBound);
-            Assert.AreEqual(expUpperBound, result.UpperBound);
-        }
-
-        [TestMethod]
-        [DataRow(19, 2, 5)]
-        [DataRow(20, 2, 5)]
-        [DataRow(21, 3, 5)]
-
-        [DataRow(9, 1, 5)]
-        [DataRow(10, 1, 5)]
-        [DataRow(11, 2, 5)]
-
-        [DataRow(0, 0, 5)]
-        [DataRow(1, 1, 5)]
-
-        [DataRow(49, 5, 5)]
-        [DataRow(50, 5, 5)]
-        [DataRow(51, 5, 5)]
-        public void Can_Bound_MoreOrEqual(int compareTo, int expLowerBound, int expUpperBound)
-        {
-            // ARRANGE
-            var tableAttr = new TableAttribute("A", "v");
-            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
-
-            // ACT
-            var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.EqualOrMore);
 
             // ASSERT
             Assert.AreEqual(expLowerBound, result.LowerBound);
@@ -97,35 +68,6 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Less);
-
-            // ASSERT
-            Assert.AreEqual(expLowerBound, result.LowerBound);
-            Assert.AreEqual(expUpperBound, result.UpperBound);
-        }
-
-        [TestMethod]
-        [DataRow(19, 0, 1)]
-        [DataRow(20, 0, 2)]
-        [DataRow(21, 0, 2)]
-
-        [DataRow(9, 0, 0)]
-        [DataRow(10, 0, 1)]
-        [DataRow(11, 0, 1)]
-
-        [DataRow(0, 0, 0)]
-        [DataRow(1, 0, 0)]
-
-        [DataRow(49, 0, 4)]
-        [DataRow(50, 0, 5)]
-        [DataRow(51, 0, 5)]
-        public void Can_Bound_LessOrEqual(int compareTo, int expLowerBound, int expUpperBound)
-        {
-            // ARRANGE
-            var tableAttr = new TableAttribute("A", "v");
-            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
-
-            // ACT
-            var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.EqualOrLess);
 
             // ASSERT
             Assert.AreEqual(expLowerBound, result.LowerBound);

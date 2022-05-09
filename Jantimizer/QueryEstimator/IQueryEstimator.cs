@@ -2,6 +2,7 @@
 using QueryEstimator.PredicateEstimators;
 using Milestoner;
 using Tools.Models.JsonModels;
+using QueryEstimator.Models.BoundResults;
 
 namespace QueryEstimator
 {

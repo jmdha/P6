@@ -22,7 +22,7 @@ namespace QueryEstimator.PredicateBounders
         {
         }
 
-        public IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
+        public IReboundableResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllMilestonesForAttribute(source);
@@ -45,6 +45,7 @@ namespace QueryEstimator.PredicateBounders
 
                 // Check within the bounds until a given predicate is no longer correct
                 bool foundLower = false;
+                bool foundAny = false;
                 bool exitSentinel = false;
                 for (int i = currentSourceLowerBound; i <= currentSourceUpperBound; i++)
                 {
@@ -53,12 +54,10 @@ namespace QueryEstimator.PredicateBounders
                         case ComparisonType.Type.More:
                             newSourceLowerBound = i;
                             if (allSourceSegments[i].LowestValue.IsLargerThan(compare))
+                            {
                                 exitSentinel = true;
-                            break;
-                        case ComparisonType.Type.EqualOrMore:
-                            newSourceLowerBound = i;
-                            if (allSourceSegments[i].LowestValue.IsLargerThanOrEqual(compare))
-                                exitSentinel = true;
+                                foundAny = true;
+                            }
                             break;
                         case ComparisonType.Type.Less:
                             if (allSourceSegments[i].HighestValue.IsLargerThanOrEqual(compare))
@@ -68,16 +67,8 @@ namespace QueryEstimator.PredicateBounders
                                 exitSentinel = true;
                                 break;
                             }
-                            newSourceUpperBound = i;
-                            break;
-                        case ComparisonType.Type.EqualOrLess:
-                            if (allSourceSegments[i].HighestValue.IsLargerThan(compare))
-                            {
-                                if (newSourceUpperBound == currentSourceUpperBound)
-                                    newSourceUpperBound = -1;
-                                exitSentinel = true;
-                                break;
-                            }
+                            else
+                                foundAny = true;
                             newSourceUpperBound = i;
                             break;
                         case ComparisonType.Type.Equal:
@@ -85,8 +76,7 @@ namespace QueryEstimator.PredicateBounders
                             {
                                 if (allSourceSegments[i].LowestValue.IsLargerThan(compare) && allSourceSegments[i].HighestValue.IsLargerThan(compare))
                                 {
-                                    newSourceLowerBound = 0;
-                                    newSourceUpperBound = -1;
+                                    foundAny = false;
                                     exitSentinel = true;
                                     break;
                                 }
@@ -94,6 +84,7 @@ namespace QueryEstimator.PredicateBounders
                                 {
                                     newSourceLowerBound = i;
                                     newSourceUpperBound = i;
+                                    foundAny = true;
                                     foundLower = true;
                                 }
                             }
@@ -111,13 +102,19 @@ namespace QueryEstimator.PredicateBounders
                         break;
                 }
 
+                if (!foundAny)
+                {
+                    newSourceLowerBound = currentSourceLowerBound;
+                    newSourceUpperBound = -1;
+                }
+
                 // Add to dictionary if not there
                 AddOrReduceUpperBound(source, newSourceUpperBound);
                 AddOrReduceLowerBound(source, newSourceLowerBound);
             }
 
             // Return a new bound result with the new upper and lower bounds
-            return new PredicateBoundResult<IComparable>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
+            return new PredicateBoundResult<IComparable>(this, source, compare, type, allSourceSegments.Count - 1, newSourceUpperBound, 0, newSourceLowerBound);
         }
 
         internal IComparable ConvertCompareTypes(IMilestone segment, IComparable compare)

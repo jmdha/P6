@@ -89,9 +89,14 @@ namespace ExperimentSuite.UserControls
                 totalDatabaseAcc /= controller.Results.Count;
 
                 UpdateLabelWithColor(TotalDatabaseAccuracyLabel, totalDatabaseAcc, "Database total accuracy:");
+
+                ShowEstimatorResultCombobox.Items.Clear();
+                foreach (var res in controller.Results)
+                    ShowEstimatorResultCombobox.Items.Add(res.CaseName);
             }
 
-            controller.Dispose();
+            ShowMilestonesButton.IsEnabled = true;
+            ShowEstimatorResultCombobox.IsEnabled = true;
         }
 
         private void UpdateLabelWithColor(Label control, decimal totalAcc, string additionalText)
@@ -185,8 +190,24 @@ namespace ExperimentSuite.UserControls
 
         private void ShowMilestonesButton_Click(object sender, RoutedEventArgs e)
         {
-            var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner);
+            var milestoneView = new MilestoneVisualiser.MilestoneVisualiser(controller.RunData.Milestoner, $"Milestone Data for '{controller.RunnerName}'");
             milestoneView.Show();
+        }
+
+        private void ShowEstimatorResultCombobox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox box)
+            {
+                foreach(var result in controller.Results)
+                {
+                    if (box.SelectedItem != null && result.CaseName == box.SelectedItem.ToString() && result.EstimatorResult != null)
+                    {
+                        var estimatorView = new EstimatorVisualiser.EstimatorVisualiser(result.EstimatorResult, $"Estimator Result for '{result.CaseName}'");
+                        estimatorView.Show();
+                        break;
+                    }
+                }
+            }
         }
     }
 }
