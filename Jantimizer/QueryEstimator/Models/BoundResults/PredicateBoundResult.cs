@@ -38,5 +38,10 @@ namespace QueryEstimator.Models.BoundResults
         {
             return LowerBound != lowerBounds[Left] || UpperBound != upperBounds[Left];
         }
+
+        public object Clone()
+        {
+            return new PredicateBoundResult<TRight>(Bounder, Left, Right, ComType, UpperBound, LowerBound);
+        }
     }
 }

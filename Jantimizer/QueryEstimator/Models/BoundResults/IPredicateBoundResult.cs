@@ -8,7 +8,7 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models.BoundResults
 {
-    public interface IPredicateBoundResult<TRight>
+    public interface IPredicateBoundResult<TRight> : ICloneable
     {
         public IPredicateBounder<TRight> Bounder { get; }
         public TableAttribute Left { get; }
