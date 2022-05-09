@@ -35,10 +35,15 @@ namespace QueryEstimator.PredicateScanners
             // Scan for both predicates and filters
             foreach (var node in nodes)
             {
+                // Bool to say if it a given predicate should only be regarded as a filter
+                // This is for cases such as "... JOIN c ON c.v > a.v AND b.v < c.v"
+                bool treatAsFilter = false;
                 foreach (var predicate in node.Predicates)
                 {
                     bool foundAny = false;
-                    foundAny = AddPredicateIfValid(predicate);
+                    foundAny = AddPredicateIfValid(predicate, treatAsFilter);
+                    if (foundAny)
+                        treatAsFilter = true;
                     if (!foundAny)
                         foundAny = AddFilterIfValid(predicate);
                     if (!foundAny)
@@ -81,7 +86,7 @@ namespace QueryEstimator.PredicateScanners
             return false;
         }
 
-        internal bool AddPredicateIfValid(JoinPredicate predicate)
+        internal bool AddPredicateIfValid(JoinPredicate predicate, bool treatAsFilter)
         {
             if (predicate.LeftAttribute.Attribute != null && predicate.RightAttribute.Attribute != null)
             {
@@ -93,7 +98,8 @@ namespace QueryEstimator.PredicateScanners
                     AddToDict<TableAttributePredicate>(new TableAttributePredicate(
                         predicate.RightAttribute.Attribute,
                         predicate.LeftAttribute.Attribute,
-                        ComparisonTypeHelper.InvertType(predicate.GetComType())));
+                        ComparisonTypeHelper.InvertType(predicate.GetComType()),
+                        treatAsFilter));
                     _usedAttributes.Add(predicate.RightAttribute.Attribute);
                 } 
                 else
@@ -101,7 +107,8 @@ namespace QueryEstimator.PredicateScanners
                     AddToDict<TableAttributePredicate>(new TableAttributePredicate(
                         predicate.LeftAttribute.Attribute,
                         predicate.RightAttribute.Attribute,
-                        predicate.GetComType()));
+                        predicate.GetComType(),
+                        treatAsFilter));
                     _usedAttributes.Add(predicate.LeftAttribute.Attribute);
                     _usedAttributes.Add(predicate.RightAttribute.Attribute);
                 }

@@ -200,11 +200,12 @@ namespace QueryEstimator
             // Foreach TableAttribute predicate in the join query, get an estimation based on new bounds.
             foreach (var pred in PredicateScanner.GetIfThere<TableAttributePredicate>())
             {
-                result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
-                    result,
-                    pred.LeftTable,
-                    pred.RightTable,
-                    pred.ComType));
+                if (!pred.TreatAsFilter)
+                    result = new SegmentResult(result, TableAttributeEstimator.GetEstimationResult(
+                        result,
+                        pred.LeftTable,
+                        pred.RightTable,
+                        pred.ComType));
             }
             return result;
         }

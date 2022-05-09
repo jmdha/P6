@@ -31,7 +31,7 @@ namespace ExperimentSuite.UserControls.EstimatorVisualiser
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             AttrName.Content = _result.Left.ToString();
-            for (int i = _result.MinLowerBound; i < _result.MaxUpperBound; i++)
+            for (int i = _result.MinLowerBound; i <= _result.MaxUpperBound; i++)
             {
                 if (i < _result.LowerBound)
                 {

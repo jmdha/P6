@@ -13,7 +13,7 @@
         </Grid.ColumnDefinitions>
 
         <ScrollViewer>
-            <StackPanel x:Name="BoundsPanel" Height="435">
+            <StackPanel x:Name="BoundsPanel">
                 
             </StackPanel>
         </ScrollViewer>
