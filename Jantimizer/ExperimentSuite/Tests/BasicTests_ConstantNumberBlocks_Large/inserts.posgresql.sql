@@ -35,7 +35,7 @@ CREATE PROCEDURE LoadTestData_C()
 language plpgsql    
 AS $$
 DECLARE
-	v_max INT := 200;
+	v_max INT := 500;
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP

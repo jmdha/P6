@@ -22,7 +22,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO b (v) VALUES ( 30 - v_counter );
+		INSERT INTO b (v) VALUES ( 5 + v_counter );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;
@@ -37,7 +37,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO c (v) VALUES ( 10 + v_counter );
+		INSERT INTO c (v) VALUES ( 25 + v_counter );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;
@@ -52,7 +52,7 @@ DECLARE
 	v_counter INT := 0;
 BEGIN
 	WHILE v_counter < v_max LOOP
-		INSERT INTO d (v) VALUES ( (-200) + v_counter );
+		INSERT INTO d (v) VALUES ( 75 + v_counter );
         v_counter := v_counter+1;
 	END LOOP;
 	RETURN;
