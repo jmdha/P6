@@ -3,7 +3,7 @@
     {
       "ExperimentName": "Experiment One - MinDepth",
       "RunParallel": true,
-      "RunExperiment": false,
+      "RunExperiment": true,
       "MilestoneType": "MinDepth",
       "ConnectorNames": [
         "POSGRESQL",
@@ -45,7 +45,13 @@
         "COVID_Funding_Setup"
       ],
       "TestFiles": [
-        "Census_2013"
+        "BasicTests_RandomNumberBlocks",
+        "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Difficult",
+        "BasicTests_ConstantNumberBlocks",
+        "WorldHappiness_With_GDP",
+        "Census_2013",
+        "COVID_Funding"
       ],
       "OptionalTestSettings": {
         "MaxEstimatorSweeps": 10,
