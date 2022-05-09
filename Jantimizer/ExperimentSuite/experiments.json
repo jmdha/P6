@@ -45,7 +45,7 @@
         "COVID_Funding_Setup"
       ],
       "TestFiles": [
-        "WorldHappiness_With_GDP"
+        "Census_2013"
       ],
       "OptionalTestSettings": {
         "MaxEstimatorSweeps": 10,
