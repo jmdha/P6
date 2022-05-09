@@ -21,6 +21,7 @@
         "BasicTests_ClumpedNumberBlocks_Possible",
         "BasicTests_ClumpedNumberBlocks_Difficult",
         "BasicTests_ConstantNumberBlocks",
+        "BasicTests_ConstantNumberBlocks_Large",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
@@ -51,6 +52,7 @@
         "BasicTests_ClumpedNumberBlocks_Possible",
         "BasicTests_ClumpedNumberBlocks_Difficult",
         "BasicTests_ConstantNumberBlocks",
+        "BasicTests_ConstantNumberBlocks_Large",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
