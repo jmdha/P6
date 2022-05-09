@@ -6,7 +6,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO a (v) VALUES ( v );
+		INSERT INTO a (v) VALUES ( v_counter );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -20,7 +20,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO b (V) VALUES ( 30 - v );
+		INSERT INTO b (V) VALUES ( 30 - v_counter );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -34,7 +34,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO c (V) VALUES ( 10 + v );
+		INSERT INTO c (V) VALUES ( 10 + v_counter );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
@@ -48,7 +48,7 @@ BEGIN
 
 	START TRANSACTION;
 	WHILE v_counter < v_max DO
-		INSERT INTO d (V) VALUES ( (-200) + v );
+		INSERT INTO d (V) VALUES ( (-200) + v_counter );
         SET v_counter=v_counter+1;
 	END WHILE;
 	COMMIT;
