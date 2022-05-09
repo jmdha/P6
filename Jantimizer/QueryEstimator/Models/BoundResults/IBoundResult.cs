@@ -8,16 +8,13 @@ using Tools.Models.JsonModels;
 
 namespace QueryEstimator.Models.BoundResults
 {
-    public interface IPredicateBoundResult<TRight> : ICloneable
+    public interface IBoundResult : ICloneable
     {
-        public IPredicateBounder<TRight> Bounder { get; }
         public TableAttribute Left { get; }
-        public TRight Right { get; }
-        public ComparisonType.Type ComType { get; }
+        public int MaxUpperBound { get; set; }
         public int UpperBound { get; set; }
+        public int MinLowerBound { get; set; }
         public int LowerBound { get; set; }
         public bool HaveChanged(Dictionary<TableAttribute, int> lowerBounds, Dictionary<TableAttribute, int> upperBounds);
-
-        public void RecalculateBounds();
     }
 }

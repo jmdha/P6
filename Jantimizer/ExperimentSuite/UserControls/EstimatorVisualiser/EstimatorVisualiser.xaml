@@ -7,6 +7,19 @@
         mc:Ignorable="d"
         Title="EstimatorVisualiser" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer>
+            <StackPanel x:Name="BoundsPanel" Height="435">
+                
+            </StackPanel>
+        </ScrollViewer>
+
+        <TreeView x:Name="ResultTreeView" Grid.Column="1">
+            
+        </TreeView>
     </Grid>
 </Window>

@@ -11,8 +11,5 @@ namespace QueryEstimator
     {
         public IMilestoner Milestoner { get; }
         public EstimatorResult GetQueryEstimation(T query);
-        public Dictionary<int, List<IPredicateBoundResult<TableAttribute>>> TableAttributeBounds { get; }
-        public Dictionary<int, List<IPredicateBoundResult<IComparable>>> FilterBounds { get; }
-        public ISegmentResult? ResultChain { get; }
     }
 }

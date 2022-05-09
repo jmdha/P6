@@ -25,7 +25,7 @@
         "COVID_Funding"
       ],
       "OptionalTestSettings": {
-        "BucketSize": 256,
+        "BucketSize": 2,
         "MaxEstimatorSweeps": 10
       }
     },

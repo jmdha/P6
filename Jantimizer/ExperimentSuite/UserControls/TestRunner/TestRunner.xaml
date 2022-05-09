@@ -39,7 +39,8 @@
 
         <StackPanel Grid.Row="2" Grid.Column="3">
             <Button x:Name="ShowMilestonesButton" Content="Milestones" Margin="5" Click="ShowMilestonesButton_Click" IsEnabled="False"/>
-            <Button x:Name="ShowEstimatorButton" Content="Estimator" Margin="5" Click="ShowEstimatorButton_Click" IsEnabled="False"/>
+            <Label Content="Estimator Results"/>
+            <ComboBox x:Name="ShowEstimatorResultCombobox" Margin="5" SelectionChanged="ShowEstimatorResultCombobox_SelectionChanged" IsEnabled="False"/>
         </StackPanel>
 
         <Label Content="Report" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"/>

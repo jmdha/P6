@@ -22,7 +22,7 @@ namespace QueryEstimator.PredicateBounders
         {
         }
 
-        public IPredicateBoundResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
+        public IReboundableResult<IComparable> Bound(TableAttribute source, IComparable compare, ComparisonType.Type type)
         {
             // Get segments and lower/upper bounds for the source attribute
             var allSourceSegments = GetAllMilestonesForAttribute(source);
@@ -117,7 +117,7 @@ namespace QueryEstimator.PredicateBounders
             }
 
             // Return a new bound result with the new upper and lower bounds
-            return new PredicateBoundResult<IComparable>(this, source, compare, type, newSourceUpperBound, newSourceLowerBound);
+            return new PredicateBoundResult<IComparable>(this, source, compare, type, allSourceSegments.Count - 1, newSourceUpperBound, 0, newSourceLowerBound);
         }
 
         internal IComparable ConvertCompareTypes(IMilestone segment, IComparable compare)
