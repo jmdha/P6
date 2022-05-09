@@ -19,7 +19,7 @@
         "BasicTests_RandomNumberBlocks",
         "BasicTests_RandomNumberBlocks_Large",
         "BasicTests_ClumpedNumberBlocks_Possible",
-        "BasicTests_ClumpedNumberBlocks_Possible_Larger",
+        "BasicTests_ClumpedNumberBlocks_Possible_Large",
         "BasicTests_ClumpedNumberBlocks_Difficult",
         "BasicTests_ClumpedNumberBlocks_Difficult_Large",
         "BasicTests_ConstantNumberBlocks",
