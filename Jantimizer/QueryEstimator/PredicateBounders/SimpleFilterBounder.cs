@@ -65,9 +65,10 @@ namespace QueryEstimator.PredicateBounders
                                 if (newSourceUpperBound == currentSourceUpperBound)
                                     newSourceUpperBound = -1;
                                 exitSentinel = true;
-                                foundAny = true;
                                 break;
                             }
+                            else
+                                foundAny = true;
                             newSourceUpperBound = i;
                             break;
                         case ComparisonType.Type.Equal:
