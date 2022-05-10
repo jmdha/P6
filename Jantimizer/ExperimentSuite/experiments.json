@@ -90,9 +90,15 @@
       ],
       "TestFiles": [
         "BasicTests_RandomNumberBlocks",
+        "BasicTests_RandomNumberBlocks_Large",
         "BasicTests_ClumpedNumberBlocks_Possible",
+        "BasicTests_ClumpedNumberBlocks_Possible_Large",
         "BasicTests_ClumpedNumberBlocks_Difficult",
+        "BasicTests_ClumpedNumberBlocks_Difficult_Large",
         "BasicTests_ConstantNumberBlocks",
+        "BasicTests_ConstantNumberBlocks_Large",
+        "BasicTests_LinearNumberBlocks",
+        "BasicTests_LinearNumberBlocks_Large",
         "WorldHappiness_With_GDP",
         "Census_2013",
         "COVID_Funding"
