@@ -1,0 +1,47 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM (census as C1 JOIN census as C2 ON C1.hours_per_week > C2.hours_per_week AND C2.hours_per_week < 5)",
+  "Comment": "Might take a while to compute",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C1"
+              },
+              "Attribute": "hours_per_week"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "hours_per_week"
+            }
+          },
+          "ComType": ">"
+        },
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "census",
+                "Alias": "C2"
+              },
+              "Attribute": "hours_per_week"
+            }
+          },
+          "RightAttribute": {
+            "ConstantValue": "5"
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}

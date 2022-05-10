@@ -1,0 +1,56 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM (world_happiness_2022 AS C1 JOIN world_happiness_2022 AS C2 ON C1.perception_of_corruption < C2.perception_of_corruption) JOIN world_happiness_2022 AS C3 ON C3.perception_of_corruption < C1.perception_of_corruption",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C2"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "ComType": "<"
+        }
+      ]
+    },
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C3"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "world_happiness_2022",
+                "Alias": "C1"
+              },
+              "Attribute": "perception_of_corruption"
+            }
+          },
+          "ComType": "<"
+        }
+      ]
+    }
+  ]
+}

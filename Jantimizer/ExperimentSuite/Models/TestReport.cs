@@ -25,6 +25,7 @@ namespace ExperimentSuite.Models
         public bool UnderEstimated { get; }
         public ulong AbstractStorageUsageBytes { get; }
         public ulong AbstractDatabaseSizeBytes { get; }
+        public decimal AbstractStorageUsagePercent { get; }
         internal EstimatorResult? EstimatorResult;
 
         public TestReport()
@@ -56,6 +57,7 @@ namespace ExperimentSuite.Models
             EstimatorAcc = GetAccuracy(databaseActual, estimatorPredicted);
             DatabaseOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)databasePredicted);
             EstimatorOffBy = (ulong)Math.Abs((decimal)databaseActual - (decimal)estimatorPredicted);
+            AbstractStorageUsagePercent = (Math.Round((decimal)abstractStorageUsageBytes / (decimal)abstractDatabaseSizeBytes, 2)) * 100;
 
             IsBetter = EstimatorOffBy < DatabaseOffBy;
             OverEstimated = estimatorPredicted > databaseActual;

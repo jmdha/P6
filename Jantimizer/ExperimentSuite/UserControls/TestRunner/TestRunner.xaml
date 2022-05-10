@@ -14,7 +14,7 @@
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="90"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="130"/>
             <RowDefinition Height="30"/>
@@ -23,9 +23,13 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Label x:Name="TestNameLabel" Foreground="Red"/>
-        <Label x:Name="TotalEstimatorAccuracyLabel" Grid.Column="2" HorizontalAlignment="Center"/>
-        <Label x:Name="TotalDatabaseAccuracyLabel" Grid.Column="1" HorizontalAlignment="Center"/>
+        <Label x:Name="TestNameLabel" Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <StackPanel Grid.Column="2" Margin="3" Background="DarkGray">
+            <Label x:Name="TotalEstimatorAccuracyLabel"/>
+            <Label x:Name="TotalDatabaseAccuracyLabel"/>
+            <Label x:Name="AbstractStoragePercentLabel"/>
+        </StackPanel>
 
         <Label Content="Status" Grid.Row="1" Grid.Column="0"/>
         <TextBox x:Name="StatusTextBox" Grid.Row="2" Grid.Column="0" Margin="5" IsEnabled="False" FontFamily="Courier New" VerticalScrollBarVisibility="Visible" TextChanged="Textbox_Autoscroll_ToBottom"/>

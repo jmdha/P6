@@ -36,7 +36,7 @@ namespace ExperimentSuite.UserControls
 
         private RunnerController controller;
 
-        public double CollapsedSize { get; } = 30;
+        public double CollapsedSize { get; } = 90;
         public double ExpandedSize { get; } = double.NaN;
 
         public TestRunner(string experimentName, string runName, string rootResultsPath, SuiteData runData, FileInfo settingsFile, FileInfo? setupFile, FileInfo? insertsFile, FileInfo? analyseFile, FileInfo? cleanupFile, List<FileInfo> caseFiles)
@@ -93,6 +93,8 @@ namespace ExperimentSuite.UserControls
                 ShowEstimatorResultCombobox.Items.Clear();
                 foreach (var res in controller.Results)
                     ShowEstimatorResultCombobox.Items.Add(res.CaseName);
+
+                UpdateLabelWithColorInv(AbstractStoragePercentLabel, controller.Results[0].AbstractStorageUsagePercent, "Abstract Storage Used:");
             }
 
             ShowMilestonesButton.IsEnabled = true;
@@ -113,6 +115,24 @@ namespace ExperimentSuite.UserControls
                 control.Foreground = Brushes.DarkGreen;
             else
                 control.Foreground = Brushes.Green;
+
+            control.Content = $"{additionalText} {Math.Round(totalAcc, 2)}%";
+        }
+
+        private void UpdateLabelWithColorInv(Label control, decimal totalAcc, string additionalText)
+        {
+            if (totalAcc < 15)
+                control.Foreground = Brushes.Green;
+            else if (totalAcc < 30)
+                control.Foreground = Brushes.DarkGreen;
+            else if (totalAcc < 50)
+                control.Foreground = Brushes.Yellow;
+            else if (totalAcc < 80)
+                control.Foreground = Brushes.Orange;
+            else if (totalAcc < 90)
+                control.Foreground = Brushes.DarkOrange;
+            else
+                control.Foreground = Brushes.Red;
 
             control.Content = $"{additionalText} {Math.Round(totalAcc, 2)}%";
         }
