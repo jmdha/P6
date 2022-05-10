@@ -27,7 +27,8 @@ namespace JantimizerSystemTests
     {
         private static string _casePath = "../../../Cases/";
         private static string _setupPath = "../../../Setups/";
-        internal static SecretsService<SystemTests> secrets = new SecretsService<SystemTests>();
+        private static SecretsService<SystemTests> secrets = new SecretsService<SystemTests>();
+        private static SecretsItem? _secret;
 
         // We should expect 100% accuracte results with single joins
         [TestMethod]
@@ -39,17 +40,12 @@ namespace JantimizerSystemTests
         public async Task Constant_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
+            await Task.Delay(100);
+
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("POSGRESQL"))
-                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
-
-            var properties = new ConnectionProperties(
-                secrets.GetSecretsItem("POSGRESQL"),
-                "postgres",
-                "systemtests_constant");
-            IDbConnector connector = new PostgreSqlConnector(properties);
+            IDbConnector connector = GetConnector("systemtests_constant");
             IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
             AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
@@ -70,17 +66,12 @@ namespace JantimizerSystemTests
         public async Task Random_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
+            await Task.Delay(100);
+
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("POSGRESQL"))
-                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
-
-            var properties = new ConnectionProperties(
-                secrets.GetSecretsItem("POSGRESQL"),
-                "postgres",
-                "systemtests_random");
-            IDbConnector connector = new PostgreSqlConnector(properties);
+            IDbConnector connector = GetConnector("systemtests_random");
             IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
             AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
@@ -101,17 +92,12 @@ namespace JantimizerSystemTests
         public async Task Clumped_Possible_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
+            await Task.Delay(100);
+
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("POSGRESQL"))
-                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
-
-            var properties = new ConnectionProperties(
-                secrets.GetSecretsItem("POSGRESQL"),
-                "postgres",
-                "systemtests_clumped_possible");
-            IDbConnector connector = new PostgreSqlConnector(properties);
+            IDbConnector connector = GetConnector("systemtests_clumped_possible");
             IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
             AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
@@ -132,17 +118,12 @@ namespace JantimizerSystemTests
         public async Task Clumped_Difficult_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
+            await Task.Delay(100);
+
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("POSGRESQL"))
-                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
-
-            var properties = new ConnectionProperties(
-                secrets.GetSecretsItem("POSGRESQL"),
-                "postgres",
-                "systemtests_clumped_difficult");
-            IDbConnector connector = new PostgreSqlConnector(properties);
+            IDbConnector connector = GetConnector("systemtests_clumped_difficult");
             IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
             AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
@@ -227,6 +208,23 @@ namespace JantimizerSystemTests
             return analysisResult;
         }
 
+        private IDbConnector GetConnector(string schema)
+        {
+            if (_secret == null)
+            {
+                if (!secrets.HasKey("POSGRESQL"))
+                    Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
+
+                _secret = secrets.GetSecretsItem("POSGRESQL");
+            }
+
+            var properties = new ConnectionProperties(
+                _secret,
+                "postgres",
+                schema);
+            IDbConnector connector = new PostgreSqlConnector(properties);
+            return connector;
+        }
 
         #endregion
     }
