@@ -42,6 +42,9 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
+            if (!secrets.HasKey("ConnectionProperties"))
+                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
+
             var properties = new ConnectionProperties(
                 secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
@@ -69,6 +72,9 @@ namespace JantimizerSystemTests
             // ARRANGE
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
+
+            if (!secrets.HasKey("ConnectionProperties"))
+                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(
                 secrets.GetSecretsItem("POSGRESQL"),
@@ -98,6 +104,9 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
+            if (!secrets.HasKey("ConnectionProperties"))
+                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
+
             var properties = new ConnectionProperties(
                 secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
@@ -125,6 +134,9 @@ namespace JantimizerSystemTests
             // ARRANGE
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
+
+            if (!secrets.HasKey("ConnectionProperties"))
+                Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(
                 secrets.GetSecretsItem("POSGRESQL"),

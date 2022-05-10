@@ -19,6 +19,11 @@ namespace Tools.Services
                 .Build();
         }
 
+        public bool HasKey(string key)
+        {
+            return configuration.GetSection(key) != null;
+        }
+
         public SecretsItem GetSecretsItem(string key)
         {
             return new SecretsItem(
@@ -26,11 +31,6 @@ namespace Tools.Services
                 configuration.GetSection("ConnectionProperties").GetSection(key)["Password"],
                 configuration.GetSection("ConnectionProperties").GetSection(key)["Server"],
                 int.Parse(configuration.GetSection("ConnectionProperties").GetSection(key)["Port"]));
-        }
-
-        public bool GetLaunchOption(string key)
-        {
-            return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
         }
     }
 }
