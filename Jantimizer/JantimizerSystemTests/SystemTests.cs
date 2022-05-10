@@ -42,7 +42,7 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("ConnectionProperties"))
+            if (!secrets.HasKey("POSGRESQL"))
                 Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(
@@ -73,7 +73,7 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("ConnectionProperties"))
+            if (!secrets.HasKey("POSGRESQL"))
                 Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(
@@ -104,7 +104,7 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("ConnectionProperties"))
+            if (!secrets.HasKey("POSGRESQL"))
                 Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(
@@ -135,7 +135,7 @@ namespace JantimizerSystemTests
             var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
-            if (!secrets.HasKey("ConnectionProperties"))
+            if (!secrets.HasKey("POSGRESQL"))
                 Assert.Inconclusive("User secrets not set! Ignore this if its run from github actions.");
 
             var properties = new ConnectionProperties(

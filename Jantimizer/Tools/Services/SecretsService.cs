@@ -21,7 +21,7 @@ namespace Tools.Services
 
         public bool HasKey(string key)
         {
-            return configuration.GetSection(key) != null;
+            return configuration.GetSection("ConnectionProperties").GetSection(key) != null;
         }
 
         public SecretsItem GetSecretsItem(string key)
