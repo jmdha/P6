@@ -194,9 +194,13 @@ namespace JantimizerSystemTests
 
         #region Private Test Methods
 
+        private static bool? haveChecked;
         private async Task<bool> IsPostgresRunning(IDbConnector connector)
         {
-            return await connector.CheckConnectionAsync();
+            if (haveChecked != null)
+                return (bool)haveChecked;
+            haveChecked = await connector.CheckConnectionAsync();
+            return (bool)haveChecked;
         }
 
         private async Task GenerateMilestones(IMilestoner milestoner)
