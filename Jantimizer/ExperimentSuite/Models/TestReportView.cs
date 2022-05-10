@@ -21,23 +21,7 @@ namespace ExperimentSuite.Models
         public bool UnderEstimated { get; }
         public ulong AbstractStorageUsageBytes { get; }
         public ulong AbstractDatabaseSizeBytes { get; }
-
-        public TestReportView(string caseName, ulong databasePredicted, ulong databaseActual, ulong estimatorPredicted, decimal databaseAcc, decimal estimatorAcc, ulong databaseOffBy, ulong estimatorOffBy, bool isBetter, bool overEstimated, bool underEstimated, ulong abstractStorageUsageBytes, ulong abstractDatabaseSizeBytes)
-        {
-            CaseName = caseName;
-            DatabasePredicted = databasePredicted;
-            DatabaseActual = databaseActual;
-            EstimatorPredicted = estimatorPredicted;
-            DatabaseAcc = databaseAcc;
-            EstimatorAcc = estimatorAcc;
-            DatabaseOffBy = databaseOffBy;
-            EstimatorOffBy = estimatorOffBy;
-            IsBetter = isBetter;
-            OverEstimated = overEstimated;
-            UnderEstimated = underEstimated;
-            AbstractStorageUsageBytes = abstractStorageUsageBytes;
-            AbstractDatabaseSizeBytes = abstractDatabaseSizeBytes;
-        }
+        public decimal AbstractStorageUsagePercent { get; }
 
         public TestReportView(TestReport report)
         {
@@ -54,6 +38,7 @@ namespace ExperimentSuite.Models
             OverEstimated= report.OverEstimated;
             AbstractDatabaseSizeBytes= report.AbstractDatabaseSizeBytes;
             AbstractStorageUsageBytes= report.AbstractStorageUsageBytes;
+            AbstractStorageUsagePercent = report.AbstractStorageUsagePercent;
         }
     }
 }
