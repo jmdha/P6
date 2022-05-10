@@ -12,7 +12,7 @@ using Tools.Models.JsonModels;
 namespace QueryEstimatorTests.System_Tests
 {
     [TestClass]
-    public class JsonQueryEstimatorSystemTests
+    public class Simple_JsonQueryEstimatorSystemTests
     {
         [TestMethod]
         // SELECT * FROM (A JOIN B ON A.v < B.v) JOIN C ON B.v < C.v

@@ -19,6 +19,13 @@ namespace Tools.Services
                 .Build();
         }
 
+        public bool HasKey(string key)
+        {
+            if (configuration.GetSection("ConnectionProperties").Exists())
+                return configuration.GetSection("ConnectionProperties").GetSection(key).Exists();
+            return false;
+        }
+
         public SecretsItem GetSecretsItem(string key)
         {
             return new SecretsItem(
@@ -26,11 +33,6 @@ namespace Tools.Services
                 configuration.GetSection("ConnectionProperties").GetSection(key)["Password"],
                 configuration.GetSection("ConnectionProperties").GetSection(key)["Server"],
                 int.Parse(configuration.GetSection("ConnectionProperties").GetSection(key)["Port"]));
-        }
-
-        public bool GetLaunchOption(string key)
-        {
-            return bool.Parse(configuration.GetSection("LaunchSystem")[key]);
         }
     }
 }
