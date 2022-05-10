@@ -154,13 +154,7 @@ namespace JantimizerSystemTests
             List<Task> results = new List<Task>();
             foreach (Func<Task> funcs in milestoneTasks)
             {
-                results.Add(funcs.Invoke());
-            }
-            while (results.Any())
-            {
-                var finishedTask = await Task.WhenAny(results);
-                results.Remove(finishedTask);
-                await finishedTask;
+                await funcs.Invoke();
             }
         }
 
@@ -171,13 +165,7 @@ namespace JantimizerSystemTests
             List<Task> results = new List<Task>();
             foreach (Func<Task> funcs in compareTasks)
             {
-                results.Add(funcs.Invoke());
-            }
-            while (results.Any())
-            {
-                var finishedTask = await Task.WhenAny(results);
-                results.Remove(finishedTask);
-                await finishedTask;
+                await funcs.Invoke();
             }
         }
 
@@ -188,7 +176,7 @@ namespace JantimizerSystemTests
             IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
             IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
 
-            if (!await IsPostgresRunning(connector))
+            if (!(await IsPostgresRunning(connector)))
                 Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
 
             await connector.CallQueryAsync(setupFileText);
