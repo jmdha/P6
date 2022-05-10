@@ -6,30 +6,26 @@ using System.Threading.Tasks;
 
 namespace Milestoner.DepthCalculators
 {
-    public class TotalSquareRootDynDepth : IDepthCalculator
+    public class SquareRootDynDepth : BaseDepthCalculator, IDepthCalculator
     {
         public double YOffset { get; set; }
         public double RootMultiplier { get; set; }
         public double RootOffset { get; set; }
 
-        public TotalSquareRootDynDepth(double yOffset, double rootMultiplier, double rootOffset) {
+        public SquareRootDynDepth(bool shouldUseUniqueValues, double yOffset, double rootMultiplier, double rootOffset) : base (shouldUseUniqueValues)
+        {
             YOffset = yOffset;
             RootMultiplier = rootMultiplier;
             RootOffset = rootOffset;
         }
 
-        private int SquareRootBuckets(long x)
+        protected override double DepthFunction(long x)
         {
             double bucketCount = Math.Sqrt(x + RootOffset) * RootMultiplier + YOffset;
 
             double depth = x / bucketCount;
 
-            return (int)Math.Floor(depth);
-        }
-
-        public int GetDepth(long uniqueValueCount, long totalValueCount)
-        {
-            return SquareRootBuckets(totalValueCount);
+            return depth;
         }
     }
 }

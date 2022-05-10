@@ -47,10 +47,9 @@ namespace ExperimentSuite.SuiteDatas
         {
             { "EquiDepth", GetMilestoner_EquiDepth },
             { "MinDepth", GetMilestoner_MinDepth },
-            { "EquiDepth_TotalSquareDynDepth", GetMilestoner_EquiDepth_TotalSquare },
-            { "EquiDepth_UniqueSquareDynDepth", GetMilestoner_EquiDepth_UniqueSquare },
-            { "MinDepth_TotalSquareDynDepth", GetMilestoner_MinDepth_TotalSquare },
-            { "MinDepth_UniqueSquareDynDepth", GetMilestoner_MinDepth_UniqueSquare }
+            { "EquiDepth_SquareDynDepth", GetMilestoner_EquiDepth_Square },
+            { "MinDepth_SquareDynDepth", GetMilestoner_MinDepth_Square },
+            { "MinDepth_Log", GetMilestoner_MinDepth_Log }
         };
 
         private static Dictionary<string, Delegate> _dataGatheres = new Dictionary<string, Delegate>()
@@ -122,54 +121,54 @@ namespace ExperimentSuite.SuiteDatas
         {
             return new EquiDepthMilestoner(
                 gathere,
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"))
+            );
         }
 
         private static IMilestoner GetMilestoner_MinDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
             return new MinDepthMilestoner(
                 gathere,
-                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize")));
+                new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"))
+            );
         }
 
-        private static IMilestoner GetMilestoner_EquiDepth_TotalSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
+        private static IMilestoner GetMilestoner_EquiDepth_Square(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
             return new EquiDepthMilestoner(
                 gathere,
-                new TotalSquareRootDynDepth(
+                new SquareRootDynDepth(
+                    JsonHelper.GetValue<bool>(optionalTestSettings,   "DynDepth_BasedOnUnique"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")
+                )
+            );
         }
 
-        private static IMilestoner GetMilestoner_EquiDepth_UniqueSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
-        {
-            return new EquiDepthMilestoner(
-                gathere,
-                new UniqueSquareRootDynDepth(
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
-        }
-
-        private static IMilestoner GetMilestoner_MinDepth_TotalSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
+        private static IMilestoner GetMilestoner_MinDepth_Square(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
             return new MinDepthMilestoner(
                 gathere,
-                new TotalSquareRootDynDepth(
+                new SquareRootDynDepth(
+                    JsonHelper.GetValue<bool>(optionalTestSettings,   "DynDepth_BasedOnUnique"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
+                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")
+                )
+             );
         }
 
-        private static IMilestoner GetMilestoner_MinDepth_UniqueSquare(IDataGatherer gathere, JsonObject optionalTestSettings)
+        private static IMilestoner GetMilestoner_MinDepth_Log(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
             return new MinDepthMilestoner(
                 gathere,
-                new UniqueSquareRootDynDepth(
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_YOffset"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootMultiplier"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "SquareRootDynDepth_RootOffset")));
+                new LogDynDepth(
+                    JsonHelper.GetValue<bool>(optionalTestSettings, "DynDepth_BasedOnUnique"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_LogBase"),
+                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_Multiplier")
+                )
+            );
         }
     }
 }

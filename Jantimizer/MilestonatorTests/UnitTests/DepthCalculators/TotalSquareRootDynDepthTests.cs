@@ -20,7 +20,7 @@ namespace MilestonatorTests.UnitTests.DepthCalculators
         public void UniqueDynamicDepth_Base_Tests(long uniqueCount, long totalCount, double yOffset, double rootMultiplier, double rootOffset)
         {
             // ARRANGE
-            IDepthCalculator depthCalculator = new TotalSquareRootDynDepth(yOffset, rootMultiplier, rootOffset);
+            IDepthCalculator depthCalculator = new SquareRootDynDepth(false, yOffset, rootMultiplier, rootOffset);
 
             // ACT
             var calcedDepth = depthCalculator.GetDepth(uniqueCount, totalCount);
