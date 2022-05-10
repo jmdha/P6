@@ -15,6 +15,8 @@ namespace ExperimentSuite.Models {
             Map(m => m.DatabaseOffBy).Name("Database off by");
             Map(m => m.EstimatorOffBy).Name("Estimator off by");
             Map(m => m.AbstractStorageUsageBytes).Name("Abstract storage use (bytes)");
+            Map(m => m.AbstractDatabaseSizeBytes).Name("Database abstract storage use (bytes)");
+            Map(m => m.AbstractStorageUsagePercent).Name("Abstract storage use vs database abstract storage use (%)");
         }
     }
 }
