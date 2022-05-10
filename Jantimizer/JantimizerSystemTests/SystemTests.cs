@@ -24,40 +24,30 @@ namespace JantimizerSystemTests
     [TestClass]
     public class SystemTests
     {
+        private static string _casePath = "../../../Cases/";
+        private static string _setupPath = "../../../Setups/";
+        private static SecretsItem _secretsItme = new SecretsItem("postgres", "password", "localhost", 5432);
+
         // We should expect 100% accuracte results with single joins
         [TestMethod]
-        [DataRow("../../../Cases/B_J1-G1_F0_a.json", "../../../Setups/constant.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F0_b.json", "../../../Setups/constant.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F1-L1.json", "../../../Setups/constant.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_a.json", "../../../Setups/constant.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_b.json", "../../../Setups/constant.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_a.json", "constant.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_b.json", "constant.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F1-L1.json", "constant.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_a.json", "constant.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_b.json", "constant.setup.posgresql.sql")]
         public async Task Constant_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
-            var queryFile = new JsonQuery(File.ReadAllText(caseFileName));
-            var setupFileTest = File.ReadAllText(setupFileName);
+            var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
+            var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                new SecretsItem("postgres","password", "localhost", 5432),
+                _secretsItme,
                 "postgres",
                 "systemtests_constant");
             IDbConnector connector = new PostgreSqlConnector(properties);
-            IPlanParser parser = new PostgreSqlParser();
-            IDataGatherer dataGatherer = new PostgresDataGatherer(properties);
-            IDepthCalculator depthCalculator = new ConstantDepth(1);
-            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
-            IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
-
-            if (!await IsPostgresRunning(connector))
-                Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
-
-            await connector.CallQueryAsync(setupFileTest);
-
-            DataSet dbResult = await connector.AnalyseExplainQueryAsync(queryFile.EquivalentSQLQuery);
-            AnalysisResult analysisResult = parser.ParsePlan(dbResult);
-
-            await GenerateMilestones(milestoner);
-            await BindMilestones(milestoner);
+            IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
+            AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
             // ACT
             EstimatorResult jantimatorResult = estimator.GetQueryEstimation(queryFile);
@@ -68,38 +58,24 @@ namespace JantimizerSystemTests
 
         // We should expect 100% accuracte results with single joins
         [TestMethod]
-        [DataRow("../../../Cases/B_J1-G1_F0_a.json", "../../../Setups/random.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F0_b.json", "../../../Setups/random.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F1-L1.json", "../../../Setups/random.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_a.json", "../../../Setups/random.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_b.json", "../../../Setups/random.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_a.json", "random.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_b.json", "random.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F1-L1.json", "random.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_a.json", "random.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_b.json", "random.setup.posgresql.sql")]
         public async Task Random_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
-            var queryFile = new JsonQuery(File.ReadAllText(caseFileName));
-            var setupFileTest = File.ReadAllText(setupFileName);
+            var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
+            var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                new SecretsItem("postgres", "password", "localhost", 5432),
+                _secretsItme,
                 "postgres",
                 "systemtests_random");
             IDbConnector connector = new PostgreSqlConnector(properties);
-            IPlanParser parser = new PostgreSqlParser();
-            IDataGatherer dataGatherer = new PostgresDataGatherer(properties);
-            IDepthCalculator depthCalculator = new ConstantDepth(1);
-            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
-            IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
-
-            if (!await IsPostgresRunning(connector))
-                Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
-
-            await connector.CallQueryAsync(setupFileTest);
-
-            DataSet dbResult = await connector.AnalyseExplainQueryAsync(queryFile.EquivalentSQLQuery);
-            AnalysisResult analysisResult = parser.ParsePlan(dbResult);
-
-            await GenerateMilestones(milestoner);
-            await BindMilestones(milestoner);
+            IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
+            AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
             // ACT
             EstimatorResult jantimatorResult = estimator.GetQueryEstimation(queryFile);
@@ -110,38 +86,24 @@ namespace JantimizerSystemTests
 
         // We should expect 100% accuracte results with single joins
         [TestMethod]
-        [DataRow("../../../Cases/B_J1-G1_F0_a.json", "../../../Setups/clumped.possible.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F0_b.json", "../../../Setups/clumped.possible.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F1-L1.json", "../../../Setups/clumped.possible.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_a.json", "../../../Setups/clumped.possible.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_b.json", "../../../Setups/clumped.possible.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_a.json", "clumped.possible.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_b.json", "clumped.possible.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F1-L1.json", "clumped.possible.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_a.json", "clumped.possible.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_b.json", "clumped.possible.setup.posgresql.sql")]
         public async Task Clumped_Possible_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
-            var queryFile = new JsonQuery(File.ReadAllText(caseFileName));
-            var setupFileTest = File.ReadAllText(setupFileName);
+            var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
+            var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                new SecretsItem("postgres", "password", "localhost", 5432),
+                _secretsItme,
                 "postgres",
                 "systemtests_clumped_possible");
             IDbConnector connector = new PostgreSqlConnector(properties);
-            IPlanParser parser = new PostgreSqlParser();
-            IDataGatherer dataGatherer = new PostgresDataGatherer(properties);
-            IDepthCalculator depthCalculator = new ConstantDepth(1);
-            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
-            IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
-
-            if (!await IsPostgresRunning(connector))
-                Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
-
-            await connector.CallQueryAsync(setupFileTest);
-
-            DataSet dbResult = await connector.AnalyseExplainQueryAsync(queryFile.EquivalentSQLQuery);
-            AnalysisResult analysisResult = parser.ParsePlan(dbResult);
-
-            await GenerateMilestones(milestoner);
-            await BindMilestones(milestoner);
+            IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
+            AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
             // ACT
             EstimatorResult jantimatorResult = estimator.GetQueryEstimation(queryFile);
@@ -152,38 +114,24 @@ namespace JantimizerSystemTests
 
         // We should expect 100% accuracte results with single joins
         [TestMethod]
-        [DataRow("../../../Cases/B_J1-G1_F0_a.json", "../../../Setups/clumped.difficult.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F0_b.json", "../../../Setups/clumped.difficult.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-G1_F1-L1.json", "../../../Setups/clumped.difficult.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_a.json", "../../../Setups/clumped.difficult.setup.posgresql.sql")]
-        [DataRow("../../../Cases/B_J1-L1_F0_b.json", "../../../Setups/clumped.difficult.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_a.json", "clumped.difficult.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F0_b.json", "clumped.difficult.setup.posgresql.sql")]
+        [DataRow("B_J1-G1_F1-L1.json", "clumped.difficult.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_a.json", "clumped.difficult.setup.posgresql.sql")]
+        [DataRow("B_J1-L1_F0_b.json", "clumped.difficult.setup.posgresql.sql")]
         public async Task Clumped_Difficult_MinDepth_Constant_Tests(string caseFileName, string setupFileName)
         {
             // ARRANGE
-            var queryFile = new JsonQuery(File.ReadAllText(caseFileName));
-            var setupFileTest = File.ReadAllText(setupFileName);
+            var queryFile = new JsonQuery(File.ReadAllText($"{_casePath}{caseFileName}"));
+            var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                new SecretsItem("postgres", "password", "localhost", 5432),
+                _secretsItme,
                 "postgres",
                 "systemtests_clumped_difficult");
             IDbConnector connector = new PostgreSqlConnector(properties);
-            IPlanParser parser = new PostgreSqlParser();
-            IDataGatherer dataGatherer = new PostgresDataGatherer(properties);
-            IDepthCalculator depthCalculator = new ConstantDepth(1);
-            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
-            IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
-
-            if (!await IsPostgresRunning(connector))
-                Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
-
-            await connector.CallQueryAsync(setupFileTest);
-
-            DataSet dbResult = await connector.AnalyseExplainQueryAsync(queryFile.EquivalentSQLQuery);
-            AnalysisResult analysisResult = parser.ParsePlan(dbResult);
-
-            await GenerateMilestones(milestoner);
-            await BindMilestones(milestoner);
+            IQueryEstimator<JsonQuery> estimator = await GetEstimator(connector, setupFileText);
+            AnalysisResult analysisResult = await GetActualResult(connector, queryFile.EquivalentSQLQuery);
 
             // ACT
             EstimatorResult jantimatorResult = estimator.GetQueryEstimation(queryFile);
@@ -238,6 +186,34 @@ namespace JantimizerSystemTests
                 await finishedTask;
             }
         }
+
+        private async Task<IQueryEstimator<JsonQuery>> GetEstimator(IDbConnector connector, string setupFileText)
+        {
+            IDataGatherer dataGatherer = new PostgresDataGatherer(connector.ConnectionProperties);
+            IDepthCalculator depthCalculator = new ConstantDepth(1);
+            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
+            IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
+
+            if (!await IsPostgresRunning(connector))
+                Assert.Inconclusive("Postgres is not running! Ignore this if its run from github actions.");
+
+            await connector.CallQueryAsync(setupFileText);
+
+            await GenerateMilestones(milestoner);
+            await BindMilestones(milestoner);
+
+            return estimator;
+        }
+
+        private async Task<AnalysisResult> GetActualResult(IDbConnector connector, string query)
+        {
+            IPlanParser parser = new PostgreSqlParser();
+            DataSet dbResult = await connector.AnalyseExplainQueryAsync(query);
+            AnalysisResult analysisResult = parser.ParsePlan(dbResult);
+
+            return analysisResult;
+        }
+
 
         #endregion
     }
