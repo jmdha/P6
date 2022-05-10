@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Tools.Models;
 using Tools.Models.JsonModels;
+using Tools.Services;
 
 namespace JantimizerSystemTests
 {
@@ -26,7 +27,7 @@ namespace JantimizerSystemTests
     {
         private static string _casePath = "../../../Cases/";
         private static string _setupPath = "../../../Setups/";
-        private static SecretsItem _secretsItme = new SecretsItem("postgres", "password", "localhost", 5432);
+        internal static SecretsService<SystemTests> secrets = new SecretsService<SystemTests>();
 
         // We should expect 100% accuracte results with single joins
         [TestMethod]
@@ -42,7 +43,7 @@ namespace JantimizerSystemTests
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                _secretsItme,
+                secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
                 "systemtests_constant");
             IDbConnector connector = new PostgreSqlConnector(properties);
@@ -70,7 +71,7 @@ namespace JantimizerSystemTests
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                _secretsItme,
+                secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
                 "systemtests_random");
             IDbConnector connector = new PostgreSqlConnector(properties);
@@ -98,7 +99,7 @@ namespace JantimizerSystemTests
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                _secretsItme,
+                secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
                 "systemtests_clumped_possible");
             IDbConnector connector = new PostgreSqlConnector(properties);
@@ -126,7 +127,7 @@ namespace JantimizerSystemTests
             var setupFileText = File.ReadAllText($"{_setupPath}{setupFileName}");
 
             var properties = new ConnectionProperties(
-                _secretsItme,
+                secrets.GetSecretsItem("POSGRESQL"),
                 "postgres",
                 "systemtests_clumped_difficult");
             IDbConnector connector = new PostgreSqlConnector(properties);
