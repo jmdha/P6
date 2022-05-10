@@ -1,0 +1,29 @@
+﻿{
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON b.v > a.v",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "a"
+              },
+              "Attribute": "v"
+            }
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}
