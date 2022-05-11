@@ -173,7 +173,7 @@ namespace JantimizerSystemTests
         {
             IDataGatherer dataGatherer = new PostgresDataGatherer(connector.ConnectionProperties);
             IDepthCalculator depthCalculator = new ConstantDepth(1);
-            IMilestoner milestoner = new MinDepthMilestoner(dataGatherer, depthCalculator);
+            IMilestoner milestoner = new CroppedMinDepthMilestoner(dataGatherer, depthCalculator);
             IQueryEstimator<JsonQuery> estimator = new JsonQueryEstimator(milestoner, 10);
 
             if (!(await IsPostgresRunning(connector)))

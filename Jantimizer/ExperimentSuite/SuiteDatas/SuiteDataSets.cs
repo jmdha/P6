@@ -129,7 +129,7 @@ namespace ExperimentSuite.SuiteDatas
 
         private static IMilestoner GetMilestoner_MinDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            return new MinDepthMilestoner(
+            return new CroppedMinDepthMilestoner(
                 gathere,
                 new ConstantDepth(JsonHelper.GetValue<int>(optionalTestSettings, "BucketSize"))
             );
@@ -150,7 +150,7 @@ namespace ExperimentSuite.SuiteDatas
 
         private static IMilestoner GetMilestoner_MinDepth_Square(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            return new MinDepthMilestoner(
+            return new CroppedMinDepthMilestoner(
                 gathere,
                 new SquareRootDynDepth(
                     JsonHelper.GetValue<bool>(optionalTestSettings,   "DynDepth_BasedOnUnique"),
@@ -163,7 +163,7 @@ namespace ExperimentSuite.SuiteDatas
 
         private static IMilestoner GetMilestoner_MinDepth_LogarithmicDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            return new MinDepthMilestoner(
+            return new CroppedMinDepthMilestoner(
                 gathere,
                 new LogarithmicDepth(
                     JsonHelper.GetValue<bool>(optionalTestSettings, "DynDepth_BasedOnUnique"),
@@ -175,7 +175,7 @@ namespace ExperimentSuite.SuiteDatas
 
         private static IMilestoner GetMilestoner_MinDepth_LogarithmicCount(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            return new MinDepthMilestoner(
+            return new CroppedMinDepthMilestoner(
                 gathere,
                 new LogarithmicCount(
                     JsonHelper.GetValue<bool>(optionalTestSettings, "DynDepth_BasedOnUnique"),
@@ -187,7 +187,7 @@ namespace ExperimentSuite.SuiteDatas
 
         private static IMilestoner GetMilestoner_MinDepth_LinearDepth(IDataGatherer gathere, JsonObject optionalTestSettings)
         {
-            return new MinDepthMilestoner(
+            return new CroppedMinDepthMilestoner(
                 gathere,
                 new LinearDepth(
                     JsonHelper.GetValue<bool>(optionalTestSettings,   "DynDepth_BasedOnUnique"),
