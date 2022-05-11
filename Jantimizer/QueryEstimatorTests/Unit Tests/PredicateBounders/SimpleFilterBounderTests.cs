@@ -17,25 +17,25 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         #region Bound
 
         [TestMethod]
-        [DataRow(19, 2, 5)]
-        [DataRow(20, 3, 5)]
-        [DataRow(21, 3, 5)]
+        [DataRow(18, 1, 4)]
+        [DataRow(20, 2, 4)]
+        [DataRow(21, 2, 4)]
 
-        [DataRow(9, 1, 5)]
-        [DataRow(10, 2, 5)]
-        [DataRow(11, 2, 5)]
+        [DataRow(8, 0, 4)]
+        [DataRow(10, 1, 4)]
+        [DataRow(11, 1, 4)]
 
-        [DataRow(0, 1, 5)]
-        [DataRow(1, 1, 5)]
+        [DataRow(0, 0, 4)]
+        [DataRow(1, 0, 4)]
 
-        [DataRow(49, 5, 5)]
+        [DataRow(48, 4, 4)]
         [DataRow(50, 0, -1)]
         [DataRow(51, 0, -1)]
         public void Can_Bound_More(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, null, true);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.More);
@@ -59,12 +59,12 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
 
         [DataRow(49, 0, 4)]
         [DataRow(50, 0, 4)]
-        [DataRow(51, 0, 5)]
+        [DataRow(51, 0, 4)]
         public void Can_Bound_Less(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, null, true);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Less);
@@ -75,25 +75,25 @@ namespace QueryEstimatorTests.Unit_Tests.PredicateBounders
         }
 
         [TestMethod]
-        [DataRow(19, 0, -1)]
+        [DataRow(19, 1, 1)]
         [DataRow(20, 2, 2)]
-        [DataRow(21, 0, -1)]
+        [DataRow(21, 2, 2)]
 
-        [DataRow(9, 0, -1)]
+        [DataRow(9, 0, 0)]
         [DataRow(10, 1, 1)]
-        [DataRow(11, 0, -1)]
+        [DataRow(11, 1, 1)]
 
         [DataRow(0, 0, 0)]
-        [DataRow(1, 0, -1)]
+        [DataRow(1, 0, 0)]
 
-        [DataRow(49, 0, -1)]
-        [DataRow(50, 5, 5)]
+        [DataRow(49, 4, 4)]
+        [DataRow(50, 4, 4)]
         [DataRow(51, 0, -1)]
         public void Can_Bound_Equal_1(int compareTo, int expLowerBound, int expUpperBound)
         {
             // ARRANGE
             var tableAttr = new TableAttribute("A", "v");
-            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr);
+            IPredicateBounder<IComparable> bounder = GetBaseBounder(tableAttr, null, true);
 
             // ACT
             var result = bounder.Bound(tableAttr, compareTo, ComparisonType.Type.Equal);
