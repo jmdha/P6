@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Milestoner.DepthCalculators
 {
-    public class LogDynDepth : BaseDepthCalculator, IDepthCalculator
+    public class LogarithmicDepth : BaseDepthCalculator, IDepthCalculator
     {
         public double LogBase { get; set; }
         public double Multiplier { get; set; }
 
-        public LogDynDepth(bool shouldUseUniqueValues, double logBase, double multiplier) : base (shouldUseUniqueValues)
+        public LogarithmicDepth(bool shouldUseUniqueValues, double logBase, double multiplier) : base (shouldUseUniqueValues)
         {
             LogBase = logBase;
             Multiplier = multiplier;
@@ -24,7 +24,7 @@ namespace Milestoner.DepthCalculators
 
         protected override double DepthFunction(long x)
         {
-            return LogN(x, LogBase) * Multiplier;
+            return x / LogN(x, LogBase) * Multiplier;
         }
     }
 }
