@@ -168,7 +168,8 @@ namespace ExperimentSuite.SuiteDatas
                 new LogarithmicDepth(
                     JsonHelper.GetValue<bool>(optionalTestSettings, "DynDepth_BasedOnUnique"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_LogBase"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_Multiplier")
+                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_Multiplier"),
+                    JsonHelper.GetValue<int>(optionalTestSettings, "LogDynDepth_XOffset")
                 )
             );
         }
@@ -180,7 +181,8 @@ namespace ExperimentSuite.SuiteDatas
                 new LogarithmicCount(
                     JsonHelper.GetValue<bool>(optionalTestSettings, "DynDepth_BasedOnUnique"),
                     JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_LogBase"),
-                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_Multiplier")
+                    JsonHelper.GetValue<double>(optionalTestSettings, "LogDynDepth_Multiplier"),
+                    JsonHelper.GetValue<int>(optionalTestSettings, "LogDynDepth_XOffset")
                 )
             );
         }

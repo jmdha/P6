@@ -10,11 +10,13 @@ namespace Milestoner.DepthCalculators
     {
         public double LogBase { get; set; }
         public double Multiplier { get; set; }
+        public int XOffset { get; set; }
 
-        public LogarithmicDepth(bool shouldUseUniqueValues, double logBase, double multiplier) : base (shouldUseUniqueValues)
+        public LogarithmicDepth(bool shouldUseUniqueValues, double logBase, double multiplier, int xOffset) : base (shouldUseUniqueValues)
         {
             LogBase = logBase;
             Multiplier = multiplier;
+            XOffset = xOffset;
         }
 
         private double LogN(long x, double logBase)
@@ -24,6 +26,7 @@ namespace Milestoner.DepthCalculators
 
         protected override double DepthFunction(long x)
         {
+            x += XOffset;
             return x / LogN(x, LogBase) * Multiplier;
         }
     }
