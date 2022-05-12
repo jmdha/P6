@@ -16,11 +16,11 @@ The syntetic datasets have the same table setup (See [mysql table definitions](/
 * **ConstantNumberBlocks**
   * Consisting of 4 tables with constant values in them (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ConstantNumberBlocks/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ConstantNumberBlocks/inserts.posgresql.sql) for details)
 * **ClumpedNumberBlocks_Difficult**
-  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.posgresql.sql) for details)
+  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks_Difficult/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks_Difficult/inserts.posgresql.sql) for details)
 * **ClumpedNumberBlocks_Possible**
-  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.posgresql.sql) for details)
+  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks_Possible/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks_Possible/inserts.posgresql.sql) for details)
 * **LinearNumberBlocks**
-  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_ClumpedNumberBlocks/inserts.posgresql.sql) for details)
+  * Consisting of 4 tables with sin-curve data distribution (See [mysql inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_LinearNumberBlocks/inserts.mysql.sql) and [postgres inserts](/Jantimizer/ExperimentSuite/Tests/BasicTests_LinearNumberBlocks/inserts.posgresql.sql) for details)
 
 In addition to this, there are `Large` verisons of them, with 5 times more rows in each table.
 
