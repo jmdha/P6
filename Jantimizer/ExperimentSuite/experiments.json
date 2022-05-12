@@ -107,7 +107,8 @@
         "MaxEstimatorSweeps": 10,
         "DynDepth_BasedOnUnique": true,
         "LogDynDepth_LogBase": 2,
-        "LogDynDepth_Multiplier": 10
+        "LogDynDepth_Multiplier": 10,
+        "LogDynDepth_XOffset": 3
       }
     },
     {
@@ -144,7 +145,8 @@
         "MaxEstimatorSweeps": 10,
         "DynDepth_BasedOnUnique": true,
         "LogDynDepth_LogBase": 2,
-        "LogDynDepth_Multiplier": 10
+        "LogDynDepth_Multiplier": 10,
+        "LogDynDepth_XOffset": 3
       }
     },
     {
