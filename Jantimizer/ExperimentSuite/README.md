@@ -34,23 +34,16 @@ The general structure of this file is:
       "ExperimentName": "Experiment One",
       "RunParallel": false,
       "RunExperiment": true,
-      "PreRunData": [
-        {
-          "ConnectorName": "POSGRESQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            ...
-          ]
-        }
+      "MilestoneType": "MinDepth",
+      "ConnectorNames": [
+        "POSGRESQL",
+        "MYSQL"
       ],
-      "RunData": [
-        {
-          "ConnectorName": "MYSQL",
-          "ConnectorID": "EquiDepth",
-          "TestFiles": [
-            ...
-          ]
-        }
+      "SetupFiles": [
+        ...
+      ],
+      "TestFiles": [
+        ...
       ],
       "OptionalTestSettings": {
       }

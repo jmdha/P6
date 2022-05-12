@@ -38,7 +38,7 @@ Where each bool indicate what should be run in that order.
 * `DoAnalyse`: Run the `analyse.sql` file
 * `DoPostCleanup`: Run the `cleanuo.sql` file after test runs
 * `DoMakeHistograms`: If the system is to make histograms of what is in the database
-* `DoRunTests`: Run the all the `.sql` files in the `Cases/` subfolder
+* `DoRunTests`: Run the all the `.json` files in the `Cases/` subfolder
 * `DoMakeReport`: Make a report of the results in the end, and save it to a `.csv` file
 * `DoMakeTimeReport`: Make a report of the execution time of each case in the end, and save it to a `.csv` file
 
@@ -48,14 +48,102 @@ As well as some additional connection properties, that should match up with what
 
 ## `Cases/`
 The folder called `Cases/` contains all the test cases to run in this test.
-This is in `.sql` format as a `SELECT` query.
-An example could be:
+This is in a `.json` format with the following syntax:
+```json
+{
+  "EquivalentSQLQuery": "SELECT * ...",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            ...
+          },
+          "RightAttribute": {
+            ...
+          },
+          "ComType": ">"
+        },
+        ...
+      ]
+    }
+  ]
+}
 
-```sql
-SELECT C.code FROM 
-	(world_happiness_2022 AS H1 JOIN world_happiness_2022 AS H2 ON 
-	 	H1.country = 'Denmark' AND 
-	 	H1.happiness_score > H2.happiness_score)
-	JOIN
-	countries AS C ON C.name = H2.country;
+```
+Where the predicates can either be a Filter predicate or a TableAttribute predicate.
+Table attribute predicates would look like:
+```json
+{
+    "LeftAttribute": {
+        "Attribute": {
+            "Table": {
+                "TableName": "a"
+            },
+            "Attribute": "v"
+        }
+    },
+    "RightAttribute": {
+        "Attribute": {
+            "Table": {
+                "TableName": "b"
+            },
+            "Attribute": "v"
+        }
+    },
+    "ComType": ">"
+},
+```
+While a Filter predicate could look like:
+```json
+{
+    "LeftAttribute": {
+        "Attribute": {
+            "Table": {
+                "TableName": "a"
+            },
+            "Attribute": "v"
+        }
+    },
+    "RightAttribute": {
+        "ConstantValue": "50"
+    },
+    "ComType": ">"
+},
+```
+
+An example could be.
+```json
+{
+  "EquivalentSQLQuery": "SELECT * FROM a JOIN b ON a.v > b.v",
+  "DoRun": true,
+  "JoinNodes": [
+    {
+      "Predicates": [
+        {
+          "LeftAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "a"
+              },
+              "Attribute": "v"
+            }
+          },
+          "RightAttribute": {
+            "Attribute": {
+              "Table": {
+                "TableName": "b"
+              },
+              "Attribute": "v"
+            }
+          },
+          "ComType": ">"
+        }
+      ]
+    }
+  ]
+}
+
+
 ```
