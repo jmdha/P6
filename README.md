@@ -2,7 +2,7 @@
 This is a project about creating better cardinality estimates for Join Queries with inequality predicates.
 Todays systems are not geared towards giving good cardinality estimates for these queries, which is something this project aims to do something about.
 
-![maingif](https://user-images.githubusercontent.com/22596587/165292165-4e6fa380-a2a5-400d-ae0a-9e88ba139d3e.gif)
+![ezgif-2-c037fe5652](https://user-images.githubusercontent.com/22596587/168040218-78df703b-a2b3-4f91-bece-fd86420f6ae4.gif)
 
 The program itself consists of a WPF interface written in C#.
 The program is capable of taking a set of queries in a json format, see what a given database system would estimate the cardinality of said query and then give a new estimate from our estimator.

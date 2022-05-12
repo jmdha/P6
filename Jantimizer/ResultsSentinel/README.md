@@ -4,12 +4,8 @@ These consists of a list that saves results. This is saved as a combination of `
 Next time those 3 parameters are the same for a result, its `GetHashCode()` is compared with the `GetHashCode()` from the saved one.
 If the two are not the same, it is put in a log with some printing of the differences.
 
-All in all there are 4 sentinels.
-* **Used Histogram Sentinel**
-  * Checks if two tests used the same histograms.
-* **Optimiser Result Sentinel**
-  * Checks if the optimiser gave the same results.
+All in all there are 2 sentinels.
+* **Estimator Result Sentinel**
+  * Checks if the estimator gave the same results.
 * **Query Plan Parser Result Sentinel**
   * Checks if the parsed query plan is the same as before.
-* **Query Parser Result Sentinel**
-  * Checks if the parsed node tree is the same as before.
