@@ -1,4 +1,4 @@
-# JANtimator: Join Analysis of iNequality Estimator
+# JANTIMATOR: Join Analysis of iNequality esTIMATOR
 This is a project about creating better cardinality estimates for Join Queries with inequality predicates.
 Todays systems are not geared towards giving good cardinality estimates for these queries, which is something this project aims to do something about.
 
