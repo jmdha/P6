@@ -23,9 +23,9 @@ namespace ExperimentSuite.Models
         public bool IsBetter { get; }
         public bool OverEstimated { get; }
         public bool UnderEstimated { get; }
-        public ulong AbstractStorageUsageBytes { get; }
-        public ulong AbstractDatabaseSizeBytes { get; }
-        public decimal AbstractStorageUsagePercent { get; }
+        public ulong AbstractStorageUsageBytes { get; set; }
+        public ulong AbstractDatabaseSizeBytes { get; set; }
+        public decimal AbstractStorageUsagePercent { get; set; }
         internal EstimatorResult? EstimatorResult;
 
         public TestReport()
