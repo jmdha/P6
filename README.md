@@ -29,8 +29,8 @@ The real datasets are:
   * Consisting of one large table with a lot of data from a census.
 * [**COVID-19 Funding**](https://data.world/hdx/e24de323-ed64-4c33-8eda-dace55d107b9) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/COVID_Funding_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/COVID_Funding_Setup/setup.posgresql.sql) for table definitions)
   * Two tables with data regarding organisational funding for COVID-19
-* [**World happiness 2022**](https://www.kaggle.com/datasets/mathurinache/world-happiness-report-2022) with [GDP data](https://data.worldbank.org/indicator/Ny.Gdp.Mktp.Cd) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.posgresql.sql) for table definitions)
-  * Consisting 3 Tables one with large one with survey data, one with countries and one yearly GDP
+* [**World happiness 2022**](https://www.kaggle.com/datasets/mathurinache/world-happiness-report-2022) (See [mysql setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.mysql.sql) and [postgres setup](/Jantimizer/ExperimentSuite/Tests/WorldHappiness_With_GDP_Setup/setup.posgresql.sql) for table definitions)
+  * Consisting 1 table one with survey data
 
 ## Setup
 You need to setup the two database systems (or alternatively disable one them in the [`experiments.json` file](/Jantimizer/ExperimentSuite/experiments.json)).
